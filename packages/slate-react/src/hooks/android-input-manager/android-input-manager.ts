@@ -123,7 +123,35 @@ export function createAndroidInputManager({
     action.run()
   }
 
+  // Helper: Check if cursor is at the first character of an empty line
+  const isAtEmptyLineFirstChar = (): boolean => {
+    const { selection, children } = editor
+    if (!selection) return false
+    
+    const { anchor } = selection
+    // offset should be 0 or 1 (first char)
+    if (anchor.offset > 1) return false
+    
+    // Get the block node at current path
+    const blockPath = anchor.path.slice(0, 1) // Get top-level path
+    const blockNode = children[blockPath[0]]
+    if (!blockNode) return true
+    
+    // Check if this line/block is empty or has only one character
+    const text = Node.string(blockNode)
+    return text.length <= 1
+  }
+
   const flush = () => {
+    // FIX: Only skip flush during composition for empty line first char scenario.
+    // Android handwriting input triggers childList mutations when writing the first
+    // character of an empty line. These mutations get restored by RestoreDOM, which
+    // interrupts the IME composition and causes premature commits.
+    // See: https://github.com/ianstormtaylor/slate/issues/5979
+    if (IS_COMPOSING.get(editor) && isAtEmptyLineFirstChar()) {
+      return
+    }
+
     if (flushTimeoutId) {
       clearTimeout(flushTimeoutId)
       flushTimeoutId = null
