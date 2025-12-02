@@ -274,6 +274,7 @@ export interface EditorPathOptions {
 
 export interface EditorPathRefOptions {
   affinity?: TextDirection | null
+  onChange?: () => void
 }
 
 export interface EditorPointOptions {
@@ -282,6 +283,7 @@ export interface EditorPointOptions {
 
 export interface EditorPointRefOptions {
   affinity?: TextDirection | null
+  onChange?: () => void
 }
 
 export interface EditorPositionsOptions {
@@ -300,6 +302,7 @@ export interface EditorPreviousOptions<T extends Node> {
 
 export interface EditorRangeRefOptions {
   affinity?: RangeDirection | null
+  onChange?: () => void
 }
 
 export interface EditorStringOptions {
