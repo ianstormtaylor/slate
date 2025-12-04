@@ -329,12 +329,12 @@ export const Node: NodeInterface = {
   },
 
   extractProps(node: Node): NodeProps {
-    if (Element.isAncestor(node)) {
-      const { children, ...properties } = node
+    if (Text.isTextNode(node)) {
+      const { text, ...properties } = node
 
       return properties
     } else {
-      const { text, ...properties } = node
+      const { children, ...properties } = node
 
       return properties
     }

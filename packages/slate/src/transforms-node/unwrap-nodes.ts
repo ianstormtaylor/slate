@@ -5,6 +5,7 @@ import { matchPath } from '../utils/match-path'
 import { Element } from '../interfaces/element'
 import { Range } from '../interfaces/range'
 import { Transforms } from '../interfaces/transforms'
+import { Text } from '../interfaces'
 
 export const unwrapNodes: NodeTransforms['unwrapNodes'] = (
   editor,
@@ -49,7 +50,7 @@ export const unwrapNodes: NodeTransforms['unwrapNodes'] = (
 
       Transforms.liftNodes(editor, {
         at: range,
-        match: n => Element.isAncestor(node) && node.children.includes(n),
+        match: n => !Text.isTextNode(node) && node.children.includes(n),
         voids,
       })
     }

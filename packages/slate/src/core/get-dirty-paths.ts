@@ -22,7 +22,7 @@ export const getDirtyPaths: WithEditorFirstArg<Editor['getDirtyPaths']> = (
     case 'insert_node': {
       const { node, path } = op
       const levels = Path.levels(path)
-      const descendants = Text.isText(node)
+      const descendants = Text.isTextNode(node)
         ? []
         : Array.from(Node.nodes(node), ([, p]) => path.concat(p))
 
