@@ -9,8 +9,8 @@ export const shouldMergeNodesRemovePrevNode: EditorInterface['shouldMergeNodesRe
     // if prevNode is first child in parent,don't remove it.
 
     return (
-      (Element.isElement(prevNode) && Editor.isEmpty(editor, prevNode)) ||
-      (Text.isText(prevNode) &&
+      (Element.isElementNode(prevNode) && Editor.isEmpty(editor, prevNode)) ||
+      (Text.isTextNode(prevNode) &&
         prevNode.text === '' &&
         prevPath[prevPath.length - 1] !== 0)
     )

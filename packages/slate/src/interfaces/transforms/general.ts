@@ -161,9 +161,12 @@ export const GeneralTransforms: GeneralTransforms = {
           const prev = children[prevIndex]
           let newNode: Descendant
 
-          if (Text.isText(node) && Text.isText(prev)) {
+          if (Text.isTextNode(node) && Text.isTextNode(prev)) {
             newNode = { ...prev, text: prev.text + node.text }
-          } else if (!Text.isText(node) && !Text.isText(prev)) {
+          } else if (
+            Element.isElementNode(node) &&
+            Element.isElementNode(prev)
+          ) {
             newNode = { ...prev, children: prev.children.concat(node.children) }
           } else {
             throw new Error(
@@ -387,7 +390,7 @@ export const GeneralTransforms: GeneralTransforms = {
           let newNode: Descendant
           let nextNode: Descendant
 
-          if (Text.isText(node)) {
+          if (Text.isTextNode(node)) {
             const before = node.text.slice(0, position)
             const after = node.text.slice(position)
             newNode = {

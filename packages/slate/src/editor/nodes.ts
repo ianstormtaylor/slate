@@ -46,7 +46,7 @@ export function* nodes<T extends Node>(
     to,
     pass: ([node, path]) => {
       if (pass && pass([node, path])) return true
-      if (!Element.isElement(node)) return false
+      if (!Element.isElementNode(node)) return false
       if (
         !voids &&
         (Editor.isVoid(editor, node) || Editor.isElementReadOnly(editor, node))
@@ -72,7 +72,7 @@ export function* nodes<T extends Node>(
       // If we've arrived at a leaf text node that is not lower than the last
       // hit, then we've found a branch that doesn't include a match, which
       // means the match is not universal.
-      if (universal && !isLower && Text.isText(node)) {
+      if (universal && !isLower && Text.isTextNode(node)) {
         return
       } else {
         continue

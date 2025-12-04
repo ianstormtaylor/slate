@@ -17,7 +17,7 @@ export const liftNodes: NodeTransforms['liftNodes'] = (
     if (match == null) {
       match = Path.isPath(at)
         ? matchPath(editor, at)
-        : n => Element.isElement(n) && Editor.isBlock(editor, n)
+        : n => Element.isElementNode(n) && Editor.isBlock(editor, n)
     }
 
     if (!at) {

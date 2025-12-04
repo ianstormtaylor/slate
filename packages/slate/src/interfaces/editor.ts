@@ -28,6 +28,7 @@ import {
 } from '../types/types'
 import { OmitFirstArg } from '../utils/types'
 import { isEditor } from '../editor/is-editor'
+import { isEditorNode } from '../editor/is-editor-node'
 import {
   TextInsertFragmentOptions,
   TextInsertTextOptions,
@@ -480,6 +481,11 @@ export interface EditorInterface {
   isEditor: (value: any, options?: EditorIsEditorOptions) => value is Editor
 
   /**
+   * Check if a node is an `Editor` object.
+   */
+  isEditorNode: (node: Node) => node is Editor
+
+  /**
    * Check if a value is a read-only `Element` object.
    */
   isElementReadOnly: (editor: Editor, element: Element) => boolean
@@ -831,6 +837,8 @@ export const Editor: EditorInterface = {
   isEditor(value: any): value is Editor {
     return isEditor(value)
   },
+
+  isEditorNode,
 
   isElementReadOnly(editor, element) {
     return editor.isElementReadOnly(element)

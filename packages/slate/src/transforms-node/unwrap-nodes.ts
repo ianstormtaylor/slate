@@ -21,7 +21,7 @@ export const unwrapNodes: NodeTransforms['unwrapNodes'] = (
     if (match == null) {
       match = Path.isPath(at)
         ? matchPath(editor, at)
-        : n => Element.isElement(n) && Editor.isBlock(editor, n)
+        : n => Element.isElementNode(n) && Editor.isBlock(editor, n)
     }
 
     if (Path.isPath(at)) {

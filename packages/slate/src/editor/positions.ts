@@ -77,7 +77,7 @@ export function* positions(
     /*
      * ELEMENT NODE - Yield position(s) for voids, collect blockText for blocks
      */
-    if (Element.isElement(node)) {
+    if (Element.isElementNode(node)) {
       if (!editor.isSelectable(node)) {
         /**
          * If the node is not selectable, skip it and its descendants
@@ -139,7 +139,7 @@ export function* positions(
      * TEXT LEAF NODE - Iterate through text content, yielding
      * positions every `distance` offset according to `unit`.
      */
-    if (Text.isText(node)) {
+    if (Text.isTextNode(node)) {
       const isFirst = Path.equals(path, first.path)
 
       // Proof that we always exhaust text nodes before encountering a new one:

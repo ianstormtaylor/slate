@@ -63,12 +63,12 @@ export const deleteText: TextTransforms['delete'] = (editor, options = {}) => {
 
     let [start, end] = Range.edges(at)
     const startBlock = Editor.above(editor, {
-      match: n => Element.isElement(n) && Editor.isBlock(editor, n),
+      match: n => Element.isElementNode(n) && Editor.isBlock(editor, n),
       at: start,
       voids,
     })
     const endBlock = Editor.above(editor, {
-      match: n => Element.isElement(n) && Editor.isBlock(editor, n),
+      match: n => Element.isElementNode(n) && Editor.isBlock(editor, n),
       at: end,
       voids,
     })
@@ -115,7 +115,7 @@ export const deleteText: TextTransforms['delete'] = (editor, options = {}) => {
 
       if (
         (!voids &&
-          Element.isElement(node) &&
+          Element.isElementNode(node) &&
           (Editor.isVoid(editor, node) ||
             Editor.isElementReadOnly(editor, node))) ||
         (!Path.isCommon(path, start.path) && !Path.isCommon(path, end.path))

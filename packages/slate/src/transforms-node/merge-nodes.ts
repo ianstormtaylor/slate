@@ -9,20 +9,13 @@ import { Scrubber } from '../interfaces/scrubber'
 import { Node } from '../interfaces/node'
 
 const hasSingleChildNest = (editor: Editor, node: Node): boolean => {
-  if (Element.isElement(node)) {
-    const element = node as Element
-    if (Editor.isVoid(editor, node)) {
-      return true
-    } else if (element.children.length === 1) {
-      return hasSingleChildNest(editor, element.children[0])
-    } else {
-      return false
-    }
-  } else if (Editor.isEditor(node)) {
-    return false
-  } else {
-    return true
-  }
+  return (
+    node !== editor &&
+    (Text.isTextNode(node) ||
+      Editor.isVoid(editor, node) ||
+      (node.children.length === 1 &&
+        hasSingleChildNest(editor, node.children[0])))
+  )
 }
 
 export const mergeNodes: NodeTransforms['mergeNodes'] = (
@@ -42,7 +35,7 @@ export const mergeNodes: NodeTransforms['mergeNodes'] = (
         const [parent] = Editor.parent(editor, at)
         match = n => parent.children.includes(n)
       } else {
-        match = n => Element.isElement(n) && Editor.isBlock(editor, n)
+        match = n => Element.isElementNode(n) && Editor.isBlock(editor, n)
       }
     }
 
@@ -100,11 +93,11 @@ export const mergeNodes: NodeTransforms['mergeNodes'] = (
 
     // Ensure that the nodes are equivalent, and figure out what the position
     // and extra properties of the merge will be.
-    if (Text.isText(node) && Text.isText(prevNode)) {
+    if (Text.isTextNode(node) && Text.isTextNode(prevNode)) {
       const { text, ...rest } = node
       position = prevNode.text.length
       properties = rest as Partial<Text>
-    } else if (Element.isElement(node) && Element.isElement(prevNode)) {
+    } else if (Element.isElementNode(node) && Element.isElementNode(prevNode)) {
       const { children, ...rest } = node
       position = prevNode.children.length
       properties = rest as Partial<Element>
