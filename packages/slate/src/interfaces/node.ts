@@ -1,6 +1,6 @@
-import { produce } from 'immer'
 import { Editor, Path, Range, Scrubber, Text } from '..'
 import { Element, ElementEntry } from './element'
+import { modifyChildren, modifyLeaf, removeChildren } from '../utils/modify'
 
 /**
  * The `Node` union type represents all of the different types of nodes that
@@ -357,35 +357,37 @@ export const Node: NodeInterface = {
   },
 
   fragment<T extends Ancestor = Editor>(root: T, range: Range): T['children'] {
-    const newRoot = produce({ children: root.children }, r => {
-      const [start, end] = Range.edges(range)
-      const nodeEntries = Node.nodes(r, {
-        reverse: true,
-        pass: ([, path]) => !Range.includes(range, path),
-      })
+    const newRoot = { children: root.children }
 
-      for (const [, path] of nodeEntries) {
-        if (!Range.includes(range, path)) {
-          const parent = Node.parent(r, path)
-          const index = path[path.length - 1]
-          parent.children.splice(index, 1)
-        }
-
-        if (Path.equals(path, end.path)) {
-          const leaf = Node.leaf(r, path)
-          leaf.text = leaf.text.slice(0, end.offset)
-        }
-
-        if (Path.equals(path, start.path)) {
-          const leaf = Node.leaf(r, path)
-          leaf.text = leaf.text.slice(start.offset)
-        }
-      }
-
-      if (Editor.isEditor(r)) {
-        r.selection = null
-      }
+    const [start, end] = Range.edges(range)
+    const nodeEntries = Node.nodes(newRoot, {
+      reverse: true,
+      pass: ([, path]) => !Range.includes(range, path),
     })
+
+    for (const [, path] of nodeEntries) {
+      if (!Range.includes(range, path)) {
+        const index = path[path.length - 1]
+
+        modifyChildren(newRoot, Path.parent(path), children =>
+          removeChildren(children, index, 1)
+        )
+      }
+
+      if (Path.equals(path, end.path)) {
+        modifyLeaf(newRoot, path, node => {
+          const before = node.text.slice(0, end.offset)
+          return { ...node, text: before }
+        })
+      }
+
+      if (Path.equals(path, start.path)) {
+        modifyLeaf(newRoot, path, node => {
+          const before = node.text.slice(start.offset)
+          return { ...node, text: before }
+        })
+      }
+    }
 
     return newRoot.children
   },

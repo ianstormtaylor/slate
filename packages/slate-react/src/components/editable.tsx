@@ -35,6 +35,7 @@ import { useTrackUserInput } from '../hooks/use-track-user-input'
 import { ReactEditor } from '../plugin/react-editor'
 import { TRIPLE_CLICK } from 'slate-dom'
 import {
+  containsShadowAware,
   DOMElement,
   DOMRange,
   DOMText,
@@ -404,8 +405,8 @@ export const Editable = forwardRef(
         const editorElement = EDITOR_TO_ELEMENT.get(editor)!
         let hasDomSelectionInEditor = false
         if (
-          editorElement.contains(anchorNode) &&
-          editorElement.contains(focusNode)
+          containsShadowAware(editorElement, anchorNode) &&
+          containsShadowAware(editorElement, focusNode)
         ) {
           hasDomSelectionInEditor = true
         }
@@ -692,18 +693,8 @@ export const Editable = forwardRef(
                 exactMatch: false,
                 suppressThrow: false,
               })
-              const flippedRange = {
-                anchor: range.focus,
-                focus: range.anchor,
-              }
 
-              if (
-                !selection ||
-                !(
-                  Range.equals(selection, range) ||
-                  Range.equals(selection, flippedRange)
-                )
-              ) {
+              if (!selection || !Range.equals(selection, range)) {
                 native = false
 
                 const selectionRef =
@@ -1951,18 +1942,17 @@ export const defaultScrollSelectionIntoView = (
   editor: ReactEditor,
   domRange: DOMRange
 ) => {
-  // This was affecting the selection of multiple blocks and dragging behavior,
-  // so enabled only if the selection has been collapsed.
-  if (
-    domRange.getBoundingClientRect &&
-    (!editor.selection ||
-      (editor.selection && Range.isCollapsed(editor.selection)))
-  ) {
-    const leafEl = domRange.startContainer.parentElement!
+  // Scroll to the focus point of the selection, in case the selection is expanded
+  const isBackward = !!editor.selection && Range.isBackward(editor.selection)
+  const domFocusPoint = domRange.cloneRange()
+  domFocusPoint.collapse(isBackward)
 
-    // COMPAT: In Chrome, domRange.getBoundingClientRect() can return zero dimensions for valid ranges (e.g. line breaks).
+  if (domFocusPoint.getBoundingClientRect) {
+    const leafEl = domFocusPoint.startContainer.parentElement!
+
+    // COMPAT: In Chrome, domFocusPoint.getBoundingClientRect() can return zero dimensions for valid ranges (e.g. line breaks).
     // When this happens, do not scroll like most editors do.
-    const domRect = domRange.getBoundingClientRect()
+    const domRect = domFocusPoint.getBoundingClientRect()
     const isZeroDimensionRect =
       domRect.width === 0 &&
       domRect.height === 0 &&
@@ -1978,8 +1968,9 @@ export const defaultScrollSelectionIntoView = (
       }
     }
 
-    // Default behavior: use domRange's getBoundingClientRect
-    leafEl.getBoundingClientRect = domRange.getBoundingClientRect.bind(domRange)
+    // Default behavior: use domFocusPoint's getBoundingClientRect
+    leafEl.getBoundingClientRect =
+      domFocusPoint.getBoundingClientRect.bind(domFocusPoint)
     scrollIntoView(leafEl, {
       scrollMode: 'if-needed',
     })

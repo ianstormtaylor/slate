@@ -1,0 +1,17 @@
+services:
+  test-runner:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ../..:/app:ro
+      - ../../test-results:/app/test-results:rw
+    environment:
+      - CI=true
+      - PLAYWRIGHT_BASE_URL=http://host.docker.internal:3000
+      - NODE_PATH=/usr/local/lib/node_modules
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+      - "localhost:host-gateway"
+    stdin_open: false
+    tty: false

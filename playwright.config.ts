@@ -23,6 +23,12 @@ const projects = [
       ...devices['Desktop Firefox'],
     },
   },
+  {
+    name: 'mobile',
+    use: {
+      ...devices['Pixel 5'],
+    },
+  },
 ]
 
 if (os.type() === 'Darwin') {
@@ -74,7 +80,8 @@ const config: PlaywrightTestConfig = {
     /* Maximum time each action such as `click()` can take. Defaults to 0 (no limit). */
     actionTimeout: 0,
     /* Base URL to use in actions like `await page.goto('/')`. */
-    // baseURL: 'http://localhost:3000',
+    // Can be overridden with PLAYWRIGHT_BASE_URL env var (used by Docker tests)
+    baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3000',
 
     /* Collect trace if the first attempt fails. See https://playwright.dev/docs/trace-viewer */
     trace: 'retain-on-first-failure',
