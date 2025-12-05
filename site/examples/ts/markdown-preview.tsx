@@ -19,7 +19,7 @@ const MarkdownPreviewExample = () => {
   const decorate = useCallback(([node, path]: NodeEntry) => {
     const ranges: Range[] = []
 
-    if (!Text.isText(node)) {
+    if (!Text.isTextNode(node)) {
       return ranges
     }
 

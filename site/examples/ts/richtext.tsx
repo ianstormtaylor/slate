@@ -97,8 +97,7 @@ const toggleBlock = (editor: CustomEditor, format: CustomElementFormat) => {
 
   Transforms.unwrapNodes(editor, {
     match: n =>
-      !Editor.isEditor(n) &&
-      SlateElement.isElement(n) &&
+      SlateElement.isElementNode(n) &&
       isListType(n.type) &&
       !isAlignType(format),
     split: true,
@@ -143,7 +142,7 @@ const isBlockActive = (
     Editor.nodes(editor, {
       at: Editor.unhangRange(editor, selection),
       match: n => {
-        if (!Editor.isEditor(n) && SlateElement.isElement(n)) {
+        if (SlateElement.isElementNode(n)) {
           if (blockType === 'align' && isAlignElement(n)) {
             return n.align === format
           }
