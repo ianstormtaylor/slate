@@ -71,14 +71,16 @@ export const wrapNodes: NodeTransforms['wrapNodes'] = (
       }
     }
 
-    const roots = editor.isInline(element)
-      ? Editor.nodes(editor, {
-          at,
-          match: n => Element.isElementNode(n) && Editor.isBlock(editor, n),
-          mode: 'lowest',
-          voids,
-        })
-      : [[editor, []] as NodeEntry]
+    const roots = Array.from(
+      Editor.nodes(editor, {
+        at,
+        match: editor.isInline(element)
+          ? n => Element.isElementNode(n) && Editor.isBlock(editor, n)
+          : n => Editor.isEditorNode(n),
+        mode: 'lowest',
+        voids,
+      })
+    )
 
     for (const [, rootPath] of roots) {
       const a = Range.isRange(at)
