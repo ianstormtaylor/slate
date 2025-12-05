@@ -67,8 +67,7 @@ const toggleBlock = (editor, format) => {
   const isList = isListType(format)
   Transforms.unwrapNodes(editor, {
     match: n =>
-      !Editor.isEditor(n) &&
-      SlateElement.isElement(n) &&
+      SlateElement.isElementNode(n) &&
       isListType(n.type) &&
       !isAlignType(format),
     split: true,
@@ -104,7 +103,7 @@ const isBlockActive = (editor, format, blockType = 'type') => {
     Editor.nodes(editor, {
       at: Editor.unhangRange(editor, selection),
       match: n => {
-        if (!Editor.isEditor(n) && SlateElement.isElement(n)) {
+        if (SlateElement.isElementNode(n)) {
           if (blockType === 'align' && isAlignElement(n)) {
             return n.align === format
           }
@@ -194,10 +193,9 @@ const BlockButton = ({ format, icon }) => {
         format,
         isAlignType(format) ? 'align' : 'type'
       )}
-      onMouseDown={event => {
-        event.preventDefault()
-        toggleBlock(editor, format)
-      }}
+      onPointerDown={event => event.preventDefault()}
+      onClick={() => toggleBlock(editor, format)}
+      data-test-id={`block-button-${format}`}
     >
       <Icon>{icon}</Icon>
     </Button>
@@ -208,10 +206,8 @@ const MarkButton = ({ format, icon }) => {
   return (
     <Button
       active={isMarkActive(editor, format)}
-      onMouseDown={event => {
-        event.preventDefault()
-        toggleMark(editor, format)
-      }}
+      onPointerDown={event => event.preventDefault()}
+      onClick={() => toggleMark(editor, format)}
     >
       <Icon>{icon}</Icon>
     </Button>

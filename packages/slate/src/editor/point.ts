@@ -20,7 +20,7 @@ export const point: EditorInterface['point'] = (editor, at, options = {}) => {
 
     const node = Node.get(editor, path)
 
-    if (!Text.isText(node)) {
+    if (!Text.isTextNode(node)) {
       throw new Error(
         `Cannot get the ${edge} point in the node at path [${at}] because it has no ${edge} text node.`
       )

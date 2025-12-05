@@ -128,14 +128,14 @@ const CodeBlockButton = () => {
       editor,
       { type: CodeBlockType, language: 'html', children: [] },
       {
-        match: n => Element.isElement(n) && n.type === ParagraphType,
+        match: n => Element.isElementNode(n) && n.type === ParagraphType,
         split: true,
       }
     )
     Transforms.setNodes(
       editor,
       { type: CodeLineType },
-      { match: n => Element.isElement(n) && n.type === ParagraphType }
+      { match: n => Element.isElementNode(n) && n.type === ParagraphType }
     )
   }
 
@@ -166,7 +166,7 @@ const renderLeaf = (props: RenderLeafProps) => {
 
 const useDecorate = () => {
   return useCallback(([node, path]: NodeEntry) => {
-    if (Element.isElement(node) && node.type === CodeBlockType) {
+    if (Element.isElementNode(node) && node.type === CodeBlockType) {
       return decorateCodeBlock([node, path])
     }
 

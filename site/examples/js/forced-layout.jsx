@@ -34,7 +34,7 @@ const withLayout = editor => {
         let type
         const slateIndex = childPath[0]
         const enforceType = type => {
-          if (SlateElement.isElement(child) && child.type !== type) {
+          if (SlateElement.isElementNode(child) && child.type !== type) {
             const newProperties = { type }
             Transforms.setNodes(editor, newProperties, {
               at: childPath,

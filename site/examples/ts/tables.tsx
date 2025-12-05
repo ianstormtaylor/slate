@@ -46,10 +46,7 @@ const withTables = (editor: CustomEditor) => {
 
     if (selection && Range.isCollapsed(selection)) {
       const [cell] = Editor.nodes(editor, {
-        match: n =>
-          !Editor.isEditor(n) &&
-          SlateElement.isElement(n) &&
-          n.type === 'table-cell',
+        match: n => SlateElement.isElementNode(n) && n.type === 'table-cell',
       })
 
       if (cell) {
@@ -70,10 +67,7 @@ const withTables = (editor: CustomEditor) => {
 
     if (selection && Range.isCollapsed(selection)) {
       const [cell] = Editor.nodes(editor, {
-        match: n =>
-          !Editor.isEditor(n) &&
-          SlateElement.isElement(n) &&
-          n.type === 'table-cell',
+        match: n => SlateElement.isElementNode(n) && n.type === 'table-cell',
       })
 
       if (cell) {
@@ -94,10 +88,7 @@ const withTables = (editor: CustomEditor) => {
 
     if (selection) {
       const [table] = Editor.nodes(editor, {
-        match: n =>
-          !Editor.isEditor(n) &&
-          SlateElement.isElement(n) &&
-          n.type === 'table',
+        match: n => SlateElement.isElementNode(n) && n.type === 'table',
       })
 
       if (table) {

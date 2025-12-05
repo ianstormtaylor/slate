@@ -64,12 +64,12 @@ export const insertNodes: NodeTransforms['insertNodes'] = (
 
     if (Point.isPoint(at)) {
       if (match == null) {
-        if (Text.isText(node)) {
-          match = n => Text.isText(n)
+        if (Text.isTextNode(node)) {
+          match = n => Text.isTextNode(n)
         } else if (editor.isInline(node)) {
-          match = n => Text.isText(n) || Editor.isInline(editor, n)
+          match = n => Text.isTextNode(n) || Editor.isInline(editor, n)
         } else {
-          match = n => Element.isElement(n) && Editor.isBlock(editor, n)
+          match = n => Element.isElementNode(n) && Editor.isBlock(editor, n)
         }
       }
 
@@ -120,7 +120,7 @@ export const insertNodes: NodeTransforms['insertNodes'] = (
             at = Path.next(at as Path)
 
             batchedOps.push(op)
-            if (Text.isText(node)) {
+            if (Text.isTextNode(node)) {
               newDirtyPaths.push(path)
             } else {
               newDirtyPaths.push(

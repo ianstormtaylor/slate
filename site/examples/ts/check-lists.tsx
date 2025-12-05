@@ -101,9 +101,7 @@ const withChecklists = (editor: CustomEditor) => {
     if (selection && Range.isCollapsed(selection)) {
       const [match] = Editor.nodes(editor, {
         match: n =>
-          !Editor.isEditor(n) &&
-          SlateElement.isElement(n) &&
-          n.type === 'check-list-item',
+          SlateElement.isElementNode(n) && n.type === 'check-list-item',
       })
 
       if (match) {
@@ -116,9 +114,7 @@ const withChecklists = (editor: CustomEditor) => {
           }
           Transforms.setNodes(editor, newProperties, {
             match: n =>
-              !Editor.isEditor(n) &&
-              SlateElement.isElement(n) &&
-              n.type === 'check-list-item',
+              SlateElement.isElementNode(n) && n.type === 'check-list-item',
           })
           return
         }

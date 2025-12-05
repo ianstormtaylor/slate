@@ -31,7 +31,7 @@ export const useDecorations = (
     return decorate([node, path])
   }
 
-  const equalityFn = Text.isText(node)
+  const equalityFn = Text.isTextNode(node)
     ? isTextDecorationsEqual
     : isElementDecorationsEqual
 

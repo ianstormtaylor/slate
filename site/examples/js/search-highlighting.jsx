@@ -13,7 +13,7 @@ const SearchHighlightingExample = () => {
       const ranges = []
       if (
         search &&
-        Element.isElement(node) &&
+        Element.isElementNode(node) &&
         Array.isArray(node.children) &&
         node.children.every(Text.isText)
       ) {

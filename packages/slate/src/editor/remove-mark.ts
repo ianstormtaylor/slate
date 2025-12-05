@@ -11,7 +11,7 @@ export const removeMark: EditorInterface['removeMark'] = (editor, key) => {
 
   if (selection) {
     const match = (node: Node, path: Path) => {
-      if (!Text.isText(node)) {
+      if (!Text.isTextNode(node)) {
         return false // marks can only be applied to text
       }
       const [parentNode, parentPath] = Editor.parent(editor, path)

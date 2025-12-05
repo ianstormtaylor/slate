@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker'
 import React, { useCallback, useEffect, useState } from 'react'
-import { createEditor as slateCreateEditor, Editor } from 'slate'
+import { createEditor as slateCreateEditor } from 'slate'
 import { Editable, Slate, withReact, useSelected } from 'slate-react'
 
 const SUPPORTS_EVENT_TIMING =
@@ -85,7 +85,7 @@ const initialInitialValue =
 const createEditor = config => {
   const editor = withReact(slateCreateEditor())
   editor.getChunkSize = node =>
-    config.chunking && Editor.isEditor(node) ? config.chunkSize : null
+    config.chunking && node === editor ? config.chunkSize : null
   return editor
 }
 const HugeDocumentExample = () => {

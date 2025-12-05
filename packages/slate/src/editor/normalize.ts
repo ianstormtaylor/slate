@@ -57,7 +57,7 @@ export const normalize: EditorInterface['normalize'] = (
           As long as the normalizer only inserts child nodes for this case it is safe to do in any order;
           by definition adding children to an empty node can't cause other paths to change.
         */
-        if (Element.isElement(node) && node.children.length === 0) {
+        if (Element.isElementNode(node) && node.children.length === 0) {
           editor.normalizeNode(entry, { operation })
         }
       }

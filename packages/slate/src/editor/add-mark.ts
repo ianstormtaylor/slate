@@ -11,7 +11,7 @@ export const addMark: EditorInterface['addMark'] = (editor, key, value) => {
 
   if (selection) {
     const match = (node: Node, path: Path) => {
-      if (!Text.isText(node)) {
+      if (!Text.isTextNode(node)) {
         return false // marks can only be applied to text
       }
       const [parentNode, parentPath] = Editor.parent(editor, path)
