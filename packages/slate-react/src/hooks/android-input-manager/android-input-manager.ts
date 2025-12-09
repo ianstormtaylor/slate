@@ -305,11 +305,15 @@ export function createAndroidInputManager({
 
     const userMarks = EDITOR_TO_USER_MARKS.get(editor)
     EDITOR_TO_USER_MARKS.delete(editor)
-    if (userMarks !== undefined) {
+    // Only call onChange if marks actually changed, to avoid duplicate onChange calls
+    // The apply() calls above already trigger onChange via Promise.resolve().then()
+    if (userMarks !== undefined && userMarks !== editor.marks) {
       editor.marks = userMarks
       editor.onChange()
+    } else if (userMarks !== undefined) {
+      // Just restore marks without triggering another onChange
+      editor.marks = userMarks
     }
-  }
 
   const handleCompositionEnd = (
     _event: React.CompositionEvent<HTMLDivElement>
@@ -390,6 +394,8 @@ export function createAndroidInputManager({
       }
 
       updatePlaceholderVisibility()
+      // Schedule flush after storing diff to ensure onChange is triggered
+      scheduleFlush()
       return
     }
 
@@ -397,6 +403,8 @@ export function createAndroidInputManager({
     if (!merged) {
       pendingDiffs.splice(idx, 1)
       updatePlaceholderVisibility()
+      // Schedule flush after modifying diffs
+      scheduleFlush()
       return
     }
 
@@ -404,6 +412,8 @@ export function createAndroidInputManager({
       ...pendingDiffs[idx],
       diff: merged,
     }
+    // Schedule flush after updating diff
+    scheduleFlush()
   }
 
   const scheduleAction = (
