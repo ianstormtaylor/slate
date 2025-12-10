@@ -1,5 +1,7 @@
 ---
 'slate': minor
+'slate-react': patch
+'slate-dom': patch
 ---
 
 Add `Editor.isEditorNode`, `Element.isElementNode`, and `Text.isTextNode` as alternative type guards for when we already know the object is a node.
