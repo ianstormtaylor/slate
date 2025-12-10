@@ -11,7 +11,7 @@ const MarkdownPreviewExample = () => {
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
   const decorate = useCallback(([node, path]) => {
     const ranges = []
-    if (!Text.isText(node)) {
+    if (!Text.isTextNode(node)) {
       return ranges
     }
     const getLength = token => {

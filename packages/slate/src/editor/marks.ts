@@ -60,13 +60,13 @@ export const marks: EditorInterface['marks'] = (editor, options = {}) => {
     const prev = Editor.previous(editor, { at: path, match: Text.isText })
     const markedVoid = Editor.above(editor, {
       match: n =>
-        Element.isElement(n) &&
+        Element.isElementNode(n) &&
         Editor.isVoid(editor, n) &&
         editor.markableVoid(n),
     })
     if (!markedVoid) {
       const block = Editor.above(editor, {
-        match: n => Element.isElement(n) && Editor.isBlock(editor, n),
+        match: n => Element.isElementNode(n) && Editor.isBlock(editor, n),
       })
 
       if (prev && block) {

@@ -47,6 +47,11 @@ export interface ElementInterface {
   ) => value is Element[]
 
   /**
+   * Check if a node is an `Element` object.
+   */
+  isElementNode: (node: Node) => node is Element
+
+  /**
    * Check if a set of props is a partial of Element.
    */
   isElementProps: (props: any) => props is Partial<Element>
@@ -108,6 +113,13 @@ export const Element: ElementInterface = {
     return (
       Array.isArray(value) &&
       value.every(val => Element.isElement(val, { deep }))
+    )
+  },
+
+  isElementNode(node: Node): node is Element {
+    return (
+      Array.isArray((node as Element).children) &&
+      typeof (node as Editor).apply !== 'function'
     )
   },
 

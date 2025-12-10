@@ -25,7 +25,7 @@ const SearchHighlightingExample = () => {
       const ranges: Range[] = []
       if (
         search &&
-        Element.isElement(node) &&
+        Element.isElementNode(node) &&
         Array.isArray(node.children) &&
         node.children.every(Text.isText)
       ) {

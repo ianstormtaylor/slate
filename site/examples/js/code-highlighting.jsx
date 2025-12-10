@@ -101,24 +101,24 @@ const CodeBlockButton = () => {
       editor,
       { type: CodeBlockType, language: 'html', children: [] },
       {
-        match: n => Element.isElement(n) && n.type === ParagraphType,
+        match: n => Element.isElementNode(n) && n.type === ParagraphType,
         split: true,
       }
     )
     Transforms.setNodes(
       editor,
       { type: CodeLineType },
-      { match: n => Element.isElement(n) && n.type === ParagraphType }
+      { match: n => Element.isElementNode(n) && n.type === ParagraphType }
     )
   }
   return (
     <Button
       data-test-id="code-block-button"
       active
-      onMouseDown={event => {
+      onPointerDown={event => {
         event.preventDefault()
-        handleClick()
       }}
+      onClick={handleClick}
     >
       <Icon>code</Icon>
     </Button>
@@ -135,7 +135,7 @@ const renderLeaf = props => {
 }
 const useDecorate = () => {
   return useCallback(([node, path]) => {
-    if (Element.isElement(node) && node.type === CodeBlockType) {
+    if (Element.isElementNode(node) && node.type === CodeBlockType) {
       return decorateCodeBlock([node, path])
     }
     return []

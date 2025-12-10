@@ -7,7 +7,7 @@ export const isEmpty: EditorInterface['isEmpty'] = (editor, element) => {
   return (
     children.length === 0 ||
     (children.length === 1 &&
-      Text.isText(first) &&
+      Text.isTextNode(first) &&
       first.text === '' &&
       !editor.isVoid(element))
   )

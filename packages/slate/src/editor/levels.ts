@@ -27,7 +27,7 @@ export function* levels<T extends Node>(
 
     levels.push([n, p] as NodeEntry<T>)
 
-    if (!voids && Element.isElement(n) && Editor.isVoid(editor, n)) {
+    if (!voids && Element.isElementNode(n) && Editor.isVoid(editor, n)) {
       break
     }
   }

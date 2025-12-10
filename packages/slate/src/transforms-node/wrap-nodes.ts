@@ -6,7 +6,7 @@ import { Element } from '../interfaces/element'
 import { Text } from '../interfaces/text'
 import { Range } from '../interfaces/range'
 import { Transforms } from '../interfaces/transforms'
-import { Point } from '../interfaces'
+import { NodeEntry, Point } from '../interfaces'
 
 export const wrapNodes: NodeTransforms['wrapNodes'] = (
   editor,
@@ -26,9 +26,10 @@ export const wrapNodes: NodeTransforms['wrapNodes'] = (
         match = matchPath(editor, at)
       } else if (editor.isInline(element)) {
         match = n =>
-          (Element.isElement(n) && Editor.isInline(editor, n)) || Text.isText(n)
+          (Element.isElementNode(n) && Editor.isInline(editor, n)) ||
+          Text.isTextNode(n)
       } else {
-        match = n => Element.isElement(n) && Editor.isBlock(editor, n)
+        match = n => Element.isElementNode(n) && Editor.isBlock(editor, n)
       }
     }
 
@@ -44,7 +45,7 @@ export const wrapNodes: NodeTransforms['wrapNodes'] = (
       const isAtBlockEdge = (point: Point) => {
         const blockAbove = Editor.above(editor, {
           at: point,
-          match: n => Element.isElement(n) && Editor.isBlock(editor, n),
+          match: n => Element.isElementNode(n) && Editor.isBlock(editor, n),
         })
         return blockAbove && Editor.isEdge(editor, point, blockAbove[1])
       }
@@ -74,8 +75,8 @@ export const wrapNodes: NodeTransforms['wrapNodes'] = (
       Editor.nodes(editor, {
         at,
         match: editor.isInline(element)
-          ? n => Element.isElement(n) && Editor.isBlock(editor, n)
-          : n => Editor.isEditor(n),
+          ? n => Element.isElementNode(n) && Editor.isBlock(editor, n)
+          : n => Editor.isEditorNode(n),
         mode: 'lowest',
         voids,
       })
@@ -120,7 +121,7 @@ export const wrapNodes: NodeTransforms['wrapNodes'] = (
         Transforms.moveNodes(editor, {
           at: range,
           match: n =>
-            Element.isAncestor(commonNode) && commonNode.children.includes(n),
+            !Text.isTextNode(commonNode) && commonNode.children.includes(n),
           to: wrapperPath.concat(0),
           voids,
         })

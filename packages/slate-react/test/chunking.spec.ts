@@ -100,7 +100,7 @@ const getChildrenAndTreeForShape = (
 }
 
 const withChunking = (editor: ReactEditor) => {
-  editor.getChunkSize = node => (Editor.isEditor(node) ? 3 : null)
+  editor.getChunkSize = node => (node === editor ? 3 : null)
   return editor
 }
 

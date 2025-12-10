@@ -51,7 +51,7 @@ export const insertFragment: TextTransforms['insertFragment'] = (
     // instead since it will need to be split otherwise.
     const inlineElementMatch = Editor.above(editor, {
       at,
-      match: n => Element.isElement(n) && Editor.isInline(editor, n),
+      match: n => Element.isElementNode(n) && Editor.isInline(editor, n),
       mode: 'highest',
       voids,
     })
@@ -69,7 +69,7 @@ export const insertFragment: TextTransforms['insertFragment'] = (
     }
 
     const blockMatch = Editor.above(editor, {
-      match: n => Element.isElement(n) && Editor.isBlock(editor, n),
+      match: n => Element.isElementNode(n) && Editor.isBlock(editor, n),
       at,
       voids,
     })!
@@ -102,7 +102,7 @@ export const insertFragment: TextTransforms['insertFragment'] = (
       if (
         !isBlockStart &&
         Path.isAncestor(p, firstLeafPath) &&
-        Element.isElement(n) &&
+        Element.isElementNode(n) &&
         !editor.isVoid(n) &&
         !editor.isInline(n)
       ) {
@@ -114,7 +114,7 @@ export const insertFragment: TextTransforms['insertFragment'] = (
       if (
         !isBlockEnd &&
         Path.isAncestor(p, lastLeafPath) &&
-        Element.isElement(n) &&
+        Element.isElementNode(n) &&
         !editor.isVoid(n) &&
         !editor.isInline(n)
       ) {
@@ -150,7 +150,7 @@ export const insertFragment: TextTransforms['insertFragment'] = (
       // longer in the first block of the fragment.
       if (
         starting &&
-        Element.isElement(node) &&
+        Element.isElementNode(node) &&
         !editor.isInline(node) &&
         !Path.isAncestor(path, firstLeafPath)
       ) {
@@ -158,7 +158,7 @@ export const insertFragment: TextTransforms['insertFragment'] = (
       }
 
       if (shouldInsert(entry)) {
-        if (Element.isElement(node) && !editor.isInline(node)) {
+        if (Element.isElementNode(node) && !editor.isInline(node)) {
           starting = false
           middles.push(node)
         } else if (starting) {
@@ -171,7 +171,7 @@ export const insertFragment: TextTransforms['insertFragment'] = (
 
     const [inlineMatch] = Editor.nodes(editor, {
       at,
-      match: n => Text.isText(n) || Editor.isInline(editor, n),
+      match: n => Text.isTextNode(n) || Editor.isInline(editor, n),
       mode: 'highest',
       voids,
     })!
@@ -198,8 +198,8 @@ export const insertFragment: TextTransforms['insertFragment'] = (
       at,
       match: n =>
         splitBlock
-          ? Element.isElement(n) && Editor.isBlock(editor, n)
-          : Text.isText(n) || Editor.isInline(editor, n),
+          ? Element.isElementNode(n) && Editor.isBlock(editor, n)
+          : Text.isTextNode(n) || Editor.isInline(editor, n),
       mode: splitBlock ? 'lowest' : 'highest',
       always:
         splitBlock &&
@@ -217,7 +217,7 @@ export const insertFragment: TextTransforms['insertFragment'] = (
 
     Transforms.insertNodes(editor, starts, {
       at: startRef.current!,
-      match: n => Text.isText(n) || Editor.isInline(editor, n),
+      match: n => Text.isTextNode(n) || Editor.isInline(editor, n),
       mode: 'highest',
       voids,
       batchDirty,
@@ -229,7 +229,7 @@ export const insertFragment: TextTransforms['insertFragment'] = (
 
     Transforms.insertNodes(editor, middles, {
       at: middleRef.current!,
-      match: n => Element.isElement(n) && Editor.isBlock(editor, n),
+      match: n => Element.isElementNode(n) && Editor.isBlock(editor, n),
       mode: 'lowest',
       voids,
       batchDirty,
@@ -237,7 +237,7 @@ export const insertFragment: TextTransforms['insertFragment'] = (
 
     Transforms.insertNodes(editor, ends, {
       at: endRef.current!,
-      match: n => Text.isText(n) || Editor.isInline(editor, n),
+      match: n => Text.isTextNode(n) || Editor.isInline(editor, n),
       mode: 'highest',
       voids,
       batchDirty,
