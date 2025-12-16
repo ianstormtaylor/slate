@@ -31,8 +31,6 @@ export const reconcileChildren = (
     debug,
   }: ReconcileOptions
 ) => {
-  chunkTree.modifiedChunks.clear()
-
   const chunkTreeHelper = new ChunkTreeHelper(chunkTree, { chunkSize, debug })
   const childrenHelper = new ChildrenHelper(editor, children)
 

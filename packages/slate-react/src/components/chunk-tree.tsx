@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react'
+import React, { ComponentProps, Fragment, useEffect } from 'react'
 import { Element } from 'slate'
 import { Key } from 'slate-dom'
 import { RenderChunkProps } from './editable'
@@ -51,7 +51,17 @@ const ChunkAncestor = <C extends TChunkAncestor>(props: {
   })
 }
 
-const ChunkTree = ChunkAncestor<TChunkTree>
+const ChunkTree = (props: ComponentProps<typeof ChunkAncestor<TChunkTree>>) => {
+  // Clear the set of modified chunks only when React finishes rendering. The
+  // timing of this is important in strict mode because if the chunks are
+  // cleared during rendering (such as in reconcileChildren), strict mode's
+  // second render won't include them.
+  useEffect(() => {
+    props.root.modifiedChunks.clear()
+  })
+
+  return <ChunkAncestor {...props} />
+}
 
 const MemoizedChunk = React.memo(
   ChunkAncestor<TChunk>,
