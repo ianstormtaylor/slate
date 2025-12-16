@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.120.1
+
+### Patch Changes
+
+- [#5988](https://github.com/ianstormtaylor/slate/pull/5988) [`bfa5055f`](https://github.com/ianstormtaylor/slate/commit/bfa5055f75fcf64ee71c2aee8f1ca43dc50222f4) Thanks [@12joan](https://github.com/12joan)! - Fix rendering issues when both chunking and React's strict mode are enabled
+
 ## 0.120.0
 
 ### Minor Changes
