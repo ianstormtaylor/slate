@@ -8,18 +8,15 @@ import {
   Text,
 } from '../interfaces'
 
-export const insertChildren = <T>(
-  xs: T[],
-  index: number,
-  ...newValues: T[]
-) => [...xs.slice(0, index), ...newValues, ...xs.slice(index)]
+export const insertChildren = <T>(xs: T[], index: number, ...newValues: T[]) =>
+  xs.slice(0, index).concat(newValues, xs.slice(index))
 
 export const replaceChildren = <T>(
   xs: T[],
   index: number,
   removeCount: number,
   ...newValues: T[]
-) => [...xs.slice(0, index), ...newValues, ...xs.slice(index + removeCount)]
+) => xs.slice(0, index).concat(newValues, xs.slice(index + removeCount))
 
 export const removeChildren = replaceChildren
 
