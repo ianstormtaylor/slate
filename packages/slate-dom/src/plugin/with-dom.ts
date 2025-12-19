@@ -347,17 +347,19 @@ export const withDOM = <T extends BaseEditor>(
     const text = data.getData('text/plain')
 
     if (text) {
-      const lines = text.split(/\r\n|\r|\n/)
-      let split = false
+      editor.whileMutablyBatching(() => {
+        const lines = text.split(/\r\n|\r|\n/)
+        let split = false
 
-      for (const line of lines) {
-        if (split) {
-          Transforms.splitNodes(e, { always: true })
+        for (const line of lines) {
+          if (split) {
+            Transforms.splitNodes(e, { always: true })
+          }
+
+          e.insertText(line)
+          split = true
         }
-
-        e.insertText(line)
-        split = true
-      }
+      })
       return true
     }
     return false

@@ -1,12 +1,14 @@
 import {
   Ancestor,
   Descendant,
+  Editor,
   Element,
   Node,
   Path,
   Scrubber,
   Text,
 } from '../interfaces'
+import { MUTATED_CHILD_ARRAYS_IN_BATCH } from './weak-maps'
 
 export const insertChildren = <T>(
   xs: T[],
@@ -39,18 +41,40 @@ export const modifyDescendant = <N extends Descendant>(
   const slicedPath = path.slice()
   let modifiedNode: Node = f(node)
 
+  const modifiedChildArrays = MUTATED_CHILD_ARRAYS_IN_BATCH.get(root as Editor)
+
   while (slicedPath.length > 1) {
     const index = slicedPath.pop()!
     const ancestorNode = Node.get(root, slicedPath) as Ancestor
 
-    modifiedNode = {
-      ...ancestorNode,
-      children: replaceChildren(ancestorNode.children, index, 1, modifiedNode),
+    if (modifiedChildArrays?.has(ancestorNode.children)) {
+      // we've already copied this array in this batch, don't worry about copying it again
+      ancestorNode.children[index] = modifiedNode
+
+      // this also means all ancestors are already copied, so we're done
+      return
+    } else {
+      modifiedNode = {
+        ...ancestorNode,
+        children: replaceChildren(ancestorNode.children, index, 1,  modifiedNode),
+      }
+      if (modifiedChildArrays) {
+        modifiedChildArrays.add(modifiedNode.children)
+      }
     }
   }
 
-  const index = slicedPath.pop()!
-  root.children = replaceChildren(root.children, index, 1, modifiedNode)
+  const index = slicedPath[0]
+
+  if (modifiedChildArrays?.has(root.children)) {
+    // we've already copied this array in this batch, don't worry about copying it again
+    root.children[index] = modifiedNode
+  } else {
+    root.children = replaceChildren(root.children, index, 1, modifiedNode)
+    if (modifiedChildArrays) {
+      modifiedChildArrays.add(root.children)
+    }
+  }
 }
 
 /**
@@ -63,6 +87,7 @@ export const modifyChildren = (
 ) => {
   if (path.length === 0) {
     root.children = f(root.children)
+    MUTATED_CHILD_ARRAYS_IN_BATCH.get(root as Editor)?.add(root.children)
   } else {
     modifyDescendant<Element>(root, path, node => {
       if (Node.isText(node)) {
@@ -73,7 +98,9 @@ export const modifyChildren = (
         )
       }
 
-      return { ...node, children: f(node.children) }
+      const children = f(node.children)
+      MUTATED_CHILD_ARRAYS_IN_BATCH.get(root as Editor)?.add(children)
+      return { ...node, children }
     })
   }
 }

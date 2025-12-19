@@ -12,6 +12,7 @@ import {
   Selection,
   Text,
 } from '../../index'
+import { MUTATED_CHILD_ARRAYS_IN_BATCH } from '../../utils'
 import {
   insertChildren,
   modifyChildren,
@@ -320,8 +321,15 @@ export const GeneralTransforms: GeneralTransforms = {
               text: after,
             }
           } else {
+            const modifiedChildArrays =
+              MUTATED_CHILD_ARRAYS_IN_BATCH.get(editor)
+
             const before = node.children.slice(0, position)
             const after = node.children.slice(position)
+            if (modifiedChildArrays) {
+              modifiedChildArrays.add(before)
+              modifiedChildArrays.add(after)
+            }
             newNode = {
               ...node,
               children: before,

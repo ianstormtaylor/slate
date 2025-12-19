@@ -115,6 +115,7 @@ export interface BaseEditor {
   splitNodes: OmitFirstArg<typeof Transforms.splitNodes>
   unsetNodes: OmitFirstArg<typeof Transforms.unsetNodes>
   unwrapNodes: OmitFirstArg<typeof Transforms.unwrapNodes>
+  whileMutablyBatching: OmitFirstArg<typeof Editor.withoutNormalizing>
   withoutNormalizing: OmitFirstArg<typeof Editor.withoutNormalizing>
   wrapNodes: OmitFirstArg<typeof Transforms.wrapNodes>
 
@@ -140,6 +141,7 @@ export interface BaseEditor {
   isEmpty: OmitFirstArg<typeof Editor.isEmpty>
   isEnd: OmitFirstArg<typeof Editor.isEnd>
   isInline: OmitFirstArg<typeof Editor.isInline>
+  isMutablyBatching: OmitFirstArg<typeof Editor.isMutablyBatching>
   isNormalizing: OmitFirstArg<typeof Editor.isNormalizing>
   isStart: OmitFirstArg<typeof Editor.isStart>
   isVoid: OmitFirstArg<typeof Editor.isVoid>
@@ -500,6 +502,11 @@ export interface EditorInterface {
   isInline: (editor: Editor, value: Element) => boolean
 
   /**
+   * Check if the editor is batching tree mutations for operations.
+   */
+  isMutablyBatching: (editor: Editor) => boolean
+
+  /**
    * Check if the editor is currently normalizing after each operation.
    */
   isNormalizing: (editor: Editor) => boolean
@@ -718,6 +725,12 @@ export interface EditorInterface {
   ) => NodeEntry<Element> | undefined
 
   /**
+   * Call a function, during which only the first operation on a node's descendant will immutably change it, all subsequent changes of its descendants in the batch will cause a mutable change.
+   * WARNING, during this function do not save any references to non-leaf nodes, as they may mutate later in the batch.
+   */
+  whileMutablyBatching: (editor: Editor, fn: () => void) => void
+
+  /**
    * Call a function, deferring normalization until after it completes.
    */
   withoutNormalizing: (editor: Editor, fn: () => void) => void
@@ -846,6 +859,10 @@ export const Editor: EditorInterface = {
     return editor.isInline(value)
   },
 
+  isMutablyBatching(editor) {
+    return editor.isMutablyBatching()
+  },
+
   isNormalizing(editor) {
     return editor.isNormalizing()
   },
@@ -969,9 +986,14 @@ export const Editor: EditorInterface = {
     return editor.void(options)
   },
 
+  whileMutablyBatching(editor, fn: () => void) {
+    editor.whileMutablyBatching(fn)
+  },
+
   withoutNormalizing(editor, fn: () => void) {
     editor.withoutNormalizing(fn)
   },
+
   shouldMergeNodesRemovePrevNode: (editor, prevNode, curNode) => {
     return editor.shouldMergeNodesRemovePrevNode(prevNode, curNode)
   },
