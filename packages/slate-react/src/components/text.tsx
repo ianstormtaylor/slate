@@ -25,9 +25,9 @@ const Text = (props: {
   decorations: DecoratedRange[]
   isLast: boolean
   parent: Element
-  renderPlaceholder: (props: RenderPlaceholderProps) => JSX.Element
-  renderLeaf?: (props: RenderLeafProps) => JSX.Element
-  renderText?: (props: RenderTextProps) => JSX.Element
+  renderPlaceholder: (props: RenderPlaceholderProps) => React.JSX.Element
+  renderLeaf?: (props: RenderLeafProps) => React.JSX.Element
+  renderText?: (props: RenderTextProps) => React.JSX.Element
   text: SlateText
 }) => {
   const {

@@ -1,6 +1,6 @@
 # Editable component
 
-## `Editable(props: EditableProps): JSX.Element`
+## `Editable(props: EditableProps): React.JSX.Element`
 
 The `Editable` component is the main editing component. Note that it must be inside a `Slate` component.
 
@@ -16,9 +16,9 @@ type EditableProps = {
   readOnly?: boolean
   role?: string
   style?: React.CSSProperties
-  renderElement?: (props: RenderElementProps) => JSX.Element
-  renderLeaf?: (props: RenderLeafProps) => JSX.Element
-  renderPlaceholder?: (props: RenderPlaceholderProps) => JSX.Element
+  renderElement?: (props: RenderElementProps) => React.JSX.Element
+  renderLeaf?: (props: RenderLeafProps) => React.JSX.Element
+  renderPlaceholder?: (props: RenderPlaceholderProps) => React.JSX.Element
   scrollSelectionIntoView?: (editor: ReactEditor, domRange: DOMRange) => void
   as?: React.ElementType
   disableDefaultStyles?: boolean
@@ -39,7 +39,7 @@ If this prop is omitted or set to false, the editor remains in the default "edit
 
 This prop is particularly useful when you want to display text or rich media content without allowing users to edit it, such as when displaying published content or a preview of the user's input.
 
-#### `renderElement?: (props: RenderElementProps) => JSX.Element`
+#### `renderElement?: (props: RenderElementProps) => React.JSX.Element`
 
 The `renderElement` prop is a function used to render a custom component for a specific type of Element node in the Slate.js document model.
 
@@ -108,7 +108,7 @@ const DefaultElement = props => {
 }
 ```
 
-#### `renderLeaf?: (props: RenderLeafProps) => JSX.Element`
+#### `renderLeaf?: (props: RenderLeafProps) => React.JSX.Element`
 
 The `renderLeaf` prop allows you to customize the rendering of leaf nodes in the document tree of your Slate editor. A "leaf" in Slate is the smallest chunk of text and its associated formatting attributes.
 
@@ -151,7 +151,7 @@ Example usage:
 />
 ```
 
-#### `renderText?: (props: RenderTextProps) => JSX.Element`
+#### `renderText?: (props: RenderTextProps) => React.JSX.Element`
 
 The `renderText` prop allows you to customize the rendering of the container element for a Text node in the Slate editor. This is useful when you need to wrap the entire text node content or add elements associated with the text node as a whole, regardless of how decorations might split the text into multiple leaves.
 
@@ -183,7 +183,7 @@ Example usage:
 />
 ```
 
-#### `renderPlaceholder?: (props: RenderPlaceholderProps) => JSX.Element`
+#### `renderPlaceholder?: (props: RenderPlaceholderProps) => React.JSX.Element`
 
 The `renderPlaceholder` prop allows you to customize how the placeholder of the Slate.js `Editable` component is rendered when the editor is empty. The placeholder will only be shown when the editor's content is empty.
 

@@ -158,11 +158,11 @@ export type EditableProps = {
   readOnly?: boolean
   role?: string
   style?: React.CSSProperties
-  renderElement?: (props: RenderElementProps) => JSX.Element
-  renderChunk?: (props: RenderChunkProps) => JSX.Element
-  renderLeaf?: (props: RenderLeafProps) => JSX.Element
-  renderText?: (props: RenderTextProps) => JSX.Element
-  renderPlaceholder?: (props: RenderPlaceholderProps) => JSX.Element
+  renderElement?: (props: RenderElementProps) => React.JSX.Element
+  renderChunk?: (props: RenderChunkProps) => React.JSX.Element
+  renderLeaf?: (props: RenderLeafProps) => React.JSX.Element
+  renderText?: (props: RenderTextProps) => React.JSX.Element
+  renderPlaceholder?: (props: RenderPlaceholderProps) => React.JSX.Element
   scrollSelectionIntoView?: (editor: ReactEditor, domRange: DOMRange) => void
   as?: React.ElementType
   disableDefaultStyles?: boolean

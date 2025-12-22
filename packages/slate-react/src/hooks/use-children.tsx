@@ -30,11 +30,11 @@ import { ElementContext } from './use-element'
 const useChildren = (props: {
   decorations: DecoratedRange[]
   node: Ancestor
-  renderElement?: (props: RenderElementProps) => JSX.Element
-  renderChunk?: (props: RenderChunkProps) => JSX.Element
-  renderPlaceholder: (props: RenderPlaceholderProps) => JSX.Element
-  renderText?: (props: RenderTextProps) => JSX.Element
-  renderLeaf?: (props: RenderLeafProps) => JSX.Element
+  renderElement?: (props: RenderElementProps) => React.JSX.Element
+  renderChunk?: (props: RenderChunkProps) => React.JSX.Element
+  renderPlaceholder: (props: RenderPlaceholderProps) => React.JSX.Element
+  renderText?: (props: RenderTextProps) => React.JSX.Element
+  renderLeaf?: (props: RenderLeafProps) => React.JSX.Element
 }) => {
   const {
     decorations,

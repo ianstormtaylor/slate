@@ -48,8 +48,8 @@ const Leaf = (props: {
   isLast: boolean
   leaf: Text
   parent: Element
-  renderPlaceholder: (props: RenderPlaceholderProps) => JSX.Element
-  renderLeaf?: (props: RenderLeafProps) => JSX.Element
+  renderPlaceholder: (props: RenderPlaceholderProps) => React.JSX.Element
+  renderLeaf?: (props: RenderLeafProps) => React.JSX.Element
   text: Text
   leafPosition?: LeafPosition
 }) => {
