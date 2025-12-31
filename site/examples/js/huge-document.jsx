@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker'
-import React, { useCallback, useEffect, useState } from 'react'
-import { createEditor as slateCreateEditor } from 'slate'
+import React, { StrictMode, useCallback, useEffect, useState } from 'react'
+import { createEditor as slateCreateEditor, Editor } from 'slate'
 import { Editable, Slate, withReact, useSelected } from 'slate-react'
 
 const SUPPORTS_EVENT_TIMING =
@@ -41,6 +41,7 @@ const initialConfig = {
     'chunk'
   ),
   showSelectedHeadings: parseBoolean('selected_headings', false),
+  strictMode: parseBoolean('strict', false),
 }
 const setSearchParams = config => {
   if (searchParams) {
@@ -54,6 +55,7 @@ const setSearchParams = config => {
       'selected_headings',
       config.showSelectedHeadings ? 'true' : 'false'
     )
+    searchParams.set('strict', config.strictMode ? 'true' : 'false')
     history.replaceState({}, '', `?${searchParams.toString()}`)
   }
 }
@@ -129,6 +131,24 @@ const HugeDocumentExample = () => {
     ),
     [config.contentVisibilityMode, config.chunkOutlines]
   )
+  const editable = rendering ? (
+    <div>Rendering&hellip;</div>
+  ) : (
+    <Slate key={editorVersion} editor={editor} initialValue={initialValue}>
+      <Editable
+        placeholder="Enter some text…"
+        renderElement={renderElement}
+        renderChunk={config.chunkDivs ? renderChunk : undefined}
+        spellCheck
+        autoFocus
+      />
+    </Slate>
+  )
+  const editableWithStrictMode = config.strictMode ? (
+    <StrictMode>{editable}</StrictMode>
+  ) : (
+    editable
+  )
   return (
     <>
       <PerformanceControls
@@ -137,19 +157,7 @@ const HugeDocumentExample = () => {
         setConfig={setConfig}
       />
 
-      {rendering ? (
-        <div>Rendering&hellip;</div>
-      ) : (
-        <Slate key={editorVersion} editor={editor} initialValue={initialValue}>
-          <Editable
-            placeholder="Enter some text…"
-            renderElement={renderElement}
-            renderChunk={config.chunkDivs ? renderChunk : undefined}
-            spellCheck
-            autoFocus
-          />
-        </Slate>
-      )}
+      {editableWithStrictMode}
     </>
   )
 }
@@ -392,6 +400,21 @@ const PerformanceControls = ({ editor, config, setConfig }) => {
               }
             />{' '}
             Call <code>useSelected</code> in each heading
+          </label>
+        </p>
+
+        <p>
+          <label>
+            <input
+              type="checkbox"
+              checked={config.strictMode}
+              onChange={event =>
+                setConfig({
+                  strictMode: event.target.checked,
+                })
+              }
+            />{' '}
+            React strict mode (only works in localhost)
           </label>
         </p>
       </details>
