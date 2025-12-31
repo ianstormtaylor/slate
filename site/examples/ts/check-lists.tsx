@@ -3,6 +3,7 @@ import React, { ChangeEvent, useCallback, useMemo } from 'react'
 import {
   Descendant,
   Editor,
+  Node,
   Point,
   Range,
   Element as SlateElement,
@@ -100,8 +101,7 @@ const withChecklists = (editor: CustomEditor) => {
 
     if (selection && Range.isCollapsed(selection)) {
       const [match] = Editor.nodes(editor, {
-        match: n =>
-          SlateElement.isElementNode(n) && n.type === 'check-list-item',
+        match: n => Node.isElement(n) && n.type === 'check-list-item',
       })
 
       if (match) {
@@ -113,8 +113,7 @@ const withChecklists = (editor: CustomEditor) => {
             type: 'paragraph',
           }
           Transforms.setNodes(editor, newProperties, {
-            match: n =>
-              SlateElement.isElementNode(n) && n.type === 'check-list-item',
+            match: n => Node.isElement(n) && n.type === 'check-list-item',
           })
           return
         }

@@ -53,11 +53,6 @@ export interface TextInterface {
   isTextList: (value: any) => value is Text[]
 
   /**
-   * Check if a node is a `Text` object.
-   */
-  isTextNode: (node: Node) => node is Text
-
-  /**
    * Check if some props are a partial of Text.
    */
   isTextProps: (props: any) => props is Partial<Text>
@@ -102,10 +97,6 @@ export const Text: TextInterface = {
 
   isTextList(value: any): value is Text[] {
     return Array.isArray(value) && value.every(val => Text.isText(val))
-  },
-
-  isTextNode(node: Node): node is Text {
-    return typeof (node as Text).text === 'string'
   },
 
   isTextProps(props: any): props is Partial<Text> {

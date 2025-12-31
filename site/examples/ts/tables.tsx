@@ -1,12 +1,5 @@
 import React, { useCallback, useMemo } from 'react'
-import {
-  Descendant,
-  Editor,
-  Point,
-  Range,
-  Element as SlateElement,
-  createEditor,
-} from 'slate'
+import { Descendant, Editor, Node, Point, Range, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
 import {
   Editable,
@@ -46,7 +39,7 @@ const withTables = (editor: CustomEditor) => {
 
     if (selection && Range.isCollapsed(selection)) {
       const [cell] = Editor.nodes(editor, {
-        match: n => SlateElement.isElementNode(n) && n.type === 'table-cell',
+        match: n => Node.isElement(n) && n.type === 'table-cell',
       })
 
       if (cell) {
@@ -67,7 +60,7 @@ const withTables = (editor: CustomEditor) => {
 
     if (selection && Range.isCollapsed(selection)) {
       const [cell] = Editor.nodes(editor, {
-        match: n => SlateElement.isElementNode(n) && n.type === 'table-cell',
+        match: n => Node.isElement(n) && n.type === 'table-cell',
       })
 
       if (cell) {
@@ -88,7 +81,7 @@ const withTables = (editor: CustomEditor) => {
 
     if (selection) {
       const [table] = Editor.nodes(editor, {
-        match: n => SlateElement.isElementNode(n) && n.type === 'table',
+        match: n => Node.isElement(n) && n.type === 'table',
       })
 
       if (table) {

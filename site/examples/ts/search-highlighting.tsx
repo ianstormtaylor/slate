@@ -1,13 +1,6 @@
 import { css } from '@emotion/css'
 import React, { useCallback, useMemo, useState } from 'react'
-import {
-  Descendant,
-  Element,
-  NodeEntry,
-  Range,
-  Text,
-  createEditor,
-} from 'slate'
+import { Descendant, Node, NodeEntry, Range, Text, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
 import { Editable, RenderLeafProps, Slate, withReact } from 'slate-react'
 
@@ -25,7 +18,7 @@ const SearchHighlightingExample = () => {
       const ranges: Range[] = []
       if (
         search &&
-        Element.isElementNode(node) &&
+        Node.isElement(node) &&
         Array.isArray(node.children) &&
         node.children.every(Text.isText)
       ) {

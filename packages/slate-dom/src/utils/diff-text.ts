@@ -1,13 +1,4 @@
-import {
-  Editor,
-  Node,
-  Operation,
-  Path,
-  Point,
-  Range,
-  Text,
-  Element,
-} from 'slate'
+import { Editor, Node, Operation, Path, Point, Range, Text } from 'slate'
 import { EDITOR_TO_PENDING_DIFFS } from './weak-maps'
 
 export type StringDiff = {
@@ -33,7 +24,7 @@ export function verifyDiffState(editor: Editor, textDiff: TextDiff): boolean {
   }
 
   const node = Node.get(editor, path)
-  if (!Text.isTextNode(node)) {
+  if (!Node.isText(node)) {
     return false
   }
 
@@ -49,7 +40,7 @@ export function verifyDiffState(editor: Editor, textDiff: TextDiff): boolean {
   }
 
   const nextNode = Node.get(editor, nextPath)
-  return Text.isTextNode(nextNode) && nextNode.text.startsWith(diff.text)
+  return Node.isText(nextNode) && nextNode.text.startsWith(diff.text)
 }
 
 export function applyStringDiff(text: string, ...diffs: StringDiff[]) {
@@ -170,12 +161,12 @@ export function normalizePoint(editor: Editor, point: Point): Point | null {
   }
 
   let leaf = Node.get(editor, path)
-  if (!Text.isTextNode(leaf)) {
+  if (!Node.isText(leaf)) {
     return null
   }
 
   const parentBlock = Editor.above(editor, {
-    match: n => Element.isElementNode(n) && Editor.isBlock(editor, n),
+    match: n => Node.isElement(n) && Editor.isBlock(editor, n),
     at: path,
   })
 

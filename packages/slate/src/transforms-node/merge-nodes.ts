@@ -11,7 +11,7 @@ import { Node } from '../interfaces/node'
 const hasSingleChildNest = (editor: Editor, node: Node): boolean => {
   return (
     node !== editor &&
-    (Text.isTextNode(node) ||
+    (Node.isText(node) ||
       Editor.isVoid(editor, node) ||
       (node.children.length === 1 &&
         hasSingleChildNest(editor, node.children[0])))
@@ -35,7 +35,7 @@ export const mergeNodes: NodeTransforms['mergeNodes'] = (
         const [parent] = Editor.parent(editor, at)
         match = n => parent.children.includes(n)
       } else {
-        match = n => Element.isElementNode(n) && Editor.isBlock(editor, n)
+        match = n => Node.isElement(n) && Editor.isBlock(editor, n)
       }
     }
 
@@ -93,11 +93,11 @@ export const mergeNodes: NodeTransforms['mergeNodes'] = (
 
     // Ensure that the nodes are equivalent, and figure out what the position
     // and extra properties of the merge will be.
-    if (Text.isTextNode(node) && Text.isTextNode(prevNode)) {
+    if (Node.isText(node) && Node.isText(prevNode)) {
       const { text, ...rest } = node
       position = prevNode.text.length
       properties = rest as Partial<Text>
-    } else if (Element.isElementNode(node) && Element.isElementNode(prevNode)) {
+    } else if (Node.isElement(node) && Node.isElement(prevNode)) {
       const { children, ...rest } = node
       position = prevNode.children.length
       properties = rest as Partial<Element>

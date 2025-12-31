@@ -6,7 +6,7 @@ import {
   createEditor,
   Descendant,
   Editor,
-  Element as SlateElement,
+  Node,
   Range,
   Transforms,
 } from 'slate'
@@ -174,27 +174,27 @@ const insertButton = (editor: CustomEditor) => {
 
 const isLinkActive = (editor: CustomEditor): boolean => {
   const [link] = Editor.nodes(editor, {
-    match: n => SlateElement.isElementNode(n) && n.type === 'link',
+    match: n => Node.isElement(n) && n.type === 'link',
   })
   return !!link
 }
 
 const isButtonActive = (editor: CustomEditor): boolean => {
   const [button] = Editor.nodes(editor, {
-    match: n => SlateElement.isElementNode(n) && n.type === 'button',
+    match: n => Node.isElement(n) && n.type === 'button',
   })
   return !!button
 }
 
 const unwrapLink = (editor: CustomEditor) => {
   Transforms.unwrapNodes(editor, {
-    match: n => SlateElement.isElementNode(n) && n.type === 'link',
+    match: n => Node.isElement(n) && n.type === 'link',
   })
 }
 
 const unwrapButton = (editor: CustomEditor) => {
   Transforms.unwrapNodes(editor, {
-    match: n => SlateElement.isElementNode(n) && n.type === 'button',
+    match: n => Node.isElement(n) && n.type === 'button',
   })
 }
 

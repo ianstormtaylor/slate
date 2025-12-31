@@ -2,11 +2,9 @@ import { NodeTransforms } from '../interfaces/transforms/node'
 import { Editor } from '../interfaces/editor'
 import { Path } from '../interfaces/path'
 import { matchPath } from '../utils/match-path'
-import { Element } from '../interfaces/element'
-import { Text } from '../interfaces/text'
 import { Range } from '../interfaces/range'
 import { Transforms } from '../interfaces/transforms'
-import { NodeEntry, Point } from '../interfaces'
+import { Node, Point } from '../interfaces'
 
 export const wrapNodes: NodeTransforms['wrapNodes'] = (
   editor,
@@ -26,10 +24,9 @@ export const wrapNodes: NodeTransforms['wrapNodes'] = (
         match = matchPath(editor, at)
       } else if (editor.isInline(element)) {
         match = n =>
-          (Element.isElementNode(n) && Editor.isInline(editor, n)) ||
-          Text.isTextNode(n)
+          (Node.isElement(n) && Editor.isInline(editor, n)) || Node.isText(n)
       } else {
-        match = n => Element.isElementNode(n) && Editor.isBlock(editor, n)
+        match = n => Node.isElement(n) && Editor.isBlock(editor, n)
       }
     }
 
@@ -45,7 +42,7 @@ export const wrapNodes: NodeTransforms['wrapNodes'] = (
       const isAtBlockEdge = (point: Point) => {
         const blockAbove = Editor.above(editor, {
           at: point,
-          match: n => Element.isElementNode(n) && Editor.isBlock(editor, n),
+          match: n => Node.isElement(n) && Editor.isBlock(editor, n),
         })
         return blockAbove && Editor.isEdge(editor, point, blockAbove[1])
       }
@@ -75,8 +72,8 @@ export const wrapNodes: NodeTransforms['wrapNodes'] = (
       Editor.nodes(editor, {
         at,
         match: editor.isInline(element)
-          ? n => Element.isElementNode(n) && Editor.isBlock(editor, n)
-          : n => Editor.isEditorNode(n),
+          ? n => Node.isElement(n) && Editor.isBlock(editor, n)
+          : n => Node.isEditor(n),
         mode: 'lowest',
         voids,
       })
@@ -121,7 +118,7 @@ export const wrapNodes: NodeTransforms['wrapNodes'] = (
         Transforms.moveNodes(editor, {
           at: range,
           match: n =>
-            !Text.isTextNode(commonNode) && commonNode.children.includes(n),
+            !Node.isText(commonNode) && commonNode.children.includes(n),
           to: wrapperPath.concat(0),
           voids,
         })

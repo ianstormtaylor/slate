@@ -1,5 +1,5 @@
 import React, { useCallback, useRef } from 'react'
-import { Ancestor, Editor, Element, DecoratedRange, Text } from 'slate'
+import { Ancestor, Editor, Element, DecoratedRange, Text, Node } from 'slate'
 import { Key, isElementDecorationsEqual } from 'slate-dom'
 import {
   RenderChunkProps,
@@ -48,7 +48,7 @@ const useChildren = (props: {
   const editor = useSlateStatic()
   IS_NODE_MAP_DIRTY.set(editor as ReactEditor, false)
 
-  const isBlock = Element.isElementNode(node) && !editor.isInline(node)
+  const isBlock = Node.isElement(node) && !editor.isInline(node)
   const isLeafBlock = isBlock && Editor.hasInlines(editor, node)
   const chunkSize = isLeafBlock ? null : editor.getChunkSize(node)
   const chunking = !!chunkSize
@@ -118,9 +118,7 @@ const useChildren = (props: {
 
   if (!chunking) {
     return node.children.map((n, i) =>
-      Text.isTextNode(n)
-        ? renderTextComponent(n, i)
-        : renderElementComponent(n, i)
+      Node.isText(n) ? renderTextComponent(n, i) : renderElementComponent(n, i)
     )
   }
 

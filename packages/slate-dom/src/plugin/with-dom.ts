@@ -1,7 +1,6 @@
 import {
   BaseEditor,
   Editor,
-  Element,
   Node,
   Operation,
   Path,
@@ -97,7 +96,7 @@ export const withDOM = <T extends BaseEditor>(
 
     if (e.selection && Range.isCollapsed(e.selection)) {
       const parentBlockEntry = Editor.above(e, {
-        match: n => Element.isElementNode(n) && Editor.isBlock(e, n),
+        match: n => Node.isElement(n) && Editor.isBlock(e, n),
         at: e.selection,
       })
 

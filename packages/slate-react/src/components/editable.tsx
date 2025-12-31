@@ -669,8 +669,7 @@ export const Editable = forwardRef(
               ) {
                 const block = Editor.above(editor, {
                   at: anchor.path,
-                  match: n =>
-                    Element.isElementNode(n) && Editor.isBlock(editor, n),
+                  match: n => Node.isElement(n) && Editor.isBlock(editor, n),
                 })
 
                 if (block && Node.string(block[0]).includes('\t')) {
@@ -1187,7 +1186,7 @@ export const Editable = forwardRef(
                         relatedTarget
                       )
 
-                      if (Element.isElementNode(node) && !editor.isVoid(node)) {
+                      if (Node.isElement(node) && !editor.isVoid(node)) {
                         return
                       }
                     }
@@ -1235,14 +1234,12 @@ export const Editable = forwardRef(
                         let blockPath = path
                         if (
                           !(
-                            Element.isElementNode(node) &&
-                            Editor.isBlock(editor, node)
+                            Node.isElement(node) && Editor.isBlock(editor, node)
                           )
                         ) {
                           const block = Editor.above(editor, {
                             match: n =>
-                              Element.isElementNode(n) &&
-                              Editor.isBlock(editor, n),
+                              Node.isElement(n) && Editor.isBlock(editor, n),
                             at: path,
                           })
 
@@ -1437,10 +1434,7 @@ export const Editable = forwardRef(
                       // default, and calling `preventDefault` hides the cursor.
                       const node = ReactEditor.toSlateNode(editor, event.target)
 
-                      if (
-                        Element.isElementNode(node) &&
-                        Editor.isVoid(editor, node)
-                      ) {
+                      if (Node.isElement(node) && Editor.isVoid(editor, node)) {
                         event.preventDefault()
                       }
                     }
@@ -1457,8 +1451,7 @@ export const Editable = forwardRef(
                       const node = ReactEditor.toSlateNode(editor, event.target)
                       const path = ReactEditor.findPath(editor, node)
                       const voidMatch =
-                        (Element.isElementNode(node) &&
-                          Editor.isVoid(editor, node)) ||
+                        (Node.isElement(node) && Editor.isVoid(editor, node)) ||
                         Editor.void(editor, { at: path, voids: true })
 
                       // If starting a drag on a void node, make sure it is selected
@@ -1838,7 +1831,7 @@ export const Editable = forwardRef(
                             )
 
                             if (
-                              Element.isElementNode(currentNode) &&
+                              Node.isElement(currentNode) &&
                               Editor.isVoid(editor, currentNode) &&
                               (Editor.isInline(editor, currentNode) ||
                                 Editor.isBlock(editor, currentNode))
