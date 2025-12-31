@@ -3,6 +3,7 @@ import {
   Editor,
   Node,
   Operation,
+  Path,
   Point,
   Range,
   RangeRef,
@@ -20,6 +21,10 @@ export type Action = { at?: Point | Range; run: () => void }
 export const IS_NODE_MAP_DIRTY: WeakMap<Editor, boolean> = new WeakMap()
 export const NODE_TO_INDEX: WeakMap<Node, number> = new WeakMap()
 export const NODE_TO_PARENT: WeakMap<Node, Ancestor> = new WeakMap()
+export const EDITOR_TO_NODE_KEY_TO_PATH: WeakMap<
+  Editor,
+  WeakMap<Key, Path>
+> = new WeakMap()
 
 /**
  * Weak maps that allow us to go between Slate nodes and DOM nodes. These

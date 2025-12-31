@@ -9,8 +9,6 @@ import {
   EDITOR_TO_KEY_TO_ELEMENT,
   ELEMENT_TO_NODE,
   NODE_TO_ELEMENT,
-  NODE_TO_INDEX,
-  NODE_TO_PARENT,
 } from 'slate-dom'
 import {
   RenderChunkProps,
@@ -138,9 +136,6 @@ const Element = (props: {
         />
       </Tag>
     )
-
-    NODE_TO_INDEX.set(text, 0)
-    NODE_TO_PARENT.set(text, element)
   }
 
   return renderElement({ attributes, children, element })
