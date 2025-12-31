@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.120.2
+
+### Patch Changes
+
+- [#5986](https://github.com/ianstormtaylor/slate/pull/5986) [`66283839`](https://github.com/ianstormtaylor/slate/commit/662838397fea198f3f8125ae87ac8b54cd29be89) Thanks [@ebroder](https://github.com/ebroder)! - Update TypeScript declarations for React v19 by switching from JSX.Element to React.JSX.Element
+
 ## 0.120.1
 
 ### Patch Changes
