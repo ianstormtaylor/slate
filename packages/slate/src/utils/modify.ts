@@ -25,6 +25,58 @@ export const replaceChildren = <T>(
 
 export const removeChildren = replaceChildren
 
+export const smartInsertChildren = <T extends Descendant>(
+  modifiedChildArrays: Set<Descendant[]> | undefined,
+  children: T[],
+  index: number,
+  ...newValues: T[]
+) => {
+  return smartReplaceChildren(
+    modifiedChildArrays,
+    children,
+    index,
+    0,
+    ...newValues
+  )
+}
+
+export const smartReplaceChildren = <T extends Descendant>(
+  modifiedChildArrays: Set<Descendant[]> | undefined,
+  children: T[],
+  index: number,
+  removeCount: number,
+  ...newValues: T[]
+) => {
+  let out
+  if (modifiedChildArrays?.has(children)) {
+    out = children
+  } else {
+    out = children.slice()
+    modifiedChildArrays?.add(out)
+  }
+  out.splice(index, removeCount, ...newValues)
+  return out
+}
+
+export const smartReplaceChild = <T extends Descendant>(
+  modifiedChildArrays: Set<Descendant[]> | undefined,
+  children: T[],
+  index: number,
+  newValue: T
+) => {
+  let out
+  if (modifiedChildArrays?.has(children)) {
+    out = children
+  } else {
+    out = children.slice()
+    modifiedChildArrays?.add(out)
+  }
+  out[index] = newValue
+  return out
+}
+
+export const smartRemoveChildren = smartReplaceChildren
+
 /**
  * Replace a descendant with a new node, replacing all ancestors
  */
@@ -38,43 +90,43 @@ export const modifyDescendant = <N extends Descendant>(
   }
 
   const node = Node.get(root, path) as N
-  const slicedPath = path.slice()
   let modifiedNode: Node = f(node)
+  if (modifiedNode === node) return
 
   const modifiedChildArrays = MUTATED_CHILD_ARRAYS_IN_BATCH.get(root as Editor)
+
+  const slicedPath = path.slice()
 
   while (slicedPath.length > 1) {
     const index = slicedPath.pop()!
     const ancestorNode = Node.get(root, slicedPath) as Ancestor
 
-    if (modifiedChildArrays?.has(ancestorNode.children)) {
-      // we've already copied this array in this batch, don't worry about copying it again
-      ancestorNode.children[index] = modifiedNode
+    const children = smartReplaceChild(
+      modifiedChildArrays,
+      ancestorNode.children,
+      index,
+      modifiedNode
+    )
 
-      // this also means all ancestors are already copied, so we're done
+    if (children === ancestorNode.children) {
+      // we were able to directly mutate, no further replacements needed
       return
-    } else {
-      modifiedNode = {
-        ...ancestorNode,
-        children: replaceChildren(ancestorNode.children, index, 1,  modifiedNode),
-      }
-      if (modifiedChildArrays) {
-        modifiedChildArrays.add(modifiedNode.children)
-      }
+    }
+
+    modifiedNode = {
+      ...ancestorNode,
+      children,
     }
   }
 
   const index = slicedPath[0]
 
-  if (modifiedChildArrays?.has(root.children)) {
-    // we've already copied this array in this batch, don't worry about copying it again
-    root.children[index] = modifiedNode
-  } else {
-    root.children = replaceChildren(root.children, index, 1, modifiedNode)
-    if (modifiedChildArrays) {
-      modifiedChildArrays.add(root.children)
-    }
-  }
+  root.children = smartReplaceChild(
+    modifiedChildArrays,
+    root.children,
+    index,
+    modifiedNode
+  )
 }
 
 /**
@@ -87,7 +139,6 @@ export const modifyChildren = (
 ) => {
   if (path.length === 0) {
     root.children = f(root.children)
-    MUTATED_CHILD_ARRAYS_IN_BATCH.get(root as Editor)?.add(root.children)
   } else {
     modifyDescendant<Element>(root, path, node => {
       if (Node.isText(node)) {
@@ -99,8 +150,7 @@ export const modifyChildren = (
       }
 
       const children = f(node.children)
-      MUTATED_CHILD_ARRAYS_IN_BATCH.get(root as Editor)?.add(children)
-      return { ...node, children }
+      return children === node.children ? node : { ...node, children }
     })
   }
 }
