@@ -13,8 +13,8 @@ const defaultRenderChunk = ({ children }: RenderChunkProps) => children
 const ChunkAncestor = <C extends TChunkAncestor>(props: {
   root: TChunkTree
   ancestor: C
-  renderElement: (node: Element, index: number, key: Key) => JSX.Element
-  renderChunk?: (props: RenderChunkProps) => JSX.Element
+  renderElement: (node: Element, index: number, key: Key) => React.JSX.Element
+  renderChunk?: (props: RenderChunkProps) => React.JSX.Element
 }) => {
   const {
     root,
