@@ -1,11 +1,4 @@
-import {
-  Descendant,
-  Editor,
-  Element,
-  Node,
-  Transforms,
-  createEditor,
-} from 'slate'
+import { Descendant, Element, Node, Transforms, createEditor } from 'slate'
 import { Key } from 'slate-dom'
 import { ReactEditor, withReact } from '../src'
 import {

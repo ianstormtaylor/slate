@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker'
 import React, { StrictMode, useCallback, useEffect, useState } from 'react'
-import { createEditor as slateCreateEditor, Editor } from 'slate'
+import { createEditor as slateCreateEditor } from 'slate'
 import { Editable, Slate, withReact, useSelected } from 'slate-react'
 
 const SUPPORTS_EVENT_TIMING =
