@@ -149,6 +149,11 @@ export interface NodeInterface {
   has: (root: Node, path: Path) => boolean
 
   /**
+   * Check if a node is an `Editor` or `Element` object.
+   */
+  isAncestor: (node: Node) => node is Ancestor
+
+  /**
    * Check if a node is an `Editor` object.
    */
   isEditor: (node: Node) => node is Editor
@@ -449,6 +454,10 @@ export const Node: NodeInterface = {
     }
 
     return true
+  },
+
+  isAncestor(node: Node): node is Ancestor {
+    return !Node.isText(node)
   },
 
   isEditor(node: Node): node is Editor {
