@@ -1,13 +1,5 @@
 import React, { useCallback, useMemo } from 'react'
-import {
-  createEditor,
-  Editor,
-  Element as SlateElement,
-  Node as SlateNode,
-  Point,
-  Range,
-  Transforms,
-} from 'slate'
+import { createEditor, Editor, Node, Point, Range, Transforms } from 'slate'
 import { withHistory } from 'slate-history'
 import { Editable, ReactEditor, Slate, withReact } from 'slate-react'
 
@@ -37,15 +29,14 @@ const MarkdownShortcutsExample = () => {
           if (!diff.text.endsWith(' ')) {
             return false
           }
-          const { text } = SlateNode.leaf(editor, path)
+          const { text } = Node.leaf(editor, path)
           const beforeText = text.slice(0, diff.start) + diff.text.slice(0, -1)
           if (!(beforeText in SHORTCUTS)) {
             return
           }
           const blockEntry = Editor.above(editor, {
             at: path,
-            match: n =>
-              SlateElement.isElementNode(n) && Editor.isBlock(editor, n),
+            match: n => Node.isElement(n) && Editor.isBlock(editor, n),
           })
           if (!blockEntry) {
             return false
@@ -79,7 +70,7 @@ const withShortcuts = editor => {
     if (text.endsWith(' ') && selection && Range.isCollapsed(selection)) {
       const { anchor } = selection
       const block = Editor.above(editor, {
-        match: n => SlateElement.isElementNode(n) && Editor.isBlock(editor, n),
+        match: n => Node.isElement(n) && Editor.isBlock(editor, n),
       })
       const path = block ? block[1] : []
       const start = Editor.start(editor, path)
@@ -95,8 +86,7 @@ const withShortcuts = editor => {
           type,
         }
         Transforms.setNodes(editor, newProperties, {
-          match: n =>
-            SlateElement.isElementNode(n) && Editor.isBlock(editor, n),
+          match: n => Node.isElement(n) && Editor.isBlock(editor, n),
         })
         if (type === 'list-item') {
           const list = {
@@ -104,7 +94,7 @@ const withShortcuts = editor => {
             children: [],
           }
           Transforms.wrapNodes(editor, list, {
-            match: n => SlateElement.isElementNode(n) && n.type === 'list-item',
+            match: n => Node.isElement(n) && n.type === 'list-item',
           })
         }
         return
@@ -116,13 +106,13 @@ const withShortcuts = editor => {
     const { selection } = editor
     if (selection && Range.isCollapsed(selection)) {
       const match = Editor.above(editor, {
-        match: n => SlateElement.isElementNode(n) && Editor.isBlock(editor, n),
+        match: n => Node.isElement(n) && Editor.isBlock(editor, n),
       })
       if (match) {
         const [block, path] = match
         const start = Editor.start(editor, path)
         if (
-          SlateElement.isElementNode(block) &&
+          Node.isElement(block) &&
           block.type !== 'paragraph' &&
           Point.equals(selection.anchor, start)
         ) {
@@ -132,8 +122,7 @@ const withShortcuts = editor => {
           Transforms.setNodes(editor, newProperties)
           if (block.type === 'list-item') {
             Transforms.unwrapNodes(editor, {
-              match: n =>
-                SlateElement.isElementNode(n) && n.type === 'bulleted-list',
+              match: n => Node.isElement(n) && n.type === 'bulleted-list',
               split: true,
             })
           }

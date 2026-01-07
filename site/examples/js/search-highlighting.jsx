@@ -1,6 +1,6 @@
 import { css } from '@emotion/css'
 import React, { useCallback, useMemo, useState } from 'react'
-import { Element, Text, createEditor } from 'slate'
+import { Node, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
 import { Editable, Slate, withReact } from 'slate-react'
 import { Icon, Toolbar } from './components'
@@ -11,12 +11,7 @@ const SearchHighlightingExample = () => {
   const decorate = useCallback(
     ([node, path]) => {
       const ranges = []
-      if (
-        search &&
-        Element.isElementNode(node) &&
-        Array.isArray(node.children) &&
-        node.children.every(Text.isText)
-      ) {
+      if (search && Node.isElement(node) && node.children.every(Node.isText)) {
         const texts = node.children.map(it => it.text)
         const str = texts.join('')
         const length = search.length

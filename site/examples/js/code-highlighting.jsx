@@ -11,7 +11,7 @@ import 'prismjs/components/prism-sql'
 import 'prismjs/components/prism-tsx'
 import 'prismjs/components/prism-typescript'
 import React, { useCallback, useState } from 'react'
-import { Editor, Element, Node, Transforms, createEditor } from 'slate'
+import { Editor, Node, Transforms, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
 import {
   Editable,
@@ -101,14 +101,14 @@ const CodeBlockButton = () => {
       editor,
       { type: CodeBlockType, language: 'html', children: [] },
       {
-        match: n => Element.isElementNode(n) && n.type === ParagraphType,
+        match: n => Node.isElement(n) && n.type === ParagraphType,
         split: true,
       }
     )
     Transforms.setNodes(
       editor,
       { type: CodeLineType },
-      { match: n => Element.isElementNode(n) && n.type === ParagraphType }
+      { match: n => Node.isElement(n) && n.type === ParagraphType }
     )
   }
   return (
@@ -135,7 +135,7 @@ const renderLeaf = props => {
 }
 const useDecorate = () => {
   return useCallback(([node, path]) => {
-    if (Element.isElementNode(node) && node.type === CodeBlockType) {
+    if (Node.isElement(node) && node.type === CodeBlockType) {
       return decorateCodeBlock([node, path])
     }
     return []
