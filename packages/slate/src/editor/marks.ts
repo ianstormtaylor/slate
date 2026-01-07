@@ -1,8 +1,7 @@
 import { Editor, EditorInterface } from '../interfaces/editor'
-import { Node, NodeEntry } from '../interfaces/node'
+import { Node } from '../interfaces/node'
 import { Range } from '../interfaces/range'
 import { Path } from '../interfaces/path'
-import { Text } from '../interfaces/text'
 import { Point } from '../interfaces'
 
 export const marks: EditorInterface['marks'] = (editor, options = {}) => {
@@ -35,7 +34,7 @@ export const marks: EditorInterface['marks'] = (editor, options = {}) => {
     }
 
     const [match] = Editor.nodes(editor, {
-      match: Text.isText,
+      match: Node.isText,
       at: {
         anchor,
         focus,
@@ -43,7 +42,7 @@ export const marks: EditorInterface['marks'] = (editor, options = {}) => {
     })
 
     if (match) {
-      const [node] = match as NodeEntry<Text>
+      const [node] = match
       const { text, ...rest } = node
       return rest
     } else {
@@ -56,7 +55,7 @@ export const marks: EditorInterface['marks'] = (editor, options = {}) => {
   let [node] = Editor.leaf(editor, path)
 
   if (anchor.offset === 0) {
-    const prev = Editor.previous(editor, { at: path, match: Text.isText })
+    const prev = Editor.previous(editor, { at: path, match: Node.isText })
     const markedVoid = Editor.above(editor, {
       match: n =>
         Node.isElement(n) && Editor.isVoid(editor, n) && editor.markableVoid(n),
@@ -71,7 +70,7 @@ export const marks: EditorInterface['marks'] = (editor, options = {}) => {
         const [, blockPath] = block
 
         if (Path.isAncestor(blockPath, prevPath)) {
-          node = prevNode as Text
+          node = prevNode
         }
       }
     }

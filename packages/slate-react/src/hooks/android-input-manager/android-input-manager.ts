@@ -1,5 +1,5 @@
 import { DebouncedFunc } from 'lodash'
-import { Editor, Node, Path, Point, Range, Text, Transforms } from 'slate'
+import { Editor, Node, Path, Point, Range, Transforms } from 'slate'
 import { ReactEditor } from '../../plugin/react-editor'
 import {
   applyStringDiff,
@@ -404,7 +404,7 @@ export function createAndroidInputManager({
         if (leaf.text.length === start.offset && end.offset === 0) {
           const next = Editor.next(editor, {
             at: start.path,
-            match: Text.isText,
+            match: Node.isText,
           })
           if (next && Path.equals(next[1], end.path)) {
             // when deleting a linebreak, targetRange will span across the break (ie start in the node before and end in the node after)

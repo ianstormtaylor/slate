@@ -1,4 +1,4 @@
-import { Editor, Node, Operation, Path, Point, Range, Text } from 'slate'
+import { Editor, Node, Operation, Path, Point, Range } from 'slate'
 import { EDITOR_TO_PENDING_DIFFS } from './weak-maps'
 
 export type StringDiff = {
@@ -175,7 +175,7 @@ export function normalizePoint(editor: Editor, point: Point): Point | null {
   }
 
   while (offset > leaf.text.length) {
-    const entry = Editor.next(editor, { at: path, match: Text.isText })
+    const entry = Editor.next(editor, { at: path, match: Node.isText })
     if (!entry || !Path.isDescendant(entry[1], parentBlock[1])) {
       return null
     }

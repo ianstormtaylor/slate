@@ -1,7 +1,6 @@
 import { Editor, EditorInterface } from '../interfaces/editor'
 import { Range } from '../interfaces/range'
 import { Path } from '../interfaces/path'
-import { Text } from '../interfaces/text'
 import { Node } from '../interfaces'
 
 export const unhangRange: EditorInterface['unhangRange'] = (
@@ -34,7 +33,7 @@ export const unhangRange: EditorInterface['unhangRange'] = (
 
   for (const [node, path] of Editor.nodes(editor, {
     at: before,
-    match: Text.isText,
+    match: Node.isText,
     reverse: true,
     voids,
   })) {
