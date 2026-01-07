@@ -1,11 +1,5 @@
 import React, { useCallback, useMemo } from 'react'
-import {
-  Editor,
-  Node,
-  Element as SlateElement,
-  Transforms,
-  createEditor,
-} from 'slate'
+import { Editor, Node, Transforms, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
 import { Editable, Slate, withReact } from 'slate-react'
 
@@ -34,7 +28,7 @@ const withLayout = editor => {
         let type
         const slateIndex = childPath[0]
         const enforceType = type => {
-          if (SlateElement.isElement(child) && child.type !== type) {
+          if (Node.isElement(child) && child.type !== type) {
             const newProperties = { type }
             Transforms.setNodes(editor, newProperties, {
               at: childPath,

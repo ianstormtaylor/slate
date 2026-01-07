@@ -1,11 +1,6 @@
 import isHotkey from 'is-hotkey'
 import React, { useCallback, useMemo } from 'react'
-import {
-  Editor,
-  Element as SlateElement,
-  Transforms,
-  createEditor,
-} from 'slate'
+import { Editor, Node, Transforms, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
 import { Editable, Slate, useSlate, withReact } from 'slate-react'
 import { Button, Icon, Toolbar } from './components'
@@ -66,11 +61,7 @@ const toggleBlock = (editor, format) => {
   )
   const isList = isListType(format)
   Transforms.unwrapNodes(editor, {
-    match: n =>
-      !Editor.isEditor(n) &&
-      SlateElement.isElement(n) &&
-      isListType(n.type) &&
-      !isAlignType(format),
+    match: n => Node.isElement(n) && isListType(n.type) && !isAlignType(format),
     split: true,
   })
   let newProperties
@@ -104,7 +95,7 @@ const isBlockActive = (editor, format, blockType = 'type') => {
     Editor.nodes(editor, {
       at: Editor.unhangRange(editor, selection),
       match: n => {
-        if (!Editor.isEditor(n) && SlateElement.isElement(n)) {
+        if (Node.isElement(n)) {
           if (blockType === 'align' && isAlignElement(n)) {
             return n.align === format
           }

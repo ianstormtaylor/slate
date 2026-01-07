@@ -1,13 +1,6 @@
 import { css } from '@emotion/css'
 import React, { useCallback, useMemo } from 'react'
-import {
-  Editor,
-  Point,
-  Range,
-  Element as SlateElement,
-  Transforms,
-  createEditor,
-} from 'slate'
+import { Editor, Node, Point, Range, Transforms, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
 import {
   Editable,
@@ -85,10 +78,7 @@ const withChecklists = editor => {
     const { selection } = editor
     if (selection && Range.isCollapsed(selection)) {
       const [match] = Editor.nodes(editor, {
-        match: n =>
-          !Editor.isEditor(n) &&
-          SlateElement.isElement(n) &&
-          n.type === 'check-list-item',
+        match: n => Node.isElement(n) && n.type === 'check-list-item',
       })
       if (match) {
         const [, path] = match
@@ -98,10 +88,7 @@ const withChecklists = editor => {
             type: 'paragraph',
           }
           Transforms.setNodes(editor, newProperties, {
-            match: n =>
-              !Editor.isEditor(n) &&
-              SlateElement.isElement(n) &&
-              n.type === 'check-list-item',
+            match: n => Node.isElement(n) && n.type === 'check-list-item',
           })
           return
         }

@@ -135,7 +135,7 @@ const createEditor = (config: Config) => {
   const editor = withReact(slateCreateEditor())
 
   editor.getChunkSize = node =>
-    config.chunking && Editor.isEditor(node) ? config.chunkSize : null
+    config.chunking && node === editor ? config.chunkSize : null
 
   return editor
 }

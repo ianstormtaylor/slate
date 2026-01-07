@@ -4,8 +4,7 @@ import { Range } from '../interfaces/range'
 import { Point } from '../interfaces/point'
 import { Path } from '../interfaces/path'
 import { Transforms } from '../interfaces/transforms'
-import { Element } from '../interfaces/element'
-import { NodeEntry } from '../interfaces/node'
+import { Node, NodeEntry } from '../interfaces/node'
 
 export const deleteText: TextTransforms['delete'] = (editor, options = {}) => {
   Editor.withoutNormalizing(editor, () => {
@@ -63,12 +62,12 @@ export const deleteText: TextTransforms['delete'] = (editor, options = {}) => {
 
     let [start, end] = Range.edges(at)
     const startBlock = Editor.above(editor, {
-      match: n => Element.isElement(n) && Editor.isBlock(editor, n),
+      match: n => Node.isElement(n) && Editor.isBlock(editor, n),
       at: start,
       voids,
     })
     const endBlock = Editor.above(editor, {
-      match: n => Element.isElement(n) && Editor.isBlock(editor, n),
+      match: n => Node.isElement(n) && Editor.isBlock(editor, n),
       at: end,
       voids,
     })
@@ -115,7 +114,7 @@ export const deleteText: TextTransforms['delete'] = (editor, options = {}) => {
 
       if (
         (!voids &&
-          Element.isElement(node) &&
+          Node.isElement(node) &&
           (Editor.isVoid(editor, node) ||
             Editor.isElementReadOnly(editor, node))) ||
         (!Path.isCommon(path, start.path) && !Path.isCommon(path, end.path))

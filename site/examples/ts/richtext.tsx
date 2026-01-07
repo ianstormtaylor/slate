@@ -3,6 +3,7 @@ import React, { KeyboardEvent, PointerEvent, useCallback, useMemo } from 'react'
 import {
   Descendant,
   Editor,
+  Node,
   Element as SlateElement,
   Transforms,
   createEditor,
@@ -96,11 +97,7 @@ const toggleBlock = (editor: CustomEditor, format: CustomElementFormat) => {
   const isList = isListType(format)
 
   Transforms.unwrapNodes(editor, {
-    match: n =>
-      !Editor.isEditor(n) &&
-      SlateElement.isElement(n) &&
-      isListType(n.type) &&
-      !isAlignType(format),
+    match: n => Node.isElement(n) && isListType(n.type) && !isAlignType(format),
     split: true,
   })
   let newProperties: Partial<SlateElement>
@@ -143,7 +140,7 @@ const isBlockActive = (
     Editor.nodes(editor, {
       at: Editor.unhangRange(editor, selection),
       match: n => {
-        if (!Editor.isEditor(n) && SlateElement.isElement(n)) {
+        if (Node.isElement(n)) {
           if (blockType === 'align' && isAlignElement(n)) {
             return n.align === format
           }

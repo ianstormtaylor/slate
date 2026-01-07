@@ -1,4 +1,4 @@
-import { Range, isObject } from '..'
+import { Range, isObject, Node } from '..'
 import { ExtendedType } from '../types/custom-types'
 import { isDeepEqual } from '../utils/deep-equal'
 
