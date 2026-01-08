@@ -33,6 +33,7 @@
     "test:inspect": "yarn test --inspect-brk",
     "test:integration": "playwright install --with-deps && run-p -r serve playwright",
     "test:integration-local": "playwright install && run-p -r serve playwright",
+    "test:integration-docker": "./playwright/docker/run-tests.sh",
     "test:mocha": "mocha --require ./config/babel/register.cjs ./packages/{slate,slate-history,slate-hyperscript}/test/**/*.{js,ts}",
     "test:jest": "jest --config jest.config.js",
     "tsc:examples": "tsc --project ./site/tsconfig.example.json",

@@ -2,7 +2,7 @@ import { css } from '@emotion/css'
 import Prism from 'prismjs'
 import 'prismjs/components/prism-markdown'
 import React, { useCallback, useMemo } from 'react'
-import { Descendant, NodeEntry, Range, Text, createEditor } from 'slate'
+import { Descendant, Node, NodeEntry, Range, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
 import { Editable, RenderLeafProps, Slate, withReact } from 'slate-react'
 import { CustomEditor } from './custom-types.d'
@@ -19,7 +19,7 @@ const MarkdownPreviewExample = () => {
   const decorate = useCallback(([node, path]: NodeEntry) => {
     const ranges: Range[] = []
 
-    if (!Text.isText(node)) {
+    if (!Node.isText(node)) {
       return ranges
     }
 

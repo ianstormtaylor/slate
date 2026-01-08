@@ -1,6 +1,6 @@
-import { produce } from 'immer'
 import { Editor, Path, Range, Scrubber, Text } from '..'
 import { Element, ElementEntry } from './element'
+import { modifyChildren, modifyLeaf, removeChildren } from '../utils/modify'
 
 /**
  * The `Node` union type represents all of the different types of nodes that
@@ -149,6 +149,21 @@ export interface NodeInterface {
   has: (root: Node, path: Path) => boolean
 
   /**
+   * Check if a node is an `Editor` or `Element` object.
+   */
+  isAncestor: (node: Node) => node is Ancestor
+
+  /**
+   * Check if a node is an `Editor` object.
+   */
+  isEditor: (node: Node) => node is Editor
+
+  /**
+   * Check if a node is an `Element` object.
+   */
+  isElement: (node: Node) => node is Element
+
+  /**
    * Check if a value implements the `Node` interface.
    */
   isNode: (value: any, options?: NodeIsNodeOptions) => value is Node
@@ -157,6 +172,11 @@ export interface NodeInterface {
    * Check if a value is a list of `Node` objects.
    */
   isNodeList: (value: any, options?: NodeIsNodeOptions) => value is Node[]
+
+  /**
+   * Check if a node is an `Text` object.
+   */
+  isText: (node: Node) => node is Text
 
   /**
    * Get the last leaf node entry in a root node from a path.
@@ -223,7 +243,7 @@ export const Node: NodeInterface = {
   ancestor(root: Node, path: Path): Ancestor {
     const node = Node.get(root, path)
 
-    if (Text.isText(node)) {
+    if (Node.isText(node)) {
       throw new Error(
         `Cannot get the ancestor node at path [${path}] because it refers to a text node instead: ${Scrubber.stringify(
           node
@@ -247,7 +267,7 @@ export const Node: NodeInterface = {
   },
 
   child(root: Node, index: number): Descendant {
-    if (Text.isText(root)) {
+    if (Node.isText(root)) {
       throw new Error(
         `Cannot get the child of a text node: ${Scrubber.stringify(root)}`
       )
@@ -293,7 +313,7 @@ export const Node: NodeInterface = {
   descendant(root: Node, path: Path): Descendant {
     const node = Node.get(root, path)
 
-    if (Editor.isEditor(node)) {
+    if (Node.isEditor(node)) {
       throw new Error(
         `Cannot get the descendant node at path [${path}] because it refers to the root editor node instead: ${Scrubber.stringify(
           node
@@ -322,19 +342,19 @@ export const Node: NodeInterface = {
     options: NodeElementsOptions = {}
   ): Generator<ElementEntry, void, undefined> {
     for (const [node, path] of Node.nodes(root, options)) {
-      if (Element.isElement(node)) {
+      if (Node.isElement(node)) {
         yield [node, path]
       }
     }
   },
 
   extractProps(node: Node): NodeProps {
-    if (Element.isAncestor(node)) {
-      const { children, ...properties } = node
+    if (Node.isText(node)) {
+      const { text, ...properties } = node
 
       return properties
     } else {
-      const { text, ...properties } = node
+      const { children, ...properties } = node
 
       return properties
     }
@@ -345,7 +365,7 @@ export const Node: NodeInterface = {
     let n = Node.get(root, p)
 
     while (n) {
-      if (Text.isText(n) || n.children.length === 0) {
+      if (Node.isText(n) || n.children.length === 0) {
         break
       } else {
         n = n.children[0]
@@ -357,35 +377,37 @@ export const Node: NodeInterface = {
   },
 
   fragment<T extends Ancestor = Editor>(root: T, range: Range): T['children'] {
-    const newRoot = produce({ children: root.children }, r => {
-      const [start, end] = Range.edges(range)
-      const nodeEntries = Node.nodes(r, {
-        reverse: true,
-        pass: ([, path]) => !Range.includes(range, path),
-      })
+    const newRoot = { children: root.children }
 
-      for (const [, path] of nodeEntries) {
-        if (!Range.includes(range, path)) {
-          const parent = Node.parent(r, path)
-          const index = path[path.length - 1]
-          parent.children.splice(index, 1)
-        }
-
-        if (Path.equals(path, end.path)) {
-          const leaf = Node.leaf(r, path)
-          leaf.text = leaf.text.slice(0, end.offset)
-        }
-
-        if (Path.equals(path, start.path)) {
-          const leaf = Node.leaf(r, path)
-          leaf.text = leaf.text.slice(start.offset)
-        }
-      }
-
-      if (Editor.isEditor(r)) {
-        r.selection = null
-      }
+    const [start, end] = Range.edges(range)
+    const nodeEntries = Node.nodes(newRoot, {
+      reverse: true,
+      pass: ([, path]) => !Range.includes(range, path),
     })
+
+    for (const [, path] of nodeEntries) {
+      if (!Range.includes(range, path)) {
+        const index = path[path.length - 1]
+
+        modifyChildren(newRoot, Path.parent(path), children =>
+          removeChildren(children, index, 1)
+        )
+      }
+
+      if (Path.equals(path, end.path)) {
+        modifyLeaf(newRoot, path, node => {
+          const before = node.text.slice(0, end.offset)
+          return { ...node, text: before }
+        })
+      }
+
+      if (Path.equals(path, start.path)) {
+        modifyLeaf(newRoot, path, node => {
+          const before = node.text.slice(start.offset)
+          return { ...node, text: before }
+        })
+      }
+    }
 
     return newRoot.children
   },
@@ -408,7 +430,7 @@ export const Node: NodeInterface = {
     for (let i = 0; i < path.length; i++) {
       const p = path[i]
 
-      if (Text.isText(node) || !node.children[p]) {
+      if (Node.isText(node) || !node.children[p]) {
         return
       }
 
@@ -424,7 +446,7 @@ export const Node: NodeInterface = {
     for (let i = 0; i < path.length; i++) {
       const p = path[i]
 
-      if (Text.isText(node) || !node.children[p]) {
+      if (Node.isText(node) || !node.children[p]) {
         return false
       }
 
@@ -432,6 +454,21 @@ export const Node: NodeInterface = {
     }
 
     return true
+  },
+
+  isAncestor(node: Node): node is Ancestor {
+    return !Node.isText(node)
+  },
+
+  isEditor(node: Node): node is Editor {
+    return typeof (node as Editor).apply === 'function'
+  },
+
+  isElement(node: Node): node is Element {
+    return (
+      Array.isArray((node as Element).children) &&
+      typeof (node as Editor).apply !== 'function'
+    )
   },
 
   isNode(value: any, { deep = false }: NodeIsNodeOptions = {}): value is Node {
@@ -451,12 +488,16 @@ export const Node: NodeInterface = {
     )
   },
 
+  isText(node: Node): node is Text {
+    return typeof (node as Text).text === 'string'
+  },
+
   last(root: Node, path: Path): NodeEntry {
     const p = path.slice()
     let n = Node.get(root, p)
 
     while (n) {
-      if (Text.isText(n) || n.children.length === 0) {
+      if (Node.isText(n) || n.children.length === 0) {
         break
       } else {
         const i = n.children.length - 1
@@ -471,7 +512,7 @@ export const Node: NodeInterface = {
   leaf(root: Node, path: Path): Text {
     const node = Node.get(root, path)
 
-    if (!Text.isText(node)) {
+    if (!Node.isText(node)) {
       throw new Error(
         `Cannot get the leaf node at path [${path}] because it refers to a non-leaf node: ${Scrubber.stringify(
           node
@@ -495,10 +536,10 @@ export const Node: NodeInterface = {
 
   matches(node: Node, props: Partial<Node>): boolean {
     return (
-      (Element.isElement(node) &&
+      (Node.isElement(node) &&
         Element.isElementProps(props) &&
         Element.matches(node, props)) ||
-      (Text.isText(node) &&
+      (Node.isText(node) &&
         Text.isTextProps(props) &&
         Text.matches(node, props))
     )
@@ -526,7 +567,7 @@ export const Node: NodeInterface = {
       // If we're allowed to go downward and we haven't descended yet, do.
       if (
         !visited.has(n) &&
-        !Text.isText(n) &&
+        !Node.isText(n) &&
         n.children.length !== 0 &&
         (pass == null || pass([n, p]) === false)
       ) {
@@ -575,19 +616,20 @@ export const Node: NodeInterface = {
 
   parent(root: Node, path: Path): Ancestor {
     const parentPath = Path.parent(path)
-    const p = Node.get(root, parentPath)
+    const node = Node.get(root, parentPath)
 
-    if (Text.isText(p)) {
+    if (Node.isText(node)) {
+      // this can happen if `path` points somewhere that doesnt exist and it's where a child of a text node would be
       throw new Error(
         `Cannot get the parent of path [${path}] because it does not exist in the root.`
       )
     }
 
-    return p
+    return node
   },
 
   string(node: Node): string {
-    if (Text.isText(node)) {
+    if (Node.isText(node)) {
       return node.text
     } else {
       return node.children.map(Node.string).join('')
@@ -599,7 +641,7 @@ export const Node: NodeInterface = {
     options: NodeTextsOptions = {}
   ): Generator<NodeEntry<Text>, void, undefined> {
     for (const [node, path] of Node.nodes(root, options)) {
-      if (Text.isText(node)) {
+      if (Node.isText(node)) {
         yield [node, path]
       }
     }

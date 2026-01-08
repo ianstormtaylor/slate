@@ -299,19 +299,19 @@ export const isTrackedMutation = (
   }
 
   const { document } = DOMEditor.getWindow(editor)
-  if (document.contains(target)) {
+  if (containsShadowAware(document, target)) {
     return DOMEditor.hasDOMNode(editor, target, { editable: true })
   }
 
   const parentMutation = batch.find(({ addedNodes, removedNodes }) => {
     for (const node of addedNodes) {
-      if (node === target || node.contains(target)) {
+      if (node === target || containsShadowAware(node, target)) {
         return true
       }
     }
 
     for (const node of removedNodes) {
-      if (node === target || node.contains(target)) {
+      if (node === target || containsShadowAware(node, target)) {
         return true
       }
     }
@@ -355,3 +355,71 @@ export const isAfter = (node: DOMNode, otherNode: DOMNode): boolean =>
     node.compareDocumentPosition(otherNode) &
       DOMNode.DOCUMENT_POSITION_FOLLOWING
   )
+
+/**
+ * Shadow DOM-aware version of Element.closest()
+ * Traverses up the DOM tree, crossing shadow DOM boundaries
+ */
+export const closestShadowAware = (
+  element: DOMElement | null | undefined,
+  selector: string
+): DOMElement | null => {
+  if (!element) {
+    return null
+  }
+
+  let current: DOMElement | null = element
+
+  while (current) {
+    if (current.matches && current.matches(selector)) {
+      return current
+    }
+
+    if (current.parentElement) {
+      current = current.parentElement
+    } else if (current.parentNode && 'host' in current.parentNode) {
+      current = (current.parentNode as ShadowRoot).host as DOMElement
+    } else {
+      return null
+    }
+  }
+
+  return null
+}
+
+/**
+ * Shadow DOM-aware version of Node.contains()
+ * Checks if a node contains another node, crossing shadow DOM boundaries
+ */
+export const containsShadowAware = (
+  parent: DOMNode | null | undefined,
+  child: DOMNode | null | undefined
+): boolean => {
+  if (!parent || !child) {
+    return false
+  }
+
+  if (parent.contains(child)) {
+    return true
+  }
+
+  let current: DOMNode | null = child
+
+  while (current) {
+    if (current === parent) {
+      return true
+    }
+
+    if (current.parentNode) {
+      if ('host' in current.parentNode) {
+        current = (current.parentNode as ShadowRoot).host
+      } else {
+        current = current.parentNode
+      }
+    } else {
+      return false
+    }
+  }
+
+  return false
+}

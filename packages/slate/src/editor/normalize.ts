@@ -2,7 +2,6 @@ import { Editor, EditorInterface } from '../interfaces/editor'
 import { DIRTY_PATH_KEYS, DIRTY_PATHS } from '../utils/weak-maps'
 import { Path } from '../interfaces/path'
 import { Node } from '../interfaces/node'
-import { Element } from '../interfaces/element'
 
 export const normalize: EditorInterface['normalize'] = (
   editor,
@@ -57,7 +56,7 @@ export const normalize: EditorInterface['normalize'] = (
           As long as the normalizer only inserts child nodes for this case it is safe to do in any order;
           by definition adding children to an empty node can't cause other paths to change.
         */
-        if (Element.isElement(node) && node.children.length === 0) {
+        if (Node.isElement(node) && node.children.length === 0) {
           editor.normalizeNode(entry, { operation })
         }
       }

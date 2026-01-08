@@ -2,6 +2,7 @@ import { faker } from '@faker-js/faker'
 import React, {
   CSSProperties,
   Dispatch,
+  StrictMode,
   useCallback,
   useEffect,
   useState,
@@ -33,6 +34,7 @@ interface Config {
   chunkOutlines: boolean
   contentVisibilityMode: 'none' | 'element' | 'chunk'
   showSelectedHeadings: boolean
+  strictMode: boolean
 }
 
 const blocksOptions = [
@@ -78,6 +80,7 @@ const initialConfig: Config = {
     'chunk'
   ),
   showSelectedHeadings: parseBoolean('selected_headings', false),
+  strictMode: parseBoolean('strict', false),
 }
 
 const setSearchParams = (config: Config) => {
@@ -92,6 +95,7 @@ const setSearchParams = (config: Config) => {
       'selected_headings',
       config.showSelectedHeadings ? 'true' : 'false'
     )
+    searchParams.set('strict', config.strictMode ? 'true' : 'false')
     history.replaceState({}, '', `?${searchParams.toString()}`)
   }
 }
@@ -131,7 +135,7 @@ const createEditor = (config: Config) => {
   const editor = withReact(slateCreateEditor())
 
   editor.getChunkSize = node =>
-    config.chunking && Editor.isEditor(node) ? config.chunkSize : null
+    config.chunking && node === editor ? config.chunkSize : null
 
   return editor
 }
@@ -183,6 +187,26 @@ const HugeDocumentExample = () => {
     [config.contentVisibilityMode, config.chunkOutlines]
   )
 
+  const editable = rendering ? (
+    <div>Rendering&hellip;</div>
+  ) : (
+    <Slate key={editorVersion} editor={editor} initialValue={initialValue}>
+      <Editable
+        placeholder="Enter some text…"
+        renderElement={renderElement}
+        renderChunk={config.chunkDivs ? renderChunk : undefined}
+        spellCheck
+        autoFocus
+      />
+    </Slate>
+  )
+
+  const editableWithStrictMode = config.strictMode ? (
+    <StrictMode>{editable}</StrictMode>
+  ) : (
+    editable
+  )
+
   return (
     <>
       <PerformanceControls
@@ -191,19 +215,7 @@ const HugeDocumentExample = () => {
         setConfig={setConfig}
       />
 
-      {rendering ? (
-        <div>Rendering&hellip;</div>
-      ) : (
-        <Slate key={editorVersion} editor={editor} initialValue={initialValue}>
-          <Editable
-            placeholder="Enter some text…"
-            renderElement={renderElement}
-            renderChunk={config.chunkDivs ? renderChunk : undefined}
-            spellCheck
-            autoFocus
-          />
-        </Slate>
-      )}
+      {editableWithStrictMode}
     </>
   )
 }
@@ -481,6 +493,21 @@ const PerformanceControls = ({
               }
             />{' '}
             Call <code>useSelected</code> in each heading
+          </label>
+        </p>
+
+        <p>
+          <label>
+            <input
+              type="checkbox"
+              checked={config.strictMode}
+              onChange={event =>
+                setConfig({
+                  strictMode: event.target.checked,
+                })
+              }
+            />{' '}
+            React strict mode (only works in localhost)
           </label>
         </p>
       </details>

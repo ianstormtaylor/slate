@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useMemo, useRef } from 'react'
-import { DecoratedRange, Descendant, NodeEntry, Text } from 'slate'
+import { DecoratedRange, Descendant, Node, NodeEntry } from 'slate'
 import { isTextDecorationsEqual, isElementDecorationsEqual } from 'slate-dom'
 import { useSlateStatic } from './use-slate-static'
 import { ReactEditor } from '../plugin/react-editor'
@@ -31,7 +31,7 @@ export const useDecorations = (
     return decorate([node, path])
   }
 
-  const equalityFn = Text.isText(node)
+  const equalityFn = Node.isText(node)
     ? isTextDecorationsEqual
     : isElementDecorationsEqual
 

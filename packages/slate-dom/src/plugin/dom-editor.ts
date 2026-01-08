@@ -1,7 +1,6 @@
 import {
   BaseEditor,
   Editor,
-  Element,
   Node,
   Path,
   Point,
@@ -11,6 +10,8 @@ import {
 } from 'slate'
 import { TextDiff } from '../utils/diff-text'
 import {
+  closestShadowAware,
+  containsShadowAware,
   DOMElement,
   DOMNode,
   DOMPoint,
@@ -327,7 +328,7 @@ export const DOMEditor: DOMEditorInterface = {
     // If the drop target is inside a void node, move it into either the
     // next or previous node, depending on which side the `x` and `y`
     // coordinates are closest to.
-    if (Element.isElement(node) && Editor.isVoid(editor, node)) {
+    if (Node.isElement(node) && Editor.isVoid(editor, node)) {
       const rect = target.getBoundingClientRect()
       const isPrev = editor.isInline(node)
         ? x - rect.left < rect.left + rect.width - x
@@ -394,7 +395,7 @@ export const DOMEditor: DOMEditorInterface = {
       const parent = NODE_TO_PARENT.get(child)
 
       if (parent == null) {
-        if (Editor.isEditor(child)) {
+        if (child === editor) {
           return path
         } else {
           break
@@ -499,12 +500,13 @@ export const DOMEditor: DOMEditorInterface = {
     }
 
     return (
-      targetEl.closest(`[data-slate-editor]`) === editorEl &&
+      closestShadowAware(targetEl, `[data-slate-editor]`) === editorEl &&
       (!editable || targetEl.isContentEditable
         ? true
         : (typeof targetEl.isContentEditable === 'boolean' && // isContentEditable exists only on HTMLElement, and on other nodes it will be undefined
             // this is the core logic that lets you know you got the right editor.selection instead of null when editor is contenteditable="false"(readOnly)
-            targetEl.closest('[contenteditable="false"]') === editorEl) ||
+            closestShadowAware(targetEl, '[contenteditable="false"]') ===
+              editorEl) ||
           !!targetEl.getAttribute('data-slate-zero-width'))
     )
   },
@@ -545,21 +547,22 @@ export const DOMEditor: DOMEditorInterface = {
 
   isTargetInsideNonReadonlyVoid: (editor, target) => {
     if (IS_READ_ONLY.get(editor)) return false
+    if (!DOMEditor.hasTarget(editor, target)) return false
 
-    const slateNode =
-      DOMEditor.hasTarget(editor, target) &&
-      DOMEditor.toSlateNode(editor, target)
-    return Element.isElement(slateNode) && Editor.isVoid(editor, slateNode)
+    const slateNode = DOMEditor.toSlateNode(editor, target)
+    return Node.isElement(slateNode) && Editor.isVoid(editor, slateNode)
   },
 
   setFragmentData: (editor, data, originEvent) =>
     editor.setFragmentData(data, originEvent),
 
   toDOMNode: (editor, node) => {
-    const KEY_TO_ELEMENT = EDITOR_TO_KEY_TO_ELEMENT.get(editor)
-    const domNode = Editor.isEditor(node)
-      ? EDITOR_TO_ELEMENT.get(editor)
-      : KEY_TO_ELEMENT?.get(DOMEditor.findKey(editor, node))
+    const domNode =
+      node === editor
+        ? EDITOR_TO_ELEMENT.get(editor)
+        : EDITOR_TO_KEY_TO_ELEMENT.get(editor)?.get(
+            DOMEditor.findKey(editor, node)
+          )
 
     if (!domNode) {
       throw new Error(
@@ -713,14 +716,15 @@ export const DOMEditor: DOMEditorInterface = {
       // if this editor is within a void node of another editor ("nested editors", like in
       // the "Editable Voids" example on the docs site).
       const voidNode =
-        potentialVoidNode && editorEl.contains(potentialVoidNode)
+        potentialVoidNode && containsShadowAware(editorEl, potentialVoidNode)
           ? potentialVoidNode
           : null
       const potentialNonEditableNode = parentNode.closest(
         '[contenteditable="false"]'
       )
       const nonEditableNode =
-        potentialNonEditableNode && editorEl.contains(potentialNonEditableNode)
+        potentialNonEditableNode &&
+        containsShadowAware(editorEl, potentialNonEditableNode)
           ? potentialNonEditableNode
           : null
       let leafNode = parentNode.closest('[data-slate-leaf]')

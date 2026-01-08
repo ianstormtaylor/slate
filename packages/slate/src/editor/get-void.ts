@@ -1,9 +1,9 @@
 import { Editor, EditorInterface } from '../interfaces/editor'
-import { Element } from '../interfaces/element'
+import { Node } from '../interfaces/node'
 
 export const getVoid: EditorInterface['void'] = (editor, options = {}) => {
   return Editor.above(editor, {
     ...options,
-    match: n => Element.isElement(n) && Editor.isVoid(editor, n),
+    match: n => Node.isElement(n) && Editor.isVoid(editor, n),
   })
 }

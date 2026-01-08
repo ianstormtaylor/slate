@@ -828,9 +828,7 @@ export const Editor: EditorInterface = {
     return editor.isEdge(point, at)
   },
 
-  isEditor(value: any): value is Editor {
-    return isEditor(value)
-  },
+  isEditor,
 
   isElementReadOnly(editor, element) {
     return editor.isElementReadOnly(element)

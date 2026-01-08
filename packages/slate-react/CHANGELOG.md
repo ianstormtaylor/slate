@@ -1,5 +1,43 @@
 # slate-react
 
+## 0.121.0
+
+### Patch Changes
+
+- [#5982](https://github.com/ianstormtaylor/slate/pull/5982) [`dd4a77b3`](https://github.com/ianstormtaylor/slate/commit/dd4a77b3c5bb5d2d3cd6a62f49d6f318d30d6727) Thanks [@nabbydude](https://github.com/nabbydude)! - Add `Node.isEditor`, `Node.isElement`, and `Node.isText` as alternative type guards for when we already know the object is a node.
+  Use these new functions instead of `Editor.isEditor`, `Element.isElement`, and `Text.isText` whenever possible, the classic functions are only necessary for typechecking an entirely unknown object.
+  ===
+
+## 0.120.2
+
+### Patch Changes
+
+- [#5986](https://github.com/ianstormtaylor/slate/pull/5986) [`66283839`](https://github.com/ianstormtaylor/slate/commit/662838397fea198f3f8125ae87ac8b54cd29be89) Thanks [@ebroder](https://github.com/ebroder)! - Update TypeScript declarations for React v19 by switching from JSX.Element to React.JSX.Element
+
+## 0.120.1
+
+### Patch Changes
+
+- [#5988](https://github.com/ianstormtaylor/slate/pull/5988) [`bfa5055f`](https://github.com/ianstormtaylor/slate/commit/bfa5055f75fcf64ee71c2aee8f1ca43dc50222f4) Thanks [@12joan](https://github.com/12joan)! - Fix rendering issues when both chunking and React's strict mode are enabled
+
+## 0.120.0
+
+### Minor Changes
+
+- [#5968](https://github.com/ianstormtaylor/slate/pull/5968) [`49f28e50`](https://github.com/ianstormtaylor/slate/commit/49f28e5067b213431bd16e423524d608cd819a80) Thanks [@TyMick](https://github.com/TyMick)! - Scroll to focus point of expanded selections in `defaultScrollSelectionIntoView`
+
+### Patch Changes
+
+- [#5976](https://github.com/ianstormtaylor/slate/pull/5976) [`3d38db8f`](https://github.com/ianstormtaylor/slate/commit/3d38db8fe7068e6a245d5b4b1ebef536ea3f8a3e) Thanks [@semimikoh](https://github.com/semimikoh)! - Fix slate-dom peer dependency to require >=0.119.0 to resolve containsShadowAware import error
+
+- [#5975](https://github.com/ianstormtaylor/slate/pull/5975) [`d0d192b8`](https://github.com/ianstormtaylor/slate/commit/d0d192b824827f3873e62f237cb5169999791744) Thanks [@nabbydude](https://github.com/nabbydude)! - Allow onValueChange and onSelectionChange to trigger on the same frame, fixing a few bugs where one was not being called
+
+## 0.119.0
+
+### Minor Changes
+
+- [#5963](https://github.com/ianstormtaylor/slate/pull/5963) [`33e74a82`](https://github.com/ianstormtaylor/slate/commit/33e74a822b82c4b9ce1444f456c5343970441ccb) Thanks [@iperzic](https://github.com/iperzic)! - Fixes an editor crash that happens when editor is placed inside Shadow DOM and the user is typing on Android
+
 ## 0.118.2
 
 ### Patch Changes

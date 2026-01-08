@@ -35,6 +35,7 @@ import { useTrackUserInput } from '../hooks/use-track-user-input'
 import { ReactEditor } from '../plugin/react-editor'
 import { TRIPLE_CLICK } from 'slate-dom'
 import {
+  containsShadowAware,
   DOMElement,
   DOMRange,
   DOMText,
@@ -157,11 +158,11 @@ export type EditableProps = {
   readOnly?: boolean
   role?: string
   style?: React.CSSProperties
-  renderElement?: (props: RenderElementProps) => JSX.Element
-  renderChunk?: (props: RenderChunkProps) => JSX.Element
-  renderLeaf?: (props: RenderLeafProps) => JSX.Element
-  renderText?: (props: RenderTextProps) => JSX.Element
-  renderPlaceholder?: (props: RenderPlaceholderProps) => JSX.Element
+  renderElement?: (props: RenderElementProps) => React.JSX.Element
+  renderChunk?: (props: RenderChunkProps) => React.JSX.Element
+  renderLeaf?: (props: RenderLeafProps) => React.JSX.Element
+  renderText?: (props: RenderTextProps) => React.JSX.Element
+  renderPlaceholder?: (props: RenderPlaceholderProps) => React.JSX.Element
   scrollSelectionIntoView?: (editor: ReactEditor, domRange: DOMRange) => void
   as?: React.ElementType
   disableDefaultStyles?: boolean
@@ -404,8 +405,8 @@ export const Editable = forwardRef(
         const editorElement = EDITOR_TO_ELEMENT.get(editor)!
         let hasDomSelectionInEditor = false
         if (
-          editorElement.contains(anchorNode) &&
-          editorElement.contains(focusNode)
+          containsShadowAware(editorElement, anchorNode) &&
+          containsShadowAware(editorElement, focusNode)
         ) {
           hasDomSelectionInEditor = true
         }
@@ -668,7 +669,7 @@ export const Editable = forwardRef(
               ) {
                 const block = Editor.above(editor, {
                   at: anchor.path,
-                  match: n => Element.isElement(n) && Editor.isBlock(editor, n),
+                  match: n => Node.isElement(n) && Editor.isBlock(editor, n),
                 })
 
                 if (block && Node.string(block[0]).includes('\t')) {
@@ -692,18 +693,8 @@ export const Editable = forwardRef(
                 exactMatch: false,
                 suppressThrow: false,
               })
-              const flippedRange = {
-                anchor: range.focus,
-                focus: range.anchor,
-              }
 
-              if (
-                !selection ||
-                !(
-                  Range.equals(selection, range) ||
-                  Range.equals(selection, flippedRange)
-                )
-              ) {
+              if (!selection || !Range.equals(selection, range)) {
                 native = false
 
                 const selectionRef =
@@ -1195,7 +1186,7 @@ export const Editable = forwardRef(
                         relatedTarget
                       )
 
-                      if (Element.isElement(node) && !editor.isVoid(node)) {
+                      if (Node.isElement(node) && !editor.isVoid(node)) {
                         return
                       }
                     }
@@ -1243,13 +1234,12 @@ export const Editable = forwardRef(
                         let blockPath = path
                         if (
                           !(
-                            Element.isElement(node) &&
-                            Editor.isBlock(editor, node)
+                            Node.isElement(node) && Editor.isBlock(editor, node)
                           )
                         ) {
                           const block = Editor.above(editor, {
                             match: n =>
-                              Element.isElement(n) && Editor.isBlock(editor, n),
+                              Node.isElement(n) && Editor.isBlock(editor, n),
                             at: path,
                           })
 
@@ -1444,10 +1434,7 @@ export const Editable = forwardRef(
                       // default, and calling `preventDefault` hides the cursor.
                       const node = ReactEditor.toSlateNode(editor, event.target)
 
-                      if (
-                        Element.isElement(node) &&
-                        Editor.isVoid(editor, node)
-                      ) {
+                      if (Node.isElement(node) && Editor.isVoid(editor, node)) {
                         event.preventDefault()
                       }
                     }
@@ -1464,8 +1451,7 @@ export const Editable = forwardRef(
                       const node = ReactEditor.toSlateNode(editor, event.target)
                       const path = ReactEditor.findPath(editor, node)
                       const voidMatch =
-                        (Element.isElement(node) &&
-                          Editor.isVoid(editor, node)) ||
+                        (Node.isElement(node) && Editor.isVoid(editor, node)) ||
                         Editor.void(editor, { at: path, voids: true })
 
                       // If starting a drag on a void node, make sure it is selected
@@ -1845,7 +1831,7 @@ export const Editable = forwardRef(
                             )
 
                             if (
-                              Element.isElement(currentNode) &&
+                              Node.isElement(currentNode) &&
                               Editor.isVoid(editor, currentNode) &&
                               (Editor.isInline(editor, currentNode) ||
                                 Editor.isBlock(editor, currentNode))
@@ -1951,18 +1937,17 @@ export const defaultScrollSelectionIntoView = (
   editor: ReactEditor,
   domRange: DOMRange
 ) => {
-  // This was affecting the selection of multiple blocks and dragging behavior,
-  // so enabled only if the selection has been collapsed.
-  if (
-    domRange.getBoundingClientRect &&
-    (!editor.selection ||
-      (editor.selection && Range.isCollapsed(editor.selection)))
-  ) {
-    const leafEl = domRange.startContainer.parentElement!
+  // Scroll to the focus point of the selection, in case the selection is expanded
+  const isBackward = !!editor.selection && Range.isBackward(editor.selection)
+  const domFocusPoint = domRange.cloneRange()
+  domFocusPoint.collapse(isBackward)
 
-    // COMPAT: In Chrome, domRange.getBoundingClientRect() can return zero dimensions for valid ranges (e.g. line breaks).
+  if (domFocusPoint.getBoundingClientRect) {
+    const leafEl = domFocusPoint.startContainer.parentElement!
+
+    // COMPAT: In Chrome, domFocusPoint.getBoundingClientRect() can return zero dimensions for valid ranges (e.g. line breaks).
     // When this happens, do not scroll like most editors do.
-    const domRect = domRange.getBoundingClientRect()
+    const domRect = domFocusPoint.getBoundingClientRect()
     const isZeroDimensionRect =
       domRect.width === 0 &&
       domRect.height === 0 &&
@@ -1978,8 +1963,9 @@ export const defaultScrollSelectionIntoView = (
       }
     }
 
-    // Default behavior: use domRange's getBoundingClientRect
-    leafEl.getBoundingClientRect = domRange.getBoundingClientRect.bind(domRange)
+    // Default behavior: use domFocusPoint's getBoundingClientRect
+    leafEl.getBoundingClientRect =
+      domFocusPoint.getBoundingClientRect.bind(domFocusPoint)
     scrollIntoView(leafEl, {
       scrollMode: 'if-needed',
     })

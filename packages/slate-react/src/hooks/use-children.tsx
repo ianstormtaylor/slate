@@ -1,5 +1,5 @@
 import React, { useCallback, useRef } from 'react'
-import { Ancestor, Editor, Element, DecoratedRange, Text } from 'slate'
+import { Ancestor, Editor, Element, DecoratedRange, Text, Node } from 'slate'
 import { Key, isElementDecorationsEqual } from 'slate-dom'
 import {
   RenderChunkProps,
@@ -30,11 +30,11 @@ import { ElementContext } from './use-element'
 const useChildren = (props: {
   decorations: DecoratedRange[]
   node: Ancestor
-  renderElement?: (props: RenderElementProps) => JSX.Element
-  renderChunk?: (props: RenderChunkProps) => JSX.Element
-  renderPlaceholder: (props: RenderPlaceholderProps) => JSX.Element
-  renderText?: (props: RenderTextProps) => JSX.Element
-  renderLeaf?: (props: RenderLeafProps) => JSX.Element
+  renderElement?: (props: RenderElementProps) => React.JSX.Element
+  renderChunk?: (props: RenderChunkProps) => React.JSX.Element
+  renderPlaceholder: (props: RenderPlaceholderProps) => React.JSX.Element
+  renderText?: (props: RenderTextProps) => React.JSX.Element
+  renderLeaf?: (props: RenderLeafProps) => React.JSX.Element
 }) => {
   const {
     decorations,
@@ -48,8 +48,7 @@ const useChildren = (props: {
   const editor = useSlateStatic()
   IS_NODE_MAP_DIRTY.set(editor as ReactEditor, false)
 
-  const isEditor = Editor.isEditor(node)
-  const isBlock = !isEditor && Element.isElement(node) && !editor.isInline(node)
+  const isBlock = Node.isElement(node) && !editor.isInline(node)
   const isLeafBlock = isBlock && Editor.hasInlines(editor, node)
   const chunkSize = isLeafBlock ? null : editor.getChunkSize(node)
   const chunking = !!chunkSize
@@ -119,7 +118,7 @@ const useChildren = (props: {
 
   if (!chunking) {
     return node.children.map((n, i) =>
-      Text.isText(n) ? renderTextComponent(n, i) : renderElementComponent(n, i)
+      Node.isText(n) ? renderTextComponent(n, i) : renderElementComponent(n, i)
     )
   }
 

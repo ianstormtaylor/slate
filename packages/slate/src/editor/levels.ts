@@ -1,6 +1,5 @@
 import { Node, NodeEntry } from '../interfaces/node'
 import { Editor, EditorLevelsOptions } from '../interfaces/editor'
-import { Element } from '../interfaces/element'
 
 export function* levels<T extends Node>(
   editor: Editor,
@@ -27,7 +26,7 @@ export function* levels<T extends Node>(
 
     levels.push([n, p] as NodeEntry<T>)
 
-    if (!voids && Element.isElement(n) && Editor.isVoid(editor, n)) {
+    if (!voids && Node.isElement(n) && Editor.isVoid(editor, n)) {
       break
     }
   }

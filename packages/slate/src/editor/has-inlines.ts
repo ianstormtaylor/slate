@@ -1,8 +1,8 @@
 import { Editor, EditorInterface } from '../interfaces/editor'
-import { Text } from '../interfaces/text'
+import { Node } from '../interfaces/node'
 
 export const hasInlines: EditorInterface['hasInlines'] = (editor, element) => {
   return element.children.some(
-    n => Text.isText(n) || Editor.isInline(editor, n)
+    n => Node.isText(n) || Editor.isInline(editor, n)
   )
 }

@@ -99,6 +99,40 @@ This will fix Prettier and Eslint errors.
 
 To run integrations with [Playwright](https://playwright.dev/), first run `yarn start` to run the examples website, then run `yarn playwright` in a separate session to open the Playwright test suite. Or alternatively, run just `yarn test:integration-local`.
 
+### Running integration tests in Docker
+
+If tests fail on CI but pass locally (often due to OS differences), you can run tests in a Docker container that replicates the same environment as CI.
+
+**Prerequisites:** The project must be built first (same as running tests locally).
+
+```text
+yarn test:integration-docker
+```
+
+The script will automatically:
+
+1. Start the development server (if not already running)
+2. Run tests inside a Docker container
+3. Stop the server when tests complete
+
+You can also pass additional arguments to the test runner. For example, to run a specific test file:
+
+```text
+yarn test:integration-docker playwright/integration/slate-react/selection.test.ts
+```
+
+Or run a specific browser project:
+
+```text
+yarn test:integration-docker --project=chromium
+```
+
+You can combine arguments as well:
+
+```text
+yarn test:integration-docker playwright/integration/examples/check-lists.test.ts --project chromium
+```
+
 ## Testing Input Methods
 
 [Here's a helpful page](https://github.com/Microsoft/vscode/wiki/IME-Test) detailing how to test various input scenarios on Windows, Mac and Linux.

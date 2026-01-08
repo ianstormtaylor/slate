@@ -2,13 +2,7 @@ import { css } from '@emotion/css'
 import { isKeyHotkey } from 'is-hotkey'
 import isUrl from 'is-url'
 import React, { useMemo } from 'react'
-import {
-  createEditor,
-  Editor,
-  Element as SlateElement,
-  Range,
-  Transforms,
-} from 'slate'
+import { createEditor, Editor, Node, Range, Transforms } from 'slate'
 import { withHistory } from 'slate-history'
 import { Editable, useSelected, useSlate, withReact } from 'slate-react'
 import * as SlateReact from 'slate-react'
@@ -143,28 +137,24 @@ const insertButton = editor => {
 }
 const isLinkActive = editor => {
   const [link] = Editor.nodes(editor, {
-    match: n =>
-      !Editor.isEditor(n) && SlateElement.isElement(n) && n.type === 'link',
+    match: n => Node.isElement(n) && n.type === 'link',
   })
   return !!link
 }
 const isButtonActive = editor => {
   const [button] = Editor.nodes(editor, {
-    match: n =>
-      !Editor.isEditor(n) && SlateElement.isElement(n) && n.type === 'button',
+    match: n => Node.isElement(n) && n.type === 'button',
   })
   return !!button
 }
 const unwrapLink = editor => {
   Transforms.unwrapNodes(editor, {
-    match: n =>
-      !Editor.isEditor(n) && SlateElement.isElement(n) && n.type === 'link',
+    match: n => Node.isElement(n) && n.type === 'link',
   })
 }
 const unwrapButton = editor => {
   Transforms.unwrapNodes(editor, {
-    match: n =>
-      !Editor.isEditor(n) && SlateElement.isElement(n) && n.type === 'button',
+    match: n => Node.isElement(n) && n.type === 'button',
   })
 }
 const wrapLink = (editor, url) => {
@@ -339,8 +329,8 @@ const AddLinkButton = () => {
   return (
     <Button
       active={isLinkActive(editor)}
-      onMouseDown={event => {
-        event.preventDefault()
+      onPointerDown={event => event.preventDefault()}
+      onClick={() => {
         const url = window.prompt('Enter the URL of the link:')
         if (!url) return
         insertLink(editor, url)
@@ -355,7 +345,8 @@ const RemoveLinkButton = () => {
   return (
     <Button
       active={isLinkActive(editor)}
-      onMouseDown={event => {
+      onPointerDown={event => event.preventDefault()}
+      onClick={() => {
         if (isLinkActive(editor)) {
           unwrapLink(editor)
         }
@@ -370,8 +361,8 @@ const ToggleEditableButtonButton = () => {
   return (
     <Button
       active
-      onMouseDown={event => {
-        event.preventDefault()
+      onPointerDown={event => event.preventDefault()}
+      onClick={() => {
         if (isButtonActive(editor)) {
           unwrapButton(editor)
         } else {
