@@ -1,12 +1,12 @@
 import { EditorInterface } from '../interfaces/editor'
-import { Path } from '../interfaces/path'
 import { Node } from '../interfaces/node'
 import { Range } from '../interfaces/range'
+import { Location } from '../interfaces'
 
 export const point: EditorInterface['point'] = (editor, at, options = {}) => {
   const { edge = 'start' } = options
 
-  if (Path.isPath(at)) {
+  if (Location.isPath(at)) {
     let path
 
     if (edge === 'end') {
@@ -28,7 +28,7 @@ export const point: EditorInterface['point'] = (editor, at, options = {}) => {
     return { path, offset: edge === 'end' ? node.text.length : 0 }
   }
 
-  if (Range.isRange(at)) {
+  if (Location.isRange(at)) {
     const [start, end] = Range.edges(at)
     return edge === 'start' ? start : end
   }

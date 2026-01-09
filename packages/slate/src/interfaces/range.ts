@@ -1,4 +1,12 @@
-import { ExtendedType, Operation, Path, Point, PointEntry, isObject } from '..'
+import {
+  ExtendedType,
+  Location,
+  Operation,
+  Path,
+  Point,
+  PointEntry,
+  isObject,
+} from '..'
 import { RangeDirection } from '../types/types'
 
 /**
@@ -42,7 +50,7 @@ export interface RangeInterface {
   /**
    * Check if a range includes a path, a point or part of another range.
    */
-  includes: (range: Range, target: Path | Point | Range) => boolean
+  includes: (range: Range, target: Location) => boolean
 
   /**
    * Check if a range includes another range.
@@ -135,8 +143,8 @@ export const Range: RangeInterface = {
     return Range.equals(intersectionRange, target)
   },
 
-  includes(range: Range, target: Path | Point | Range): boolean {
-    if (Range.isRange(target)) {
+  includes(range: Range, target: Location): boolean {
+    if (Location.isRange(target)) {
       if (
         Range.includes(range, target.anchor) ||
         Range.includes(range, target.focus)
@@ -153,7 +161,7 @@ export const Range: RangeInterface = {
     let isAfterStart = false
     let isBeforeEnd = false
 
-    if (Point.isPoint(target)) {
+    if (Location.isPoint(target)) {
       isAfterStart = Point.compare(target, start) >= 0
       isBeforeEnd = Point.compare(target, end) <= 0
     } else {

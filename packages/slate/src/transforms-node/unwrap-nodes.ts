@@ -1,10 +1,9 @@
 import { NodeTransforms } from '../interfaces/transforms/node'
 import { Editor } from '../interfaces/editor'
-import { Path } from '../interfaces/path'
 import { matchPath } from '../utils/match-path'
 import { Range } from '../interfaces/range'
 import { Transforms } from '../interfaces/transforms'
-import { Node } from '../interfaces'
+import { Location, Node } from '../interfaces'
 
 export const unwrapNodes: NodeTransforms['unwrapNodes'] = (
   editor,
@@ -19,16 +18,16 @@ export const unwrapNodes: NodeTransforms['unwrapNodes'] = (
     }
 
     if (match == null) {
-      match = Path.isPath(at)
+      match = Location.isPath(at)
         ? matchPath(editor, at)
         : n => Node.isElement(n) && Editor.isBlock(editor, n)
     }
 
-    if (Path.isPath(at)) {
+    if (Location.isPath(at)) {
       at = Editor.range(editor, at)
     }
 
-    const rangeRef = Range.isRange(at) ? Editor.rangeRef(editor, at) : null
+    const rangeRef = Location.isRange(at) ? Editor.rangeRef(editor, at) : null
     const matches = Editor.nodes(editor, { at, match, mode, voids })
     const pathRefs = Array.from(
       matches,

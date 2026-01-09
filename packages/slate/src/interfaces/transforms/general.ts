@@ -260,7 +260,7 @@ export const GeneralTransforms: GeneralTransforms = {
         }
 
         if (editor.selection == null) {
-          if (!Range.isRange(newProperties)) {
+          if (!(newProperties.anchor && newProperties.focus)) {
             throw new Error(
               `Cannot apply an incomplete "set_selection" operation properties ${Scrubber.stringify(
                 newProperties
@@ -268,7 +268,7 @@ export const GeneralTransforms: GeneralTransforms = {
             )
           }
 
-          editor.selection = { ...newProperties }
+          editor.selection = { ...(newProperties as Range) }
           break
         }
 

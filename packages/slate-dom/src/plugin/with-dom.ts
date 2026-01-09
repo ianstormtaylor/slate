@@ -1,11 +1,11 @@
 import {
   BaseEditor,
   Editor,
+  Location,
   Node,
   Operation,
   Path,
   PathRef,
-  Point,
   Range,
   Transforms,
 } from 'slate'
@@ -142,7 +142,7 @@ export const withDOM = <T extends BaseEditor>(
 
     const pendingAction = EDITOR_TO_PENDING_ACTION.get(e)
     if (pendingAction?.at) {
-      const at = Point.isPoint(pendingAction?.at)
+      const at = Location.isPoint(pendingAction?.at)
         ? transformPendingPoint(e, pendingAction.at, op)
         : transformPendingRange(e, pendingAction.at, op)
 

@@ -1,5 +1,5 @@
 import { DebouncedFunc } from 'lodash'
-import { Editor, Node, Path, Point, Range, Transforms } from 'slate'
+import { Editor, Location, Node, Path, Point, Range, Transforms } from 'slate'
 import { ReactEditor } from '../../plugin/react-editor'
 import {
   applyStringDiff,
@@ -106,7 +106,7 @@ export function createAndroidInputManager({
     }
 
     if (action.at) {
-      const target = Point.isPoint(action.at)
+      const target = Location.isPoint(action.at)
         ? normalizePoint(editor, action.at)
         : normalizeRange(editor, action.at)
 
