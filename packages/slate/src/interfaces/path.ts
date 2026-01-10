@@ -288,10 +288,7 @@ export const Path: PathInterface = {
   },
 
   isPath(value: any): value is Path {
-    return (
-      Array.isArray(value) &&
-      (value.length === 0 || typeof value[0] === 'number')
-    )
+    return Array.isArray(value) && value.every(n => typeof n === 'number')
   },
 
   isSibling(path: Path, another: Path): boolean {
