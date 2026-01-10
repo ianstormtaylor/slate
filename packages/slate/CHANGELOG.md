@@ -1,5 +1,11 @@
 # slate
 
+## 0.122.0
+
+### Minor Changes
+
+- [#5970](https://github.com/ianstormtaylor/slate/pull/5970) [`893cac3e`](https://github.com/ianstormtaylor/slate/commit/893cac3e4ec9233e8499ad93b2b063dddb22371f) Thanks [@nabbydude](https://github.com/nabbydude)! - Optimized normalizeNode implementation, should work the same, but may behave slightly differently if you give it something really malformed
+
 ## 0.121.0
 
 ### Minor Changes
