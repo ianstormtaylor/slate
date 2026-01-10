@@ -1,4 +1,4 @@
-import { Editor, Location, Node, Path, Range, Transforms } from '../../index'
+import { Editor, Location, Node, Range, Transforms } from '../../index'
 import { TextUnit } from '../../types/types'
 import { getDefaultInsertLocation } from '../../utils'
 
@@ -67,11 +67,11 @@ export const TextTransforms: TextTransforms = {
       const { voids = false } = options
       let { at = getDefaultInsertLocation(editor) } = options
 
-      if (Path.isPath(at)) {
+      if (Location.isPath(at)) {
         at = Editor.range(editor, at)
       }
 
-      if (Range.isRange(at)) {
+      if (Location.isRange(at)) {
         if (Range.isCollapsed(at)) {
           at = at.anchor
         } else {

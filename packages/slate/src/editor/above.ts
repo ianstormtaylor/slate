@@ -1,5 +1,5 @@
 import { Editor, EditorInterface } from '../interfaces/editor'
-import { Range } from '../interfaces'
+import { Location } from '../interfaces'
 import { Path } from '../interfaces/path'
 
 export const above: EditorInterface['above'] = (editor, options = {}) => {
@@ -18,7 +18,7 @@ export const above: EditorInterface['above'] = (editor, options = {}) => {
 
   // If `at` is a Range that spans mulitple nodes, `path` will be their common ancestor.
   // Otherwise `path` will be a text node and/or the same as `at`, in which cases we want to start with its parent.
-  if (!Range.isRange(at) || Path.equals(at.focus.path, at.anchor.path)) {
+  if (!Location.isRange(at) || Path.equals(at.focus.path, at.anchor.path)) {
     if (path.length === 0) return
     path = Path.parent(path)
   }

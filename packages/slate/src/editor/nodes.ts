@@ -1,6 +1,6 @@
 import { Node, NodeEntry } from '../interfaces/node'
 import { Editor, EditorNodesOptions } from '../interfaces/editor'
-import { Span } from '../interfaces/location'
+import { Location } from '../interfaces/location'
 import { Path } from '../interfaces/path'
 
 export function* nodes<T extends Node>(
@@ -28,7 +28,7 @@ export function* nodes<T extends Node>(
   let from
   let to
 
-  if (Span.isSpan(at)) {
+  if (Location.isSpan(at)) {
     from = at[0]
     to = at[1]
   } else {

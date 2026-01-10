@@ -3,11 +3,10 @@ import { Editor } from '../interfaces/editor'
 import { Node } from '../interfaces/node'
 import { Range } from '../interfaces/range'
 import { Transforms } from '../interfaces/transforms'
-import { Point } from '../interfaces/point'
 import { Path } from '../interfaces/path'
 import { getDefaultInsertLocation } from '../utils'
 import { batchDirtyPaths } from '../core/batch-dirty-paths'
-import { BaseInsertNodeOperation } from '../interfaces'
+import { BaseInsertNodeOperation, Location } from '../interfaces'
 import { updateDirtyPaths } from '../core/update-dirty-paths'
 
 export const insertNodes: NodeTransforms['insertNodes'] = (
@@ -45,7 +44,7 @@ export const insertNodes: NodeTransforms['insertNodes'] = (
       select = false
     }
 
-    if (Range.isRange(at)) {
+    if (Location.isRange(at)) {
       if (!hanging) {
         at = Editor.unhangRange(editor, at, { voids })
       }
@@ -60,7 +59,7 @@ export const insertNodes: NodeTransforms['insertNodes'] = (
       }
     }
 
-    if (Point.isPoint(at)) {
+    if (Location.isPoint(at)) {
       if (match == null) {
         if (Node.isText(node)) {
           match = n => Node.isText(n)

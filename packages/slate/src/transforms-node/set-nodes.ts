@@ -1,10 +1,10 @@
 import { NodeTransforms } from '../interfaces/transforms/node'
 import { Editor } from '../interfaces/editor'
-import { Path } from '../interfaces/path'
 import { matchPath } from '../utils/match-path'
 import { Range } from '../interfaces/range'
 import { Transforms } from '../interfaces/transforms'
 import { Node } from '../interfaces/node'
+import { Location } from '../interfaces'
 
 export const setNodes: NodeTransforms['setNodes'] = (
   editor,
@@ -25,16 +25,16 @@ export const setNodes: NodeTransforms['setNodes'] = (
     }
 
     if (match == null) {
-      match = Path.isPath(at)
+      match = Location.isPath(at)
         ? matchPath(editor, at)
         : n => Node.isElement(n) && Editor.isBlock(editor, n)
     }
 
-    if (!hanging && Range.isRange(at)) {
+    if (!hanging && Location.isRange(at)) {
       at = Editor.unhangRange(editor, at, { voids })
     }
 
-    if (split && Range.isRange(at)) {
+    if (split && Location.isRange(at)) {
       if (
         Range.isCollapsed(at) &&
         Editor.leaf(editor, at.anchor)[0].text.length > 0

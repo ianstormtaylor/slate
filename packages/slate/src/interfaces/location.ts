@@ -16,12 +16,48 @@ export interface LocationInterface {
    * Check if a value implements the `Location` interface.
    */
   isLocation: (value: any) => value is Location
+
+  /**
+   * Check if a location is a `Path`.
+   */
+  isPath: (at: Location) => at is Path
+
+  /**
+   * Check if a location is a `Point`.
+   */
+  isPoint: (at: Location) => at is Point
+
+  /**
+   * Check if a location is a `Range`.
+   */
+  isRange: (at: Location) => at is Range
+
+  /**
+   * Differentiate between a normal `Location` and a `Span`.
+   */
+  isSpan: (at: Location | Span) => at is Span
 }
 
 // eslint-disable-next-line no-redeclare
 export const Location: LocationInterface = {
   isLocation(value: any): value is Location {
     return Path.isPath(value) || Point.isPoint(value) || Range.isRange(value)
+  },
+
+  isPath(at: Location): at is Path {
+    return Array.isArray(at)
+  },
+
+  isPoint(at: Location): at is Point {
+    return 'offset' in at
+  },
+
+  isRange(at: Location): at is Range {
+    return 'anchor' in at
+  },
+
+  isSpan(at: Location | Span): at is Span {
+    return Array.isArray(at) && Array.isArray(at[0])
   },
 }
 

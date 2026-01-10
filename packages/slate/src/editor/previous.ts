@@ -1,6 +1,5 @@
 import { Editor, EditorInterface } from '../interfaces/editor'
-import { Span } from '../interfaces/location'
-import { Path } from '../interfaces/path'
+import { Location, Span } from '../interfaces/location'
 
 export const previous: EditorInterface['previous'] = (editor, options = {}) => {
   const { mode = 'lowest', voids = false } = options
@@ -22,12 +21,12 @@ export const previous: EditorInterface['previous'] = (editor, options = {}) => {
   // the point before the location passed in
   const span: Span = [pointBeforeLocation.path, to]
 
-  if (Path.isPath(at) && at.length === 0) {
+  if (Location.isPath(at) && at.length === 0) {
     throw new Error(`Cannot get the previous node from the root node!`)
   }
 
   if (match == null) {
-    if (Path.isPath(at)) {
+    if (Location.isPath(at)) {
       const [parent] = Editor.parent(editor, at)
       match = n => parent.children.includes(n)
     } else {

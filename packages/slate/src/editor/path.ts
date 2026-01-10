@@ -1,9 +1,9 @@
-import { EditorInterface, Node, Path, Point, Range } from '../interfaces'
+import { EditorInterface, Location, Node, Path, Range } from '../interfaces'
 
 export const path: EditorInterface['path'] = (editor, at, options = {}) => {
   const { depth, edge } = options
 
-  if (Path.isPath(at)) {
+  if (Location.isPath(at)) {
     if (edge === 'start') {
       const [, firstPath] = Node.first(editor, at)
       at = firstPath
@@ -13,7 +13,7 @@ export const path: EditorInterface['path'] = (editor, at, options = {}) => {
     }
   }
 
-  if (Range.isRange(at)) {
+  if (Location.isRange(at)) {
     if (edge === 'start') {
       at = Range.start(at)
     } else if (edge === 'end') {
@@ -23,7 +23,7 @@ export const path: EditorInterface['path'] = (editor, at, options = {}) => {
     }
   }
 
-  if (Point.isPoint(at)) {
+  if (Location.isPoint(at)) {
     at = at.path
   }
 
