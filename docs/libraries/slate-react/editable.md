@@ -173,7 +173,7 @@ An example usage might look like:
         ...attributes.style,
         color: 'gray',
       },
-    };
+    }
     return <div {...styledAttributes}>{children}</div>
   }}
 />
