@@ -1,5 +1,12 @@
 # slate-react
 
+## 0.123.0
+
+### Patch Changes
+
+- [#6000](https://github.com/ianstormtaylor/slate/pull/6000) [`8d9bf305`](https://github.com/ianstormtaylor/slate/commit/8d9bf30595a6fad62ff15e302ab489ff46a2515a) Thanks [@nabbydude](https://github.com/nabbydude)! - Added `Location.isPath`, `Location.isPoint`, `Location.isRange`, and `Location.isSpan` functions, as efficient type discriminators.
+  Use these instead of `Path.isPath`, `Point.isPoint`, `Range.isRange`, and `Span.isSpan` whenever possible.
+
 ## 0.121.0
 
 ### Patch Changes
