@@ -5,7 +5,7 @@ on:
     branches:
       - main
 
-# Default to no permissions unless explicitly granted per job
+# Default to no permissions unless granted at job level
 permissions: {}
 
 jobs:
@@ -14,9 +14,9 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: write       # changesets/action creates releases
-      pull-requests: write  # changesets/action creates PRs
-      id-token: write       # REQUIRED for npm Trusted Publishing (OIDC)
+      contents: write
+      pull-requests: write
+      id-token: write
 
     strategy:
       max-parallel: 1
@@ -38,12 +38,12 @@ jobs:
           cache: yarn
           registry-url: https://registry.npmjs.org
 
-      # Ensure npm supports Trusted Publishing (OIDC)
+      - name: Enable Corepack (Yarn)
+        run: corepack enable
+
+      # npm Trusted Publishing requires npm CLI >= 11.5.1
       - name: Upgrade npm for trusted publishing
         run: npm i -g npm@^11.5.1
-
-      - name: Enable Corepack
-        run: corepack enable
 
       - name: Install dependencies
         run: yarn install
@@ -51,19 +51,21 @@ jobs:
       - name: Prepare release
         run: yarn prerelease
 
-      # https://github.com/changesets/action
+      - name: Debug versions
+        run: |
+          node -v
+          npm -v
+          yarn -v
+
       - name: Create release pull request or Publish to npm
         if: matrix.channel == 'latest'
         uses: changesets/action@v1
         with:
-          # defined in package.json#scripts
           version: yarn changesetversion
           publish: yarn changeset publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          YARN_ENABLE_IMMUTABLE_INSTALLS: false
 
-      # https://github.com/atlassian/changesets/blob/master/docs/snapshot-releases.md
       - name: Release to @dev channel
         if: matrix.channel == 'dev'
         run: |
