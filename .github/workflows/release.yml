@@ -46,7 +46,7 @@ jobs:
         run: corepack enable
 
       - name: Install dependencies
-        run: yarn install --immutable=false
+        run: yarn install
 
       - name: Prepare release
         run: yarn prerelease
