@@ -20,9 +20,7 @@ jobs:
     strategy:
       max-parallel: 1
       matrix:
-        channel:
-          - latest
-          - dev
+        channel: [latest, dev]
 
     steps:
       - name: Checkout repo
@@ -35,22 +33,27 @@ jobs:
         with:
           node-version: 22.17
           cache: yarn
-          registry-url: https://registry.npmjs.org
+          # IMPORTANT: do NOT set registry-url here (avoid auth/.npmrc side effects)
 
       - name: Enable Corepack (Yarn)
         run: corepack enable
 
-      # npm Trusted Publishing requires npm CLI >= 11.5.1
-      - name: Upgrade npm for trusted publishing
-        run: npm i -g npm@^11.5.1
+      - name: Upgrade npm (OIDC fixes ship in npm releases)
+        run: npm i -g npm@latest
 
-      # Keep a minimal npmrc with NO token. OIDC will be used during publish.
-      - name: Configure npm (no token)
+      - name: Configure npm registry (no token)
         run: |
           cat > ~/.npmrc <<'EOF'
           registry=https://registry.npmjs.org/
-          always-auth=false
           EOF
+
+      - name: Debug npm auth config
+        run: |
+          npm -v
+          echo "=== user npmrc ==="
+          cat ~/.npmrc || true
+          echo "=== any auth/token config? ==="
+          npm config list -l | grep -iE 'auth|token|always-auth' || true
 
       - name: Install dependencies
         run: yarn install
@@ -58,14 +61,6 @@ jobs:
       - name: Prepare release
         run: yarn prerelease
 
-      - name: Debug versions
-        run: |
-          node -v
-          npm -v
-          yarn -v
-          npm config get registry
-
-      # LATEST CHANNEL: use changesets/action ONLY for the PR/versioning logic
       - name: Create or update release PR
         if: matrix.channel == 'latest'
         id: changesets
@@ -75,15 +70,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # LATEST CHANNEL: publish only when there is no changeset PR to make/update
-      # (i.e. we're on main after merge, or there are no changesets but some packages are unpublished)
       - name: Publish to npm (OIDC)
         if: matrix.channel == 'latest' && steps.changesets.outputs.hasChangesets == 'false'
         run: yarn changeset publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # DEV CHANNEL: snapshot publishes directly (OIDC)
       - name: Release to @dev channel
         if: matrix.channel == 'dev'
         run: |
