@@ -45,6 +45,15 @@ jobs:
       - name: Upgrade npm for trusted publishing
         run: npm i -g npm@^11.5.1
 
+      # IMPORTANT: Prevent changesets/action from generating an auth-token ~/.npmrc
+      # (OIDC trusted publishing should NOT use NODE_AUTH_TOKEN / NPM_TOKEN)
+      - name: Configure npm for trusted publishing (no token)
+        run: |
+          cat > ~/.npmrc <<'EOF'
+          registry=https://registry.npmjs.org/
+          always-auth=false
+          EOF
+
       - name: Install dependencies
         run: yarn install
 
@@ -56,6 +65,8 @@ jobs:
           node -v
           npm -v
           yarn -v
+          npm config get registry
+          npm config list -l | grep -E '(_auth|token|always-auth)' || true
 
       - name: Create release pull request or Publish to npm
         if: matrix.channel == 'latest'
