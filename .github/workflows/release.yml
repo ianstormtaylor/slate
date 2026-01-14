@@ -5,7 +5,6 @@ on:
     branches:
       - main
 
-# Default to no permissions unless granted at job level
 permissions: {}
 
 jobs:
@@ -45,9 +44,8 @@ jobs:
       - name: Upgrade npm for trusted publishing
         run: npm i -g npm@^11.5.1
 
-      # IMPORTANT: Prevent changesets/action from generating an auth-token ~/.npmrc
-      # (OIDC trusted publishing should NOT use NODE_AUTH_TOKEN / NPM_TOKEN)
-      - name: Configure npm for trusted publishing (no token)
+      # Keep a minimal npmrc with NO token. OIDC will be used during publish.
+      - name: Configure npm (no token)
         run: |
           cat > ~/.npmrc <<'EOF'
           registry=https://registry.npmjs.org/
@@ -66,17 +64,26 @@ jobs:
           npm -v
           yarn -v
           npm config get registry
-          npm config list -l | grep -E '(_auth|token|always-auth)' || true
 
-      - name: Create release pull request or Publish to npm
+      # LATEST CHANNEL: use changesets/action ONLY for the PR/versioning logic
+      - name: Create or update release PR
         if: matrix.channel == 'latest'
+        id: changesets
         uses: changesets/action@v1
         with:
           version: yarn changesetversion
-          publish: yarn changeset publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      # LATEST CHANNEL: publish only when there is no changeset PR to make/update
+      # (i.e. we're on main after merge, or there are no changesets but some packages are unpublished)
+      - name: Publish to npm (OIDC)
+        if: matrix.channel == 'latest' && steps.changesets.outputs.hasChangesets == 'false'
+        run: yarn changeset publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # DEV CHANNEL: snapshot publishes directly (OIDC)
       - name: Release to @dev channel
         if: matrix.channel == 'dev'
         run: |
