@@ -180,19 +180,26 @@ export const insertFragment: TextTransforms['insertFragment'] = (
     const isInlineStart = Editor.isStart(editor, at, inlinePath)
     const isInlineEnd = Editor.isEnd(editor, at, inlinePath)
 
+    // When inserting block-level nodes into the middle, we still anchor to the
+    // current block path; after split Slate keeps the right half at the same
+    // path, so inserting at that path puts middles between halves.
+    const insertingIntoBlockMiddle = !isBlockStart && !isBlockEnd
     const middleRef = Editor.pathRef(
       editor,
       isBlockEnd && !ends.length ? Path.next(blockPath) : blockPath
     )
-
     const endRef = Editor.pathRef(
       editor,
       isInlineEnd ? Path.next(inlinePath) : inlinePath
     )
 
-    // If the fragment contains inlines in multiple distinct blocks, split the
-    // destination block.
-    const splitBlock = ends.length > 0
+    // Split the destination block if:
+    // - the fragment has trailing inlines to merge (original behavior), or
+    // - we're inserting block-level nodes into the middle of a block so they
+    //   can appear between the two halves of the destination block.
+    const shouldSplitForMiddleBlocks =
+      middles.length > 0 && insertingIntoBlockMiddle
+    const splitBlock = ends.length > 0 || shouldSplitForMiddleBlocks
 
     Transforms.splitNodes(editor, {
       at,
@@ -223,7 +230,9 @@ export const insertFragment: TextTransforms['insertFragment'] = (
       batchDirty,
     })
 
-    if (isBlockEmpty && !starts.length && middles.length && !ends.length) {
+    const shouldDeleteEmptyBlock =
+      isBlockEmpty && !starts.length && middles.length && !ends.length
+    if (shouldDeleteEmptyBlock) {
       Transforms.delete(editor, { at: blockPath, voids })
     }
 
@@ -255,8 +264,19 @@ export const insertFragment: TextTransforms['insertFragment'] = (
       }
 
       if (path) {
-        const end = Editor.end(editor, path)
-        Transforms.select(editor, end)
+        // If the previous sibling is void (e.g., an inserted image block),
+        // place the cursor at the start of the right-half block.
+        const nodeAtPath = Node.get(editor, path)
+        const isVoidAtPath =
+          Element.isElement(nodeAtPath) && editor.isVoid(nodeAtPath)
+        if (isVoidAtPath) {
+          const nextPath = Path.next(path)
+          const start = Editor.start(editor, nextPath)
+          Transforms.select(editor, start)
+        } else {
+          const end = Editor.end(editor, path)
+          Transforms.select(editor, end)
+        }
       }
     }
 
