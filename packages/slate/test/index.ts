@@ -1,11 +1,15 @@
 import assert from 'assert'
 import { cloneDeep } from 'lodash'
 import { fixtures } from '../../../support/fixtures'
-import { Editor, createEditor } from 'slate'
+import { Editor, Element, Operation, createEditor } from 'slate'
 import { createHyperscript } from 'slate-hyperscript'
 
 describe('slate', () => {
-  fixtures(__dirname, 'interfaces', ({ module }) => {
+  fixtures<{
+    input: unknown
+    test: (input: unknown) => unknown
+    output: unknown
+  }>(__dirname, 'interfaces', ({ module }) => {
     let { input, test, output } = module
     if (Editor.isEditor(input)) {
       input = withTest(input)
@@ -13,55 +17,79 @@ describe('slate', () => {
     const result = test(input)
     assert.deepEqual(result, output)
   })
-  fixtures(__dirname, 'operations', ({ module }) => {
-    const { input, operations, output } = module
-    const editor = withTest(input)
-    Editor.withoutNormalizing(editor, () => {
-      for (const op of operations) {
-        editor.apply(op)
-      }
-    })
-    assert.deepEqual(editor.children, output.children)
-    assert.deepEqual(editor.selection, output.selection)
-  })
-  fixtures(__dirname, 'normalization', ({ module }) => {
-    const { input, output, withFallbackElement } = module
-    const editor = withTest(input)
-    if (withFallbackElement) {
-      const { normalizeNode } = editor
-      editor.normalizeNode = (entry, options) => {
-        normalizeNode(entry, { ...options, fallbackElement: () => ({}) })
-      }
+  fixtures<{ input: Editor; operations: Operation[]; output: Editor }>(
+    __dirname,
+    'operations',
+    ({ module }) => {
+      const { input, operations, output } = module
+      const editor = withTest(input)
+      Editor.withoutNormalizing(editor, () => {
+        for (const op of operations) {
+          editor.apply(op)
+        }
+      })
+      assert.deepEqual(editor.children, output.children)
+      assert.deepEqual(editor.selection, output.selection)
     }
-    Editor.normalize(editor, { force: true })
-    assert.deepEqual(editor.children, output.children)
-    assert.deepEqual(editor.selection, output.selection)
-  })
-  fixtures(__dirname, 'transforms', ({ module }) => {
-    const { input, run, output } = module
-    const editor = withTest(input)
-    run(editor)
-    assert.deepEqual(editor.children, output.children)
-    assert.deepEqual(editor.selection, output.selection)
-  })
-  fixtures(__dirname, 'utils/deep-equal', ({ module }) => {
-    let { input, test, output } = module
-    if (Editor.isEditor(input)) {
-      input = withTest(input)
+  )
+  fixtures<{ input: Editor; withFallbackElement?: boolean; output: Editor }>(
+    __dirname,
+    'normalization',
+    ({ module }) => {
+      const { input, output, withFallbackElement } = module
+      const editor = withTest(input)
+      if (withFallbackElement) {
+        const { normalizeNode } = editor
+        editor.normalizeNode = (entry, options) => {
+          normalizeNode(entry, {
+            ...options,
+            fallbackElement: () => ({}) as Element,
+          })
+        }
+      }
+      Editor.normalize(editor, { force: true })
+      assert.deepEqual(editor.children, output.children)
+      assert.deepEqual(editor.selection, output.selection)
     }
-    const result = test(input)
-    assert.deepEqual(result, output)
-  })
+  )
+  fixtures<{ input: Editor; run: (input: Editor) => void; output: Editor }>(
+    __dirname,
+    'transforms',
+    ({ module }) => {
+      const { input, run, output } = module
+      const editor = withTest(input)
+      run(editor)
+      assert.deepEqual(editor.children, output.children)
+      assert.deepEqual(editor.selection, output.selection)
+    }
+  )
+  fixtures<{ input: Editor; test: (input: Editor) => void; output: Editor }>(
+    __dirname,
+    'utils/deep-equal',
+    ({ module }) => {
+      let { input, test, output } = module
+      if (Editor.isEditor(input)) {
+        input = withTest(input)
+      }
+      const result = test(input)
+      assert.deepEqual(result, output)
+    }
+  )
   // make sure with or without batchDirty, the normalize result is the same
-  const testBatchDirty = ({ module }) => {
+
+  type batchDirtyTestModule = {
+    input: Editor
+    run: (input: Editor, options: { batchDirty: boolean }) => void
+  }
+  const testBatchDirty = ({ module }: { module: batchDirtyTestModule }) => {
     const { input, run } = module
 
     const input2 = createEditor()
     input2.children = cloneDeep(input.children)
     input2.selection = cloneDeep(input.selection)
 
-    const dirties1 = []
-    const dirties2 = []
+    const dirties1: string[] = []
+    const dirties2: string[] = []
 
     const editor1 = withBatchTest(withTest(input), dirties1)
     const editor2 = withBatchTest(withTest(input2), dirties2)
@@ -71,14 +99,23 @@ describe('slate', () => {
 
     assert.equal(dirties1.join(' '), dirties2.join(' '))
   }
-  fixtures(__dirname, 'transforms/insertNodes', ({ module }) => {
-    testBatchDirty({ module })
-  })
-  fixtures(__dirname, 'transforms/insertFragment', ({ module }) => {
-    testBatchDirty({ module })
-  })
+  fixtures<batchDirtyTestModule>(
+    __dirname,
+    'transforms/insertNodes',
+    ({ module }) => {
+      testBatchDirty({ module })
+    }
+  )
+  fixtures<batchDirtyTestModule>(
+    __dirname,
+    'transforms/insertFragment',
+    ({ module }) => {
+      testBatchDirty({ module })
+    }
+  )
 })
-const withTest = editor => {
+
+const withTest = (editor: Editor) => {
   const { isInline, isVoid, isElementReadOnly, isSelectable } = editor
   editor.isInline = element => {
     return element.inline === true ? true : isInline(element)
@@ -94,7 +131,8 @@ const withTest = editor => {
   }
   return editor
 }
-const withBatchTest = (editor, dirties) => {
+
+const withBatchTest = (editor: Editor, dirties: string[]) => {
   const { normalizeNode } = editor
   editor.normalizeNode = ([node, path]) => {
     dirties.push(JSON.stringify(path))
@@ -102,6 +140,7 @@ const withBatchTest = (editor, dirties) => {
   }
   return editor
 }
+
 export const jsx = createHyperscript({
   elements: {
     block: {},

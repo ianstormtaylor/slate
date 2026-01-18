@@ -1,16 +1,30 @@
 import fs from 'fs'
 import { basename, extname, resolve } from 'path'
 
-export const fixtures = (...args) => {
-  let fn = args.pop()
-  let options = { skip: false }
+type fixtureFunction<T> = (options: {
+  name: string
+  path: string
+  module: T
+}) => void
+
+interface fixtureOptions {
+  skip?: boolean
+}
+
+type fixtureArguments<T> =
+  | [...paths: string[], fn: fixtureFunction<T>]
+  | [...paths: string[], fn: fixtureFunction<T>, options: fixtureOptions]
+
+export const fixtures = <T>(...args: fixtureArguments<T>) => {
+  let fn = args.pop() as fixtureFunction<T>
+  let options: fixtureOptions = { skip: false }
 
   if (typeof fn !== 'function') {
-    options = fn
-    fn = args.pop()
+    options = fn as fixtureOptions
+    fn = args.pop() as fixtureFunction<T>
   }
 
-  const path = resolve(...args)
+  const path = resolve(...(args as string[]))
   const files = fs.readdirSync(path)
   const dir = basename(path)
   const d = options.skip ? describe.skip : describe
@@ -43,7 +57,6 @@ export const fixtures = (...args) => {
 
           if (module.skip) {
             this.skip()
-            return
           }
 
           fn({ name, path, module })
@@ -53,6 +66,6 @@ export const fixtures = (...args) => {
   })
 }
 
-fixtures.skip = (...args) => {
+fixtures.skip = <T>(...args: [...string[], fixtureFunction<T>]) => {
   fixtures(...args, { skip: true })
 }

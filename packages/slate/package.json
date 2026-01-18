@@ -15,6 +15,9 @@
   ],
   "devDependencies": {
     "@babel/runtime": "^7.23.2",
+    "@types/lodash": "^4.17.23",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^25.0.9",
     "lodash": "^4.17.21",
     "slate-hyperscript": "^0.115.0",
     "source-map-loader": "^4.0.1"
