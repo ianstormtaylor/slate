@@ -9,6 +9,6 @@ export const input = (
   </element>
 )
 export const test = value => {
-  return Node.string(value, [1])
+  return Node.string(value)
 }
 export const output = `onetwo`

@@ -15,7 +15,7 @@ export const input = (
 export const run = editor => {
   Transforms.mergeNodes(editor, {
     at: [1],
-    withMatch: ([, p]) => p.length === 1,
+    match: (n, p) => p.length === 1,
   })
 }
 export const output = (
