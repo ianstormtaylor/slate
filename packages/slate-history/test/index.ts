@@ -6,7 +6,8 @@ import { BaseEditor, Editor } from 'slate'
 
 declare module 'slate' {
   interface CustomTypes {
-    Editor: HistoryEditor
+    // Editor is already defined in /support/types, but it will include this type
+    PackageSpecificEditorForTests: HistoryEditor
   }
 }
 

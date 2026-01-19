@@ -1,18 +1,10 @@
-import {
-  BaseEditor,
-  BaseElement,
-  BaseSelection,
-  BaseText,
-  Editor,
-  Element,
-  Text,
-} from 'slate'
+import { BaseEditor, BaseElement, BaseSelection, BaseText } from 'slate'
 
 // Allowed tags for jsx elements and allowed types for those tags
 declare global {
   namespace jsx.JSX {
     interface IntrinsicElements {
-      editor: Omit<Editor, keyof BaseEditor>
+      editor: GenericAdditions
       fragment: {}
 
       selection: {}
@@ -20,11 +12,11 @@ declare global {
       anchor: {} | { path: number[]; offset: number }
       focus: {} | { path: number[]; offset: number }
 
-      element: Omit<Element, keyof BaseElement>
-      text: Omit<Text, keyof BaseText>
+      element: ElementFlags & ElementAdditions
+      text: TextAdditions
 
-      block: Omit<Element, keyof BaseElement | 'inline'>
-      inline: Omit<Element, keyof BaseElement | 'inline'>
+      block: Omit<ElementFlags, 'inline'> & ElementAdditions
+      inline: Omit<ElementFlags, 'inline'> & ElementAdditions
     }
   }
 }
@@ -62,12 +54,6 @@ export interface GenericAdditions extends SingleLetterFlags {
   alreadyHasAKey?: unknown
   attr?: unknown
   custom?: unknown
-
-  // this is for testing generic attributes we might want to test on a node
-  // anything prefixed with b_ is a boolean flag, s_ is a string
-  // so you can test theoretical custom properties like b_isItalic or s_backgroundColor
-  [key: `f_${string}`]: true | undefined
-  [key: `s_${string}`]: string | undefined
 }
 
 // arbitrary attributes used to differentiate elements
@@ -87,7 +73,9 @@ export interface TextAdditions extends GenericAdditions {
 
 declare module 'slate' {
   interface CustomTypes {
-    Editor: BaseEditor & GenericAdditions
+    Editor: BaseEditor &
+      GenericAdditions &
+      CustomTypes['PackageSpecificEditorForTests']
     Element: BaseElement & ElementFlags & ElementAdditions
     Text: BaseText & TextAdditions
 
