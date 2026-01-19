@@ -21,12 +21,10 @@ export const input = (
   </editor>
 )
 export const test = value => {
-  return Array.from(Node.elements(value))
+  return Array.from(Node.elements(value, { from: [1, 1] }))
 }
 export const output = [
-  Editor.node(input, [0]),
   Editor.node(input, [1]),
-  Editor.node(input, [1, 0]),
   Editor.node(input, [1, 1]),
   Editor.node(input, [2]),
 ]
