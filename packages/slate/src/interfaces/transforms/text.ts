@@ -1,4 +1,13 @@
-import { Editor, Location, Node, Path, Range, Transforms } from '../../index'
+import {
+  Editor,
+  Element,
+  Location,
+  Node,
+  NodeEntry,
+  Path,
+  Range,
+  Transforms,
+} from '../../index'
 import { TextUnit } from '../../types/types'
 import { getDefaultInsertLocation } from '../../utils'
 
@@ -11,11 +20,28 @@ export interface TextDeleteOptions {
   voids?: boolean
 }
 
+export interface InsertFragmentFilterOptions {
+  /**
+   * The block entry that the fragment will be inserted into.
+   */
+  blockEntry: NodeEntry<Element>
+}
+
+export type InsertFragmentFilter = (
+  node: Node,
+  options: InsertFragmentFilterOptions
+) => boolean
+
 export interface TextInsertFragmentOptions {
   at?: Location
   hanging?: boolean
   voids?: boolean
   batchDirty?: boolean
+  /**
+   * A filter function that controls whether each individual node is eligible for insertion.
+   * Return `true` to allow the node, `false` to skip it.
+   */
+  filter?: InsertFragmentFilter
 }
 
 export interface TextInsertTextOptions {

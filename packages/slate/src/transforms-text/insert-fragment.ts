@@ -14,7 +14,7 @@ export const insertFragment: TextTransforms['insertFragment'] = (
   options = {}
 ) => {
   Editor.withoutNormalizing(editor, () => {
-    const { hanging = false, voids = false } = options
+    const { hanging = false, voids = false, filter } = options
     let { at = getDefaultInsertLocation(editor), batchDirty = true } = options
 
     if (!fragment.length) {
@@ -74,6 +74,47 @@ export const insertFragment: TextTransforms['insertFragment'] = (
       voids,
     })!
     const [, blockPath] = blockMatch
+
+    const filterOptions = { blockEntry: blockMatch }
+    const filterNode = (node: Node): Node | null => {
+      if (!filter) return node
+
+      if (Text.isText(node)) {
+        return filter(node, filterOptions) ? node : null
+      }
+
+      if (Element.isElement(node)) {
+        if (!filter(node, filterOptions)) {
+          return null
+        }
+
+        const filteredChildren = node.children
+          .map(filterNode)
+          .filter((child): child is Descendant => child !== null)
+
+        // If all children were filtered out, return null for non-void elements
+        if (filteredChildren.length === 0 && !editor.isVoid(node)) {
+          return null
+        }
+
+        return { ...node, children: filteredChildren }
+      }
+
+      return node
+    }
+
+    const filteredFragment = filter
+      ? (fragment
+          .map(filterNode)
+          .filter((node): node is Descendant => node !== null) as Node[])
+      : fragment
+
+    if (!filteredFragment.length) {
+      return
+    }
+
+    // Use filteredFragment instead of fragment from here on
+    fragment = filteredFragment
     const isBlockStart = Editor.isStart(editor, at, blockPath)
     const isBlockEnd = Editor.isEnd(editor, at, blockPath)
     const isBlockEmpty = isBlockStart && isBlockEnd
