@@ -3,7 +3,7 @@ import { Transforms } from 'slate'
 import { jsx } from '../../..'
 
 export const run = editor => {
-  Transforms.liftNodes(editor, { match: n => n.c })
+  Transforms.liftNodes(editor, { match: n => n.c === true })
 }
 export const input = (
   <editor>
