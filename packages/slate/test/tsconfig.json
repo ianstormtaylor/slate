@@ -1,4 +1,5 @@
 {
   "extends": "../../../config/typescript/tsconfig.test.json",
-  "include": ["./**/*", "../../../support/*"]
+  "include": ["./**/*", "../../../support/*", "../src/utils/*"],
+  "exclude": ["./interfaces/CustomTypes/**/*"]
 }

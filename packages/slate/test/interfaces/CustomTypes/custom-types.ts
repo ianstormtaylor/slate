@@ -34,13 +34,7 @@ export type CustomOperation = {
 
 export type ExtendedOperation = BaseOperation | CustomOperation
 
-export type CustomElement = (BaseElement | HeadingElement | ListItemElement) & {
-  type?: string
-  void?: true
-  inline?: true
-  readOnly?: true
-  nonSelectable?: true
-}
+export type CustomElement = BaseElement | HeadingElement | ListItemElement
 
 declare module 'slate' {
   interface CustomTypes {

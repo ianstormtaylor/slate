@@ -13622,6 +13622,8 @@ __metadata:
   resolution: "slate-history@workspace:packages/slate-history"
   dependencies:
     "@babel/runtime": "npm:^7.23.2"
+    "@types/mocha": "npm:^10.0.10"
+    "@types/node": "npm:^25.0.9"
     lodash: "npm:^4.17.21"
     slate: "npm:^0.123.0"
     slate-hyperscript: "npm:^0.115.0"
@@ -13636,6 +13638,8 @@ __metadata:
   resolution: "slate-hyperscript@workspace:packages/slate-hyperscript"
   dependencies:
     "@babel/runtime": "npm:^7.23.2"
+    "@types/mocha": "npm:^10.0.10"
+    "@types/node": "npm:^25.0.9"
     slate: "npm:^0.123.0"
     source-map-loader: "npm:^4.0.1"
   peerDependencies:

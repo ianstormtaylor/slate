@@ -1,10 +1,21 @@
 import assert from 'assert'
 import { fixtures } from '../../../support/fixtures'
 import { createHyperscript } from 'slate-hyperscript'
-import { History, withHistory } from '..'
+import { History, HistoryEditor, withHistory } from '..'
+import { BaseEditor, Editor } from 'slate'
+
+declare module 'slate' {
+  interface CustomTypes {
+    Editor: HistoryEditor
+  }
+}
 
 describe('slate-history', () => {
-  fixtures(__dirname, 'undo', ({ module }) => {
+  fixtures<{
+    input: BaseEditor
+    run: (input: Editor) => void
+    output: Pick<Editor, 'children' | 'selection'>
+  }>(__dirname, 'undo', ({ module }) => {
     const { input, run, output } = module
     const editor = withTest(withHistory(input))
     run(editor)
@@ -13,7 +24,11 @@ describe('slate-history', () => {
     assert.deepEqual(editor.selection, output.selection)
   })
 
-  fixtures(__dirname, 'isHistory', ({ module }) => {
+  fixtures<{
+    input: BaseEditor
+    run: (input: Editor) => void
+    output: boolean
+  }>(__dirname, 'isHistory', ({ module }) => {
     const { input, run, output } = module
     const editor = withTest(withHistory(input))
     run(editor)
@@ -29,24 +44,19 @@ export const jsx = createHyperscript({
   },
 })
 
-const withTest = editor => {
+const withTest = (editor: Editor) => {
   const { isInline, isVoid, isElementReadOnly, isSelectable } = editor
-
   editor.isInline = element => {
     return element.inline === true ? true : isInline(element)
   }
-
   editor.isVoid = element => {
     return element.void === true ? true : isVoid(element)
   }
-
   editor.isElementReadOnly = element => {
     return element.readOnly === true ? true : isElementReadOnly(element)
   }
-
   editor.isSelectable = element => {
     return element.nonSelectable === true ? false : isSelectable(element)
   }
-
   return editor
 }
