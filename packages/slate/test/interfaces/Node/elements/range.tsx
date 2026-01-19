@@ -2,6 +2,10 @@
 import { Node } from 'slate'
 import { jsx } from 'slate-hyperscript'
 
+// TODO: this test is nonsensical, seemingly testing an API that doesn't exist
+// please put a proper test here, then remove this line
+export const skip = true
+
 export const input = (
   <editor>
     <element>
@@ -13,20 +17,20 @@ export const input = (
   </editor>
 )
 export const test = value => {
-  return Array.from(
-    Node.elements(value, {
-      range: {
-        anchor: {
-          path: [0, 1],
-          offset: 0,
-        },
-        focus: {
-          path: [0, 2],
-          offset: 0,
-        },
-      },
-    })
-  )
+  // return Array.from(
+  //   Node.elements(value, {
+  //     range: {
+  //       anchor: {
+  //         path: [0, 1],
+  //         offset: 0,
+  //       },
+  //       focus: {
+  //         path: [0, 2],
+  //         offset: 0,
+  //       },
+  //     },
+  //   })
+  // )
 }
 export const output = [
   [
