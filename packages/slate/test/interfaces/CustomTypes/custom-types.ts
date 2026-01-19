@@ -5,7 +5,6 @@ import {
   BaseRange,
   Descendant,
   BaseOperation,
-  BaseElement,
 } from 'slate'
 
 export type HeadingElement = {
@@ -34,7 +33,7 @@ export type CustomOperation = {
 
 export type ExtendedOperation = BaseOperation | CustomOperation
 
-export type CustomElement = BaseElement | HeadingElement | ListItemElement
+export type CustomElement = HeadingElement | ListItemElement
 
 declare module 'slate' {
   interface CustomTypes {
