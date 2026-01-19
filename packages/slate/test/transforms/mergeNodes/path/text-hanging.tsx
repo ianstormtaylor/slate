@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import { Transforms, Text } from 'slate'
+import { Transforms } from 'slate'
 import { jsx } from '../../..'
 
 export const input = (
@@ -12,7 +12,9 @@ export const input = (
   </editor>
 )
 export const run = editor => {
-  Transforms.mergeNodes(editor, { at: [1, 1], match: Text.isText })
+  // Disable normalizing, since otherwise this test passes due to it
+  editor.normalizeNode = () => {}
+  Transforms.mergeNodes(editor, { at: [1, 1] })
 }
 export const output = (
   <editor>
