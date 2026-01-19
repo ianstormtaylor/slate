@@ -10,6 +10,6 @@
     { "path": "./packages/slate/test" },
     { "path": "./packages/slate-history/test" },
     { "path": "./packages/slate-hyperscript/test" },
-    // { "path": "./packages/slate-react/test/tsconfig.json" },
+    { "path": "./packages/slate-react/test" }
   ]
 }

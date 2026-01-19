@@ -5,5 +5,5 @@
     "rootDir": "../..",
     "jsxFactory": "jsx",
     "noEmit": true
-  },
+  }
 }
