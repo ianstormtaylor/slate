@@ -1,8 +1,43 @@
 import assert from 'assert'
 import { cloneDeep } from 'lodash'
 import { fixtures } from '../../../support/fixtures'
-import { Editor, Element, Operation, createEditor } from 'slate'
-import { createHyperscript } from 'slate-hyperscript'
+import {
+  Editor,
+  Element,
+  Operation,
+  createEditor as createBaseEditor,
+} from 'slate'
+import {
+  createHyperscript,
+  createEditor as createEditorCreator,
+} from 'slate-hyperscript'
+
+const withTest = (editor: Editor) => {
+  const { isInline, isVoid, isElementReadOnly, isSelectable } = editor
+  editor.isInline = element => {
+    return element.inline === true ? true : isInline(element)
+  }
+  editor.isVoid = element => {
+    return element.void === true ? true : isVoid(element)
+  }
+  editor.isElementReadOnly = element => {
+    return element.readOnly === true ? true : isElementReadOnly(element)
+  }
+  editor.isSelectable = element => {
+    return element.nonSelectable === true ? false : isSelectable(element)
+  }
+  return editor
+}
+
+export const jsx = createHyperscript({
+  elements: {
+    block: {},
+    inline: { inline: true },
+  },
+  creators: {
+    editor: createEditorCreator(() => withTest(createBaseEditor())),
+  },
+})
 
 describe('slate', () => {
   fixtures<{
@@ -10,10 +45,7 @@ describe('slate', () => {
     test: (input: unknown) => unknown
     output: unknown
   }>(__dirname, 'interfaces', ({ module }) => {
-    let { input, test, output } = module
-    if (Editor.isEditor(input)) {
-      input = withTest(input)
-    }
+    const { input, test, output } = module
     const result = test(input)
     assert.deepEqual(result, output)
   })
@@ -22,14 +54,13 @@ describe('slate', () => {
     'operations',
     ({ module }) => {
       const { input, operations, output } = module
-      const editor = withTest(input)
-      Editor.withoutNormalizing(editor, () => {
+      Editor.withoutNormalizing(input, () => {
         for (const op of operations) {
-          editor.apply(op)
+          input.apply(op)
         }
       })
-      assert.deepEqual(editor.children, output.children)
-      assert.deepEqual(editor.selection, output.selection)
+      assert.deepEqual(input.children, output.children)
+      assert.deepEqual(input.selection, output.selection)
     }
   )
   fixtures<{ input: Editor; withFallbackElement?: boolean; output: Editor }>(
@@ -37,19 +68,18 @@ describe('slate', () => {
     'normalization',
     ({ module }) => {
       const { input, output, withFallbackElement } = module
-      const editor = withTest(input)
       if (withFallbackElement) {
-        const { normalizeNode } = editor
-        editor.normalizeNode = (entry, options) => {
+        const { normalizeNode } = input
+        input.normalizeNode = (entry, options) => {
           normalizeNode(entry, {
             ...options,
             fallbackElement: () => ({}) as Element,
           })
         }
       }
-      Editor.normalize(editor, { force: true })
-      assert.deepEqual(editor.children, output.children)
-      assert.deepEqual(editor.selection, output.selection)
+      Editor.normalize(input, { force: true })
+      assert.deepEqual(input.children, output.children)
+      assert.deepEqual(input.selection, output.selection)
     }
   )
   fixtures<{ input: Editor; run: (input: Editor) => void; output: Editor }>(
@@ -57,7 +87,7 @@ describe('slate', () => {
     'transforms',
     ({ module }) => {
       const { input, run, output } = module
-      const editor = withTest(input)
+      const editor = input
       run(editor)
       assert.deepEqual(editor.children, output.children)
       assert.deepEqual(editor.selection, output.selection)
@@ -67,10 +97,7 @@ describe('slate', () => {
     __dirname,
     'utils/deep-equal',
     ({ module }) => {
-      let { input, test, output } = module
-      if (Editor.isEditor(input)) {
-        input = withTest(input)
-      }
+      const { input, test, output } = module
       const result = test(input)
       assert.deepEqual(result, output)
     }
@@ -84,15 +111,15 @@ describe('slate', () => {
   const testBatchDirty = ({ module }: { module: batchDirtyTestModule }) => {
     const { input, run } = module
 
-    const input2 = createEditor()
+    const input2 = withTest(createBaseEditor())
     input2.children = cloneDeep(input.children)
     input2.selection = cloneDeep(input.selection)
 
     const dirties1: string[] = []
     const dirties2: string[] = []
 
-    const editor1 = withBatchTest(withTest(input), dirties1)
-    const editor2 = withBatchTest(withTest(input2), dirties2)
+    const editor1 = withBatchTest(input, dirties1)
+    const editor2 = withBatchTest(input2, dirties2)
 
     run(editor1, { batchDirty: true })
     run(editor2, { batchDirty: false })
@@ -115,23 +142,6 @@ describe('slate', () => {
   )
 })
 
-const withTest = (editor: Editor) => {
-  const { isInline, isVoid, isElementReadOnly, isSelectable } = editor
-  editor.isInline = element => {
-    return element.inline === true ? true : isInline(element)
-  }
-  editor.isVoid = element => {
-    return element.void === true ? true : isVoid(element)
-  }
-  editor.isElementReadOnly = element => {
-    return element.readOnly === true ? true : isElementReadOnly(element)
-  }
-  editor.isSelectable = element => {
-    return element.nonSelectable === true ? false : isSelectable(element)
-  }
-  return editor
-}
-
 const withBatchTest = (editor: Editor, dirties: string[]) => {
   const { normalizeNode } = editor
   editor.normalizeNode = ([node, path]) => {
@@ -140,10 +150,3 @@ const withBatchTest = (editor: Editor, dirties: string[]) => {
   }
   return editor
 }
-
-export const jsx = createHyperscript({
-  elements: {
-    block: {},
-    inline: { inline: true },
-  },
-})

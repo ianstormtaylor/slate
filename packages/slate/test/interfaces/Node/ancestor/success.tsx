@@ -1,6 +1,6 @@
 /** @jsx jsx  */
 import { Node } from 'slate'
-import { jsx } from 'slate-hyperscript'
+import { jsx } from '../../..'
 import { cloneDeep } from 'lodash'
 
 export const input = (

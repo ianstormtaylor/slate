@@ -1,8 +1,11 @@
 import assert from 'assert'
 import { fixtures } from '../../../support/fixtures'
-import { createHyperscript } from 'slate-hyperscript'
+import {
+  createHyperscript,
+  createEditor as createEditorCreator,
+} from 'slate-hyperscript'
 import { History, HistoryEditor, withHistory } from '..'
-import { BaseEditor, Editor } from 'slate'
+import { BaseEditor, Editor, createEditor as createBaseEditor } from 'slate'
 
 declare module 'slate' {
   interface CustomTypes {
@@ -10,40 +13,6 @@ declare module 'slate' {
     PackageSpecificEditorForTests: HistoryEditor
   }
 }
-
-describe('slate-history', () => {
-  fixtures<{
-    input: BaseEditor
-    run: (input: Editor) => void
-    output: Pick<Editor, 'children' | 'selection'>
-  }>(__dirname, 'undo', ({ module }) => {
-    const { input, run, output } = module
-    const editor = withTest(withHistory(input))
-    run(editor)
-    editor.undo()
-    assert.deepEqual(editor.children, output.children)
-    assert.deepEqual(editor.selection, output.selection)
-  })
-
-  fixtures<{
-    input: BaseEditor
-    run: (input: Editor) => void
-    output: boolean
-  }>(__dirname, 'isHistory', ({ module }) => {
-    const { input, run, output } = module
-    const editor = withTest(withHistory(input))
-    run(editor)
-    const result = History.isHistory(editor.history)
-    assert.strictEqual(result, output)
-  })
-})
-
-export const jsx = createHyperscript({
-  elements: {
-    block: {},
-    inline: { inline: true },
-  },
-})
 
 const withTest = (editor: Editor) => {
   const { isInline, isVoid, isElementReadOnly, isSelectable } = editor
@@ -61,3 +30,42 @@ const withTest = (editor: Editor) => {
   }
   return editor
 }
+
+export const jsx = createHyperscript({
+  elements: {
+    block: {},
+    inline: { inline: true },
+  },
+  creators: {
+    editor: createEditorCreator(() =>
+      withTest(withHistory(createBaseEditor()))
+    ),
+  },
+})
+
+describe('slate-history', () => {
+  fixtures<{
+    input: BaseEditor
+    run: (input: Editor) => void
+    output: Pick<Editor, 'children' | 'selection'>
+  }>(__dirname, 'undo', ({ module }) => {
+    const { input, run, output } = module
+    const editor = input as Editor
+    run(editor)
+    editor.undo()
+    assert.deepEqual(editor.children, output.children)
+    assert.deepEqual(editor.selection, output.selection)
+  })
+
+  fixtures<{
+    input: BaseEditor
+    run: (input: Editor) => void
+    output: boolean
+  }>(__dirname, 'isHistory', ({ module }) => {
+    const { input, run, output } = module
+    const editor = input as Editor
+    run(editor)
+    const result = History.isHistory(editor.history)
+    assert.strictEqual(result, output)
+  })
+})
