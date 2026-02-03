@@ -1,5 +1,15 @@
 # slate-dom
 
+## 0.123.1
+
+### Patch Changes
+
+- [#6004](https://github.com/ianstormtaylor/slate/pull/6004) [`e2a940a0`](https://github.com/ianstormtaylor/slate/commit/e2a940a0e1575a4f084923a16a1ab89cf965dfda) Thanks [@christianhg](https://github.com/christianhg)! - Fix `findPath` throwing "Unable to find the path for Slate node" after component unmount
+
+  When `toSlatePoint` is called with `suppressThrow: true` (e.g., from `toSlateRange` during selection change handling), it should not throw errors. However, the internal `findPath` calls were not respecting this option, causing errors to be thrown when the component was unmounting and node references became stale.
+
+  This fix wraps the `findPath` calls in `toSlatePoint` with try-catch blocks that respect the `suppressThrow` option, returning `null` instead of throwing when the option is enabled.
+
 ## 0.123.0
 
 ### Patch Changes
