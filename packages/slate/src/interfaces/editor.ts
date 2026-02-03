@@ -59,6 +59,7 @@ export interface BaseEditor {
     options?: {
       operation?: Operation
       fallbackElement?: () => Element
+      force?: boolean
     }
   ) => void
   onChange: (options?: { operation?: Operation }) => void
