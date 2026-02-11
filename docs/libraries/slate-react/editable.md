@@ -136,7 +136,7 @@ export interface RenderLeafProps {
 
 Example usage:
 
-```typescript
+```jsx
 <Editor
   renderLeaf={({ attributes, children, leaf }) => {
     return (
@@ -206,13 +206,21 @@ An example usage might look like:
 
 ```jsx
 <Editable
-  renderPlaceholder={({ attributes, children }) => (
-    <div {...attributes} style={{ fontStyle: 'italic', color: 'gray' }}>
-      {children}
-    </div>
-  )}
+  placeholder="Enter text here..."
+  renderPlaceholder={({ attributes, children }) => {
+    const styledAttributes = {
+      ...attributes,
+      style: {
+        ...attributes.style,
+        color: 'gray',
+      },
+    }
+    return <div {...styledAttributes}>{children}</div>
+  }}
 />
 ```
+
+Note that the `attributes` prop that comes in will contain a `style` object already. This object contains important styling properties which will make the placeholder behave like a placeholder. As such, it is advisable to extend styles and to focus on things like changing colors, opacity etc. Changing positioning, for example, could cause undesirable behavior.
 
 #### `scrollSelectionIntoView?: (editor: ReactEditor, domRange: DOMRange) => void`
 
