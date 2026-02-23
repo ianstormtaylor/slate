@@ -4,6 +4,7 @@ export {
   RenderElementProps,
   RenderChunkProps,
   RenderLeafProps,
+  RenderTextProps,
   RenderPlaceholderProps,
   DefaultPlaceholder,
   defaultScrollSelectionIntoView,
