@@ -3486,6 +3486,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/lodash@npm:^4.17.23":
+  version: 4.17.23
+  resolution: "@types/lodash@npm:4.17.23"
+  checksum: 05935534a44aadef67c2158b2fb4a042a226970088106a40ddc67e4f063783149fe5cf02279d7dd4a1e72c98d9189b9430face659645dbf77270f8c4c3e387f5
+  languageName: node
+  linkType: hard
+
 "@types/minimatch@npm:^3.0.3":
   version: 3.0.5
   resolution: "@types/minimatch@npm:3.0.5"
@@ -3497,6 +3504,13 @@ __metadata:
   version: 1.2.2
   resolution: "@types/minimist@npm:1.2.2"
   checksum: b8da83c66eb4aac0440e64674b19564d9d86c80ae273144db9681e5eeff66f238ade9515f5006ffbfa955ceff8b89ad2bd8ec577d7caee74ba101431fb07045d
+  languageName: node
+  linkType: hard
+
+"@types/mocha@npm:^10.0.10":
+  version: 10.0.10
+  resolution: "@types/mocha@npm:10.0.10"
+  checksum: 4e3b61ed5112add86891a5dd3ebdd087714f5e1784a63d47a96424c0825058fd07074e85e43573462f751636c92808fc18a5f3862fe45e649ea98fdc5a3ee2ea
   languageName: node
   linkType: hard
 
@@ -3520,6 +3534,15 @@ __metadata:
   version: 12.20.55
   resolution: "@types/node@npm:12.20.55"
   checksum: 1f916a06fff02faadb09a16ed6e31820ce170798b202ef0b14fc244bfbd721938c54a3a99836e185e4414ca461fe96c5bb5c67c3d248f153555b7e6347f061dd
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^25.0.9":
+  version: 25.0.9
+  resolution: "@types/node@npm:25.0.9"
+  dependencies:
+    undici-types: "npm:~7.16.0"
+  checksum: 2c16f137ed3a952903b7641df5ce16663ad00911dc6a9010156602251420da127bf7dbd32d22aac9eda0cc430381164d55a36240039b7d06ab693b9aad5c3f23
   languageName: node
   linkType: hard
 
@@ -13599,6 +13622,8 @@ __metadata:
   resolution: "slate-history@workspace:packages/slate-history"
   dependencies:
     "@babel/runtime": "npm:^7.23.2"
+    "@types/mocha": "npm:^10.0.10"
+    "@types/node": "npm:^25.0.9"
     lodash: "npm:^4.17.21"
     slate: "npm:^0.123.0"
     slate-hyperscript: "npm:^0.115.0"
@@ -13613,6 +13638,8 @@ __metadata:
   resolution: "slate-hyperscript@workspace:packages/slate-hyperscript"
   dependencies:
     "@babel/runtime": "npm:^7.23.2"
+    "@types/mocha": "npm:^10.0.10"
+    "@types/node": "npm:^25.0.9"
     slate: "npm:^0.123.0"
     source-map-loader: "npm:^4.0.1"
   peerDependencies:
@@ -13745,6 +13772,9 @@ __metadata:
   resolution: "slate@workspace:packages/slate"
   dependencies:
     "@babel/runtime": "npm:^7.23.2"
+    "@types/lodash": "npm:^4.17.23"
+    "@types/mocha": "npm:^10.0.10"
+    "@types/node": "npm:^25.0.9"
     lodash: "npm:^4.17.21"
     slate-hyperscript: "npm:^0.115.0"
     source-map-loader: "npm:^4.0.1"
@@ -14936,6 +14966,13 @@ __metadata:
   version: 5.25.3
   resolution: "undici-types@npm:5.25.3"
   checksum: 9a57f2dd6fecb2d0f7d9b86aa6f417609a0ffc73247a95aa25c078cf36cbbfe6c164b63b8dace7ad01126e6510f284c185b69c78356bb1d6b279f195acffcaf4
+  languageName: node
+  linkType: hard
+
+"undici-types@npm:~7.16.0":
+  version: 7.16.0
+  resolution: "undici-types@npm:7.16.0"
+  checksum: db43439f69c2d94cc29f75cbfe9de86df87061d6b0c577ebe9bb3255f49b22c50162a7d7eb413b0458b6510b8ca299ac7cff38c3a29fbd31af9f504bcf7fbc0d
   languageName: node
   linkType: hard
 
