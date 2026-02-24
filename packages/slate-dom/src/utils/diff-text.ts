@@ -336,11 +336,7 @@ export function transformTextDiff(
             path,
           }
         } else if (op.offset < end) {
-          return {
-            diff: { start, end: end - length, text },
-            id,
-            path,
-          }
+          return { diff: { start, end: end - length, text }, id, path }
         } else {
           return textDiff
         }
@@ -363,18 +359,14 @@ export function transformTextDiff(
             path,
           }
         } else {
-          return {
-            diff,
-            id,
-            path,
-          }
+          return textDiff
         }
       }
       case 'merge_node': {
         return {
           diff: { start: start + op.position, end: end + op.position, text },
           id,
-          path: Path.transform(path, op),
+          path: Path.previous(path),
         }
       }
     }
