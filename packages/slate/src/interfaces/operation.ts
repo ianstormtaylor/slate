@@ -188,14 +188,9 @@ export interface OperationInterface {
   transformsPaths: (op: Operation) => op is PathTransformingOperation
 
   /**
-   * Check if an operation is of a type that could affect a Point.
+   * Check if an operation is of a type that could affect a Point (and by extension, a Range).
    */
   transformsPoints: (op: Operation) => op is PointTransformingOperation
-
-  /**
-   * Check if an operation is of a type that could affect a Range.
-   */
-  transformsRanges: (op: Operation) => op is PointTransformingOperation
 }
 
 // eslint-disable-next-line no-redeclare
@@ -361,11 +356,5 @@ export const Operation: OperationInterface = {
       default:
         return Operation.transformsPaths(operation)
     }
-  },
-
-  transformsRanges(
-    operation: Operation
-  ): operation is RangeTransformingOperation {
-    return Operation.transformsPoints(operation)
   },
 }

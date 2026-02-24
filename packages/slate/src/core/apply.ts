@@ -21,9 +21,6 @@ export const apply: WithEditorFirstArg<Editor['apply']> = (editor, op) => {
     for (const ref of Editor.pointRefs(editor)) {
       PointRef.transform(ref, op)
     }
-  }
-
-  if (Operation.transformsRanges(op)) {
     for (const ref of Editor.rangeRefs(editor)) {
       RangeRef.transform(ref, op)
     }
