@@ -475,7 +475,14 @@ export const DOMEditor: DOMEditorInterface = {
 
   hasDOMNode: (editor, target, options = {}) => {
     const { editable = false } = options
-    const editorEl = DOMEditor.toDOMNode(editor, editor)
+
+    let editorEl
+    try {
+      editorEl = DOMEditor.toDOMNode(editor, editor)
+    } catch {
+      // Editor not mounted - target cannot be part of this editor
+      return false
+    }
     let targetEl
 
     // COMPAT: In Firefox, reading `target.nodeType` will throw an error if
