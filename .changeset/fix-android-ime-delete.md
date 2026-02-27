@@ -1,0 +1,5 @@
+---
+'slate-react': patch
+---
+
+fix: Fix Android IME delete not triggering onChange correctly. Previously, the first delete would not trigger onChange, and the second delete would trigger it twice.

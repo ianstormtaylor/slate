@@ -240,11 +240,12 @@ export function createAndroidInputManager({
 
     const userMarks = EDITOR_TO_USER_MARKS.get(editor)
     EDITOR_TO_USER_MARKS.delete(editor)
-    if (userMarks !== undefined) {
+    if (userMarks !== undefined && userMarks !== editor.marks) {
       editor.marks = userMarks
       editor.onChange()
+    } else if (userMarks !== undefined) {
+      editor.marks = userMarks
     }
-  }
 
   const handleCompositionEnd = (
     _event: React.CompositionEvent<HTMLDivElement>
@@ -301,6 +302,7 @@ export function createAndroidInputManager({
       }
 
       updatePlaceholderVisibility()
+      scheduleFlush()
       return
     }
 
@@ -308,6 +310,7 @@ export function createAndroidInputManager({
     if (!merged) {
       pendingDiffs.splice(idx, 1)
       updatePlaceholderVisibility()
+      scheduleFlush()
       return
     }
 
@@ -315,6 +318,7 @@ export function createAndroidInputManager({
       ...pendingDiffs[idx],
       diff: merged,
     }
+    scheduleFlush()
   }
 
   const scheduleAction = (
