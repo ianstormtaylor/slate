@@ -430,6 +430,10 @@ export const Node: NodeInterface = {
     for (let i = 0; i < path.length; i++) {
       const p = path[i]
 
+      if (typeof p !== 'number') {
+        throw new Error('Got non-numeric path index')
+      }
+
       if (Node.isText(node) || !node.children[p]) {
         return
       }
