@@ -1,15 +1,16 @@
-import { isDeepEqual } from '../../../src/utils/deep-equal'
+import { isDeepEqual } from 'slate/src/utils/deep-equal'
 
 export const input = {
   objectA: {
     text: 'same text',
-    array: ['array-content'],
     bold: true,
+    italic: { origin: 'inherited', value: true },
+    underline: { origin: 'inherited', value: false },
   },
   objectB: {
     text: 'same text',
-    array: ['array-content'],
-    bold: false,
+    bold: true,
+    italic: { origin: 'inherited', value: true },
   },
 }
 

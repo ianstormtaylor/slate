@@ -13,7 +13,6 @@ export const test = value => {
       path: [0, 0],
       text: 'a',
       offset: 1,
-      properties: {},
     },
     { affinity: 'forward' }
   )
