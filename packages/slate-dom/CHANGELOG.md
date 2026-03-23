@@ -1,5 +1,11 @@
 # slate-dom
 
+## 0.124.0
+
+### Patch Changes
+
+- [#6019](https://github.com/ianstormtaylor/slate/pull/6019) [`b9794a97`](https://github.com/ianstormtaylor/slate/commit/b9794a97dd8141f0e09c7ebb37395197553be2f6) Thanks [@delijah](https://github.com/delijah)! - Fix text node lookup for toSlatePoint
+
 ## 0.123.1
 
 ### Patch Changes

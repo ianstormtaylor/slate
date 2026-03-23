@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.124.0
+
+### Patch Changes
+
+- [#6012](https://github.com/ianstormtaylor/slate/pull/6012) [`57bdd4fe`](https://github.com/ianstormtaylor/slate/commit/57bdd4feee71f2805af5baab08cf622ee55bceaa) Thanks [@changlin-cn](https://github.com/changlin-cn)! - Fix Slate component to properly handle editor updates by adding `editor` as a dependency in the useEffect hook.
+
 ## 0.123.0
 
 ### Patch Changes
