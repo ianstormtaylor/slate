@@ -69,6 +69,7 @@ jobs:
           version: yarn changesetversion
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          YARN_ENABLE_IMMUTABLE_INSTALLS: false
 
       - name: Publish to npm (OIDC)
         if: matrix.channel == 'latest' && steps.changesets.outputs.hasChangesets == 'false'
