@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useMemo, useRef } from 'react'
+import { createContext, useCallback, useContext, useMemo, useReducer, useRef } from 'react'
 import { DecoratedRange, Descendant, Node, NodeEntry } from 'slate'
 import { isTextDecorationsEqual, isElementDecorationsEqual } from 'slate-dom'
 import { useSlateStatic } from './use-slate-static'
@@ -52,6 +52,7 @@ export const useDecorations = (
 export const useDecorateContext = (
   decorateProp: (entry: NodeEntry) => DecoratedRange[]
 ) => {
+  const [, forceUpdate] = useReducer(s => s + 1, 0)
   const eventListeners = useRef(new Set<Callback>())
 
   const latestDecorate = useRef(decorateProp)
@@ -59,6 +60,7 @@ export const useDecorateContext = (
   useIsomorphicLayoutEffect(() => {
     latestDecorate.current = decorateProp
     eventListeners.current.forEach(listener => listener())
+    forceUpdate()
   }, [decorateProp])
 
   const decorate = useCallback(
