@@ -1,4 +1,11 @@
-import { createContext, useCallback, useContext, useMemo, useReducer, useRef } from 'react'
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useReducer,
+  useRef,
+} from 'react'
 import { DecoratedRange, Descendant, Node, NodeEntry } from 'slate'
 import { isTextDecorationsEqual, isElementDecorationsEqual } from 'slate-dom'
 import { useSlateStatic } from './use-slate-static'

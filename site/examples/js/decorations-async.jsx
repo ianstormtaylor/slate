@@ -1,38 +1,28 @@
 import { css } from '@emotion/css'
 import React, { useCallback, useEffect, useRef, useState, useMemo } from 'react'
-import { Descendant, Text, NodeEntry, Range, createEditor } from 'slate'
+import { Text, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
-import {
-  Editable,
-  RenderLeafProps,
-  Slate,
-  withReact,
-  ReactEditor,
-} from 'slate-react'
-
+import { Editable, Slate, withReact } from 'slate-react'
 // Finds all words that appear more than once across the document and returns
 // their ranges. In a real app this work might come from a language server,
 // spell-checker, or search index — anything that produces results with latency.
-function findDuplicateRanges(editor: ReactEditor): Range[] {
-  const freq: Record<string, number> = {}
-
+function findDuplicateRanges(editor) {
+  const freq = {}
   for (const [node] of editor.nodes({ at: [], match: n => Text.isText(n) })) {
     if (!Text.isText(node)) continue
     for (const word of node.text.toLowerCase().match(/\b\w+\b/g) ?? []) {
       freq[word] = (freq[word] ?? 0) + 1
     }
   }
-
   const duplicates = new Set(Object.keys(freq).filter(w => freq[w] > 1))
-  const ranges: Range[] = []
-
+  const ranges = []
   for (const [node, path] of editor.nodes({
     at: [],
     match: n => Text.isText(n),
   })) {
     if (!Text.isText(node)) continue
     const wordRe = /\b\w+\b/g
-    let match: RegExpExecArray | null
+    let match
     while ((match = wordRe.exec(node.text)) !== null) {
       if (duplicates.has(match[0].toLowerCase())) {
         ranges.push({
@@ -42,28 +32,22 @@ function findDuplicateRanges(editor: ReactEditor): Range[] {
       }
     }
   }
-
   return ranges
 }
-
 const AsyncDecorationsExample = () => {
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
-
-  const [ranges, setRanges] = useState<Range[]>([])
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-
+  const [ranges, setRanges] = useState([])
+  const timeoutRef = useRef(null)
   // Compute the initial decorations synchronously on mount.
   useEffect(() => {
     setRanges(findDuplicateRanges(editor))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-
   useEffect(() => {
     return () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current)
     }
   }, [])
-
   // On every change, keep the existing ranges and schedule a recompute after
   // 600 ms. When the timeout fires, `setRanges` produces a new `ranges`
   // reference, which gives `decorate` a new identity and triggers a full
@@ -75,9 +59,8 @@ const AsyncDecorationsExample = () => {
       setRanges(findDuplicateRanges(editor))
     }, 600)
   }, [editor])
-
   const decorate = useCallback(
-    ([node, path]: NodeEntry): Range[] => {
+    ([node, path]) => {
       if (!Text.isText(node)) return []
       return ranges
         .filter(r => r.anchor.path[0] === path[0])
@@ -85,7 +68,6 @@ const AsyncDecorationsExample = () => {
     },
     [ranges]
   )
-
   return (
     <div>
       <p
@@ -113,7 +95,7 @@ const AsyncDecorationsExample = () => {
       >
         <Editable
           decorate={decorate}
-          renderLeaf={(props: RenderLeafProps) => <Leaf {...props} />}
+          renderLeaf={props => <Leaf {...props} />}
           className={css`
             min-height: 140px;
             padding: 12px;
@@ -127,18 +109,11 @@ const AsyncDecorationsExample = () => {
     </div>
   )
 }
-
-interface HighlightLeaf {
-  highlight?: boolean
-  text: string
-}
-
-const Leaf = ({ attributes, children, leaf }: RenderLeafProps) => {
-  const hLeaf = leaf as HighlightLeaf
+const Leaf = ({ attributes, children, leaf }) => {
+  const hLeaf = leaf
   return (
     <span
       {...attributes}
-      {...(hLeaf.highlight && { 'data-cy': 'highlight' })}
       className={css`
         background-color: ${hLeaf.highlight ? '#ffe58f' : 'transparent'};
         border-radius: ${hLeaf.highlight ? '2px' : '0'};
@@ -148,8 +123,7 @@ const Leaf = ({ attributes, children, leaf }: RenderLeafProps) => {
     </span>
   )
 }
-
-const initialValue: Descendant[] = [
+const initialValue = [
   {
     type: 'paragraph',
     children: [
@@ -167,5 +141,4 @@ const initialValue: Descendant[] = [
     ],
   },
 ]
-
 export default AsyncDecorationsExample
