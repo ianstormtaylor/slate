@@ -82,6 +82,7 @@ export const isEditor: EditorInterface['isEditor'] = (
     typeof value.removeNodes === 'function' &&
     typeof value.select === 'function' &&
     typeof value.setNodes === 'function' &&
+    typeof value.setNodesBatch === 'function' &&
     typeof value.setNormalizing === 'function' &&
     typeof value.setPoint === 'function' &&
     typeof value.setSelection === 'function' &&

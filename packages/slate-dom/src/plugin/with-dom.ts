@@ -51,7 +51,8 @@ export const withDOM = <T extends BaseEditor>(
   clipboardFormatKey = 'x-slate-fragment'
 ): T & DOMEditor => {
   const e = editor as T & DOMEditor
-  const { apply, onChange, deleteBackward, addMark, removeMark } = e
+  const { apply, onChange, deleteBackward, addMark, removeMark, setNodesBatch } =
+    e
 
   // The WeakMap which maps a key to a specific HTMLElement must be scoped to the editor instance to
   // avoid collisions between editors in the DOM that share the same value.
@@ -231,6 +232,21 @@ export const withDOM = <T extends BaseEditor>(
       }
 
       pathRef.unref()
+    }
+  }
+
+  e.setNodesBatch = updates => {
+    const matches: [Path, Key][] = []
+
+    for (const { at } of updates) {
+      matches.push(...getMatches(e, at))
+    }
+
+    setNodesBatch(updates)
+
+    for (const [path, key] of matches) {
+      const [node] = Editor.node(e, path)
+      NODE_TO_KEY.set(node, key)
     }
   }
 

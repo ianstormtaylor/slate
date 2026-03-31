@@ -32,7 +32,7 @@ import {
   TextInsertFragmentOptions,
   TextInsertTextOptions,
 } from './transforms/text'
-import { NodeInsertNodesOptions } from './transforms/node'
+import { NodeBatchUpdate, NodeInsertNodesOptions } from './transforms/node'
 
 /**
  * The `Editor` interface stores all the state of a Slate editor. It is extended
@@ -110,6 +110,7 @@ export interface BaseEditor {
       merge?: PropsMerge
     }
   ) => void
+  setNodesBatch: <T extends Node>(updates: NodeBatchUpdate<T>[]) => void
   setNormalizing: OmitFirstArg<typeof Editor.setNormalizing>
   setPoint: OmitFirstArg<typeof Transforms.setPoint>
   setSelection: OmitFirstArg<typeof Transforms.setSelection>
