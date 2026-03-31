@@ -7,7 +7,15 @@ import React, {
   useEffect,
   useState,
 } from 'react'
-import { createEditor as slateCreateEditor, Descendant, Editor } from 'slate'
+import {
+  createEditor as slateCreateEditor,
+  Descendant,
+  Editor,
+  Element as SlateElement,
+  Node,
+  Path,
+  Transforms,
+} from 'slate'
 import {
   Editable,
   RenderElementProps,
@@ -35,6 +43,36 @@ interface Config {
   contentVisibilityMode: 'none' | 'element' | 'chunk'
   showSelectedHeadings: boolean
   strictMode: boolean
+}
+
+type BenchmarkMode =
+  | 'applyBatch'
+  | 'applySetNode'
+  | 'pathTraversal'
+  | 'directRewrite'
+  | 'setNodes'
+  | 'setNodesWithoutNormalizing'
+
+interface BenchmarkResult {
+  blocks: number
+  durationMs: number
+  label: string
+  propValue: string
+}
+
+interface BenchmarkMetric {
+  averageMs: number
+  label: string
+  maxMs: number
+  minMs: number
+  mode: BenchmarkMode
+  vsDirectRewrite: number | null
+}
+
+interface BenchmarkSuiteResult {
+  blocks: number
+  metrics: BenchmarkMetric[]
+  repeats: number
 }
 
 const blocksOptions = [
@@ -131,6 +169,34 @@ const getInitialValue = (blocks: number) => {
 const initialInitialValue =
   typeof window === 'undefined' ? [] : getInitialValue(initialConfig.blocks)
 
+const BENCHMARK_PROP = 'benchmarkRun'
+
+const benchmarkLabels: Record<BenchmarkMode, string> = {
+  applyBatch: 'Transforms.applyBatch with exact-path set_node ops',
+  applySetNode: 'editor.apply(set_node) on every top-level block',
+  directRewrite: 'Direct immutable rewrite of editor.children',
+  pathTraversal: 'Traverse every top-level path with Node.get',
+  setNodes: 'Transforms.setNodes on every top-level block',
+  setNodesWithoutNormalizing:
+    'Transforms.setNodes on every top-level block inside Editor.withoutNormalizing',
+}
+
+const interactiveBenchmarkModes: BenchmarkMode[] = [
+  'applyBatch',
+  'setNodes',
+  'setNodesWithoutNormalizing',
+  'applySetNode',
+]
+
+const comparisonBenchmarkModes: BenchmarkMode[] = [
+  'applyBatch',
+  'pathTraversal',
+  'directRewrite',
+  'setNodes',
+  'setNodesWithoutNormalizing',
+  'applySetNode',
+]
+
 const createEditor = (config: Config) => {
   const editor = withReact(slateCreateEditor())
 
@@ -138,6 +204,145 @@ const createEditor = (config: Config) => {
     config.chunking && node === editor ? config.chunkSize : null
 
   return editor
+}
+
+const cloneValue = <V,>(value: V): V => JSON.parse(JSON.stringify(value)) as V
+
+const createDetachedBenchmarkEditor = (children: Descendant[]) => {
+  const editor = slateCreateEditor()
+
+  editor.children = cloneValue(children)
+
+  return editor
+}
+
+const runTopLevelBenchmark = (
+  editor: Editor,
+  mode: BenchmarkMode
+): BenchmarkResult => {
+  const propValue = `${mode}-${Date.now()}-${Math.random()
+    .toString(36)
+    .slice(2, 8)}`
+  const paths = editor.children.map((_, index) => [index] as Path)
+  const start = performance.now()
+
+  const applyToAllBlocks = () => {
+    for (const path of paths) {
+      if (mode === 'pathTraversal') {
+        Node.get(editor, path)
+        continue
+      }
+
+      if (mode === 'directRewrite') {
+        editor.children = editor.children.map(node =>
+          SlateElement.isElement(node)
+            ? ({
+                ...node,
+                [BENCHMARK_PROP]: propValue,
+              } as unknown as Descendant)
+            : node
+        )
+        return
+      }
+
+      if (mode === 'applySetNode') {
+        const node = Node.get(editor, path)
+
+        if (!SlateElement.isElement(node)) continue
+
+        const previousValue = (node as Record<string, unknown>)[BENCHMARK_PROP]
+
+        editor.apply({
+          type: 'set_node',
+          path,
+          properties:
+            previousValue === undefined
+              ? {}
+              : { [BENCHMARK_PROP]: previousValue },
+          newProperties: { [BENCHMARK_PROP]: propValue },
+        } as any)
+        continue
+      }
+
+      if (mode === 'applyBatch') {
+        Transforms.applyBatch(
+          editor,
+          paths.map(batchPath => ({
+            type: 'set_node',
+            path: batchPath,
+            properties: {},
+            newProperties: { [BENCHMARK_PROP]: propValue },
+          })) as any
+        )
+        return
+      }
+
+      Transforms.setNodes(
+        editor,
+        { [BENCHMARK_PROP]: propValue } as Partial<SlateElement>,
+        { at: path }
+      )
+    }
+  }
+
+  if (mode === 'setNodesWithoutNormalizing') {
+    Editor.withoutNormalizing(editor, applyToAllBlocks)
+  } else {
+    applyToAllBlocks()
+  }
+
+  return {
+    blocks: paths.length,
+    durationMs: Math.round((performance.now() - start) * 100) / 100,
+    label: benchmarkLabels[mode],
+    propValue,
+  }
+}
+
+const runDetachedBenchmarkSuite = (
+  children: Descendant[],
+  repeats: number
+): BenchmarkSuiteResult => {
+  const durationsByMode = new Map<BenchmarkMode, number[]>()
+
+  for (const mode of comparisonBenchmarkModes) {
+    durationsByMode.set(mode, [])
+
+    for (let index = 0; index < repeats; index++) {
+      const benchmarkEditor = createDetachedBenchmarkEditor(children)
+      const result = runTopLevelBenchmark(benchmarkEditor, mode)
+
+      durationsByMode.get(mode)!.push(result.durationMs)
+    }
+  }
+
+  const directRewriteAverage =
+    durationsByMode.get('directRewrite')!.reduce((total, duration) => {
+      return total + duration
+    }, 0) / repeats
+
+  return {
+    blocks: children.length,
+    metrics: comparisonBenchmarkModes.map(mode => {
+      const durations = durationsByMode.get(mode)!
+      const averageMs =
+        durations.reduce((total, duration) => total + duration, 0) /
+        durations.length
+
+      return {
+        averageMs: Math.round(averageMs * 100) / 100,
+        label: benchmarkLabels[mode],
+        maxMs: Math.max(...durations),
+        minMs: Math.min(...durations),
+        mode,
+        vsDirectRewrite:
+          mode === 'directRewrite' || directRewriteAverage === 0
+            ? null
+            : Math.round((averageMs / directRewriteAverage) * 100) / 100,
+      }
+    }),
+    repeats,
+  }
 }
 
 const HugeDocumentExample = () => {
@@ -304,6 +509,14 @@ const PerformanceControls = ({
   const [keyPressDurations, setKeyPressDurations] = useState<number[]>([])
   const [lastLongAnimationFrameDuration, setLastLongAnimationFrameDuration] =
     useState<number | null>(null)
+  const [benchmarkRepeats, setBenchmarkRepeats] = useState(3)
+  const [runningBenchmark, setRunningBenchmark] =
+    useState<BenchmarkMode | null>(null)
+  const [lastBenchmarkResult, setLastBenchmarkResult] =
+    useState<BenchmarkResult | null>(null)
+  const [runningBenchmarkSuite, setRunningBenchmarkSuite] = useState(false)
+  const [lastBenchmarkSuite, setLastBenchmarkSuite] =
+    useState<BenchmarkSuiteResult | null>(null)
 
   const lastKeyPressDuration: number | null = keyPressDurations[0] ?? null
 
@@ -361,6 +574,41 @@ const PerformanceControls = ({
 
     return () => observer.disconnect()
   }, [editor])
+
+  useEffect(() => {
+    setRunningBenchmark(null)
+    setLastBenchmarkResult(null)
+    setRunningBenchmarkSuite(false)
+    setLastBenchmarkSuite(null)
+  }, [editor])
+
+  const queueBenchmark = useCallback(
+    (mode: BenchmarkMode) => {
+      setRunningBenchmark(mode)
+
+      requestAnimationFrame(() => {
+        const result = runTopLevelBenchmark(editor, mode)
+
+        setLastBenchmarkResult(result)
+        setRunningBenchmark(null)
+      })
+    },
+    [editor]
+  )
+
+  const queueBenchmarkSuite = useCallback(() => {
+    setRunningBenchmarkSuite(true)
+
+    requestAnimationFrame(() => {
+      const result = runDetachedBenchmarkSuite(
+        editor.children as Descendant[],
+        benchmarkRepeats
+      )
+
+      setLastBenchmarkSuite(result)
+      setRunningBenchmarkSuite(false)
+    })
+  }, [benchmarkRepeats, editor])
 
   return (
     <div className="performance-controls">
@@ -538,6 +786,196 @@ const PerformanceControls = ({
 
         {SUPPORTS_EVENT_TIMING && lastKeyPressDuration === null && (
           <p>Events shorter than 16ms may not be detected.</p>
+        )}
+      </details>
+
+      <details>
+        <summary>Transform benchmark</summary>
+
+        <p>
+          The comparison suite runs on detached editors cloned from the current
+          document, so it isolates transform cost from React rendering. The live
+          buttons below mutate the active editor and make the pause visible in
+          the UI.
+        </p>
+
+        <p
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 8,
+            alignItems: 'center',
+          }}
+        >
+          <label>
+            Repeats:{' '}
+            <select
+              disabled={runningBenchmarkSuite}
+              onChange={event => {
+                setBenchmarkRepeats(parseInt(event.target.value, 10))
+              }}
+              value={benchmarkRepeats}
+            >
+              {[1, 3, 5].map(repeats => (
+                <option key={repeats} value={repeats}>
+                  {repeats}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <button
+            disabled={runningBenchmarkSuite || runningBenchmark !== null}
+            onClick={queueBenchmarkSuite}
+            style={{
+              cursor:
+                runningBenchmarkSuite || runningBenchmark !== null
+                  ? 'wait'
+                  : 'pointer',
+              padding: '6px 10px',
+            }}
+            type="button"
+          >
+            {runningBenchmarkSuite
+              ? 'Running detached comparison…'
+              : 'Run detached comparison'}
+          </button>
+        </p>
+
+        {lastBenchmarkSuite && (
+          <>
+            <p>
+              Detached comparison over{' '}
+              {lastBenchmarkSuite.blocks.toLocaleString()} top-level blocks,
+              averaged across {lastBenchmarkSuite.repeats} run
+              {lastBenchmarkSuite.repeats === 1 ? '' : 's'}.
+            </p>
+
+            <table
+              style={{
+                borderCollapse: 'collapse',
+                width: '100%',
+              }}
+            >
+              <thead>
+                <tr>
+                  <th align="left">Lane</th>
+                  <th align="right">Avg (ms)</th>
+                  <th align="right">Min-Max (ms)</th>
+                  <th align="right">Vs rewrite</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {lastBenchmarkSuite.metrics.map(metric => (
+                  <tr key={metric.mode}>
+                    <td>{metric.label}</td>
+                    <td align="right">{metric.averageMs.toFixed(2)}</td>
+                    <td align="right">
+                      {metric.minMs.toFixed(2)}-{metric.maxMs.toFixed(2)}
+                    </td>
+                    <td align="right">
+                      {metric.vsDirectRewrite === null
+                        ? 'baseline'
+                        : `${metric.vsDirectRewrite.toFixed(2)}x`}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            {(() => {
+              const directRewrite = lastBenchmarkSuite.metrics.find(
+                metric => metric.mode === 'directRewrite'
+              )
+              const setNodes = lastBenchmarkSuite.metrics.find(
+                metric => metric.mode === 'setNodes'
+              )
+              const applyBatch = lastBenchmarkSuite.metrics.find(
+                metric => metric.mode === 'applyBatch'
+              )
+              const withoutNormalizing = lastBenchmarkSuite.metrics.find(
+                metric => metric.mode === 'setNodesWithoutNormalizing'
+              )
+
+              if (
+                !directRewrite ||
+                !setNodes ||
+                !applyBatch ||
+                !withoutNormalizing
+              ) {
+                return null
+              }
+
+              return (
+                <p>
+                  On this flat top-level document,{' '}
+                  <strong>{setNodes.label}</strong> averages{' '}
+                  <strong>{setNodes.vsDirectRewrite?.toFixed(2)}x</strong> the
+                  cost of the cheap immutable rewrite baseline,{' '}
+                  <strong>
+                    {(setNodes.averageMs / applyBatch.averageMs).toFixed(2)}x
+                  </strong>{' '}
+                  the cost of <strong>{applyBatch.label}</strong>, and{' '}
+                  <strong>
+                    {(
+                      setNodes.averageMs / withoutNormalizing.averageMs
+                    ).toFixed(2)}
+                    x
+                  </strong>{' '}
+                  the cost of the same loop inside{' '}
+                  <code>Editor.withoutNormalizing</code>.
+                </p>
+              )
+            })()}
+          </>
+        )}
+
+        <p>
+          Live single-run controls. Each run writes a hidden{' '}
+          <code>{BENCHMARK_PROP}</code> prop so repeated clicks still do real
+          work.
+        </p>
+
+        <p
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 8,
+          }}
+        >
+          {interactiveBenchmarkModes.map(mode => (
+            <button
+              key={mode}
+              disabled={runningBenchmark !== null || runningBenchmarkSuite}
+              onClick={() => queueBenchmark(mode)}
+              style={{
+                cursor:
+                  runningBenchmark !== null || runningBenchmarkSuite
+                    ? 'wait'
+                    : 'pointer',
+                padding: '6px 10px',
+              }}
+              type="button"
+            >
+              {runningBenchmark === mode ? 'Running…' : benchmarkLabels[mode]}
+            </button>
+          ))}
+        </p>
+
+        {lastBenchmarkResult && (
+          <>
+            <p>
+              Last run: <strong>{lastBenchmarkResult.durationMs} ms</strong> for{' '}
+              {lastBenchmarkResult.blocks.toLocaleString()} top-level blocks.
+            </p>
+
+            <p>{lastBenchmarkResult.label}</p>
+
+            <p>
+              Hidden prop value: <code>{lastBenchmarkResult.propValue}</code>
+            </p>
+          </>
         )}
       </details>
     </div>

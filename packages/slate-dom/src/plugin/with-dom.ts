@@ -8,6 +8,7 @@ import {
   PathRef,
   Range,
   Transforms,
+  wrapApply,
 } from 'slate'
 import {
   TextDiff,
@@ -51,8 +52,7 @@ export const withDOM = <T extends BaseEditor>(
   clipboardFormatKey = 'x-slate-fragment'
 ): T & DOMEditor => {
   const e = editor as T & DOMEditor
-  const { apply, onChange, deleteBackward, addMark, removeMark, setNodesBatch } =
-    e
+  const { onChange, deleteBackward, addMark, removeMark } = e
 
   // The WeakMap which maps a key to a specific HTMLElement must be scoped to the editor instance to
   // avoid collisions between editors in the DOM that share the same value.
@@ -120,7 +120,7 @@ export const withDOM = <T extends BaseEditor>(
 
   // This attempts to reset the NODE_TO_KEY entry to the correct value
   // as apply() changes the object reference and hence invalidates the NODE_TO_KEY entry
-  e.apply = (op: Operation) => {
+  wrapApply(e, apply => (op: Operation) => {
     const matches: [Path, Key][] = []
     const pathRefMatches: [PathRef, Key][] = []
 
@@ -233,23 +233,7 @@ export const withDOM = <T extends BaseEditor>(
 
       pathRef.unref()
     }
-  }
-
-  e.setNodesBatch = updates => {
-    const matches: [Path, Key][] = []
-
-    for (const { at } of updates) {
-      matches.push(...getMatches(e, at))
-    }
-
-    setNodesBatch(updates)
-
-    for (const [path, key] of matches) {
-      const [node] = Editor.node(e, path)
-      NODE_TO_KEY.set(node, key)
-    }
-  }
-
+  })
   e.setFragmentData = (data: Pick<DataTransfer, 'getData' | 'setData'>) => {
     const { selection } = e
 

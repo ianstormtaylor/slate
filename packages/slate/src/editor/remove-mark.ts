@@ -2,7 +2,7 @@ import { Node } from '../interfaces/node'
 import { Path } from '../interfaces/path'
 import { Range } from '../interfaces/range'
 import { Transforms } from '../interfaces/transforms'
-import { FLUSHING } from '../utils/weak-maps'
+import { scheduleOnChange } from '../core/batch'
 import { Editor, EditorInterface } from '../interfaces/editor'
 
 export const removeMark: EditorInterface['removeMark'] = (editor, key) => {
@@ -36,9 +36,7 @@ export const removeMark: EditorInterface['removeMark'] = (editor, key) => {
       const marks = { ...(Editor.marks(editor) || {}) }
       delete marks[<keyof Node>key]
       editor.marks = marks
-      if (!FLUSHING.get(editor)) {
-        editor.onChange()
-      }
+      scheduleOnChange(editor)
     }
   }
 }

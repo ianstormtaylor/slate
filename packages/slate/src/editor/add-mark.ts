@@ -2,7 +2,7 @@ import { Node } from '../interfaces/node'
 import { Path } from '../interfaces/path'
 import { Range } from '../interfaces/range'
 import { Transforms } from '../interfaces/transforms'
-import { FLUSHING } from '../utils/weak-maps'
+import { scheduleOnChange } from '../core/batch'
 import { Editor, EditorInterface } from '../interfaces/editor'
 
 export const addMark: EditorInterface['addMark'] = (editor, key, value) => {
@@ -43,9 +43,7 @@ export const addMark: EditorInterface['addMark'] = (editor, key, value) => {
       }
 
       editor.marks = marks
-      if (!FLUSHING.get(editor)) {
-        editor.onChange()
-      }
+      scheduleOnChange(editor)
     }
   }
 }

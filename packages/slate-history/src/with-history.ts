@@ -1,12 +1,4 @@
-import {
-  Editor,
-  Node,
-  NodeBatchUpdate,
-  Operation,
-  Path,
-  Transforms,
-  buildSetNodeBatchOperations,
-} from 'slate'
+import { Editor, Operation, Path, Transforms, wrapApply } from 'slate'
 
 import { HistoryEditor } from './history-editor'
 
@@ -22,7 +14,6 @@ import { HistoryEditor } from './history-editor'
 
 export const withHistory = <T extends Editor>(editor: T) => {
   const e = editor as T & HistoryEditor
-  const { apply, setNodesBatch } = e
   e.history = { undos: [], redos: [] }
 
   e.redo = () => {
@@ -74,7 +65,7 @@ export const withHistory = <T extends Editor>(editor: T) => {
     }
   }
 
-  e.apply = (op: Operation) => {
+  wrapApply(e, apply => (op: Operation) => {
     const { operations, history } = e
     const { undos } = history
     const lastBatch = undos[undos.length - 1]
@@ -121,59 +112,7 @@ export const withHistory = <T extends Editor>(editor: T) => {
     }
 
     apply(op)
-  }
-
-  e.setNodesBatch = <T extends Node>(updates: NodeBatchUpdate<T>[]) => {
-    const ops = buildSetNodeBatchOperations(e, updates)
-    const { operations, history } = e
-    const { undos } = history
-    const lastBatch = undos[undos.length - 1]
-    const lastOp =
-      lastBatch && lastBatch.operations[lastBatch.operations.length - 1]
-    let save = HistoryEditor.isSaving(e)
-    let merge = HistoryEditor.isMerging(e)
-
-    if (save == null) {
-      save = ops.length > 0
-    }
-
-    if (save && ops.length > 0) {
-      if (merge == null) {
-        if (lastBatch == null) {
-          merge = false
-        } else if (operations.includes(lastOp)) {
-          merge = true
-        } else {
-          merge = false
-        }
-      }
-
-      if (HistoryEditor.isSplittingOnce(e)) {
-        merge = false
-        HistoryEditor.setSplittingOnce(e, undefined)
-      }
-
-      if (lastBatch && merge) {
-        lastBatch.operations.push(...ops)
-      } else {
-        const batch = {
-          operations: ops,
-          selectionBefore: e.selection,
-        }
-
-        e.writeHistory('undos', batch)
-      }
-
-      while (undos.length > 100) {
-        undos.shift()
-      }
-
-      history.redos = []
-    }
-
-    setNodesBatch(updates)
-  }
-
+  })
   e.writeHistory = (stack: 'undos' | 'redos', batch: any) => {
     e.history[stack].push(batch)
   }

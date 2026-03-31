@@ -107,10 +107,10 @@ const InsertEditableVoidButton = () => {
   const editor = useSlateStatic()
   return (
     <Button
-      onMouseDown={event => {
+      onPointerDown={event => {
         event.preventDefault()
-        insertEditableVoid(editor)
       }}
+      onClick={() => insertEditableVoid(editor)}
     >
       <Icon>add</Icon>
     </Button>

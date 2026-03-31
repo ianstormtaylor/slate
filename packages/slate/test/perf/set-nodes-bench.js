@@ -1,20 +1,20 @@
+/* eslint-disable no-console */
 const { performance } = require('node:perf_hooks')
 
+const { createEditor, Editor, Element, Node, Transforms } = require('../../src')
 const {
-  createEditor,
-  Editor,
-  Element,
-  Node,
-  Path,
-  PathRef,
-  PointRef,
-  RangeRef,
-  Transforms,
-} = require('../../src')
-const { isBatchingDirtyPaths } = require('../../src/core/batch-dirty-paths')
-const { updateDirtyPaths } = require('../../src/core/update-dirty-paths')
-const { FLUSHING } = require('../../src/utils/weak-maps')
+  finalizeOperation,
+  transformOperationRefs,
+  updateOperationDirtyPaths,
+} = require('../../src/core/apply')
+const {
+  clearExactSetNodeDraft,
+  commitExactSetNodeDraft,
+  materializeExactSetNodeDraft,
+  stageExactSetNodeOperation,
+} = require('../../src/core/children')
 const { modifyDescendant } = require('../../src/utils/modify')
+const { BATCH_DEPTH } = require('../../src/utils/weak-maps')
 
 const DEFAULT_BLOCKS = 5000
 const DEFAULT_GROUP_SIZE = 50
@@ -69,10 +69,14 @@ const createSetNodeOps = targetPaths =>
     newProperties: { id: `id-${index}` },
   }))
 
-const createSetNodeBatchUpdates = targetPaths =>
-  targetPaths.map((path, index) => ({
-    at: path,
-    props: { id: `id-${index}` },
+const createInsertNodeOps = blockCount =>
+  Array.from({ length: blockCount }, (_, index) => ({
+    type: 'insert_node',
+    path: [index],
+    node: {
+      type: 'paragraph',
+      children: [{ text: `Inserted ${index}` }],
+    },
   }))
 
 const collectTargetPaths = editor =>
@@ -86,80 +90,6 @@ const collectTargetPaths = editor =>
     ([, path]) => path
   )
 
-const installTimedApply = editor => {
-  const metrics = {
-    applyCount: 0,
-    totalMs: 0,
-    pathRefsMs: 0,
-    pointRefsMs: 0,
-    rangeRefsMs: 0,
-    dirtyPathsMs: 0,
-    transformMs: 0,
-    normalizeMs: 0,
-  }
-
-  editor.apply = op => {
-    const applyStart = performance.now()
-    let start = applyStart
-
-    metrics.applyCount++
-
-    for (const ref of Editor.pathRefs(editor)) {
-      PathRef.transform(ref, op)
-    }
-    metrics.pathRefsMs += performance.now() - start
-
-    start = performance.now()
-    for (const ref of Editor.pointRefs(editor)) {
-      PointRef.transform(ref, op)
-    }
-    metrics.pointRefsMs += performance.now() - start
-
-    start = performance.now()
-    for (const ref of Editor.rangeRefs(editor)) {
-      RangeRef.transform(ref, op)
-    }
-    metrics.rangeRefsMs += performance.now() - start
-
-    start = performance.now()
-    if (!isBatchingDirtyPaths(editor)) {
-      const transform = Path.operationCanTransformPath(op)
-        ? path => Path.transform(path, op)
-        : undefined
-      updateDirtyPaths(editor, editor.getDirtyPaths(op), transform)
-    }
-    metrics.dirtyPathsMs += performance.now() - start
-
-    start = performance.now()
-    Transforms.transform(editor, op)
-    metrics.transformMs += performance.now() - start
-
-    editor.operations.push(op)
-
-    start = performance.now()
-    Editor.normalize(editor, { operation: op })
-    metrics.normalizeMs += performance.now() - start
-
-    if (op.type === 'set_selection') {
-      editor.marks = null
-    }
-
-    if (!FLUSHING.get(editor)) {
-      FLUSHING.set(editor, true)
-
-      Promise.resolve().then(() => {
-        FLUSHING.set(editor, false)
-        editor.onChange({ operation: op })
-        editor.operations = []
-      })
-    }
-
-    metrics.totalMs += performance.now() - applyStart
-  }
-
-  return metrics
-}
-
 const median = values => {
   const sorted = [...values].sort((a, b) => a - b)
   const middle = Math.floor(sorted.length / 2)
@@ -169,17 +99,6 @@ const median = values => {
   }
 
   return sorted[middle]
-}
-
-const summarizeMetrics = runs => {
-  const keys = Object.keys(runs[0].metrics)
-  const summary = {}
-
-  for (const key of keys) {
-    summary[key] = median(runs.map(run => run.metrics[key]))
-  }
-
-  return summary
 }
 
 const assertEquivalentChildren = (label, received, expected) => {
@@ -227,13 +146,10 @@ const verifyBatchPrototype = () => {
       })
     })
 
-    Transforms.setNodesBatch(
-      batchedEditor,
-      createSetNodeBatchUpdates(testCase.targetPaths)
-    )
+    Transforms.applyBatch(batchedEditor, createSetNodeOps(testCase.targetPaths))
 
     assertEquivalentChildren(
-      `setNodesBatch(${testCase.label})`,
+      `applyBatch(${testCase.label})`,
       batchedEditor.children,
       baselineEditor.children
     )
@@ -263,6 +179,99 @@ const rewriteGroupedChildren = editor => {
   }))
 }
 
+const timeExactSetNodeBreakdown = ({
+  benchmark,
+  blockCount,
+  groupSize,
+  repeats,
+}) => {
+  if (!benchmark.breakdown) {
+    return null
+  }
+
+  const phaseFactories = {
+    refs:
+      ({ editor, ops }) =>
+      () => {
+        for (const op of ops) {
+          transformOperationRefs(editor, op)
+        }
+      },
+    dirtyPaths:
+      ({ editor, ops }) =>
+      () => {
+        for (const op of ops) {
+          updateOperationDirtyPaths(editor, op)
+        }
+      },
+    stage:
+      ({ editor, ops }) =>
+      () => {
+        for (const op of ops) {
+          stageExactSetNodeOperation(editor, op)
+        }
+      },
+    finalize:
+      ({ editor, ops }) =>
+      () => {
+        BATCH_DEPTH.set(editor, 1)
+
+        try {
+          for (const op of ops) {
+            finalizeOperation(editor, op)
+          }
+        } finally {
+          BATCH_DEPTH.delete(editor)
+        }
+      },
+    materialize: ({ editor, ops }) => {
+      for (const op of ops) {
+        stageExactSetNodeOperation(editor, op)
+      }
+
+      return () => {
+        materializeExactSetNodeDraft(editor)
+      }
+    },
+    commit: ({ editor, ops }) => {
+      for (const op of ops) {
+        stageExactSetNodeOperation(editor, op)
+      }
+
+      return () => {
+        commitExactSetNodeDraft(editor)
+      }
+    },
+  }
+
+  const breakdown = {}
+
+  for (const phase of benchmark.breakdown) {
+    const durations = []
+
+    for (let repeat = 0; repeat < repeats; repeat++) {
+      const editor = createEditorWithValue(
+        benchmark.shape === 'flat'
+          ? buildFlatValue(blockCount)
+          : buildGroupedValue(blockCount, groupSize)
+      )
+      const targetPaths = collectTargetPaths(editor)
+      const ops = createSetNodeOps(targetPaths)
+      const run = phaseFactories[phase]({ editor, ops })
+      const start = performance.now()
+
+      run()
+
+      durations.push(performance.now() - start)
+      clearExactSetNodeDraft(editor)
+    }
+
+    breakdown[phase] = Number(median(durations).toFixed(2))
+  }
+
+  return breakdown
+}
+
 const runScenario = async ({ benchmark, blockCount, groupSize, repeats }) => {
   const runs = []
 
@@ -270,26 +279,31 @@ const runScenario = async ({ benchmark, blockCount, groupSize, repeats }) => {
     const editor = createEditorWithValue(
       benchmark.shape === 'flat'
         ? buildFlatValue(blockCount)
-        : buildGroupedValue(blockCount, groupSize)
+        : benchmark.shape === 'grouped'
+        ? buildGroupedValue(blockCount, groupSize)
+        : []
     )
     const targetPaths = collectTargetPaths(editor)
-    const applyMetrics = installTimedApply(editor)
 
     const start = performance.now()
-    benchmark.run({ editor, targetPaths })
+    benchmark.run({ blockCount, editor, targetPaths })
     const durationMs = performance.now() - start
 
     await waitForMicrotasks()
 
     runs.push({
       durationMs,
-      metrics: applyMetrics,
     })
   }
 
   return {
-    applyMetrics: summarizeMetrics(runs),
     durationMs: median(runs.map(run => run.durationMs)),
+    breakdown: timeExactSetNodeBreakdown({
+      benchmark,
+      blockCount,
+      groupSize,
+      repeats,
+    }),
   }
 }
 
@@ -334,11 +348,42 @@ const benchmarks = [
     },
   },
   {
-    id: 'batched-exact-flat',
-    label: 'Transforms.setNodesBatch exact-path batch',
+    id: 'apply-batch-flat',
+    label: 'Transforms.applyBatch exact-path set_node batch',
     shape: 'flat',
+    breakdown: [
+      'refs',
+      'dirtyPaths',
+      'stage',
+      'finalize',
+      'materialize',
+      'commit',
+    ],
     run: ({ editor, targetPaths }) => {
-      Transforms.setNodesBatch(editor, createSetNodeBatchUpdates(targetPaths))
+      Transforms.applyBatch(
+        editor,
+        targetPaths.map((path, index) => ({
+          type: 'set_node',
+          path,
+          properties: {},
+          newProperties: { id: `id-${index}` },
+        }))
+      )
+    },
+  },
+  {
+    id: 'apply-batch-flat-mixed-insert-tail',
+    label: 'Transforms.applyBatch exact-path set_node batch plus tail insert',
+    shape: 'flat',
+    run: ({ blockCount, editor, targetPaths }) => {
+      Transforms.applyBatch(editor, [
+        ...createSetNodeOps(targetPaths),
+        {
+          type: 'insert_node',
+          path: [blockCount],
+          node: { type: 'paragraph', children: [{ text: 'tail' }] },
+        },
+      ])
     },
   },
   {
@@ -388,6 +433,29 @@ const benchmarks = [
     },
   },
   {
+    id: 'apply-insert-empty-no-normalize',
+    label:
+      'editor.apply(insert_node) batch on empty document inside Editor.withoutNormalizing',
+    shape: 'empty',
+    run: ({ blockCount, editor }) => {
+      const ops = createInsertNodeOps(blockCount)
+
+      Editor.withoutNormalizing(editor, () => {
+        ops.forEach(op => {
+          editor.apply(op)
+        })
+      })
+    },
+  },
+  {
+    id: 'apply-batch-insert-empty',
+    label: 'Transforms.applyBatch insert_node batch on empty document',
+    shape: 'empty',
+    run: ({ blockCount, editor }) => {
+      Transforms.applyBatch(editor, createInsertNodeOps(blockCount))
+    },
+  },
+  {
     id: 'setnodes-grouped',
     label: 'Transforms.setNodes per path on grouped document',
     shape: 'grouped',
@@ -399,7 +467,8 @@ const benchmarks = [
   },
   {
     id: 'apply-grouped-no-normalize',
-    label: 'editor.apply(set_node) per path inside Editor.withoutNormalizing on grouped document',
+    label:
+      'editor.apply(set_node) per path inside Editor.withoutNormalizing on grouped document',
     shape: 'grouped',
     run: ({ editor, targetPaths }) => {
       Editor.withoutNormalizing(editor, () => {
@@ -415,11 +484,28 @@ const benchmarks = [
     },
   },
   {
-    id: 'batched-exact-grouped',
-    label: 'Transforms.setNodesBatch exact-path batch on grouped document',
+    id: 'apply-batch-grouped',
+    label:
+      'Transforms.applyBatch exact-path set_node batch on grouped document',
     shape: 'grouped',
+    breakdown: [
+      'refs',
+      'dirtyPaths',
+      'stage',
+      'finalize',
+      'materialize',
+      'commit',
+    ],
     run: ({ editor, targetPaths }) => {
-      Transforms.setNodesBatch(editor, createSetNodeBatchUpdates(targetPaths))
+      Transforms.applyBatch(
+        editor,
+        targetPaths.map((path, index) => ({
+          type: 'set_node',
+          path,
+          properties: {},
+          newProperties: { id: `id-${index}` },
+        }))
+      )
     },
   },
 ]
@@ -445,18 +531,24 @@ const main = async () => {
       label: benchmark.label,
       shape: benchmark.shape,
       durationMs: Number(result.durationMs.toFixed(2)),
-      applyCount: result.applyMetrics.applyCount,
-      applyTotalMs: Number(result.applyMetrics.totalMs.toFixed(2)),
-      dirtyPathsMs: Number(result.applyMetrics.dirtyPathsMs.toFixed(2)),
-      transformMs: Number(result.applyMetrics.transformMs.toFixed(2)),
-      normalizeMs: Number(result.applyMetrics.normalizeMs.toFixed(2)),
-      pathRefsMs: Number(result.applyMetrics.pathRefsMs.toFixed(2)),
-      pointRefsMs: Number(result.applyMetrics.pointRefsMs.toFixed(2)),
-      rangeRefsMs: Number(result.applyMetrics.rangeRefsMs.toFixed(2)),
+      breakdown: result.breakdown,
     })
   }
 
-  console.table(results)
+  console.table(results.map(({ breakdown, ...result }) => result))
+
+  const breakdownRows = results
+    .filter(result => result.breakdown)
+    .map(result => ({
+      id: result.id,
+      shape: result.shape,
+      ...result.breakdown,
+    }))
+
+  if (breakdownRows.length > 0) {
+    console.table(breakdownRows)
+  }
+
   console.log(
     JSON.stringify(
       {

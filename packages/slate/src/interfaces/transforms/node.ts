@@ -1,9 +1,6 @@
 import { Editor, Element, Location, Node, Path } from '../../index'
 import { NodeMatch, PropsCompare, PropsMerge } from '../editor'
 import { MaximizeMode, RangeMode } from '../../types/types'
-import type { NodeBatchUpdate } from '../../transforms-node/set-nodes-batched'
-
-export type { NodeBatchUpdate } from '../../transforms-node/set-nodes-batched'
 
 export interface NodeInsertNodesOptions<T extends Node> {
   at?: Location
@@ -102,14 +99,6 @@ export interface NodeTransforms {
   ) => void
 
   /**
-   * Set new properties on many exact paths in one logical batch.
-   */
-  setNodesBatch: <T extends Node>(
-    editor: Editor,
-    updates: NodeBatchUpdate<T>[]
-  ) => void
-
-  /**
    * Split the nodes at a specific location.
    */
   splitNodes: <T extends Node>(
@@ -191,9 +180,6 @@ export const NodeTransforms: NodeTransforms = {
   },
   setNodes(editor, props, options) {
     editor.setNodes(props, options)
-  },
-  setNodesBatch(editor, updates) {
-    editor.setNodesBatch(updates)
   },
   splitNodes(editor, options) {
     editor.splitNodes(options)

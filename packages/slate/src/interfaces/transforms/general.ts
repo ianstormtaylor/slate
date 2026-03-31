@@ -12,6 +12,7 @@ import {
   Selection,
   Text,
 } from '../../index'
+import { applyOperationBatch } from '../../core/apply'
 import {
   insertChildren,
   modifyChildren,
@@ -23,6 +24,11 @@ import {
 
 export interface GeneralTransforms {
   /**
+   * Apply many operations as one logical batch.
+   */
+  applyBatch: (editor: Editor, ops: Operation[]) => void
+
+  /**
    * Transform the editor by an operation.
    */
   transform: (editor: Editor, op: Operation) => void
@@ -30,6 +36,10 @@ export interface GeneralTransforms {
 
 // eslint-disable-next-line no-redeclare
 export const GeneralTransforms: GeneralTransforms = {
+  applyBatch(editor: Editor, ops: Operation[]): void {
+    applyOperationBatch(editor, ops)
+  },
+
   transform(editor: Editor, op: Operation): void {
     let transformSelection = false
 

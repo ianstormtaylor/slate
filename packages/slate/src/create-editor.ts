@@ -14,6 +14,7 @@ import {
   shouldNormalize,
 } from './'
 import { apply } from './core'
+import { defineChildrenAccessor } from './core/children'
 import {
   above,
   after,
@@ -78,7 +79,6 @@ import {
   mergeNodes,
   moveNodes,
   removeNodes,
-  setNodesBatch,
   setNodes,
   splitNodes,
   unsetNodes,
@@ -90,8 +90,8 @@ import {
  * Create a new Slate `Editor` object.
  */
 export const createEditor = (): Editor => {
-  const editor: Editor = {
-    children: [],
+  const editor = {
+    children: [] as any,
     operations: [],
     selection: null,
     marks: null,
@@ -171,7 +171,6 @@ export const createEditor = (): Editor => {
     removeNodes: (...args) => removeNodes(editor, ...args),
     select: (...args) => select(editor, ...args),
     setNodes: (...args) => setNodes(editor, ...args),
-    setNodesBatch: (...args) => setNodesBatch(editor, ...args),
     setNormalizing: (...args) => setNormalizing(editor, ...args),
     setPoint: (...args) => setPoint(editor, ...args),
     setSelection: (...args) => setSelection(editor, ...args),
@@ -186,7 +185,10 @@ export const createEditor = (): Editor => {
     wrapNodes: (...args) => wrapNodes(editor, ...args),
     shouldMergeNodesRemovePrevNode: (...args) =>
       shouldMergeNodesRemovePrevNode(editor, ...args),
-  }
+  } as Editor
+
+  defineChildrenAccessor(editor)
+  editor.children = []
 
   return editor
 }

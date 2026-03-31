@@ -28,11 +28,12 @@ import {
 } from '../types/types'
 import { OmitFirstArg } from '../utils/types'
 import { isEditor } from '../editor/is-editor'
+import { withBatch as withBatchEditor } from '../editor/with-batch'
 import {
   TextInsertFragmentOptions,
   TextInsertTextOptions,
 } from './transforms/text'
-import { NodeBatchUpdate, NodeInsertNodesOptions } from './transforms/node'
+import { NodeInsertNodesOptions } from './transforms/node'
 
 /**
  * The `Editor` interface stores all the state of a Slate editor. It is extended
@@ -110,7 +111,6 @@ export interface BaseEditor {
       merge?: PropsMerge
     }
   ) => void
-  setNodesBatch: <T extends Node>(updates: NodeBatchUpdate<T>[]) => void
   setNormalizing: OmitFirstArg<typeof Editor.setNormalizing>
   setPoint: OmitFirstArg<typeof Transforms.setPoint>
   setSelection: OmitFirstArg<typeof Transforms.setSelection>
@@ -720,6 +720,11 @@ export interface EditorInterface {
   ) => NodeEntry<Element> | undefined
 
   /**
+   * Call a function, deferring normalization and flush until it completes.
+   */
+  withBatch: (editor: Editor, fn: () => void) => void
+
+  /**
    * Call a function, deferring normalization until after it completes.
    */
   withoutNormalizing: (editor: Editor, fn: () => void) => void
@@ -969,6 +974,10 @@ export const Editor: EditorInterface = {
 
   void(editor, options) {
     return editor.void(options)
+  },
+
+  withBatch(editor, fn: () => void) {
+    withBatchEditor(editor, fn)
   },
 
   withoutNormalizing(editor, fn: () => void) {
