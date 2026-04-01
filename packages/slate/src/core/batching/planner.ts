@@ -106,7 +106,11 @@ const getSameParentInsertMoveSegmentEnd = (
       ? null
       : Path.parent(firstOp.path)
 
-  if (!parentPath) {
+  if (
+    !parentPath ||
+    (firstOp.type === 'move_node' &&
+      !Path.equals(Path.parent(firstOp.newPath), parentPath))
+  ) {
     return startIndex
   }
 
@@ -146,6 +150,11 @@ const getSameParentMoveSegmentEnd = (ops: Operation[], startIndex: number) => {
 
   const pathParent = Path.parent(op.path)
   const newPathParent = Path.parent(op.newPath)
+
+  if (!Path.equals(pathParent, newPathParent)) {
+    return startIndex
+  }
+
   let endIndex = startIndex + 1
 
   while (endIndex < ops.length) {

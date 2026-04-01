@@ -296,28 +296,6 @@ const calculateDirtyPathsAfterBatch = (editor: Editor, ops: Operation[]) => {
   return { dirtyPathKeys, dirtyPaths }
 }
 
-const applyDirtyPathSimulatedBatch = (editor: Editor, ops: Operation[]) => {
-  const { dirtyPathKeys, dirtyPaths } = calculateDirtyPathsAfterBatch(
-    editor,
-    ops
-  )
-
-  batchOperationDirtyPaths(
-    editor,
-    () => {
-      Editor.withBatch(editor, () => {
-        for (const op of ops) {
-          editor.apply(op)
-        }
-
-        DIRTY_PATHS.set(editor, dirtyPaths)
-        DIRTY_PATH_KEYS.set(editor, dirtyPathKeys)
-      })
-    },
-    () => {}
-  )
-}
-
 const applyBatchSegment = (editor: Editor, segment: BatchSegment) => {
   switch (segment.kind) {
     case 'same-parent-insert-move': {
@@ -363,9 +341,9 @@ const applyBatchSegment = (editor: Editor, segment: BatchSegment) => {
       )
       return
     case 'move':
-      withInternalBatchReads(editor, () =>
-        applyDirtyPathSimulatedBatch(editor, segment.ops)
-      )
+      for (const op of segment.ops) {
+        editor.apply(op)
+      }
       return
     case 'generic':
       if (applyWholeBatchFastPath(editor, segment.ops)) {
@@ -387,16 +365,18 @@ const shouldSkipTextMergeDirtyPaths = (
     return false
   }
 
-  const prevPath = Path.previous(op.path)
+  return withInternalBatchReads(editor, () => {
+    const prevPath = Path.previous(op.path)
 
-  if (!Editor.hasPath(editor, op.path) || !Editor.hasPath(editor, prevPath)) {
-    return false
-  }
+    if (!Editor.hasPath(editor, op.path) || !Editor.hasPath(editor, prevPath)) {
+      return false
+    }
 
-  const [node] = Editor.node(editor, op.path)
-  const [prevNode] = Editor.node(editor, prevPath)
+    const [node] = Editor.node(editor, op.path)
+    const [prevNode] = Editor.node(editor, prevPath)
 
-  return Node.isText(node) && Node.isText(prevNode)
+    return Node.isText(node) && Node.isText(prevNode)
+  })
 }
 
 const flushConflictingLiveBatches = (editor: Editor, op: Operation) => {
@@ -628,7 +608,9 @@ const tryStageLiveSplitOperation = (editor: Editor, op: Operation) => {
   }
 
   transformOperationRefs(editor, op)
-  transformOperationTree(editor, op)
+  withInternalBatchReads(editor, () => {
+    transformOperationTree(editor, op)
+  })
   finalizeOperation(editor, op)
   stageLiveSplitBatchOperation(editor, op)
 
@@ -679,61 +661,60 @@ const tryStageLiveMoveOperation = (editor: Editor, op: Operation) => {
 export const applyOperationInBatch: WithEditorFirstArg<Editor['apply']> = (
   editor,
   op
-) =>
-  withInternalBatchReads(editor, () => {
-    flushConflictingLiveBatches(editor, op)
+) => {
+  flushConflictingLiveBatches(editor, op)
 
-    if (op.type !== 'merge_node' && hasMergeNodeDraft(editor)) {
-      promoteMergeNodeDraftToDraftChildren(editor)
-    }
+  if (op.type !== 'merge_node' && hasMergeNodeDraft(editor)) {
+    promoteMergeNodeDraftToDraftChildren(editor)
+  }
 
-    if (op.type !== 'split_node' && hasSplitNodeDraft(editor)) {
-      promoteSplitNodeDraftToDraftChildren(editor)
-    }
+  if (op.type !== 'split_node' && hasSplitNodeDraft(editor)) {
+    promoteSplitNodeDraftToDraftChildren(editor)
+  }
 
-    if (tryStageTextBatchOperation(editor, op)) {
-      return
-    }
+  if (tryStageTextBatchOperation(editor, op)) {
+    return
+  }
 
-    if (tryStageExactSetNodeBatchOperation(editor, op)) {
-      return
-    }
+  if (tryStageExactSetNodeBatchOperation(editor, op)) {
+    return
+  }
 
-    if (tryStageInsertBatchOperation(editor, op)) {
-      return
-    }
+  if (tryStageInsertBatchOperation(editor, op)) {
+    return
+  }
 
-    if (tryStageLiveInsertMoveOperation(editor, op)) {
-      return
-    }
+  if (tryStageLiveInsertMoveOperation(editor, op)) {
+    return
+  }
 
-    if (tryStageLiveMergeOperation(editor, op)) {
-      return
-    }
+  if (tryStageLiveMergeOperation(editor, op)) {
+    return
+  }
 
-    if (tryStageLiveSplitOperation(editor, op)) {
-      return
-    }
+  if (tryStageLiveSplitOperation(editor, op)) {
+    return
+  }
 
-    if (tryStageLiveMoveOperation(editor, op)) {
-      return
-    }
+  if (tryStageLiveMoveOperation(editor, op)) {
+    return
+  }
 
-    if (hasLiveInsertMoveBatch(editor)) {
-      flushLiveInsertMoveBatch(editor)
-    }
+  if (hasLiveInsertMoveBatch(editor)) {
+    flushLiveInsertMoveBatch(editor)
+  }
 
-    if (hasLiveMergeBatch(editor)) {
-      flushLiveMergeBatch(editor)
-    }
+  if (hasLiveMergeBatch(editor)) {
+    flushLiveMergeBatch(editor)
+  }
 
-    if (hasLiveSplitBatch(editor)) {
-      flushLiveSplitBatch(editor)
-    }
+  if (hasLiveSplitBatch(editor)) {
+    flushLiveSplitBatch(editor)
+  }
 
-    promoteBufferedDraftsToDraftChildren(editor)
-    runOperation(editor, op)
-  })
+  promoteBufferedDraftsToDraftChildren(editor)
+  runOperation(editor, op)
+}
 
 function applyWholeBatchFastPath(editor: Editor, ops: Operation[]) {
   if (isSameParentInsertBatch(ops)) {
@@ -751,13 +732,6 @@ function applyWholeBatchFastPath(editor: Editor, ops: Operation[]) {
       withInternalBatchReads(editor, () =>
         createLiveSameParentMoveDirtyPathTransform(editor, ops)
       )
-    )
-    return true
-  }
-
-  if (isLiveMoveNodeBatch(ops)) {
-    withInternalBatchReads(editor, () =>
-      applyDirtyPathSimulatedBatch(editor, ops)
     )
     return true
   }

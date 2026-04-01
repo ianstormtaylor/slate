@@ -182,7 +182,6 @@ export const withHistory = <T extends Editor>(editor: T) => {
     } else if (
       HistoryEditor.isSaving(e) !== false &&
       op.type === 'set_selection' &&
-      op.newProperties != null &&
       lastBatch
     ) {
       lastBatch.selectionAfter = e.selection

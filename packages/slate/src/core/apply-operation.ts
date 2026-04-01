@@ -102,8 +102,8 @@ export const finalizeOperation = (editor: Editor, op: Operation) => {
 
 export const runOperation = (editor: Editor, op: Operation) => {
   transformOperationRefs(editor, op)
-  updateOperationDirtyPaths(editor, op)
   transformOperationTree(editor, op)
+  updateOperationDirtyPaths(editor, op)
   finalizeOperation(editor, op)
 }
 

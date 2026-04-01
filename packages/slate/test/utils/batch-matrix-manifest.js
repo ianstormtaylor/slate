@@ -14,7 +14,7 @@ const BATCH_MATRIX_MANIFEST = {
     file: 'packages/slate/test/apply-batch-text-ops.js',
   },
   genericTreeOps: {
-    count: 46,
+    count: 50,
     file: 'packages/slate/test/apply-batch-generic-tree-ops.js',
   },
   genericTreeOpsObservation: {

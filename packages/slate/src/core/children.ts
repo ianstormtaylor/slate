@@ -15,6 +15,7 @@ import {
   isObservingBatchNormalize,
   isReadingBatchInternals,
   isWritingBatchInternals,
+  withInternalBatchReads,
   withObservedBatchNormalize,
 } from './batch'
 import {
@@ -374,9 +375,10 @@ export const canStageMergeNodeOperation = (
     return false
   }
 
-  const prevPath = Path.previous(op.path)
-  const node = Node.get(editor, op.path)
-  const prevNode = Node.get(editor, prevPath)
+  const [node, prevNode] = withInternalBatchReads(editor, () => {
+    const prevPath = Path.previous(op.path)
+    return [Node.get(editor, op.path), Node.get(editor, prevPath)]
+  })
 
   if (!Node.isText(node) || !Node.isText(prevNode)) {
     return false
@@ -467,7 +469,7 @@ export const canStageSplitNodeOperation = (
     return false
   }
 
-  const node = Node.get(editor, op.path)
+  const node = withInternalBatchReads(editor, () => Node.get(editor, op.path))
 
   if (!Node.isText(node)) {
     return false

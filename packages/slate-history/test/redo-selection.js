@@ -54,4 +54,24 @@ describe('slate-history redo behavior', () => {
 
     assert.deepEqual(editor.children, childrenAfterSplit)
   })
+
+  it('restores a deselection that happens before the pending flush', async () => {
+    const editor = withHistory(createEditor())
+
+    editor.children = [{ type: 'paragraph', children: [{ text: 'one' }] }]
+    editor.selection = {
+      anchor: { path: [0, 0], offset: 1 },
+      focus: { path: [0, 0], offset: 1 },
+    }
+
+    Transforms.insertText(editor, 'X')
+    Transforms.deselect(editor)
+
+    await flushMicrotasks()
+
+    editor.undo()
+    editor.redo()
+
+    assert.equal(editor.selection, null)
+  })
 })

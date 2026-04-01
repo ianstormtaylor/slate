@@ -293,7 +293,11 @@ export const isSameParentInsertMoveBatch = (
       ? null
       : Path.parent(firstOp.path)
 
-  if (!parentPath) {
+  if (
+    !parentPath ||
+    (firstOp.type === 'move_node' &&
+      !Path.equals(Path.parent(firstOp.newPath), parentPath))
+  ) {
     return false
   }
 
@@ -316,11 +320,14 @@ export const getSameParentInsertMoveDirtyPathState = (
   editor: Editor,
   ops: (BaseInsertNodeOperation | BaseMoveNodeOperation)[]
 ) => {
+  if (!isSameParentInsertMoveBatch(ops)) {
+    throw new Error(
+      'Cannot batch insert_node and move_node operations unless every operation targets the same parent path.'
+    )
+  }
+
   const firstOp = ops[0]
-  const parentPath =
-    firstOp.type === 'insert_node'
-      ? Path.parent(firstOp.path)
-      : Path.parent(firstOp.path)
+  const parentPath = Path.parent(firstOp.path)
   const parent = parentPath.length === 0 ? editor : Node.get(editor, parentPath)
 
   if (!Node.isEditor(parent) && !Node.isElement(parent)) {

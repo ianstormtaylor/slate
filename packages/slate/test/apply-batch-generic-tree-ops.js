@@ -6,6 +6,11 @@ import { DIRTY_PATHS } from '../src/utils/weak-maps'
 
 const paragraph = text => ({ type: 'paragraph', children: [{ text }] })
 
+const paragraphWithTexts = (...texts) => ({
+  type: 'paragraph',
+  children: texts.map(text => ({ text })),
+})
+
 const section = texts => ({
   type: 'section',
   children: texts.map(text => paragraph(text)),
@@ -307,6 +312,39 @@ const TREE_OP_SCENARIOS = [
       },
     ],
     compareDirtyPaths: true,
+  },
+  {
+    id: 'crossParentMoveBatchNormalization',
+    children: [paragraphWithTexts('a', 'b'), paragraph('c')],
+    ops: [
+      {
+        type: 'move_node',
+        path: [0, 0],
+        newPath: [1, 0],
+      },
+      {
+        type: 'move_node',
+        path: [0, 0],
+        newPath: [1, 1],
+      },
+    ],
+  },
+  {
+    id: 'crossParentMoveThenInsertNormalization',
+    children: [paragraphWithTexts('a', 'b'), paragraph('c')],
+    ops: [
+      {
+        type: 'move_node',
+        path: [0, 0],
+        newPath: [1, 0],
+      },
+      {
+        type: 'insert_node',
+        path: [0, 1],
+        node: { text: 'x' },
+      },
+    ],
+    compareOperations: false,
   },
   {
     id: 'moveNodeSelection',
@@ -634,7 +672,8 @@ describe('Transforms.applyBatch generic tree ops', () => {
         wrapperMode: 'plain',
         observationMode: 'none',
         compareDirtyPaths: scenario.compareDirtyPaths,
-        compareOperations: !scenario.compareDirtyPaths,
+        compareOperations:
+          scenario.compareOperations ?? !scenario.compareDirtyPaths,
       })
     })
   }
