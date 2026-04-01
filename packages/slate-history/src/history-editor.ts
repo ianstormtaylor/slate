@@ -28,7 +28,7 @@ export const HistoryEditor = {
    */
 
   isHistoryEditor(value: any): value is HistoryEditor {
-    return History.isHistory(value.history) && Editor.isEditor(value)
+    return Editor.isEditor(value) && History.isHistory(value.history)
   },
 
   /**

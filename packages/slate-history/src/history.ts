@@ -6,6 +6,10 @@ interface Batch {
   selectionAfter: Range | null
 }
 
+const isBatch = (value: any): value is Batch => {
+  return isObject(value) && Operation.isOperationList(value.operations)
+}
+
 /**
  * `History` objects hold all of the operations that are applied to a value, so
  * they can be undone or redone as necessary.
@@ -27,10 +31,8 @@ export const History = {
       isObject(value) &&
       Array.isArray(value.redos) &&
       Array.isArray(value.undos) &&
-      (value.redos.length === 0 ||
-        Operation.isOperationList(value.redos[0].operations)) &&
-      (value.undos.length === 0 ||
-        Operation.isOperationList(value.undos[0].operations))
+      (value.redos.length === 0 || isBatch(value.redos[0])) &&
+      (value.undos.length === 0 || isBatch(value.undos[0]))
     )
   },
 }
