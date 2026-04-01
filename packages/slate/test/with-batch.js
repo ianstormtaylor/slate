@@ -595,6 +595,43 @@ describe('Transforms.applyBatch', () => {
     assert.strictEqual(getCommittedChildren(editor), replacement)
   })
 
+  it('drops stale operations when editor.children is assigned before a pending flush resolves', async () => {
+    const editor = createEditor()
+    const replacement = [
+      { type: 'paragraph', children: [{ text: 'replacement' }] },
+    ]
+    const onChangeCalls = []
+
+    editor.children = createParagraphs()
+    editor.onChange = options => {
+      onChangeCalls.push({
+        operations: [...editor.operations],
+        options,
+        children: editor.children,
+      })
+    }
+
+    editor.apply({
+      type: 'set_node',
+      path: [0],
+      properties: {},
+      newProperties: { id: 'stale' },
+    })
+
+    editor.children = replacement
+
+    await Promise.resolve()
+
+    assert.deepEqual(onChangeCalls, [
+      {
+        operations: [],
+        options: undefined,
+        children: replacement,
+      },
+    ])
+    assert.deepEqual(editor.operations, [])
+  })
+
   it('keeps compatible same-parent insert_node writes on the private insert draft until commit', () => {
     const editor = createEditor()
 

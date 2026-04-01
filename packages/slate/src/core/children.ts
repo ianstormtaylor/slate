@@ -177,6 +177,9 @@ export const setChildren = (editor: Editor, children: Descendant[]) => {
   clearLiveMoveBatch(editor)
   clearLiveSplitBatch(editor)
   clearDraftChildren(editor)
+  DIRTY_PATHS.delete(editor)
+  DIRTY_PATH_KEYS.delete(editor)
+  editor.operations = []
   CHILDREN.set(editor, children)
 }
 

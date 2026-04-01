@@ -40,13 +40,8 @@ export const withHistory = <T extends Editor>(editor: T) => {
     }
   }
 
-  const resetHistoryAfterChildrenAssignment = (pendingOps: Operation[]) => {
-    const savedOps = pendingOps.filter(op => shouldSave(op, undefined))
-
-    if (savedOps.length > 0) {
-      e.history.undos = []
-    }
-
+  const resetHistoryAfterChildrenAssignment = () => {
+    e.history.undos = []
     e.history.redos = []
   }
 
@@ -179,8 +174,6 @@ export const withHistory = <T extends Editor>(editor: T) => {
       enumerable: childrenDescriptor.enumerable ?? true,
       get: getChildren,
       set(children) {
-        const pendingOps = [...e.operations]
-
         setChildren.call(e, children)
 
         if (
@@ -191,7 +184,7 @@ export const withHistory = <T extends Editor>(editor: T) => {
           return
         }
 
-        resetHistoryAfterChildrenAssignment(pendingOps)
+        resetHistoryAfterChildrenAssignment()
       },
     })
   }
