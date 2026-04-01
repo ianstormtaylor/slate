@@ -235,3 +235,24 @@ The `match` function can examine the children of a node, in `node.children`, or 
 
 Sequences of Transforms may need to be wrapped in [`Editor.withoutNormalizing`](../api/nodes/editor.md#editorwithoutnormalizingeditor-editor-fn---void--void) if the node tree should _not_ be normalized between Transforms.
 See [Normalization - Implications for Other Code](./11-normalizing.md#implications-for-other-code);
+
+## Batched Operations
+
+If you need to apply many operations together, use [`Editor.withBatch`](../api/nodes/editor.md#editorwithbatcheditor-editor-fn---void--void) or [`Transforms.applyBatch`](../api/transforms.md#transformsapplybatcheditor-editor-ops-operation).
+
+Use `Editor.withBatch` when you are applying commands, transforms, or direct `editor.apply` calls in a callback:
+
+```javascript
+Editor.withBatch(editor, () => {
+  editor.apply(op1)
+  editor.apply(op2)
+})
+```
+
+Use `Transforms.applyBatch` when you already have an array of operations:
+
+```javascript
+Transforms.applyBatch(editor, [op1, op2])
+```
+
+In both cases, Slate still applies operations one at a time through the editor's normal `apply` behavior. The difference is that normalization and `onChange` flush are deferred until the batch completes.

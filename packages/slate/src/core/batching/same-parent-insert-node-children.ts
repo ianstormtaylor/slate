@@ -1,5 +1,5 @@
-import { Descendant, Element, Path } from '..'
-import { BaseInsertNodeOperation } from '../interfaces/operation'
+import { Descendant, Element, Path } from '../..'
+import { BaseInsertNodeOperation } from '../../interfaces/operation'
 
 const getParentPath = (op: BaseInsertNodeOperation) => Path.parent(op.path)
 

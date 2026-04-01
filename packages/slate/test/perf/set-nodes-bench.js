@@ -32,7 +32,7 @@ const {
   clearLiveSplitBatch,
   flushLiveSplitBatch,
   stageLiveSplitBatchOperation,
-} = require('../../src/core/live-move-dirty-paths')
+} = require('../../src/core/batching/live-dirty-paths')
 const { modifyDescendant } = require('../../src/utils/modify')
 const { BATCH_DEPTH } = require('../../src/utils/weak-maps')
 

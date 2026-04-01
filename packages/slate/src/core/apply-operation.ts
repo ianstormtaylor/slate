@@ -7,7 +7,7 @@ import { Path } from '../interfaces/path'
 import { Transforms } from '../interfaces/transforms'
 import { Operation } from '../interfaces/operation'
 import { Editor } from '../interfaces/editor'
-import { batchDirtyPaths, isBatchingDirtyPaths } from './batch-dirty-paths'
+import { batchDirtyPaths, isBatchingDirtyPaths } from './batching/dirty-paths'
 import { withInternalBatchWrites } from './batch'
 import { updateDirtyPaths } from './update-dirty-paths'
 

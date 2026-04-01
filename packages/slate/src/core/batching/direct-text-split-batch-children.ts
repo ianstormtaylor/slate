@@ -1,6 +1,6 @@
-import { Descendant, Element, Text } from '..'
-import { BaseSplitNodeOperation } from '../interfaces/operation'
-import { replaceChildren } from '../utils/modify'
+import { Descendant, Element, Text } from '../..'
+import { BaseSplitNodeOperation } from '../../interfaces/operation'
+import { replaceChildren } from '../../utils/modify'
 
 export const applyDirectTextSplitBatchToChildren = (
   children: Descendant[],

@@ -1,10 +1,12 @@
-import { Path } from '../interfaces/path'
+import { Path } from '../../interfaces/path'
 import {
   BaseInsertNodeOperation,
   BaseMoveNodeOperation,
   Operation,
-} from '../interfaces/operation'
+} from '../../interfaces/operation'
 
+// The planner only decides which contiguous op runs deserve a specialized
+// execution path. It does not mutate the editor.
 export type BatchSegmentKind =
   | 'generic'
   | 'same-parent-insert-move'

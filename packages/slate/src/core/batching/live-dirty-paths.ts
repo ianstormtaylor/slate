@@ -7,8 +7,8 @@ import {
   Node,
   Operation,
   Path,
-} from '..'
-import { updateDirtyPaths } from './update-dirty-paths'
+} from '../..'
+import { updateDirtyPaths } from '../update-dirty-paths'
 import {
   BATCH_LIVE_INSERT_MOVE_OPS,
   BATCH_LIVE_MERGE_OPS,
@@ -16,7 +16,7 @@ import {
   BATCH_LIVE_SPLIT_OPS,
   DIRTY_PATH_KEYS,
   DIRTY_PATHS,
-} from '../utils/weak-maps'
+} from '../../utils/weak-maps'
 
 const transformPathThroughOps = (path: Path, ops: Operation[]) => {
   let nextPath: Path | null = path

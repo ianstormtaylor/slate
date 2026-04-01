@@ -1,6 +1,6 @@
 // perf
 
-import { Editor } from '../interfaces/editor'
+import { Editor } from '../../interfaces/editor'
 
 const BATCHING_DIRTY_PATHS: WeakMap<Editor, boolean> = new WeakMap()
 

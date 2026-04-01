@@ -42,6 +42,21 @@ The `operations` property contains all of the operations that have been applied 
 The `marks` property stores formatting to be applied when the editor inserts text. If `marks` is `null`, the formatting will be taken from the current selection.
 Don't set it directly; use `Editor.addMark` and `Editor.removeMark`.
 
+## Batching
+
+If you need to apply many operations as one logical unit, use `Editor.withBatch`:
+
+```javascript
+Editor.withBatch(editor, () => {
+  editor.apply(op1)
+  editor.apply(op2)
+})
+```
+
+This keeps `editor.apply` as the per-operation hook, but defers normalization and `onChange` flush until the callback completes.
+
+If you already have an array of operations, use [`Transforms.applyBatch`](04-transforms.md#batched-operations).
+
 ## Overriding Behaviors
 
 In previous guides we've already hinted at this, but you can override any of the behaviors of an editor by overriding its function properties.

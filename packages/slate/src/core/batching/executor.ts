@@ -1,15 +1,15 @@
-import { Path } from '../interfaces/path'
-import { WithEditorFirstArg } from '../utils/types'
+import { Path } from '../../interfaces/path'
+import { WithEditorFirstArg } from '../../utils/types'
 import {
   BaseInsertNodeOperation,
   BaseMergeNodeOperation,
   BaseMoveNodeOperation,
   BaseSplitNodeOperation,
   Operation,
-} from '../interfaces/operation'
-import { Editor } from '../interfaces/editor'
-import { Node } from '../interfaces/node'
-import { isBatchingDirtyPaths } from './batch-dirty-paths'
+} from '../../interfaces/operation'
+import { Editor } from '../../interfaces/editor'
+import { Node } from '../../interfaces/node'
+import { isBatchingDirtyPaths } from './dirty-paths'
 import {
   batchOperationDirtyPaths,
   finalizeOperation,
@@ -19,7 +19,7 @@ import {
   transformOperationSelectionPoints,
   transformOperationTree,
   updateOperationDirtyPaths,
-} from './apply-operation'
+} from '../apply-operation'
 import {
   canStageSplitNodeOperation,
   canStageInsertNodeOperation,
@@ -43,7 +43,7 @@ import {
   stageSplitNodeOperation,
   stageTextOperation,
   applyTextOperationToDraftChildren,
-} from './children'
+} from '../children'
 import {
   canExtendLiveInsertMoveBatch,
   createSameParentMoveDirtyPathTransform as createLiveSameParentMoveDirtyPathTransform,
@@ -64,18 +64,20 @@ import {
   stageLiveMergeBatchOperation,
   stageLiveMoveBatchOperation,
   stageLiveSplitBatchOperation,
-} from './live-move-dirty-paths'
-import { updateDirtyPaths } from './update-dirty-paths'
-import { DIRTY_PATH_KEYS, DIRTY_PATHS } from '../utils/weak-maps'
+} from './live-dirty-paths'
+import { updateDirtyPaths } from '../update-dirty-paths'
+import { DIRTY_PATH_KEYS, DIRTY_PATHS } from '../../utils/weak-maps'
 import {
   BatchSegment,
   batchNeedsSegmentPlanning,
   isSameParentInsertBatch,
   planOperationBatchSegments,
   shouldPreferWholeBatchExecution,
-} from './apply-batch-planner'
-import { withInternalBatchReads } from './batch'
+} from './planner'
+import { withInternalBatchReads } from '../batch'
 
+// The executor owns staged draft mutation and dirty-path batching once a
+// segment shape has already been chosen by planner.ts.
 const transformPathThroughOps = (path: Path, ops: Operation[]) => {
   let nextPath: Path | null = path
 

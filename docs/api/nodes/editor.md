@@ -349,6 +349,10 @@ Normalize any dirty objects in the editor.
 
 Options: `{force?: boolean; operation?: Operation}`
 
+#### `Editor.withBatch(editor: Editor, fn: () => void) => void`
+
+Call a function, deferring normalization and `onChange` flush until it completes.
+
 #### `Editor.withoutNormalizing(editor: Editor, fn: () => void) => void`
 
 Call a function, deferring normalization until after it completes.

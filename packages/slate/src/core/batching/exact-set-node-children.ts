@@ -1,5 +1,5 @@
-import { Descendant, Node } from '..'
-import { BaseSetNodeOperation } from '../interfaces/operation'
+import { Descendant, Node } from '../..'
+import { BaseSetNodeOperation } from '../../interfaces/operation'
 
 type BatchTreeNode = {
   children: Map<number, BatchTreeNode>

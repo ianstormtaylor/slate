@@ -30,7 +30,7 @@ import {
   hasLiveMergeBatch,
   hasLiveMoveBatch,
   hasLiveSplitBatch,
-} from './live-move-dirty-paths'
+} from './batching/live-dirty-paths'
 import {
   BATCH_DRAFT_CHILDREN,
   BATCH_DEPTH,
@@ -61,11 +61,11 @@ import {
 import {
   applySetNodeBatchToChildren,
   validateExactSetNodeOperation,
-} from './exact-set-node-children'
-import { applyDirectTextMergeBatchToChildren } from './direct-text-merge-batch-children'
-import { applyDirectTextSplitBatchToChildren } from './direct-text-split-batch-children'
-import { applyInsertNodeBatchToChildren } from './same-parent-insert-node-children'
-import { applyTextBatchToChildren } from './text-batch-children'
+} from './batching/exact-set-node-children'
+import { applyDirectTextMergeBatchToChildren } from './batching/direct-text-merge-batch-children'
+import { applyDirectTextSplitBatchToChildren } from './batching/direct-text-split-batch-children'
+import { applyInsertNodeBatchToChildren } from './batching/same-parent-insert-node-children'
+import { applyTextBatchToChildren } from './batching/text-batch-children'
 
 type TextBatchOperation = BaseInsertTextOperation | BaseRemoveTextOperation
 

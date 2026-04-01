@@ -2,10 +2,12 @@ import { WithEditorFirstArg } from '../utils/types'
 import { Editor } from '../interfaces/editor'
 import { runOperation } from './apply-operation'
 import { isBatching, scheduleOnChange } from './batch'
-import { applyOperationBatch, applyOperationInBatch } from './apply-batch'
+import { applyOperationBatch, applyOperationInBatch } from './batching/executor'
 
-export { applyOperationBatch } from './apply-batch'
+export { applyOperationBatch } from './batching/executor'
 
+// Keep the public apply seam boring: single-op execution lives here, while
+// batch planning and execution stay under ./batching/.
 const applyOperationNormally: WithEditorFirstArg<Editor['apply']> = (
   editor,
   op

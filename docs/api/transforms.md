@@ -178,6 +178,12 @@ Options: `{at?: Location, voids?: boolean}`
 
 ### Editor transforms
 
+#### `Transforms.applyBatch(editor: Editor, ops: Operation[])`
+
+Apply many operations as one logical batch.
+
+This is useful when you already have an array of operations to apply. The operations still go through the editor's normal `apply` behavior one at a time, but normalization and `onChange` flush are deferred until the batch completes.
+
 #### `Transforms.transform(editor: Editor, transform: Transform)`
 
 Transform the `editor` by an `operation`.

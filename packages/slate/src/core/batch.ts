@@ -5,7 +5,7 @@ import {
   flushLiveMergeBatch,
   flushLiveMoveBatch,
   flushLiveSplitBatch,
-} from './live-move-dirty-paths'
+} from './batching/live-dirty-paths'
 import {
   BATCH_DEPTH,
   BATCH_INTERNAL_READ_DEPTH,
@@ -17,6 +17,9 @@ import {
   FLUSHING,
 } from '../utils/weak-maps'
 
+// Batch lifecycle and observation barriers live here. Planner and executor
+// details stay under ./batching/ so this file answers "when does a batch run?"
+// instead of "how does each batch family work?"
 export type BatchTracePhase =
   | 'flushBeforeNormalize'
   | 'commitBeforeNormalize'

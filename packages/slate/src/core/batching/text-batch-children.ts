@@ -1,8 +1,8 @@
-import { Descendant, Element, Text } from '..'
+import { Descendant, Element, Text } from '../..'
 import {
   BaseInsertTextOperation,
   BaseRemoveTextOperation,
-} from '../interfaces/operation'
+} from '../../interfaces/operation'
 
 type TextBatchOperation = BaseInsertTextOperation | BaseRemoveTextOperation
 
