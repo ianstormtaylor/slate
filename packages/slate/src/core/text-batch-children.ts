@@ -1,60 +1,54 @@
-import { Descendant, Node } from '..'
-import { BaseSetNodeOperation } from '../interfaces/operation'
+import { Descendant, Element, Text } from '..'
+import {
+  BaseInsertTextOperation,
+  BaseRemoveTextOperation,
+} from '../interfaces/operation'
+
+type TextBatchOperation = BaseInsertTextOperation | BaseRemoveTextOperation
 
 type BatchTreeNode = {
   children: Map<number, BatchTreeNode>
-  ops?: BaseSetNodeOperation[]
+  ops?: TextBatchOperation[]
 }
 
 const createBatchTreeNode = (): BatchTreeNode => ({
   children: new Map(),
 })
 
-export const validateExactSetNodeOperation = (op: BaseSetNodeOperation) => {
-  if (op.path.length === 0) {
-    throw new Error('Cannot set properties on the root node!')
+const applyTextOperation = (node: Text, op: TextBatchOperation): Text => {
+  if (op.type === 'insert_text') {
+    if (op.text.length === 0) {
+      return node
+    }
+
+    const before = node.text.slice(0, op.offset)
+    const after = node.text.slice(op.offset)
+    const text = before + op.text + after
+
+    return text === node.text ? node : { ...node, text }
   }
 
-  for (const key in op.newProperties) {
-    if (key === 'children' || key === 'text') {
-      throw new Error(`Cannot set the "${key}" property of nodes!`)
-    }
+  if (op.text.length === 0) {
+    return node
   }
+
+  const before = node.text.slice(0, op.offset)
+  const after = node.text.slice(op.offset + op.text.length)
+  const text = before + after
+
+  return text === node.text ? node : { ...node, text }
 }
 
-const applySetNodeOperation = (node: Node, op: BaseSetNodeOperation): Node => {
-  const { properties, newProperties } = op
-  const nextNode = { ...node }
-  const mutableNode = nextNode as Record<string, unknown>
-
-  validateExactSetNodeOperation(op)
-
-  for (const key in newProperties) {
-    const value = newProperties[key as keyof Node]
-
-    if (value == null) {
-      delete mutableNode[key]
-    } else {
-      mutableNode[key] = value
-    }
-  }
-
-  for (const key in properties) {
-    if (!newProperties.hasOwnProperty(key)) {
-      delete mutableNode[key]
-    }
-  }
-
-  return nextNode
-}
-
-const applyBatchToNode = (node: Node, branch: BatchTreeNode): Node => {
+const applyBatchToNode = (
+  node: Descendant,
+  branch: BatchTreeNode
+): Descendant => {
   let nextNode = node
 
   if (branch.children.size > 0) {
-    if (!Node.isElement(node)) {
+    if (!Element.isElement(node)) {
       throw new Error(
-        `Cannot apply batched node updates beneath non-element node at operation path [${
+        `Cannot apply batched text operations beneath non-element node at operation path [${
           branch.ops?.[branch.ops.length - 1]?.path ?? ''
         }]`
       )
@@ -68,7 +62,7 @@ const applyBatchToNode = (node: Node, branch: BatchTreeNode): Node => {
 
       if (!child) {
         throw new Error(
-          `Cannot apply batched set_node operations because path [${index}] does not exist in the current branch.`
+          `Cannot apply batched text operations because path [${index}] does not exist in the current branch.`
         )
       }
 
@@ -84,22 +78,34 @@ const applyBatchToNode = (node: Node, branch: BatchTreeNode): Node => {
       nextNode = {
         ...nextNode,
         children: nextChildren,
-      } as Node
+      }
     }
   }
 
   if (branch.ops) {
-    for (const op of branch.ops) {
-      nextNode = applySetNodeOperation(nextNode, op)
+    if (!Text.isText(nextNode)) {
+      throw new Error(
+        `Cannot apply batched text operations to non-text node at path [${
+          branch.ops[branch.ops.length - 1]?.path ?? ''
+        }]`
+      )
     }
+
+    let nextLeaf = nextNode
+
+    for (const op of branch.ops) {
+      nextLeaf = applyTextOperation(nextLeaf, op)
+    }
+
+    nextNode = nextLeaf
   }
 
   return nextNode
 }
 
-export const applySetNodeBatchToChildren = (
+export const applyTextBatchToChildren = (
   children: Descendant[],
-  ops: BaseSetNodeOperation[]
+  ops: TextBatchOperation[]
 ) => {
   if (ops.length === 0) {
     return children
@@ -108,8 +114,6 @@ export const applySetNodeBatchToChildren = (
   const root = createBatchTreeNode()
 
   for (const op of ops) {
-    validateExactSetNodeOperation(op)
-
     let branch = root
 
     for (const index of op.path) {
@@ -134,7 +138,7 @@ export const applySetNodeBatchToChildren = (
 
     if (!child) {
       throw new Error(
-        `Cannot apply batched set_node operations because top-level path [${index}] does not exist.`
+        `Cannot apply batched text operations because top-level path [${index}] does not exist.`
       )
     }
 

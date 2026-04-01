@@ -1,19 +1,17 @@
 import assert from 'assert'
-import { createEditor, Transforms } from 'slate'
+import { createEditor, Editor, Transforms } from 'slate'
+import { assertBatchMatrixManifest } from '../../slate/test/utils/batch-matrix-manifest'
 import { HistoryEditor, withHistory } from '..'
 
-describe('HistoryEditor applyBatch exact-path set_node', () => {
-  it('stores one undo batch containing the original set_node operations', () => {
-    const editor = withHistory(createEditor())
-    const initialChildren = [
+const HISTORY_BATCH_CASES = [
+  {
+    id: 'exactUnique',
+    initialChildren: [
       { type: 'paragraph', children: [{ text: 'one' }] },
       { type: 'paragraph', children: [{ text: 'two' }] },
       { type: 'paragraph', children: [{ text: 'three' }] },
-    ]
-
-    editor.children = JSON.parse(JSON.stringify(initialChildren))
-
-    Transforms.applyBatch(editor, [
+    ],
+    ops: [
       {
         type: 'set_node',
         path: [0],
@@ -26,10 +24,8 @@ describe('HistoryEditor applyBatch exact-path set_node', () => {
         properties: {},
         newProperties: { id: 'c' },
       },
-    ])
-
-    assert.equal(editor.history.undos.length, 1)
-    assert.deepEqual(editor.history.undos[0].operations, [
+    ],
+    expectedHistoryOps: [
       {
         type: 'set_node',
         path: [0],
@@ -42,12 +38,199 @@ describe('HistoryEditor applyBatch exact-path set_node', () => {
         properties: {},
         newProperties: { id: 'c' },
       },
-    ])
+    ],
+  },
+  {
+    id: 'duplicateExact',
+    initialChildren: [{ type: 'paragraph', children: [{ text: 'one' }] }],
+    ops: [
+      {
+        type: 'set_node',
+        path: [0],
+        properties: {},
+        newProperties: { id: 'a' },
+      },
+      {
+        type: 'set_node',
+        path: [0],
+        properties: { id: 'a' },
+        newProperties: { id: 'b', role: 'final' },
+      },
+    ],
+    expectedHistoryOps: [
+      {
+        type: 'set_node',
+        path: [0],
+        properties: {},
+        newProperties: { id: 'a' },
+      },
+      {
+        type: 'set_node',
+        path: [0],
+        properties: { id: 'a' },
+        newProperties: { id: 'b', role: 'final' },
+      },
+    ],
+  },
+  {
+    id: 'mixedStructural',
+    initialChildren: [
+      { type: 'paragraph', children: [{ text: 'one' }] },
+      { type: 'paragraph', children: [{ text: 'two' }] },
+    ],
+    ops: [
+      {
+        type: 'set_node',
+        path: [0],
+        properties: {},
+        newProperties: { id: 'a' },
+      },
+      {
+        type: 'insert_node',
+        path: [1],
+        node: { type: 'paragraph', children: [{ text: 'middle' }] },
+      },
+    ],
+    expectedHistoryOps: [
+      {
+        type: 'set_node',
+        path: [0],
+        properties: {},
+        newProperties: { id: 'a' },
+      },
+      {
+        type: 'insert_node',
+        path: [1],
+        node: { type: 'paragraph', children: [{ text: 'middle' }] },
+      },
+    ],
+  },
+  {
+    id: 'mixedTextSelectionNode',
+    initialChildren: [{ type: 'paragraph', children: [{ text: 'one' }] }],
+    initialSelection: {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 0], offset: 0 },
+    },
+    ops: [
+      {
+        type: 'insert_text',
+        path: [0, 0],
+        offset: 1,
+        text: 'X',
+      },
+      {
+        type: 'set_selection',
+        properties: {
+          anchor: { path: [0, 0], offset: 0 },
+          focus: { path: [0, 0], offset: 0 },
+        },
+        newProperties: {
+          anchor: { path: [0, 0], offset: 2 },
+          focus: { path: [0, 0], offset: 2 },
+        },
+      },
+      {
+        type: 'set_node',
+        path: [0],
+        properties: {},
+        newProperties: { id: 'p0' },
+      },
+    ],
+    expectedHistoryOps: [
+      {
+        type: 'insert_text',
+        path: [0, 0],
+        offset: 1,
+        text: 'X',
+      },
+      {
+        type: 'set_node',
+        path: [0],
+        properties: {},
+        newProperties: { id: 'p0' },
+      },
+    ],
+    expectedSelectionBefore: {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 0], offset: 0 },
+    },
+  },
+]
 
-    editor.undo()
-
-    assert.deepEqual(editor.children, initialChildren)
+describe('HistoryEditor applyBatch exact-path set_node', () => {
+  it('declares the history batch manifest', () => {
+    assertBatchMatrixManifest('historyBatchCases', HISTORY_BATCH_CASES.length)
   })
+
+  const runHistoryBatch = (editor, batchEntry, ops) => {
+    if (batchEntry === 'applyBatch') {
+      Transforms.applyBatch(editor, ops)
+      return
+    }
+
+    if (batchEntry === 'manualWithBatch') {
+      Editor.withBatch(editor, () => {
+        for (const op of ops) {
+          editor.apply(op)
+        }
+      })
+      return
+    }
+
+    throw new Error(`Unsupported batch entry: ${batchEntry}`)
+  }
+
+  const HISTORY_BATCH_MATRIX = ['applyBatch', 'manualWithBatch'].flatMap(
+    batchEntry =>
+      HISTORY_BATCH_CASES.map(historyCase => ({
+        batchEntry,
+        historyCase,
+        name: `batchEntry=${batchEntry} | scenario=${historyCase.id}`,
+      }))
+  )
+
+  it('declares the history batch entry matrix manifest', () => {
+    assertBatchMatrixManifest(
+      'historyBatchEntries',
+      HISTORY_BATCH_MATRIX.length
+    )
+  })
+
+  for (const matrixCase of HISTORY_BATCH_MATRIX) {
+    it(matrixCase.name, () => {
+      const { batchEntry, historyCase } = matrixCase
+      const editor = withHistory(createEditor())
+
+      editor.children = JSON.parse(JSON.stringify(historyCase.initialChildren))
+      editor.selection = historyCase.initialSelection
+        ? JSON.parse(JSON.stringify(historyCase.initialSelection))
+        : null
+
+      runHistoryBatch(editor, batchEntry, historyCase.ops)
+
+      assert.equal(editor.history.undos.length, 1)
+      assert.deepEqual(
+        editor.history.undos[0].operations,
+        historyCase.expectedHistoryOps
+      )
+
+      if (historyCase.expectedSelectionBefore) {
+        assert.deepEqual(
+          editor.history.undos[0].selectionBefore,
+          historyCase.expectedSelectionBefore
+        )
+      }
+
+      editor.undo()
+
+      assert.deepEqual(editor.children, historyCase.initialChildren)
+
+      if (historyCase.initialSelection) {
+        assert.deepEqual(editor.selection, historyCase.initialSelection)
+      }
+    })
+  }
 
   it('merges into the current undo batch when called before the pending flush', () => {
     const editor = withHistory(createEditor())
@@ -124,7 +307,30 @@ describe('HistoryEditor applyBatch exact-path set_node', () => {
     ])
   })
 
-  it('keeps exact-path undo semantics intact without routing through removed public batch APIs', () => {
+  it('drops stale undo state when direct children assignment overwrites prior batched ops', () => {
+    const editor = withHistory(createEditor())
+
+    editor.children = [
+      { type: 'paragraph', children: [{ text: 'one' }] },
+      { type: 'paragraph', children: [{ text: 'two' }] },
+      { type: 'paragraph', children: [{ text: 'three' }] },
+    ]
+
+    Editor.withBatch(editor, () => {
+      editor.apply({
+        type: 'move_node',
+        path: [2],
+        newPath: [0],
+      })
+      editor.children = [
+        { type: 'paragraph', children: [{ text: 'replacement' }] },
+      ]
+    })
+
+    assert.equal(editor.history.undos.length, 0)
+  })
+
+  it('keeps only post-assignment ops in history when later batched ops run on the replacement tree', () => {
     const editor = withHistory(createEditor())
 
     editor.children = [
@@ -132,20 +338,23 @@ describe('HistoryEditor applyBatch exact-path set_node', () => {
       { type: 'paragraph', children: [{ text: 'two' }] },
     ]
 
-    Transforms.applyBatch(editor, [
-      {
+    Editor.withBatch(editor, () => {
+      editor.apply({
         type: 'set_node',
         path: [0],
         properties: {},
-        newProperties: { id: 'a' },
-      },
-      {
+        newProperties: { id: 'stale' },
+      })
+      editor.children = [
+        { type: 'paragraph', children: [{ text: 'replacement' }] },
+      ]
+      editor.apply({
         type: 'set_node',
-        path: [1],
+        path: [0],
         properties: {},
-        newProperties: { id: 'b' },
-      },
-    ])
+        newProperties: { id: 'final' },
+      })
+    })
 
     assert.equal(editor.history.undos.length, 1)
     assert.deepEqual(editor.history.undos[0].operations, [
@@ -153,99 +362,14 @@ describe('HistoryEditor applyBatch exact-path set_node', () => {
         type: 'set_node',
         path: [0],
         properties: {},
-        newProperties: { id: 'a' },
-      },
-      {
-        type: 'set_node',
-        path: [1],
-        properties: {},
-        newProperties: { id: 'b' },
-      },
-    ])
-  })
-
-  it('undoes duplicate exact-path writes in original operation order', () => {
-    const editor = withHistory(createEditor())
-    const initialChildren = [{ type: 'paragraph', children: [{ text: 'one' }] }]
-
-    editor.children = JSON.parse(JSON.stringify(initialChildren))
-
-    Transforms.applyBatch(editor, [
-      {
-        type: 'set_node',
-        path: [0],
-        properties: {},
-        newProperties: { id: 'a' },
-      },
-      {
-        type: 'set_node',
-        path: [0],
-        properties: { id: 'a' },
-        newProperties: { id: 'b', role: 'final' },
-      },
-    ])
-
-    assert.equal(editor.history.undos.length, 1)
-    assert.deepEqual(editor.history.undos[0].operations, [
-      {
-        type: 'set_node',
-        path: [0],
-        properties: {},
-        newProperties: { id: 'a' },
-      },
-      {
-        type: 'set_node',
-        path: [0],
-        properties: { id: 'a' },
-        newProperties: { id: 'b', role: 'final' },
+        newProperties: { id: 'final' },
       },
     ])
 
     editor.undo()
 
-    assert.deepEqual(editor.children, initialChildren)
-  })
-
-  it('stores mixed exact-path and structural operations in one undo batch', () => {
-    const editor = withHistory(createEditor())
-    const initialChildren = [
-      { type: 'paragraph', children: [{ text: 'one' }] },
-      { type: 'paragraph', children: [{ text: 'two' }] },
-    ]
-
-    editor.children = JSON.parse(JSON.stringify(initialChildren))
-
-    Transforms.applyBatch(editor, [
-      {
-        type: 'set_node',
-        path: [0],
-        properties: {},
-        newProperties: { id: 'a' },
-      },
-      {
-        type: 'insert_node',
-        path: [1],
-        node: { type: 'paragraph', children: [{ text: 'middle' }] },
-      },
+    assert.deepEqual(editor.children, [
+      { type: 'paragraph', children: [{ text: 'replacement' }] },
     ])
-
-    assert.equal(editor.history.undos.length, 1)
-    assert.deepEqual(editor.history.undos[0].operations, [
-      {
-        type: 'set_node',
-        path: [0],
-        properties: {},
-        newProperties: { id: 'a' },
-      },
-      {
-        type: 'insert_node',
-        path: [1],
-        node: { type: 'paragraph', children: [{ text: 'middle' }] },
-      },
-    ])
-
-    editor.undo()
-
-    assert.deepEqual(editor.children, initialChildren)
   })
 })

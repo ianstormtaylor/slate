@@ -1,6 +1,7 @@
 import {
   BaseEditor,
   Editor,
+  isWritingBatchInternals,
   Location,
   Node,
   Operation,
@@ -8,7 +9,6 @@ import {
   PathRef,
   Range,
   Transforms,
-  wrapApply,
 } from 'slate'
 import {
   TextDiff,
@@ -52,7 +52,7 @@ export const withDOM = <T extends BaseEditor>(
   clipboardFormatKey = 'x-slate-fragment'
 ): T & DOMEditor => {
   const e = editor as T & DOMEditor
-  const { onChange, deleteBackward, addMark, removeMark } = e
+  const { apply, onChange, deleteBackward, addMark, removeMark } = e
 
   // The WeakMap which maps a key to a specific HTMLElement must be scoped to the editor instance to
   // avoid collisions between editors in the DOM that share the same value.
@@ -120,7 +120,7 @@ export const withDOM = <T extends BaseEditor>(
 
   // This attempts to reset the NODE_TO_KEY entry to the correct value
   // as apply() changes the object reference and hence invalidates the NODE_TO_KEY entry
-  wrapApply(e, apply => (op: Operation) => {
+  e.apply = (op: Operation) => {
     const matches: [Path, Key][] = []
     const pathRefMatches: [PathRef, Key][] = []
 
@@ -205,6 +205,10 @@ export const withDOM = <T extends BaseEditor>(
 
     apply(op)
 
+    if (op.type === 'insert_text' || op.type === 'remove_text') {
+      EDITOR_TO_PENDING_DIFFS.delete(e)
+    }
+
     switch (op.type) {
       case 'insert_node':
       case 'remove_node':
@@ -233,7 +237,37 @@ export const withDOM = <T extends BaseEditor>(
 
       pathRef.unref()
     }
-  })
+  }
+
+  const childrenDescriptor = Object.getOwnPropertyDescriptor(e, 'children')
+
+  if (childrenDescriptor?.get && childrenDescriptor?.set) {
+    const getChildren = childrenDescriptor.get
+    const setChildren = childrenDescriptor.set
+
+    Object.defineProperty(e, 'children', {
+      configurable: true,
+      enumerable: childrenDescriptor.enumerable ?? true,
+      get: getChildren,
+      set(children) {
+        setChildren.call(e, children)
+
+        if (isWritingBatchInternals(e)) {
+          return
+        }
+
+        EDITOR_TO_PENDING_DIFFS.delete(e)
+        EDITOR_TO_PENDING_SELECTION.delete(e)
+        EDITOR_TO_PENDING_ACTION.delete(e)
+        EDITOR_TO_PENDING_INSERTION_MARKS.delete(e)
+        EDITOR_TO_USER_MARKS.delete(e)
+        EDITOR_TO_USER_SELECTION.get(e)?.unref()
+        EDITOR_TO_USER_SELECTION.delete(e)
+        IS_NODE_MAP_DIRTY.set(e, true)
+      },
+    })
+  }
+
   e.setFragmentData = (data: Pick<DataTransfer, 'getData' | 'setData'>) => {
     const { selection } = e
 

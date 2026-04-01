@@ -1,4 +1,11 @@
-import { Editor, Operation, Path, Transforms, wrapApply } from 'slate'
+import {
+  Editor,
+  isWritingBatchInternals,
+  Operation,
+  Path,
+  Transforms,
+  wrapApply,
+} from 'slate'
 
 import { HistoryEditor } from './history-editor'
 
@@ -15,6 +22,44 @@ import { HistoryEditor } from './history-editor'
 export const withHistory = <T extends Editor>(editor: T) => {
   const e = editor as T & HistoryEditor
   e.history = { undos: [], redos: [] }
+
+  const trimPendingSavedHistoryOperations = (pendingOps: Operation[]) => {
+    const savedOps = pendingOps.filter(op => shouldSave(op, undefined))
+
+    if (savedOps.length === 0) {
+      e.history.redos = []
+      return
+    }
+
+    const remaining = [...savedOps]
+
+    while (remaining.length > 0 && e.history.undos.length > 0) {
+      const lastBatch = e.history.undos[e.history.undos.length - 1]
+
+      while (remaining.length > 0 && lastBatch.operations.length > 0) {
+        const pendingOp = remaining[remaining.length - 1]
+        const batchOp = lastBatch.operations[lastBatch.operations.length - 1]
+
+        if (batchOp !== pendingOp) {
+          return
+        }
+
+        lastBatch.operations.pop()
+        remaining.pop()
+      }
+
+      if (lastBatch.operations.length === 0) {
+        e.history.undos.pop()
+        continue
+      }
+
+      break
+    }
+
+    if (remaining.length === 0) {
+      e.history.redos = []
+    }
+  }
 
   e.redo = () => {
     const { history } = e
@@ -113,6 +158,31 @@ export const withHistory = <T extends Editor>(editor: T) => {
 
     apply(op)
   })
+
+  const childrenDescriptor = Object.getOwnPropertyDescriptor(e, 'children')
+
+  if (childrenDescriptor?.get && childrenDescriptor?.set) {
+    const getChildren = childrenDescriptor.get
+    const setChildren = childrenDescriptor.set
+
+    Object.defineProperty(e, 'children', {
+      configurable: true,
+      enumerable: childrenDescriptor.enumerable ?? true,
+      get: getChildren,
+      set(children) {
+        const pendingOps = [...e.operations]
+
+        setChildren.call(e, children)
+
+        if (isWritingBatchInternals(e)) {
+          return
+        }
+
+        trimPendingSavedHistoryOperations(pendingOps)
+      },
+    })
+  }
+
   e.writeHistory = (stack: 'undos' | 'redos', batch: any) => {
     e.history[stack].push(batch)
   }

@@ -1,12 +1,19 @@
 /* eslint-disable no-console */
 const { performance } = require('node:perf_hooks')
 
-const { createEditor, Editor, Element, Node, Transforms } = require('../../src')
+const {
+  createEditor,
+  Editor,
+  Element,
+  Node,
+  Transforms,
+  wrapApply,
+} = require('../../src')
 const {
   finalizeOperation,
   transformOperationRefs,
   updateOperationDirtyPaths,
-} = require('../../src/core/apply')
+} = require('../../src/core/apply-operation')
 const {
   clearExactSetNodeDraft,
   commitExactSetNodeDraft,
@@ -22,6 +29,19 @@ const DEFAULT_REPEATS = 5
 
 const waitForMicrotasks = () => Promise.resolve()
 
+const parseListArg = name => {
+  const prefix = `--${name}=`
+  const value = process.argv.find(arg => arg.startsWith(prefix))
+
+  if (!value) return null
+
+  return value
+    .slice(prefix.length)
+    .split(',')
+    .map(part => part.trim())
+    .filter(Boolean)
+}
+
 const parseNumberArg = (name, fallback) => {
   const prefix = `--${name}=`
   const value = process.argv.find(arg => arg.startsWith(prefix))
@@ -36,6 +56,12 @@ const buildFlatValue = blockCount =>
   Array.from({ length: blockCount }, (_, index) => ({
     type: 'paragraph',
     children: [{ text: `Block ${index}` }],
+  }))
+
+const buildFlatValueWithMergedTexts = blockCount =>
+  Array.from({ length: blockCount }, (_, index) => ({
+    type: 'paragraph',
+    children: [{ text: `Block ` }, { text: `${index}` }],
   }))
 
 const buildGroupedValue = (blockCount, groupSize) => {
@@ -61,6 +87,26 @@ const createEditorWithValue = value => {
   return editor
 }
 
+const createBenchmarkEditor = ({ benchmark, blockCount, groupSize }) =>
+  benchmark.createEditor
+    ? benchmark.createEditor({ blockCount, groupSize })
+    : createEditorWithValue(
+        benchmark.shape === 'flat'
+          ? buildFlatValue(blockCount)
+          : benchmark.shape === 'grouped'
+          ? buildGroupedValue(blockCount, groupSize)
+          : []
+      )
+
+const prepareBenchmark = ({ benchmark, blockCount, editor, groupSize }) => {
+  const targetPaths = collectTargetPaths(editor)
+  const prepared = benchmark.prepare
+    ? benchmark.prepare({ blockCount, editor, groupSize, targetPaths })
+    : undefined
+
+  return { prepared, targetPaths }
+}
+
 const createSetNodeOps = targetPaths =>
   targetPaths.map((path, index) => ({
     type: 'set_node',
@@ -68,6 +114,22 @@ const createSetNodeOps = targetPaths =>
     properties: {},
     newProperties: { id: `id-${index}` },
   }))
+
+const createDuplicateSetNodeOps = targetPaths =>
+  targetPaths.flatMap((path, index) => [
+    {
+      type: 'set_node',
+      path,
+      properties: {},
+      newProperties: { id: `id-${index}-a` },
+    },
+    {
+      type: 'set_node',
+      path,
+      properties: {},
+      newProperties: { id: `id-${index}-b` },
+    },
+  ])
 
 const createInsertNodeOps = blockCount =>
   Array.from({ length: blockCount }, (_, index) => ({
@@ -78,6 +140,103 @@ const createInsertNodeOps = blockCount =>
       children: [{ text: `Inserted ${index}` }],
     },
   }))
+
+const createPrependInsertNodeOps = blockCount =>
+  Array.from({ length: blockCount }, (_, index) => ({
+    type: 'insert_node',
+    path: [0],
+    node: {
+      type: 'paragraph',
+      children: [{ text: `Inserted ${index}` }],
+    },
+  }))
+
+const createInterleavedInsertMoveOps = blockCount => {
+  const ops = [
+    {
+      type: 'insert_node',
+      path: [0],
+      node: {
+        type: 'paragraph',
+        children: [{ text: 'Inserted 0' }],
+      },
+    },
+  ]
+
+  for (let index = 1; index < blockCount; index++) {
+    ops.push({
+      type: 'insert_node',
+      path: [index],
+      node: {
+        type: 'paragraph',
+        children: [{ text: `Inserted ${index}` }],
+      },
+    })
+    ops.push({
+      type: 'move_node',
+      path: [index],
+      newPath: [0],
+    })
+  }
+
+  return ops
+}
+
+const createRemoveNodeOps = children =>
+  children
+    .map((node, index) => ({
+      type: 'remove_node',
+      path: [index],
+      node: JSON.parse(JSON.stringify(node)),
+    }))
+    .reverse()
+
+const createMoveNodeOps = blockCount =>
+  Array.from({ length: Math.max(blockCount - 1, 0) }, (_, index) => ({
+    type: 'move_node',
+    path: [index + 1],
+    newPath: [0],
+  }))
+
+const createMergeNodeOps = blockCount =>
+  Array.from({ length: blockCount }, (_, index) => ({
+    type: 'merge_node',
+    path: [index, 1],
+    position: 6,
+    properties: {},
+  }))
+
+const createSplitNodeOps = targetPaths =>
+  targetPaths.map(path => ({
+    type: 'split_node',
+    path: path.concat(0),
+    position: 1,
+    properties: {},
+  }))
+
+const createInsertTextOps = targetPaths =>
+  targetPaths.map(path => ({
+    type: 'insert_text',
+    path: path.concat(0),
+    offset: 1,
+    text: 'X',
+  }))
+
+const installReadAfterEachObserver = editor => {
+  const { apply } = editor
+
+  editor.apply = op => {
+    apply(op)
+    editor.children
+  }
+}
+
+const installReadAfterEachWrapper = editor => {
+  wrapApply(editor, apply => op => {
+    apply(op)
+    editor.children
+  })
+}
 
 const collectTargetPaths = editor =>
   Array.from(
@@ -133,10 +292,17 @@ const verifyBatchPrototype = () => {
 
   for (const testCase of cases) {
     const exactOps = createSetNodeOps(testCase.targetPaths)
+    const duplicateExactOps = createDuplicateSetNodeOps(testCase.targetPaths)
     const baselineEditor = createEditorWithValue(
       JSON.parse(JSON.stringify(testCase.value))
     )
     const batchedEditor = createEditorWithValue(
+      JSON.parse(JSON.stringify(testCase.value))
+    )
+    const duplicateBaselineEditor = createEditorWithValue(
+      JSON.parse(JSON.stringify(testCase.value))
+    )
+    const duplicateBatchedEditor = createEditorWithValue(
       JSON.parse(JSON.stringify(testCase.value))
     )
 
@@ -152,6 +318,23 @@ const verifyBatchPrototype = () => {
       `applyBatch(${testCase.label})`,
       batchedEditor.children,
       baselineEditor.children
+    )
+
+    Editor.withoutNormalizing(duplicateBaselineEditor, () => {
+      duplicateExactOps.forEach(op => {
+        duplicateBaselineEditor.apply(op)
+      })
+    })
+
+    Transforms.applyBatch(
+      duplicateBatchedEditor,
+      createDuplicateSetNodeOps(testCase.targetPaths)
+    )
+
+    assertEquivalentChildren(
+      `applyBatch duplicate(${testCase.label})`,
+      duplicateBatchedEditor.children,
+      duplicateBaselineEditor.children
     )
   }
 }
@@ -272,21 +455,111 @@ const timeExactSetNodeBreakdown = ({
   return breakdown
 }
 
+const timeOperationLoopBreakdown = ({
+  benchmark,
+  blockCount,
+  groupSize,
+  repeats,
+}) => {
+  if (!benchmark.loopBreakdown) {
+    return null
+  }
+
+  const phaseFactories = {
+    refs:
+      ({ editor, ops }) =>
+      () => {
+        for (const op of ops) {
+          transformOperationRefs(editor, op)
+        }
+      },
+    dirtyPaths:
+      ({ editor, ops }) =>
+      () => {
+        for (const op of ops) {
+          updateOperationDirtyPaths(editor, op)
+        }
+      },
+    transform:
+      ({ editor, ops }) =>
+      () => {
+        for (const op of ops) {
+          Transforms.transform(editor, op)
+        }
+      },
+    finalize:
+      ({ editor, ops }) =>
+      () => {
+        BATCH_DEPTH.set(editor, 1)
+
+        try {
+          for (const op of ops) {
+            finalizeOperation(editor, op)
+          }
+        } finally {
+          BATCH_DEPTH.delete(editor)
+        }
+      },
+  }
+
+  const breakdown = {}
+
+  for (const phase of benchmark.loopBreakdown) {
+    const durations = []
+
+    for (let repeat = 0; repeat < repeats; repeat++) {
+      const editor = createBenchmarkEditor({
+        benchmark,
+        blockCount,
+        groupSize,
+      })
+      const { prepared, targetPaths } = prepareBenchmark({
+        benchmark,
+        blockCount,
+        editor,
+        groupSize,
+      })
+      const ops = benchmark.getBreakdownOps
+        ? benchmark.getBreakdownOps({
+            blockCount,
+            editor,
+            groupSize,
+            prepared,
+            targetPaths,
+          })
+        : prepared
+      const run = phaseFactories[phase]({ editor, ops })
+      const start = performance.now()
+
+      run()
+
+      durations.push(performance.now() - start)
+    }
+
+    breakdown[phase] = Number(median(durations).toFixed(2))
+  }
+
+  return breakdown
+}
+
 const runScenario = async ({ benchmark, blockCount, groupSize, repeats }) => {
   const runs = []
 
   for (let repeat = 0; repeat < repeats; repeat++) {
-    const editor = createEditorWithValue(
-      benchmark.shape === 'flat'
-        ? buildFlatValue(blockCount)
-        : benchmark.shape === 'grouped'
-        ? buildGroupedValue(blockCount, groupSize)
-        : []
-    )
-    const targetPaths = collectTargetPaths(editor)
+    const editor = createBenchmarkEditor({
+      benchmark,
+      blockCount,
+      groupSize,
+    })
+    const { prepared, targetPaths } = prepareBenchmark({
+      benchmark,
+      blockCount,
+      editor,
+      groupSize,
+    })
 
     const start = performance.now()
-    benchmark.run({ blockCount, editor, targetPaths })
+    benchmark.run({ blockCount, editor, prepared, targetPaths })
     const durationMs = performance.now() - start
 
     await waitForMicrotasks()
@@ -298,12 +571,19 @@ const runScenario = async ({ benchmark, blockCount, groupSize, repeats }) => {
 
   return {
     durationMs: median(runs.map(run => run.durationMs)),
-    breakdown: timeExactSetNodeBreakdown({
-      benchmark,
-      blockCount,
-      groupSize,
-      repeats,
-    }),
+    breakdown:
+      timeExactSetNodeBreakdown({
+        benchmark,
+        blockCount,
+        groupSize,
+        repeats,
+      }) ??
+      timeOperationLoopBreakdown({
+        benchmark,
+        blockCount,
+        groupSize,
+        repeats,
+      }),
   }
 }
 
@@ -372,6 +652,86 @@ const benchmarks = [
     },
   },
   {
+    id: 'with-batch-flat',
+    label: 'Editor.withBatch exact-path set_node manual apply loop',
+    shape: 'flat',
+    run: ({ editor, targetPaths }) => {
+      Editor.withBatch(editor, () => {
+        createSetNodeOps(targetPaths).forEach(op => {
+          editor.apply(op)
+        })
+      })
+    },
+  },
+  {
+    id: 'apply-batch-flat-duplicate',
+    label: 'Transforms.applyBatch duplicate-path set_node batch',
+    shape: 'flat',
+    run: ({ editor, targetPaths }) => {
+      Transforms.applyBatch(editor, createDuplicateSetNodeOps(targetPaths))
+    },
+  },
+  {
+    id: 'with-batch-flat-duplicate',
+    label: 'Editor.withBatch duplicate-path set_node manual apply loop',
+    shape: 'flat',
+    run: ({ editor, targetPaths }) => {
+      Editor.withBatch(editor, () => {
+        createDuplicateSetNodeOps(targetPaths).forEach(op => {
+          editor.apply(op)
+        })
+      })
+    },
+  },
+  {
+    id: 'apply-batch-flat-observe-each',
+    label:
+      'Transforms.applyBatch exact-path set_node batch with read-after-each observation',
+    shape: 'flat',
+    run: ({ editor, targetPaths }) => {
+      installReadAfterEachObserver(editor)
+      Transforms.applyBatch(editor, createSetNodeOps(targetPaths))
+    },
+  },
+  {
+    id: 'with-batch-flat-observe-each',
+    label:
+      'Editor.withBatch exact-path set_node manual apply loop with read-after-each observation',
+    shape: 'flat',
+    run: ({ editor, targetPaths }) => {
+      installReadAfterEachObserver(editor)
+      Editor.withBatch(editor, () => {
+        createSetNodeOps(targetPaths).forEach(op => {
+          editor.apply(op)
+        })
+      })
+    },
+  },
+  {
+    id: 'apply-batch-flat-wrapper-read',
+    label:
+      'Transforms.applyBatch exact-path set_node batch with wrapper read-after-each observation',
+    shape: 'flat',
+    run: ({ editor, targetPaths }) => {
+      installReadAfterEachWrapper(editor)
+      Transforms.applyBatch(editor, createSetNodeOps(targetPaths))
+    },
+  },
+  {
+    id: 'with-batch-flat-wrapper-read',
+    label:
+      'Editor.withBatch exact-path set_node manual apply loop with wrapper read-after-each observation',
+    shape: 'flat',
+    run: ({ editor, targetPaths }) => {
+      installReadAfterEachWrapper(editor)
+      Editor.withBatch(editor, () => {
+        createSetNodeOps(targetPaths).forEach(op => {
+          editor.apply(op)
+        })
+      })
+    },
+  },
+  {
     id: 'apply-batch-flat-mixed-insert-tail',
     label: 'Transforms.applyBatch exact-path set_node batch plus tail insert',
     shape: 'flat',
@@ -384,6 +744,67 @@ const benchmarks = [
           node: { type: 'paragraph', children: [{ text: 'tail' }] },
         },
       ])
+    },
+  },
+  {
+    id: 'apply-batch-flat-mixed-set-move',
+    label:
+      'Transforms.applyBatch exact-path set_node batch plus move_node batch',
+    shape: 'flat',
+    run: ({ blockCount, editor, targetPaths }) => {
+      Transforms.applyBatch(editor, [
+        ...createSetNodeOps(targetPaths),
+        ...createMoveNodeOps(blockCount),
+      ])
+    },
+  },
+  {
+    id: 'with-batch-flat-mixed-set-move',
+    label: 'Editor.withBatch exact-path set_node loop plus move_node loop',
+    shape: 'flat',
+    run: ({ blockCount, editor, targetPaths }) => {
+      const ops = [
+        ...createSetNodeOps(targetPaths),
+        ...createMoveNodeOps(blockCount),
+      ]
+
+      Editor.withBatch(editor, () => {
+        ops.forEach(op => {
+          editor.apply(op)
+        })
+      })
+    },
+  },
+  {
+    id: 'apply-batch-flat-mixed-set-move-observe-each',
+    label:
+      'Transforms.applyBatch exact-path set_node batch plus move_node batch with read-after-each observation',
+    shape: 'flat',
+    run: ({ blockCount, editor, targetPaths }) => {
+      installReadAfterEachObserver(editor)
+      Transforms.applyBatch(editor, [
+        ...createSetNodeOps(targetPaths),
+        ...createMoveNodeOps(blockCount),
+      ])
+    },
+  },
+  {
+    id: 'with-batch-flat-mixed-set-move-observe-each',
+    label:
+      'Editor.withBatch exact-path set_node loop plus move_node loop with read-after-each observation',
+    shape: 'flat',
+    run: ({ blockCount, editor, targetPaths }) => {
+      const ops = [
+        ...createSetNodeOps(targetPaths),
+        ...createMoveNodeOps(blockCount),
+      ]
+
+      installReadAfterEachObserver(editor)
+      Editor.withBatch(editor, () => {
+        ops.forEach(op => {
+          editor.apply(op)
+        })
+      })
     },
   },
   {
@@ -456,6 +877,192 @@ const benchmarks = [
     },
   },
   {
+    id: 'apply-insert-empty-prepend-no-normalize',
+    label:
+      'editor.apply(insert_node prepend) batch on empty document inside Editor.withoutNormalizing',
+    shape: 'empty',
+    run: ({ blockCount, editor }) => {
+      const ops = createPrependInsertNodeOps(blockCount)
+
+      Editor.withoutNormalizing(editor, () => {
+        ops.forEach(op => {
+          editor.apply(op)
+        })
+      })
+    },
+  },
+  {
+    id: 'apply-batch-insert-empty-prepend',
+    label: 'Transforms.applyBatch insert_node prepend batch on empty document',
+    shape: 'empty',
+    run: ({ blockCount, editor }) => {
+      Transforms.applyBatch(editor, createPrependInsertNodeOps(blockCount))
+    },
+  },
+  {
+    id: 'apply-interleaved-insert-move-empty-no-normalize',
+    label:
+      'editor.apply(interleaved insert_node + move_node) on empty document inside Editor.withoutNormalizing',
+    shape: 'empty',
+    run: ({ blockCount, editor }) => {
+      const ops = createInterleavedInsertMoveOps(blockCount)
+
+      Editor.withoutNormalizing(editor, () => {
+        ops.forEach(op => {
+          editor.apply(op)
+        })
+      })
+    },
+  },
+  {
+    id: 'apply-batch-interleaved-insert-move-empty',
+    label:
+      'Transforms.applyBatch interleaved insert_node + move_node on empty document',
+    shape: 'empty',
+    run: ({ blockCount, editor }) => {
+      Transforms.applyBatch(editor, createInterleavedInsertMoveOps(blockCount))
+    },
+  },
+  {
+    id: 'with-batch-interleaved-insert-move-empty',
+    label:
+      'Editor.withBatch interleaved insert_node + move_node loop on empty document',
+    shape: 'empty',
+    run: ({ blockCount, editor }) => {
+      const ops = createInterleavedInsertMoveOps(blockCount)
+
+      Editor.withBatch(editor, () => {
+        ops.forEach(op => {
+          editor.apply(op)
+        })
+      })
+    },
+  },
+  {
+    id: 'apply-remove-flat-no-normalize',
+    label:
+      'editor.apply(remove_node) batch on flat document inside Editor.withoutNormalizing',
+    shape: 'flat',
+    prepare: ({ editor }) => createRemoveNodeOps(editor.children),
+    run: ({ editor, prepared: ops }) => {
+      Editor.withoutNormalizing(editor, () => {
+        ops.forEach(op => {
+          editor.apply(op)
+        })
+      })
+    },
+  },
+  {
+    id: 'apply-batch-remove-flat',
+    label: 'Transforms.applyBatch remove_node batch on flat document',
+    shape: 'flat',
+    prepare: ({ editor }) => createRemoveNodeOps(editor.children),
+    run: ({ editor, prepared: ops }) => {
+      Transforms.applyBatch(editor, ops)
+    },
+  },
+  {
+    id: 'apply-move-flat-no-normalize',
+    label:
+      'editor.apply(move_node) batch on flat document inside Editor.withoutNormalizing',
+    shape: 'flat',
+    prepare: ({ blockCount }) => createMoveNodeOps(blockCount),
+    run: ({ editor, prepared: ops }) => {
+      Editor.withoutNormalizing(editor, () => {
+        ops.forEach(op => {
+          editor.apply(op)
+        })
+      })
+    },
+  },
+  {
+    id: 'apply-batch-move-flat',
+    label: 'Transforms.applyBatch move_node batch on flat document',
+    shape: 'flat',
+    loopBreakdown: ['refs', 'dirtyPaths', 'transform', 'finalize'],
+    prepare: ({ blockCount }) => createMoveNodeOps(blockCount),
+    run: ({ editor, prepared: ops }) => {
+      Transforms.applyBatch(editor, ops)
+    },
+  },
+  {
+    id: 'apply-merge-flat-no-normalize',
+    label:
+      'editor.apply(merge_node) batch on flat document inside Editor.withoutNormalizing',
+    shape: 'flat-merge',
+    createEditor: ({ blockCount }) =>
+      createEditorWithValue(buildFlatValueWithMergedTexts(blockCount)),
+    prepare: ({ blockCount }) => createMergeNodeOps(blockCount),
+    run: ({ editor, prepared: ops }) => {
+      Editor.withoutNormalizing(editor, () => {
+        ops.forEach(op => {
+          editor.apply(op)
+        })
+      })
+    },
+  },
+  {
+    id: 'apply-batch-merge-flat',
+    label: 'Transforms.applyBatch merge_node batch on flat document',
+    shape: 'flat-merge',
+    loopBreakdown: ['refs', 'dirtyPaths', 'transform', 'finalize'],
+    createEditor: ({ blockCount }) =>
+      createEditorWithValue(buildFlatValueWithMergedTexts(blockCount)),
+    prepare: ({ blockCount }) => createMergeNodeOps(blockCount),
+    run: ({ editor, prepared: ops }) => {
+      Transforms.applyBatch(editor, ops)
+    },
+  },
+  {
+    id: 'apply-split-flat-no-normalize',
+    label:
+      'editor.apply(split_node) batch on flat document inside Editor.withoutNormalizing',
+    shape: 'flat',
+    prepare: ({ targetPaths }) => createSplitNodeOps(targetPaths),
+    run: ({ editor, prepared: ops }) => {
+      Editor.withoutNormalizing(editor, () => {
+        ops.forEach(op => {
+          editor.apply(op)
+        })
+      })
+    },
+  },
+  {
+    id: 'apply-batch-split-flat',
+    label: 'Transforms.applyBatch split_node batch on flat document',
+    shape: 'flat',
+    loopBreakdown: ['refs', 'dirtyPaths', 'transform', 'finalize'],
+    prepare: ({ targetPaths }) => createSplitNodeOps(targetPaths),
+    run: ({ editor, prepared: ops }) => {
+      Transforms.applyBatch(editor, ops)
+    },
+  },
+  {
+    id: 'apply-batch-insert-text-flat',
+    label:
+      'Transforms.applyBatch insert_text batch on merged-text flat document',
+    shape: 'flat-merge',
+    createEditor: ({ blockCount }) =>
+      createEditorWithValue(buildFlatValueWithMergedTexts(blockCount)),
+    prepare: ({ targetPaths }) => createInsertTextOps(targetPaths),
+    run: ({ editor, prepared: ops }) => {
+      Transforms.applyBatch(editor, ops)
+    },
+  },
+  {
+    id: 'apply-batch-insert-text-flat-observe-each',
+    label:
+      'Transforms.applyBatch insert_text batch with read-after-each observation on merged-text flat document',
+    shape: 'flat-merge',
+    createEditor: ({ blockCount }) =>
+      createEditorWithValue(buildFlatValueWithMergedTexts(blockCount)),
+    prepare: ({ targetPaths }) => createInsertTextOps(targetPaths),
+    run: ({ editor, prepared: ops }) => {
+      installReadAfterEachObserver(editor)
+      Transforms.applyBatch(editor, ops)
+    },
+  },
+  {
     id: 'setnodes-grouped',
     label: 'Transforms.setNodes per path on grouped document',
     shape: 'grouped',
@@ -510,15 +1117,47 @@ const benchmarks = [
   },
 ]
 
+const REQUIRED_BENCHMARK_IDS = [
+  'apply-flat-no-normalize',
+  'apply-grouped-no-normalize',
+  'apply-batch-flat',
+  'with-batch-flat',
+  'apply-batch-grouped',
+  'apply-batch-flat-duplicate',
+  'with-batch-flat-duplicate',
+  'apply-batch-flat-observe-each',
+  'with-batch-flat-observe-each',
+  'apply-batch-flat-wrapper-read',
+  'with-batch-flat-wrapper-read',
+  'apply-batch-flat-mixed-set-move',
+  'with-batch-flat-mixed-set-move',
+  'apply-batch-flat-mixed-set-move-observe-each',
+  'with-batch-flat-mixed-set-move-observe-each',
+  'apply-batch-insert-empty',
+  'apply-batch-insert-empty-prepend',
+  'apply-batch-interleaved-insert-move-empty',
+  'with-batch-interleaved-insert-move-empty',
+  'apply-batch-remove-flat',
+  'apply-batch-move-flat',
+  'apply-batch-merge-flat',
+  'apply-batch-split-flat',
+  'apply-batch-insert-text-flat',
+  'apply-batch-insert-text-flat-observe-each',
+]
+
 const main = async () => {
   verifyBatchPrototype()
 
   const blockCount = parseNumberArg('blocks', DEFAULT_BLOCKS)
   const groupSize = parseNumberArg('group-size', DEFAULT_GROUP_SIZE)
   const repeats = parseNumberArg('repeats', DEFAULT_REPEATS)
+  const include = parseListArg('include')
+  const selectedBenchmarks = include
+    ? benchmarks.filter(benchmark => include.includes(benchmark.id))
+    : benchmarks
   const results = []
 
-  for (const benchmark of benchmarks) {
+  for (const benchmark of selectedBenchmarks) {
     const result = await runScenario({
       benchmark,
       blockCount,
@@ -563,7 +1202,16 @@ const main = async () => {
   )
 }
 
-main().catch(error => {
-  console.error(error)
-  process.exitCode = 1
-})
+module.exports = {
+  benchmarks,
+  REQUIRED_BENCHMARK_IDS,
+  runScenario,
+  verifyBatchPrototype,
+}
+
+if (require.main === module) {
+  main().catch(error => {
+    console.error(error)
+    process.exitCode = 1
+  })
+}

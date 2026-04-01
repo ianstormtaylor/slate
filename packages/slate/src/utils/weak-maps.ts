@@ -1,4 +1,9 @@
 import {
+  BaseInsertNodeOperation,
+  BaseInsertTextOperation,
+  BaseMergeNodeOperation,
+  BaseMoveNodeOperation,
+  BaseRemoveTextOperation,
   BaseSetNodeOperation,
   Descendant,
   Editor,
@@ -15,8 +20,34 @@ type BatchNormalizeState = {
 }
 
 export const BATCH_DEPTH: WeakMap<Editor, number> = new WeakMap()
+export const BATCH_INTERNAL_READ_DEPTH: WeakMap<Editor, number> = new WeakMap()
+export const BATCH_INTERNAL_WRITE_DEPTH: WeakMap<Editor, number> = new WeakMap()
+export const BATCH_OBSERVE_NORMALIZE_DEPTH: WeakMap<Editor, number> =
+  new WeakMap()
 export const BATCH_DRAFT_CHILDREN: WeakMap<Editor, Descendant[]> = new WeakMap()
+export const BATCH_INSERT_NODE_OPS: WeakMap<Editor, BaseInsertNodeOperation[]> =
+  new WeakMap()
+export const BATCH_LIVE_INSERT_MOVE_OPS: WeakMap<
+  Editor,
+  (BaseInsertNodeOperation | BaseMoveNodeOperation)[]
+> = new WeakMap()
+export const BATCH_INSERT_NODE_PARENT_PATH: WeakMap<Editor, Path> =
+  new WeakMap()
+export const BATCH_INSERT_NODE_SNAPSHOT: WeakMap<Editor, Descendant[]> =
+  new WeakMap()
+export const BATCH_INSERT_NODE_SNAPSHOT_OPS: WeakMap<Editor, number> =
+  new WeakMap()
+export const BATCH_TEXT_OPS: WeakMap<
+  Editor,
+  (BaseInsertTextOperation | BaseRemoveTextOperation)[]
+> = new WeakMap()
+export const BATCH_TEXT_SNAPSHOT: WeakMap<Editor, Descendant[]> = new WeakMap()
+export const BATCH_TEXT_SNAPSHOT_OPS: WeakMap<Editor, number> = new WeakMap()
 export const BATCH_EXACT_SET_NODE_OPS: WeakMap<Editor, BaseSetNodeOperation[]> =
+  new WeakMap()
+export const BATCH_LIVE_MERGE_OPS: WeakMap<Editor, BaseMergeNodeOperation[]> =
+  new WeakMap()
+export const BATCH_LIVE_MOVE_OPS: WeakMap<Editor, BaseMoveNodeOperation[]> =
   new WeakMap()
 export const BATCH_EXACT_SET_NODE_SNAPSHOT: WeakMap<Editor, Descendant[]> =
   new WeakMap()

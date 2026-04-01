@@ -1,5 +1,5 @@
 import ReactDOM from 'react-dom'
-import { BaseEditor, Node, wrapApply } from 'slate'
+import { BaseEditor, Node } from 'slate'
 import { withDOM, IS_ANDROID, EDITOR_TO_PENDING_SELECTION } from 'slate-dom'
 import { ReactEditor } from './react-editor'
 import { REACT_MAJOR_VERSION } from '../utils/environment'
@@ -21,7 +21,7 @@ export const withReact = <T extends BaseEditor>(
 
   e = withDOM(e, clipboardFormatKey)
 
-  const { onChange, insertText } = e
+  const { apply, onChange, insertText } = e
 
   e.getChunkSize = () => null
 
@@ -58,7 +58,7 @@ export const withReact = <T extends BaseEditor>(
   // On move_node, if the chunking optimization is enabled for the parent of the
   // node being moved, add the moved node to the movedNodeKeys set of the
   // parent's chunk tree.
-  wrapApply(e, apply => operation => {
+  e.apply = operation => {
     if (operation.type === 'move_node') {
       const parent = Node.parent(e, operation.path)
       const chunking = !!e.getChunkSize(parent)
@@ -72,7 +72,7 @@ export const withReact = <T extends BaseEditor>(
     }
 
     apply(operation)
-  })
+  }
 
   return e
 }

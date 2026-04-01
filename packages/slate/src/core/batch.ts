@@ -1,15 +1,93 @@
 import { Editor, EditorNormalizeOptions } from '../interfaces/editor'
 import { commitDraftChildren } from './children'
 import {
+  flushLiveInsertMoveBatch,
+  flushLiveMergeBatch,
+  flushLiveMoveBatch,
+} from './live-move-dirty-paths'
+import {
   BATCH_DEPTH,
+  BATCH_INTERNAL_READ_DEPTH,
+  BATCH_INTERNAL_WRITE_DEPTH,
+  BATCH_OBSERVE_NORMALIZE_DEPTH,
   BATCH_NORMALIZE,
   BATCH_PENDING_FLUSH,
+  DIRTY_PATHS,
   FLUSHING,
 } from '../utils/weak-maps'
 
 const getBatchDepth = (editor: Editor) => BATCH_DEPTH.get(editor) ?? 0
 
 export const isBatching = (editor: Editor) => getBatchDepth(editor) > 0
+
+const getInternalBatchReadDepth = (editor: Editor) =>
+  BATCH_INTERNAL_READ_DEPTH.get(editor) ?? 0
+
+export const isReadingBatchInternals = (editor: Editor) =>
+  getInternalBatchReadDepth(editor) > 0
+
+const getInternalBatchWriteDepth = (editor: Editor) =>
+  BATCH_INTERNAL_WRITE_DEPTH.get(editor) ?? 0
+
+export const isWritingBatchInternals = (editor: Editor) =>
+  getInternalBatchWriteDepth(editor) > 0
+
+export const withInternalBatchReads = <T>(editor: Editor, fn: () => T): T => {
+  const depth = getInternalBatchReadDepth(editor)
+
+  BATCH_INTERNAL_READ_DEPTH.set(editor, depth + 1)
+
+  try {
+    return fn()
+  } finally {
+    if (depth === 0) {
+      BATCH_INTERNAL_READ_DEPTH.delete(editor)
+    } else {
+      BATCH_INTERNAL_READ_DEPTH.set(editor, depth)
+    }
+  }
+}
+
+export const withInternalBatchWrites = <T>(editor: Editor, fn: () => T): T => {
+  const depth = getInternalBatchWriteDepth(editor)
+
+  BATCH_INTERNAL_WRITE_DEPTH.set(editor, depth + 1)
+
+  try {
+    return fn()
+  } finally {
+    if (depth === 0) {
+      BATCH_INTERNAL_WRITE_DEPTH.delete(editor)
+    } else {
+      BATCH_INTERNAL_WRITE_DEPTH.set(editor, depth)
+    }
+  }
+}
+
+const getObservedBatchNormalizeDepth = (editor: Editor) =>
+  BATCH_OBSERVE_NORMALIZE_DEPTH.get(editor) ?? 0
+
+export const isObservingBatchNormalize = (editor: Editor) =>
+  getObservedBatchNormalizeDepth(editor) > 0
+
+export const withObservedBatchNormalize = <T>(
+  editor: Editor,
+  fn: () => T
+): T => {
+  const depth = getObservedBatchNormalizeDepth(editor)
+
+  BATCH_OBSERVE_NORMALIZE_DEPTH.set(editor, depth + 1)
+
+  try {
+    return fn()
+  } finally {
+    if (depth === 0) {
+      BATCH_OBSERVE_NORMALIZE_DEPTH.delete(editor)
+    } else {
+      BATCH_OBSERVE_NORMALIZE_DEPTH.set(editor, depth)
+    }
+  }
+}
 
 export const wrapApply = <T extends Editor>(
   editor: T,
@@ -38,6 +116,13 @@ export const queueBatchNormalize = (
   }
 
   BATCH_NORMALIZE.set(editor, pending)
+}
+
+export const getQueuedBatchNormalize = (editor: Editor) =>
+  BATCH_NORMALIZE.get(editor)
+
+export const clearQueuedBatchNormalize = (editor: Editor) => {
+  BATCH_NORMALIZE.delete(editor)
 }
 
 const flushOnChange = (editor: Editor) => {
@@ -82,20 +167,44 @@ export const withBatch = (editor: Editor, fn: () => void) => {
       BATCH_DEPTH.set(editor, depth)
     } else {
       BATCH_DEPTH.delete(editor)
+      flushLiveInsertMoveBatch(editor)
+      flushLiveMergeBatch(editor)
+      flushLiveMoveBatch(editor)
       commitDraftChildren(editor)
 
       const normalizeOptions = BATCH_NORMALIZE.get(editor)
 
-      BATCH_NORMALIZE.delete(editor)
+      clearQueuedBatchNormalize(editor)
 
       if (normalizeOptions) {
-        Editor.normalize(editor, {
-          force: normalizeOptions.force,
-          operation:
+        BATCH_DEPTH.set(editor, 1)
+
+        try {
+          let shouldForce = normalizeOptions.force
+          let operation =
             editor.operations.length === 1
               ? normalizeOptions.operation
-              : undefined,
-        })
+              : undefined
+
+          do {
+            withObservedBatchNormalize(editor, () => {
+              Editor.normalize(editor, {
+                force: shouldForce,
+                operation,
+              })
+            })
+
+            flushLiveInsertMoveBatch(editor)
+            flushLiveMergeBatch(editor)
+            flushLiveMoveBatch(editor)
+            commitDraftChildren(editor)
+
+            shouldForce = false
+            operation = undefined
+          } while ((DIRTY_PATHS.get(editor)?.length ?? 0) > 0)
+        } finally {
+          BATCH_DEPTH.delete(editor)
+        }
       }
 
       if (BATCH_PENDING_FLUSH.get(editor) || editor.operations.length > 0) {

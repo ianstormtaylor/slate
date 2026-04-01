@@ -1,6 +1,10 @@
 import assert from 'assert'
 import { createEditor, Editor, Transforms } from '../src'
-import { getCommittedChildren } from '../src/core/children'
+import {
+  getCommittedChildren,
+  hasDraftChildren,
+  hasInsertNodeDraft,
+} from '../src/core/children'
 import { wrapApply } from '../src/core/batch'
 
 const flushMicrotasks = async () => {
@@ -128,6 +132,40 @@ describe('Editor.withBatch', () => {
     await flushMicrotasks()
 
     assert.equal(onChangeCount, 1)
+  })
+
+  it('returns the current draft children without forcing observation normalize when normalization is suspended', () => {
+    const editor = createEditor()
+
+    editor.children = createParagraphs()
+
+    Editor.withBatch(editor, () => {
+      Editor.withoutNormalizing(editor, () => {
+        editor.apply({
+          type: 'set_node',
+          path: [0],
+          properties: {},
+          newProperties: { id: 'a' },
+        })
+
+        assert.deepEqual(editor.children, [
+          { type: 'paragraph', id: 'a', children: [{ text: 'one' }] },
+          { type: 'paragraph', children: [{ text: 'two' }] },
+        ])
+
+        editor.apply({
+          type: 'set_node',
+          path: [1],
+          properties: {},
+          newProperties: { id: 'b' },
+        })
+      })
+    })
+
+    assert.deepEqual(editor.children, [
+      { type: 'paragraph', id: 'a', children: [{ text: 'one' }] },
+      { type: 'paragraph', id: 'b', children: [{ text: 'two' }] },
+    ])
   })
 })
 
@@ -466,5 +504,285 @@ describe('Transforms.applyBatch', () => {
 
     assert.strictEqual(getCommittedChildren(editor), replacement)
     assert.strictEqual(editor.children, replacement)
+  })
+
+  it('drops pre-assignment pending operations and keeps only post-assignment ops in the current batch', () => {
+    const editor = createEditor()
+
+    editor.children = createParagraphs()
+
+    Editor.withBatch(editor, () => {
+      editor.apply({
+        type: 'set_node',
+        path: [0],
+        properties: {},
+        newProperties: { id: 'stale' },
+      })
+      editor.children = [
+        { type: 'paragraph', children: [{ text: 'replacement' }] },
+      ]
+      editor.apply({
+        type: 'set_node',
+        path: [0],
+        properties: {},
+        newProperties: { id: 'final' },
+      })
+
+      assert.deepEqual(editor.operations, [
+        {
+          type: 'set_node',
+          path: [0],
+          properties: {},
+          newProperties: { id: 'final' },
+        },
+      ])
+    })
+  })
+
+  it('clears pending live move dirty-path batches when editor.children is assigned inside a batch', () => {
+    const editor = createEditor()
+    const replacement = [
+      { type: 'paragraph', children: [{ text: 'replacement' }] },
+    ]
+
+    editor.children = [
+      { type: 'paragraph', children: [{ text: 'one' }] },
+      { type: 'paragraph', children: [{ text: 'two' }] },
+      { type: 'paragraph', children: [{ text: 'three' }] },
+    ]
+
+    Editor.withBatch(editor, () => {
+      editor.apply({
+        type: 'move_node',
+        path: [2],
+        newPath: [0],
+      })
+
+      editor.children = replacement
+    })
+
+    assert.strictEqual(editor.children, replacement)
+    assert.strictEqual(getCommittedChildren(editor), replacement)
+  })
+
+  it('clears pending live insert-move dirty-path batches when editor.children is assigned inside a batch', () => {
+    const editor = createEditor()
+    const replacement = [
+      { type: 'paragraph', children: [{ text: 'replacement' }] },
+    ]
+
+    editor.children = [
+      { type: 'paragraph', children: [{ text: 'zero' }] },
+      { type: 'paragraph', children: [{ text: 'one' }] },
+    ]
+
+    Editor.withBatch(editor, () => {
+      editor.apply({
+        type: 'insert_node',
+        path: [2],
+        node: { type: 'paragraph', children: [{ text: 'two' }] },
+      })
+      editor.apply({
+        type: 'move_node',
+        path: [2],
+        newPath: [0],
+      })
+
+      editor.children = replacement
+    })
+
+    assert.strictEqual(editor.children, replacement)
+    assert.strictEqual(getCommittedChildren(editor), replacement)
+  })
+
+  it('keeps compatible same-parent insert_node writes on the private insert draft until commit', () => {
+    const editor = createEditor()
+
+    editor.children = createParagraphs()
+
+    const committedBefore = getCommittedChildren(editor)
+
+    Editor.withBatch(editor, () => {
+      editor.apply({
+        type: 'insert_node',
+        path: [2],
+        node: { type: 'paragraph', children: [{ text: 'three' }] },
+      })
+
+      assert.equal(hasInsertNodeDraft(editor), true)
+      assert.equal(hasDraftChildren(editor), false)
+      assert.strictEqual(getCommittedChildren(editor), committedBefore)
+      assert.deepEqual(editor.children, [
+        { type: 'paragraph', children: [{ text: 'one' }] },
+        { type: 'paragraph', children: [{ text: 'two' }] },
+        { type: 'paragraph', children: [{ text: 'three' }] },
+      ])
+
+      editor.apply({
+        type: 'insert_node',
+        path: [3],
+        node: { type: 'paragraph', children: [{ text: 'four' }] },
+      })
+
+      assert.equal(hasInsertNodeDraft(editor), true)
+      assert.equal(hasDraftChildren(editor), false)
+      assert.strictEqual(getCommittedChildren(editor), committedBefore)
+      assert.deepEqual(editor.children, [
+        { type: 'paragraph', children: [{ text: 'one' }] },
+        { type: 'paragraph', children: [{ text: 'two' }] },
+        { type: 'paragraph', children: [{ text: 'three' }] },
+        { type: 'paragraph', children: [{ text: 'four' }] },
+      ])
+    })
+
+    assert.equal(hasInsertNodeDraft(editor), false)
+    assert.equal(hasDraftChildren(editor), false)
+    assert.deepEqual(getCommittedChildren(editor), editor.children)
+  })
+
+  it('keeps same-parent non-monotonic insert_node writes on the private insert draft until commit', () => {
+    const editor = createEditor()
+
+    editor.children = createParagraphs()
+
+    const committedBefore = getCommittedChildren(editor)
+
+    Editor.withBatch(editor, () => {
+      editor.apply({
+        type: 'insert_node',
+        path: [0],
+        node: { type: 'paragraph', children: [{ text: 'zero' }] },
+      })
+
+      assert.equal(hasInsertNodeDraft(editor), true)
+      assert.equal(hasDraftChildren(editor), false)
+      assert.strictEqual(getCommittedChildren(editor), committedBefore)
+      assert.deepEqual(editor.children, [
+        { type: 'paragraph', children: [{ text: 'zero' }] },
+        { type: 'paragraph', children: [{ text: 'one' }] },
+        { type: 'paragraph', children: [{ text: 'two' }] },
+      ])
+
+      editor.apply({
+        type: 'insert_node',
+        path: [0],
+        node: { type: 'paragraph', children: [{ text: 'minus one' }] },
+      })
+
+      assert.equal(hasInsertNodeDraft(editor), true)
+      assert.equal(hasDraftChildren(editor), false)
+      assert.strictEqual(getCommittedChildren(editor), committedBefore)
+      assert.deepEqual(editor.children, [
+        { type: 'paragraph', children: [{ text: 'minus one' }] },
+        { type: 'paragraph', children: [{ text: 'zero' }] },
+        { type: 'paragraph', children: [{ text: 'one' }] },
+        { type: 'paragraph', children: [{ text: 'two' }] },
+      ])
+    })
+
+    assert.equal(hasInsertNodeDraft(editor), false)
+    assert.equal(hasDraftChildren(editor), false)
+    assert.deepEqual(getCommittedChildren(editor), editor.children)
+  })
+
+  it('keeps nested same-parent insert_node writes on the private insert draft until commit', () => {
+    const editor = createEditor()
+
+    editor.children = [
+      {
+        type: 'section',
+        children: [
+          { type: 'paragraph', children: [{ text: 'one' }] },
+          { type: 'paragraph', children: [{ text: 'four' }] },
+        ],
+      },
+    ]
+
+    const committedBefore = getCommittedChildren(editor)
+
+    Editor.withBatch(editor, () => {
+      editor.apply({
+        type: 'insert_node',
+        path: [0, 1],
+        node: { type: 'paragraph', children: [{ text: 'two' }] },
+      })
+
+      assert.equal(hasInsertNodeDraft(editor), true)
+      assert.equal(hasDraftChildren(editor), false)
+      assert.strictEqual(getCommittedChildren(editor), committedBefore)
+      assert.deepEqual(editor.children, [
+        {
+          type: 'section',
+          children: [
+            { type: 'paragraph', children: [{ text: 'one' }] },
+            { type: 'paragraph', children: [{ text: 'two' }] },
+            { type: 'paragraph', children: [{ text: 'four' }] },
+          ],
+        },
+      ])
+
+      editor.apply({
+        type: 'insert_node',
+        path: [0, 2],
+        node: { type: 'paragraph', children: [{ text: 'three' }] },
+      })
+
+      assert.equal(hasInsertNodeDraft(editor), true)
+      assert.equal(hasDraftChildren(editor), false)
+      assert.strictEqual(getCommittedChildren(editor), committedBefore)
+      assert.deepEqual(editor.children, [
+        {
+          type: 'section',
+          children: [
+            { type: 'paragraph', children: [{ text: 'one' }] },
+            { type: 'paragraph', children: [{ text: 'two' }] },
+            { type: 'paragraph', children: [{ text: 'three' }] },
+            { type: 'paragraph', children: [{ text: 'four' }] },
+          ],
+        },
+      ])
+    })
+
+    assert.equal(hasInsertNodeDraft(editor), false)
+    assert.equal(hasDraftChildren(editor), false)
+    assert.deepEqual(getCommittedChildren(editor), editor.children)
+  })
+
+  it('promotes incompatible insert_node batches into the generic draft root without early commit', () => {
+    const editor = createEditor()
+
+    editor.children = createParagraphs()
+
+    const committedBefore = getCommittedChildren(editor)
+
+    Editor.withBatch(editor, () => {
+      editor.apply({
+        type: 'insert_node',
+        path: [2],
+        node: { type: 'paragraph', children: [{ text: 'three' }] },
+      })
+
+      assert.equal(hasInsertNodeDraft(editor), true)
+      assert.equal(hasDraftChildren(editor), false)
+
+      editor.apply({
+        type: 'insert_node',
+        path: [0, 1],
+        node: { text: '!' },
+      })
+
+      assert.equal(hasInsertNodeDraft(editor), false)
+      assert.equal(hasDraftChildren(editor), true)
+      assert.strictEqual(getCommittedChildren(editor), committedBefore)
+      assert.deepEqual(editor.children, [
+        { type: 'paragraph', children: [{ text: 'one!' }] },
+        { type: 'paragraph', children: [{ text: 'two' }] },
+        { type: 'paragraph', children: [{ text: 'three' }] },
+      ])
+    })
+
+    assert.equal(hasInsertNodeDraft(editor), false)
+    assert.equal(hasDraftChildren(editor), false)
+    assert.deepEqual(getCommittedChildren(editor), editor.children)
   })
 })

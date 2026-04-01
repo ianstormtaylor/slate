@@ -1,95 +1,104 @@
 import assert from 'assert'
-import { createEditor, Transforms } from 'slate'
+import { createMatrixCases, runBatchReplayCase } from './utils/batch-matrix'
+import { assertBatchMatrixManifest } from './utils/batch-matrix-manifest'
 
-describe('Transforms.applyBatch exact-path set_node', () => {
-  it('applies multiple exact-path updates and records ordinary set_node ops', () => {
-    const editor = createEditor()
+const createFlatChildren = () => [
+  { type: 'paragraph', children: [{ text: 'one' }] },
+  { type: 'paragraph', children: [{ text: 'two' }] },
+  { type: 'paragraph', children: [{ text: 'three' }] },
+]
 
-    editor.children = [
+const createNestedChildren = () => [
+  {
+    type: 'section',
+    children: [
       { type: 'paragraph', children: [{ text: 'one' }] },
       { type: 'paragraph', children: [{ text: 'two' }] },
       { type: 'paragraph', children: [{ text: 'three' }] },
+    ],
+  },
+]
+
+const getPathsForShape = (documentShape, targetShape) => {
+  if (documentShape === 'flat') {
+    return targetShape === 'duplicate'
+      ? { first: [0], second: [0] }
+      : { first: [0], second: [2] }
+  }
+
+  return targetShape === 'duplicate'
+    ? { first: [0, 0], second: [0, 0] }
+    : { first: [0, 0], second: [0, 2] }
+}
+
+const createOps = (documentShape, targetShape) => {
+  const paths = getPathsForShape(documentShape, targetShape)
+
+  if (targetShape === 'duplicate') {
+    return [
+      {
+        type: 'set_node',
+        path: paths.first,
+        properties: {},
+        newProperties: { id: 'blue' },
+      },
+      {
+        type: 'set_node',
+        path: paths.second,
+        properties: {},
+        newProperties: { id: 'final', role: 'final' },
+      },
     ]
+  }
 
-    Transforms.applyBatch(editor, [
-      {
-        type: 'set_node',
-        path: [0],
-        properties: {},
-        newProperties: { id: 'a' },
-      },
-      {
-        type: 'set_node',
-        path: [2],
-        properties: {},
-        newProperties: { id: 'c' },
-      },
-    ])
+  return [
+    {
+      type: 'set_node',
+      path: paths.first,
+      properties: {},
+      newProperties: { id: 'blue' },
+    },
+    {
+      type: 'set_node',
+      path: paths.second,
+      properties: {},
+      newProperties: { id: 'green' },
+    },
+  ]
+}
 
-    assert.deepEqual(editor.children, [
-      { type: 'paragraph', id: 'a', children: [{ text: 'one' }] },
-      { type: 'paragraph', children: [{ text: 'two' }] },
-      { type: 'paragraph', id: 'c', children: [{ text: 'three' }] },
-    ])
+const EXACT_SET_NODE_MATRIX = createMatrixCases({
+  batchEntry: ['applyBatch', 'manualWithBatch'],
+  wrapperMode: ['plain', 'rewrite'],
+  observationMode: ['none', 'readAfterEach', 'persistRef'],
+  documentShape: ['flat', 'nested'],
+  targetShape: ['unique', 'duplicate'],
+})
 
-    assert.deepEqual(editor.operations, [
-      {
-        type: 'set_node',
-        path: [0],
-        properties: {},
-        newProperties: { id: 'a' },
-      },
-      {
-        type: 'set_node',
-        path: [2],
-        properties: {},
-        newProperties: { id: 'c' },
-      },
-    ])
+describe('Transforms.applyBatch exact-path set_node', () => {
+  it('declares the exact-set-node matrix manifest', () => {
+    assertBatchMatrixManifest('exactSetNode', EXACT_SET_NODE_MATRIX.length)
   })
 
-  it('applies duplicate exact paths in order and keeps the original operations', () => {
-    const editor = createEditor()
+  for (const matrixCase of EXACT_SET_NODE_MATRIX) {
+    it(matrixCase.name, () => {
+      const children =
+        matrixCase.documentShape === 'flat'
+          ? createFlatChildren()
+          : createNestedChildren()
+      const paths = getPathsForShape(
+        matrixCase.documentShape,
+        matrixCase.targetShape
+      )
 
-    editor.children = [{ type: 'paragraph', children: [{ text: 'one' }] }]
-
-    Transforms.applyBatch(editor, [
-      {
-        type: 'set_node',
-        path: [0],
-        properties: {},
-        newProperties: { id: 'a' },
-      },
-      {
-        type: 'set_node',
-        path: [0],
-        properties: { id: 'a' },
-        newProperties: { id: 'b', role: 'final' },
-      },
-    ])
-
-    assert.deepEqual(editor.children, [
-      {
-        type: 'paragraph',
-        id: 'b',
-        role: 'final',
-        children: [{ text: 'one' }],
-      },
-    ])
-
-    assert.deepEqual(editor.operations, [
-      {
-        type: 'set_node',
-        path: [0],
-        properties: {},
-        newProperties: { id: 'a' },
-      },
-      {
-        type: 'set_node',
-        path: [0],
-        properties: { id: 'a' },
-        newProperties: { id: 'b', role: 'final' },
-      },
-    ])
-  })
+      runBatchReplayCase({
+        children,
+        ops: createOps(matrixCase.documentShape, matrixCase.targetShape),
+        batchEntry: matrixCase.batchEntry,
+        wrapperMode: matrixCase.wrapperMode,
+        observationMode: matrixCase.observationMode,
+        persistRefPath: paths.first,
+      })
+    })
+  }
 })

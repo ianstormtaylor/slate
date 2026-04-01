@@ -90,8 +90,8 @@ import {
  * Create a new Slate `Editor` object.
  */
 export const createEditor = (): Editor => {
-  const editor = {
-    children: [] as any,
+  const editor: Editor = {
+    children: [],
     operations: [],
     selection: null,
     marks: null,
@@ -185,7 +185,7 @@ export const createEditor = (): Editor => {
     wrapNodes: (...args) => wrapNodes(editor, ...args),
     shouldMergeNodesRemovePrevNode: (...args) =>
       shouldMergeNodesRemovePrevNode(editor, ...args),
-  } as Editor
+  }
 
   defineChildrenAccessor(editor)
   editor.children = []

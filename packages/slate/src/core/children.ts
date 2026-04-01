@@ -1,30 +1,143 @@
 import { Descendant } from '../interfaces/node'
-import { BaseSetNodeOperation } from '../interfaces/operation'
+import {
+  BaseInsertNodeOperation,
+  BaseInsertTextOperation,
+  BaseRemoveTextOperation,
+  BaseSetNodeOperation,
+} from '../interfaces/operation'
 import { Editor } from '../interfaces/editor'
+import { Path } from '../interfaces/path'
+import {
+  clearQueuedBatchNormalize,
+  getQueuedBatchNormalize,
+  isObservingBatchNormalize,
+  isReadingBatchInternals,
+  isWritingBatchInternals,
+  withObservedBatchNormalize,
+} from './batch'
+import {
+  clearLiveInsertMoveBatch,
+  clearLiveMergeBatch,
+  clearLiveMoveBatch,
+  flushLiveInsertMoveBatch,
+  flushLiveMergeBatch,
+  flushLiveMoveBatch,
+  hasLiveInsertMoveBatch,
+  hasLiveMergeBatch,
+  hasLiveMoveBatch,
+} from './live-move-dirty-paths'
 import {
   BATCH_DRAFT_CHILDREN,
   BATCH_DEPTH,
+  BATCH_INSERT_NODE_OPS,
+  BATCH_INSERT_NODE_PARENT_PATH,
+  BATCH_INSERT_NODE_SNAPSHOT,
+  BATCH_INSERT_NODE_SNAPSHOT_OPS,
   BATCH_EXACT_SET_NODE_OPS,
   BATCH_EXACT_SET_NODE_SNAPSHOT,
   BATCH_EXACT_SET_NODE_SNAPSHOT_OPS,
+  BATCH_TEXT_OPS,
+  BATCH_TEXT_SNAPSHOT,
+  BATCH_TEXT_SNAPSHOT_OPS,
   CHILDREN,
+  DIRTY_PATH_KEYS,
+  DIRTY_PATHS,
 } from '../utils/weak-maps'
-import { applySetNodeBatchToChildren } from './exact-set-node-children'
+import {
+  applySetNodeBatchToChildren,
+  validateExactSetNodeOperation,
+} from './exact-set-node-children'
+import { applyInsertNodeBatchToChildren } from './same-parent-insert-node-children'
+import { applyTextBatchToChildren } from './text-batch-children'
 
-export const getChildren = (editor: Editor): Descendant[] =>
-  hasExactSetNodeDraft(editor)
+type TextBatchOperation = BaseInsertTextOperation | BaseRemoveTextOperation
+
+const getCurrentChildren = (editor: Editor): Descendant[] =>
+  hasInsertNodeDraft(editor)
+    ? materializeInsertNodeDraft(editor)
+    : hasTextDraft(editor)
+    ? materializeTextDraft(editor)
+    : hasExactSetNodeDraft(editor)
     ? materializeExactSetNodeDraft(editor)
     : hasDraftChildren(editor)
     ? getDraftChildren(editor)
     : getCommittedChildren(editor)
 
+const getObservedChildren = (editor: Editor): Descendant[] => {
+  const children = getCurrentChildren(editor)
+  const normalizeOptions = getQueuedBatchNormalize(editor)
+
+  if (
+    !isBatching(editor) ||
+    !normalizeOptions ||
+    !Editor.isNormalizing(editor)
+  ) {
+    return children
+  }
+
+  if (hasLiveInsertMoveBatch(editor)) {
+    flushLiveInsertMoveBatch(editor)
+  }
+
+  if (hasLiveMergeBatch(editor)) {
+    flushLiveMergeBatch(editor)
+  }
+
+  if (hasLiveMoveBatch(editor)) {
+    flushLiveMoveBatch(editor)
+  }
+
+  // A batch read is an observation barrier. Normalize the live draft in place
+  // so later ops continue from replay-equivalent structure, and so internal
+  // normalize ops still flow through editor.apply wrappers.
+  let shouldForce = normalizeOptions.force
+  let operation = normalizeOptions.operation
+
+  do {
+    withObservedBatchNormalize(editor, () => {
+      Editor.normalize(editor, {
+        force: shouldForce,
+        operation,
+      })
+    })
+
+    flushLiveInsertMoveBatch(editor)
+    flushLiveMergeBatch(editor)
+    flushLiveMoveBatch(editor)
+
+    shouldForce = false
+    operation = undefined
+  } while ((DIRTY_PATHS.get(editor)?.length ?? 0) > 0)
+
+  clearQueuedBatchNormalize(editor)
+
+  return getCurrentChildren(editor)
+}
+
+export const getChildren = (editor: Editor): Descendant[] =>
+  isReadingBatchInternals(editor) || isObservingBatchNormalize(editor)
+    ? getCurrentChildren(editor)
+    : getObservedChildren(editor)
+
 export const getCommittedChildren = (editor: Editor): Descendant[] =>
   CHILDREN.get(editor) ?? []
 
 export const setChildren = (editor: Editor, children: Descendant[]) => {
+  clearInsertNodeDraft(editor)
+  clearTextDraft(editor)
   clearExactSetNodeDraft(editor)
+  clearLiveInsertMoveBatch(editor)
+  clearLiveMergeBatch(editor)
+  clearLiveMoveBatch(editor)
 
   if (isBatching(editor)) {
+    if (!isWritingBatchInternals(editor)) {
+      clearQueuedBatchNormalize(editor)
+      DIRTY_PATHS.delete(editor)
+      DIRTY_PATH_KEYS.delete(editor)
+      editor.operations = []
+    }
+
     BATCH_DRAFT_CHILDREN.set(editor, children)
     return
   }
@@ -40,12 +153,163 @@ export const getDraftChildren = (editor: Editor): Descendant[] =>
   BATCH_DRAFT_CHILDREN.get(editor) ?? []
 
 export const setDraftChildren = (editor: Editor, children: Descendant[]) => {
+  clearInsertNodeDraft(editor)
+  clearTextDraft(editor)
   clearExactSetNodeDraft(editor)
   BATCH_DRAFT_CHILDREN.set(editor, children)
 }
 
 export const clearDraftChildren = (editor: Editor) => {
   BATCH_DRAFT_CHILDREN.delete(editor)
+}
+
+export const hasInsertNodeDraft = (editor: Editor) =>
+  (BATCH_INSERT_NODE_OPS.get(editor)?.length ?? 0) > 0
+
+export const canStageInsertNodeOperation = (
+  editor: Editor,
+  op: BaseInsertNodeOperation
+) => {
+  const ops = BATCH_INSERT_NODE_OPS.get(editor)
+
+  if (!ops) {
+    return true
+  }
+
+  const parentPath =
+    BATCH_INSERT_NODE_PARENT_PATH.get(editor) ?? Path.parent(ops[0].path)
+
+  return Path.equals(Path.parent(op.path), parentPath)
+}
+
+export const stageInsertNodeOperation = (
+  editor: Editor,
+  op: BaseInsertNodeOperation
+) => {
+  const ops = BATCH_INSERT_NODE_OPS.get(editor)
+
+  if (ops) {
+    ops.push(op)
+    return
+  }
+
+  BATCH_INSERT_NODE_OPS.set(editor, [op])
+  BATCH_INSERT_NODE_PARENT_PATH.set(editor, Path.parent(op.path))
+}
+
+export const getInsertNodeDraftOps = (editor: Editor) => [
+  ...(BATCH_INSERT_NODE_OPS.get(editor) ?? []),
+]
+
+export const materializeInsertNodeDraft = (editor: Editor): Descendant[] => {
+  const ops = BATCH_INSERT_NODE_OPS.get(editor) ?? []
+  const snapshot = BATCH_INSERT_NODE_SNAPSHOT.get(editor)
+  const snapshotOps = BATCH_INSERT_NODE_SNAPSHOT_OPS.get(editor) ?? 0
+
+  if (ops.length === 0) {
+    return getCommittedChildren(editor)
+  }
+
+  if (snapshot && snapshotOps === ops.length) {
+    return snapshot
+  }
+
+  const baseChildren = snapshot ?? getCommittedChildren(editor)
+  const nextChildren = applyInsertNodeBatchToChildren(
+    baseChildren,
+    ops.slice(snapshotOps)
+  )
+
+  BATCH_INSERT_NODE_SNAPSHOT.set(editor, nextChildren)
+  BATCH_INSERT_NODE_SNAPSHOT_OPS.set(editor, ops.length)
+
+  return nextChildren
+}
+
+export const promoteInsertNodeDraftToDraftChildren = (editor: Editor) => {
+  if (!hasInsertNodeDraft(editor)) {
+    return
+  }
+
+  setDraftChildren(editor, materializeInsertNodeDraft(editor))
+}
+
+export const commitInsertNodeDraft = (editor: Editor) => {
+  if (!hasInsertNodeDraft(editor)) {
+    return
+  }
+
+  CHILDREN.set(editor, materializeInsertNodeDraft(editor))
+  clearInsertNodeDraft(editor)
+}
+
+export const clearInsertNodeDraft = (editor: Editor) => {
+  BATCH_INSERT_NODE_OPS.delete(editor)
+  BATCH_INSERT_NODE_PARENT_PATH.delete(editor)
+  BATCH_INSERT_NODE_SNAPSHOT.delete(editor)
+  BATCH_INSERT_NODE_SNAPSHOT_OPS.delete(editor)
+}
+
+export const hasTextDraft = (editor: Editor) =>
+  (BATCH_TEXT_OPS.get(editor)?.length ?? 0) > 0
+
+export const stageTextOperation = (editor: Editor, op: TextBatchOperation) => {
+  const ops = BATCH_TEXT_OPS.get(editor)
+
+  if (ops) {
+    ops.push(op)
+    return
+  }
+
+  BATCH_TEXT_OPS.set(editor, [op])
+}
+
+export const materializeTextDraft = (editor: Editor): Descendant[] => {
+  const ops = BATCH_TEXT_OPS.get(editor) ?? []
+  const snapshot = BATCH_TEXT_SNAPSHOT.get(editor)
+  const snapshotOps = BATCH_TEXT_SNAPSHOT_OPS.get(editor) ?? 0
+
+  if (ops.length === 0) {
+    return getCommittedChildren(editor)
+  }
+
+  if (snapshot && snapshotOps === ops.length) {
+    return snapshot
+  }
+
+  const baseChildren = snapshot ?? getCommittedChildren(editor)
+  const nextChildren = applyTextBatchToChildren(
+    baseChildren,
+    ops.slice(snapshotOps)
+  )
+
+  BATCH_TEXT_SNAPSHOT.set(editor, nextChildren)
+  BATCH_TEXT_SNAPSHOT_OPS.set(editor, ops.length)
+
+  return nextChildren
+}
+
+export const promoteTextDraftToDraftChildren = (editor: Editor) => {
+  if (!hasTextDraft(editor)) {
+    return
+  }
+
+  setDraftChildren(editor, materializeTextDraft(editor))
+}
+
+export const commitTextDraft = (editor: Editor) => {
+  if (!hasTextDraft(editor)) {
+    return
+  }
+
+  CHILDREN.set(editor, materializeTextDraft(editor))
+  clearTextDraft(editor)
+}
+
+export const clearTextDraft = (editor: Editor) => {
+  BATCH_TEXT_OPS.delete(editor)
+  BATCH_TEXT_SNAPSHOT.delete(editor)
+  BATCH_TEXT_SNAPSHOT_OPS.delete(editor)
 }
 
 export const hasExactSetNodeDraft = (editor: Editor) =>
@@ -55,6 +319,8 @@ export const stageExactSetNodeOperation = (
   editor: Editor,
   op: BaseSetNodeOperation
 ) => {
+  validateExactSetNodeOperation(op)
+
   const ops = BATCH_EXACT_SET_NODE_OPS.get(editor)
 
   if (ops) {
@@ -111,6 +377,16 @@ export const commitDraftChildren = (editor: Editor) => {
   if (hasDraftChildren(editor)) {
     CHILDREN.set(editor, getDraftChildren(editor))
     clearDraftChildren(editor)
+    return
+  }
+
+  if (hasInsertNodeDraft(editor)) {
+    commitInsertNodeDraft(editor)
+    return
+  }
+
+  if (hasTextDraft(editor)) {
+    commitTextDraft(editor)
     return
   }
 

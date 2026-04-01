@@ -12,7 +12,10 @@ export const getDirtyPaths: WithEditorFirstArg<Editor['getDirtyPaths']> = (
 ) => {
   switch (op.type) {
     case 'insert_text':
-    case 'remove_text':
+    case 'remove_text': {
+      return [Path.parent(op.path)]
+    }
+
     case 'set_node': {
       const { path } = op
       return Path.levels(path)
