@@ -5,4 +5,4 @@
 'slate-react': patch
 ---
 
-Add `Editor.withBatch` and `Transforms.applyBatch`, route batched operations through the shared apply engine, and keep DOM, history, and React integrations aligned with the new batch semantics.
+Add `Editor.withBatch` and `Transforms.applyBatch` for opt-in batched operations. Defers normalization and `onChange` flush until a batch completes while keeping `editor.apply` as the per-operation plugin seam.

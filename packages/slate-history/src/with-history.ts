@@ -23,6 +23,22 @@ export const withHistory = <T extends Editor>(editor: T) => {
   const e = editor as T & HistoryEditor
   e.history = { undos: [], redos: [] }
 
+  const restoreSelection = (selection: T['selection']) => {
+    if (selection) {
+      if (e.selection) {
+        Transforms.setSelection(e, selection)
+      } else {
+        Transforms.select(e, selection)
+      }
+
+      return
+    }
+
+    if (e.selection) {
+      Transforms.deselect(e)
+    }
+  }
+
   const trimPendingSavedHistoryOperations = (pendingOps: Operation[]) => {
     const savedOps = pendingOps.filter(op => shouldSave(op, undefined))
 
@@ -68,15 +84,15 @@ export const withHistory = <T extends Editor>(editor: T) => {
     if (redos.length > 0) {
       const batch = redos[redos.length - 1]
 
-      if (batch.selectionBefore) {
-        Transforms.setSelection(e, batch.selectionBefore)
-      }
-
       HistoryEditor.withoutSaving(e, () => {
         Editor.withoutNormalizing(e, () => {
+          restoreSelection(batch.selectionBefore)
+
           for (const op of batch.operations) {
             e.apply(op)
           }
+
+          restoreSelection(batch.selectionAfter)
         })
       })
 
@@ -99,9 +115,8 @@ export const withHistory = <T extends Editor>(editor: T) => {
           for (const op of inverseOps) {
             e.apply(op)
           }
-          if (batch.selectionBefore) {
-            Transforms.setSelection(e, batch.selectionBefore)
-          }
+
+          restoreSelection(batch.selectionBefore)
         })
       })
 
@@ -118,6 +133,7 @@ export const withHistory = <T extends Editor>(editor: T) => {
       lastBatch && lastBatch.operations[lastBatch.operations.length - 1]
     let save = HistoryEditor.isSaving(e)
     let merge = HistoryEditor.isMerging(e)
+    let trackedBatch = null
 
     if (save == null) {
       save = shouldSave(op, lastOp)
@@ -141,12 +157,15 @@ export const withHistory = <T extends Editor>(editor: T) => {
 
       if (lastBatch && merge) {
         lastBatch.operations.push(op)
+        trackedBatch = lastBatch
       } else {
         const batch = {
           operations: [op],
           selectionBefore: e.selection,
+          selectionAfter: e.selection,
         }
         e.writeHistory('undos', batch)
+        trackedBatch = batch
       }
 
       while (undos.length > 100) {
@@ -157,6 +176,18 @@ export const withHistory = <T extends Editor>(editor: T) => {
     }
 
     apply(op)
+
+    if (trackedBatch) {
+      trackedBatch.selectionAfter = e.selection
+    } else if (
+      HistoryEditor.isSaving(e) !== false &&
+      op.type === 'set_selection' &&
+      op.newProperties != null &&
+      lastBatch
+    ) {
+      lastBatch.selectionAfter = e.selection
+      history.redos = []
+    }
   })
 
   const childrenDescriptor = Object.getOwnPropertyDescriptor(e, 'children')
@@ -174,7 +205,10 @@ export const withHistory = <T extends Editor>(editor: T) => {
 
         setChildren.call(e, children)
 
-        if (isWritingBatchInternals(e)) {
+        if (
+          isWritingBatchInternals(e) ||
+          HistoryEditor.isSaving(e) === false
+        ) {
           return
         }
 

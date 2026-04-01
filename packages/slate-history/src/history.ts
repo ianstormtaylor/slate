@@ -3,6 +3,7 @@ import { Operation, Range, isObject } from 'slate'
 interface Batch {
   operations: Operation[]
   selectionBefore: Range | null
+  selectionAfter: Range | null
 }
 
 /**
