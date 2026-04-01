@@ -176,11 +176,7 @@ export const withHistory = <T extends Editor>(editor: T) => {
       set(children) {
         setChildren.call(e, children)
 
-        if (
-          applyDepth > 0 ||
-          isWritingBatchInternals(e) ||
-          HistoryEditor.isSaving(e) === false
-        ) {
+        if (applyDepth > 0 || isWritingBatchInternals(e)) {
           return
         }
 

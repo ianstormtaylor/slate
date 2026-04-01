@@ -102,6 +102,29 @@ describe('slate-history helper cleanup', () => {
     assert.deepEqual(editor.children, replacement)
   })
 
+  it('clears stale undo history after direct children replacement inside withoutSaving', async () => {
+    const editor = createHistoryEditor()
+    const replacement = [
+      { type: 'paragraph', children: [{ text: 'replacement' }] },
+    ]
+
+    Transforms.insertText(editor, '!')
+    await flushMicrotasks()
+
+    assert.equal(editor.history.undos.length, 1)
+
+    HistoryEditor.withoutSaving(editor, () => {
+      editor.children = replacement
+    })
+
+    assert.equal(editor.history.undos.length, 0)
+    assert.equal(editor.history.redos.length, 0)
+
+    editor.undo()
+
+    assert.deepEqual(editor.children, replacement)
+  })
+
   it('restores merge state when withoutMerging throws', () => {
     const editor = createHistoryEditor()
 
