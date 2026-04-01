@@ -60,6 +60,27 @@ describe('slate-history helper cleanup', () => {
     assert.equal(editor.history.undos.length, 1)
   })
 
+  it('consumes the split flag across nested withNewBatch calls', async () => {
+    const editor = createHistoryEditor()
+
+    Transforms.insertText(editor, '!')
+    await flushMicrotasks()
+
+    HistoryEditor.withNewBatch(editor, () => {
+      HistoryEditor.withNewBatch(editor, () => {
+        Transforms.insertText(editor, 'x')
+      })
+
+      Transforms.insertText(editor, 'y')
+    })
+
+    assert.equal(editor.history.undos.length, 2)
+    assert.deepEqual(
+      editor.history.undos[1].operations.map(op => op.text),
+      ['x', 'y']
+    )
+  })
+
   it('restores merge state when withoutMerging throws', () => {
     const editor = createHistoryEditor()
 

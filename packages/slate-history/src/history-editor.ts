@@ -103,8 +103,9 @@ export const HistoryEditor = {
       fn()
     } finally {
       MERGING.set(editor, prev)
+      const splittingOnce = HistoryEditor.isSplittingOnce(editor)
 
-      if (prevSplittingOnce === undefined) {
+      if (!splittingOnce || prevSplittingOnce === undefined) {
         SPLITTING_ONCE.delete(editor)
       } else {
         SPLITTING_ONCE.set(editor, prevSplittingOnce)

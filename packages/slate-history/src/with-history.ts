@@ -22,6 +22,7 @@ import { HistoryEditor } from './history-editor'
 export const withHistory = <T extends Editor>(editor: T) => {
   const e = editor as T & HistoryEditor
   e.history = { undos: [], redos: [] }
+  let applyDepth = 0
 
   const restoreSelection = (selection: T['selection']) => {
     if (selection) {
@@ -39,42 +40,14 @@ export const withHistory = <T extends Editor>(editor: T) => {
     }
   }
 
-  const trimPendingSavedHistoryOperations = (pendingOps: Operation[]) => {
+  const resetHistoryAfterChildrenAssignment = (pendingOps: Operation[]) => {
     const savedOps = pendingOps.filter(op => shouldSave(op, undefined))
 
-    if (savedOps.length === 0) {
-      e.history.redos = []
-      return
+    if (savedOps.length > 0) {
+      e.history.undos = []
     }
 
-    const remaining = [...savedOps]
-
-    while (remaining.length > 0 && e.history.undos.length > 0) {
-      const lastBatch = e.history.undos[e.history.undos.length - 1]
-
-      while (remaining.length > 0 && lastBatch.operations.length > 0) {
-        const pendingOp = remaining[remaining.length - 1]
-        const batchOp = lastBatch.operations[lastBatch.operations.length - 1]
-
-        if (batchOp !== pendingOp) {
-          return
-        }
-
-        lastBatch.operations.pop()
-        remaining.pop()
-      }
-
-      if (lastBatch.operations.length === 0) {
-        e.history.undos.pop()
-        continue
-      }
-
-      break
-    }
-
-    if (remaining.length === 0) {
-      e.history.redos = []
-    }
+    e.history.redos = []
   }
 
   e.redo = () => {
@@ -175,7 +148,13 @@ export const withHistory = <T extends Editor>(editor: T) => {
       history.redos = []
     }
 
-    apply(op)
+    applyDepth++
+
+    try {
+      apply(op)
+    } finally {
+      applyDepth--
+    }
 
     if (trackedBatch) {
       trackedBatch.selectionAfter = e.selection
@@ -205,13 +184,14 @@ export const withHistory = <T extends Editor>(editor: T) => {
         setChildren.call(e, children)
 
         if (
+          applyDepth > 0 ||
           isWritingBatchInternals(e) ||
           HistoryEditor.isSaving(e) === false
         ) {
           return
         }
 
-        trimPendingSavedHistoryOperations(pendingOps)
+        resetHistoryAfterChildrenAssignment(pendingOps)
       },
     })
   }
