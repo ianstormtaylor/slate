@@ -57,10 +57,90 @@ export const isSameParentMoveBatch = (
   )
 }
 
+const getSingleSameParentMoveFinalPath = (op: BaseMoveNodeOperation) => {
+  if (op.path.length === 0 || op.newPath.length === 0) {
+    return null
+  }
+
+  const nextPath = Path.transform(op.path, op)
+
+  if (!nextPath) {
+    throw new Error(
+      `Cannot apply a "move_node" operation at path [${op.path}] because the transformed destination is invalid.`
+    )
+  }
+
+  return nextPath
+}
+
+const isSingleSameParentMoveBatch = (
+  ops: BaseMoveNodeOperation[]
+): ops is [BaseMoveNodeOperation] => ops.length === 1
+
+const getSingleSameParentMoveDirtyPaths = (ops: [BaseMoveNodeOperation]) => {
+  const [op] = ops
+  const parentPath = Path.parent(op.path)
+  const nextPath = getSingleSameParentMoveFinalPath(op)
+
+  if (!nextPath) {
+    throw new Error(
+      `Cannot apply a "move_node" operation at path [${op.path}] because the transformed destination is invalid.`
+    )
+  }
+
+  return [...Path.levels(parentPath), nextPath]
+}
+
+const createSingleSameParentMoveDirtyPathTransform = (
+  ops: [BaseMoveNodeOperation]
+) => {
+  const [op] = ops
+  const parentPath = Path.parent(op.path)
+  const sourceIndex = op.path[parentPath.length]
+  const targetPath = getSingleSameParentMoveFinalPath(op)
+
+  if (!targetPath) {
+    return (path: Path) => transformPathThroughOps(path, ops)
+  }
+
+  const targetIndex = targetPath[parentPath.length]
+
+  return (path: Path) => {
+    if (path.length <= parentPath.length) {
+      return path
+    }
+
+    if (!Path.equals(path.slice(0, parentPath.length), parentPath)) {
+      return transformPathThroughOps(path, ops)
+    }
+
+    const index = path[parentPath.length]
+    let nextIndex = index
+
+    if (index === sourceIndex) {
+      nextIndex = targetIndex
+    } else if (targetIndex < sourceIndex) {
+      if (index >= targetIndex && index < sourceIndex) {
+        nextIndex = index + 1
+      }
+    } else if (targetIndex > sourceIndex) {
+      if (index > sourceIndex && index <= targetIndex) {
+        nextIndex = index - 1
+      }
+    }
+
+    return parentPath.concat(nextIndex, ...path.slice(parentPath.length + 1))
+  }
+}
+
 export const getSameParentMoveDirtyPaths = (
   editor: Editor,
   ops: BaseMoveNodeOperation[]
 ) => {
+  if (isSingleSameParentMoveBatch(ops)) {
+    return getSingleSameParentMoveDirtyPaths(ops)
+  }
+
   const parentPath = Path.parent(ops[0].path)
   const parent = parentPath.length === 0 ? editor : Node.get(editor, parentPath)
 
@@ -113,6 +193,10 @@ export const createSameParentMoveDirtyPathTransform = (
   editor: Editor,
   ops: BaseMoveNodeOperation[]
 ) => {
+  if (isSingleSameParentMoveBatch(ops)) {
+    return createSingleSameParentMoveDirtyPathTransform(ops)
+  }
+
   const parentPath = Path.parent(ops[0].path)
   const parent = parentPath.length === 0 ? editor : Node.get(editor, parentPath)
 

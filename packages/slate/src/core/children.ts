@@ -297,6 +297,22 @@ export const promoteTextDraftToDraftChildren = (editor: Editor) => {
   setDraftChildren(editor, materializeTextDraft(editor))
 }
 
+export const applyTextOperationToDraftChildren = (
+  editor: Editor,
+  op: TextBatchOperation
+) => {
+  if (!hasDraftChildren(editor)) {
+    return
+  }
+
+  const children = getDraftChildren(editor)
+  const nextChildren = applyTextBatchToChildren(children, [op])
+
+  if (nextChildren !== children) {
+    setDraftChildren(editor, nextChildren)
+  }
+}
+
 export const commitTextDraft = (editor: Editor) => {
   if (!hasTextDraft(editor)) {
     return

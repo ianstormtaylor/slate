@@ -19,6 +19,62 @@ const hasSingleChildNest = (editor: Editor, node: Node): boolean => {
   )
 }
 
+const mergePreviousSiblingByPath = (
+  editor: Editor,
+  path: Path,
+  voids: boolean
+) => {
+  if (
+    path.length === 0 ||
+    !Path.hasPrevious(path) ||
+    !Editor.hasPath(editor, path)
+  ) {
+    return false
+  }
+
+  const prevPath = Path.previous(path)
+
+  if (!Editor.hasPath(editor, prevPath)) {
+    return false
+  }
+
+  const current = Editor.node(editor, path)
+  const prev = Editor.node(editor, prevPath)
+  const [node] = current
+  const [prevNode] = prev
+  let properties
+  let position
+
+  if (Node.isText(node) && Node.isText(prevNode)) {
+    const { text, ...rest } = node
+    position = prevNode.text.length
+    properties = rest as Partial<Text>
+  } else if (Node.isElement(node) && Node.isElement(prevNode)) {
+    const { children, ...rest } = node
+    position = prevNode.children.length
+    properties = rest as Partial<Element>
+  } else {
+    throw new Error(
+      `Cannot merge the node at path [${path}] with the previous sibling because it is not the same kind: ${Scrubber.stringify(
+        node
+      )} ${Scrubber.stringify(prevNode)}`
+    )
+  }
+
+  if (Editor.shouldMergeNodesRemovePrevNode(editor, prev, current)) {
+    Transforms.removeNodes(editor, { at: prevPath, voids })
+  } else {
+    editor.apply({
+      type: 'merge_node',
+      path,
+      position,
+      properties,
+    })
+  }
+
+  return true
+}
+
 export const mergeNodes: NodeTransforms['mergeNodes'] = (
   editor,
   options = {}
@@ -61,6 +117,14 @@ export const mergeNodes: NodeTransforms['mergeNodes'] = (
           Transforms.select(editor, at)
         }
       }
+    }
+
+    if (
+      usesDefaultSiblingMatch &&
+      pathAt &&
+      mergePreviousSiblingByPath(editor, pathAt, voids)
+    ) {
+      return
     }
 
     const [current] = Editor.nodes(editor, { at, match, voids, mode })
