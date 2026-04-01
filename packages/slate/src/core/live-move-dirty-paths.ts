@@ -2,6 +2,7 @@ import {
   BaseInsertNodeOperation,
   BaseMergeNodeOperation,
   BaseMoveNodeOperation,
+  BaseSplitNodeOperation,
   Editor,
   Node,
   Operation,
@@ -12,6 +13,7 @@ import {
   BATCH_LIVE_INSERT_MOVE_OPS,
   BATCH_LIVE_MERGE_OPS,
   BATCH_LIVE_MOVE_OPS,
+  BATCH_LIVE_SPLIT_OPS,
   DIRTY_PATH_KEYS,
   DIRTY_PATHS,
 } from '../utils/weak-maps'
@@ -429,6 +431,123 @@ export const getSameParentInsertMoveDirtyPathState = (
   return { newDirtyPaths, transformDirtyPath }
 }
 
+export const createIndependentParentStructuralDirtyPathTransform = (
+  ops: (BaseMergeNodeOperation | BaseSplitNodeOperation)[]
+) => {
+  const opsByParentPathKey = new Map(
+    ops.map(op => [Path.parent(op.path).join(','), op] as const)
+  )
+
+  return (path: Path) => {
+    for (let length = path.length; length >= 0; length--) {
+      const parentOp = opsByParentPathKey.get(path.slice(0, length).join(','))
+
+      if (!parentOp) {
+        continue
+      }
+
+      if (length === path.length) {
+        return path
+      }
+
+      return Path.transform(path, parentOp)
+    }
+
+    return path
+  }
+}
+
+const isIndependentParentStructuralBatch = (
+  ops: (BaseMergeNodeOperation | BaseSplitNodeOperation)[]
+) => {
+  const parentPathKeys = new Set<string>()
+
+  for (const op of ops) {
+    const key = Path.parent(op.path).join(',')
+
+    if (parentPathKeys.has(key)) {
+      return false
+    }
+
+    parentPathKeys.add(key)
+  }
+
+  return true
+}
+
+export const isIndependentParentSplitBatch = (
+  ops: Operation[]
+): ops is BaseSplitNodeOperation[] =>
+  ops.length > 0 &&
+  ops.every(op => op.type === 'split_node') &&
+  isIndependentParentStructuralBatch(ops as BaseSplitNodeOperation[])
+
+export const isIndependentParentMergeBatch = (
+  ops: Operation[]
+): ops is BaseMergeNodeOperation[] =>
+  ops.length > 0 &&
+  ops.every(op => op.type === 'merge_node') &&
+  isIndependentParentStructuralBatch(ops as BaseMergeNodeOperation[])
+
+export const getIndependentParentMergeDirtyPathState = (
+  ops: BaseMergeNodeOperation[]
+) => {
+  const newDirtyPaths: Path[] = []
+  const newDirtyPathKeys = new Set<string>()
+
+  const add = (path: Path) => {
+    const key = path.join(',')
+
+    if (!newDirtyPathKeys.has(key)) {
+      newDirtyPathKeys.add(key)
+      newDirtyPaths.push(path)
+    }
+  }
+
+  for (const op of ops) {
+    for (const path of Path.ancestors(op.path)) {
+      add(path)
+    }
+
+    add(Path.previous(op.path))
+  }
+
+  return {
+    newDirtyPaths,
+    transformDirtyPath:
+      createIndependentParentStructuralDirtyPathTransform(ops),
+  }
+}
+
+export const getIndependentParentSplitDirtyPathState = (
+  editor: Editor,
+  ops: BaseSplitNodeOperation[]
+) => {
+  const newDirtyPaths: Path[] = []
+  const newDirtyPathKeys = new Set<string>()
+
+  const add = (path: Path) => {
+    const key = path.join(',')
+
+    if (!newDirtyPathKeys.has(key)) {
+      newDirtyPathKeys.add(key)
+      newDirtyPaths.push(path)
+    }
+  }
+
+  for (const op of ops) {
+    for (const path of editor.getDirtyPaths(op)) {
+      add(path)
+    }
+  }
+
+  return {
+    newDirtyPaths,
+    transformDirtyPath:
+      createIndependentParentStructuralDirtyPathTransform(ops),
+  }
+}
+
 const calculateDirtyPathsAfterBatch = (editor: Editor, ops: Operation[]) => {
   let dirtyPaths = [...(DIRTY_PATHS.get(editor) ?? [])]
   let dirtyPathKeys = new Set(DIRTY_PATH_KEYS.get(editor) ?? [])
@@ -562,6 +681,9 @@ export const clearLiveMoveBatch = (editor: Editor) => {
 export const hasLiveMergeBatch = (editor: Editor) =>
   (BATCH_LIVE_MERGE_OPS.get(editor)?.length ?? 0) > 0
 
+export const hasLiveSplitBatch = (editor: Editor) =>
+  (BATCH_LIVE_SPLIT_OPS.get(editor)?.length ?? 0) > 0
+
 export const stageLiveMergeBatchOperation = (
   editor: Editor,
   op: BaseMergeNodeOperation
@@ -583,17 +705,71 @@ export const flushLiveMergeBatch = (editor: Editor) => {
     return
   }
 
+  BATCH_LIVE_MERGE_OPS.delete(editor)
+
+  if (isIndependentParentMergeBatch(ops)) {
+    const { newDirtyPaths, transformDirtyPath } =
+      getIndependentParentMergeDirtyPathState(ops)
+
+    updateDirtyPaths(editor, newDirtyPaths, transformDirtyPath)
+    return
+  }
+
+  const mergeOps = ops as BaseMergeNodeOperation[]
+
   updateDirtyPaths(
     editor,
-    ops.flatMap(op => editor.getDirtyPaths(op)),
-    path => transformPathThroughOps(path, ops)
+    mergeOps.flatMap(op => editor.getDirtyPaths(op)),
+    createIndependentParentStructuralDirtyPathTransform(mergeOps)
   )
-
-  BATCH_LIVE_MERGE_OPS.delete(editor)
 }
 
 export const clearLiveMergeBatch = (editor: Editor) => {
   BATCH_LIVE_MERGE_OPS.delete(editor)
+}
+
+export const stageLiveSplitBatchOperation = (
+  editor: Editor,
+  op: BaseSplitNodeOperation
+) => {
+  const ops = BATCH_LIVE_SPLIT_OPS.get(editor)
+
+  if (ops) {
+    ops.push(op)
+    return
+  }
+
+  BATCH_LIVE_SPLIT_OPS.set(editor, [op])
+}
+
+export const flushLiveSplitBatch = (editor: Editor) => {
+  const ops = BATCH_LIVE_SPLIT_OPS.get(editor)
+
+  if (!ops || ops.length === 0) {
+    return
+  }
+
+  BATCH_LIVE_SPLIT_OPS.delete(editor)
+
+  if (isIndependentParentStructuralBatch(ops)) {
+    const { newDirtyPaths, transformDirtyPath } =
+      getIndependentParentSplitDirtyPathState(editor, ops)
+
+    updateDirtyPaths(editor, newDirtyPaths, transformDirtyPath)
+    return
+  }
+
+  const { dirtyPathKeys, dirtyPaths } = calculateDirtyPathsAfterBatch(
+    editor,
+    ops
+  )
+
+  DIRTY_PATHS.set(editor, dirtyPaths)
+  DIRTY_PATH_KEYS.set(editor, dirtyPathKeys)
+}
+
+export const clearLiveSplitBatch = (editor: Editor) => {
+  BATCH_LIVE_SPLIT_OPS.delete(editor)
 }
 
 export const flushLiveMoveBatch = (editor: Editor) => {

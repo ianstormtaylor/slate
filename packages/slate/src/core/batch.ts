@@ -4,6 +4,7 @@ import {
   flushLiveInsertMoveBatch,
   flushLiveMergeBatch,
   flushLiveMoveBatch,
+  flushLiveSplitBatch,
 } from './live-move-dirty-paths'
 import {
   BATCH_DEPTH,
@@ -15,6 +16,20 @@ import {
   DIRTY_PATHS,
   FLUSHING,
 } from '../utils/weak-maps'
+
+export type BatchTracePhase =
+  | 'flushBeforeNormalize'
+  | 'commitBeforeNormalize'
+  | 'normalize'
+  | 'flushAfterNormalize'
+  | 'commitAfterNormalize'
+
+type BatchTraceHooks = {
+  onPhaseEnd?: (phase: BatchTracePhase) => void
+  onPhaseStart?: (phase: BatchTracePhase) => void
+}
+
+const BATCH_TRACE_HOOKS: WeakMap<Editor, BatchTraceHooks> = new WeakMap()
 
 const getBatchDepth = (editor: Editor) => BATCH_DEPTH.get(editor) ?? 0
 
@@ -87,6 +102,49 @@ export const withObservedBatchNormalize = <T>(
       BATCH_OBSERVE_NORMALIZE_DEPTH.set(editor, depth)
     }
   }
+}
+
+export const withBatchTrace = <T>(
+  editor: Editor,
+  hooks: BatchTraceHooks,
+  fn: () => T
+): T => {
+  const previous = BATCH_TRACE_HOOKS.get(editor)
+
+  BATCH_TRACE_HOOKS.set(editor, hooks)
+
+  try {
+    return fn()
+  } finally {
+    if (previous) {
+      BATCH_TRACE_HOOKS.set(editor, previous)
+    } else {
+      BATCH_TRACE_HOOKS.delete(editor)
+    }
+  }
+}
+
+const traceBatchPhase = <T>(
+  editor: Editor,
+  phase: BatchTracePhase,
+  fn: () => T
+): T => {
+  const hooks = BATCH_TRACE_HOOKS.get(editor)
+
+  hooks?.onPhaseStart?.(phase)
+
+  try {
+    return fn()
+  } finally {
+    hooks?.onPhaseEnd?.(phase)
+  }
+}
+
+const flushLiveBatchState = (editor: Editor) => {
+  flushLiveInsertMoveBatch(editor)
+  flushLiveMergeBatch(editor)
+  flushLiveMoveBatch(editor)
+  flushLiveSplitBatch(editor)
 }
 
 export const wrapApply = <T extends Editor>(
@@ -167,10 +225,12 @@ export const withBatch = (editor: Editor, fn: () => void) => {
       BATCH_DEPTH.set(editor, depth)
     } else {
       BATCH_DEPTH.delete(editor)
-      flushLiveInsertMoveBatch(editor)
-      flushLiveMergeBatch(editor)
-      flushLiveMoveBatch(editor)
-      commitDraftChildren(editor)
+      traceBatchPhase(editor, 'flushBeforeNormalize', () => {
+        flushLiveBatchState(editor)
+      })
+      traceBatchPhase(editor, 'commitBeforeNormalize', () => {
+        commitDraftChildren(editor)
+      })
 
       const normalizeOptions = BATCH_NORMALIZE.get(editor)
 
@@ -187,17 +247,21 @@ export const withBatch = (editor: Editor, fn: () => void) => {
               : undefined
 
           do {
-            withObservedBatchNormalize(editor, () => {
-              Editor.normalize(editor, {
-                force: shouldForce,
-                operation,
+            traceBatchPhase(editor, 'normalize', () => {
+              withObservedBatchNormalize(editor, () => {
+                Editor.normalize(editor, {
+                  force: shouldForce,
+                  operation,
+                })
               })
             })
 
-            flushLiveInsertMoveBatch(editor)
-            flushLiveMergeBatch(editor)
-            flushLiveMoveBatch(editor)
-            commitDraftChildren(editor)
+            traceBatchPhase(editor, 'flushAfterNormalize', () => {
+              flushLiveBatchState(editor)
+            })
+            traceBatchPhase(editor, 'commitAfterNormalize', () => {
+              commitDraftChildren(editor)
+            })
 
             shouldForce = false
             operation = undefined

@@ -1,9 +1,7 @@
 import { Path } from '../interfaces/path'
 import {
   BaseInsertNodeOperation,
-  BaseMergeNodeOperation,
   BaseMoveNodeOperation,
-  BaseSplitNodeOperation,
   Operation,
 } from '../interfaces/operation'
 
@@ -13,13 +11,14 @@ export type BatchSegmentKind =
   | 'same-parent-insert'
   | 'same-parent-move'
   | 'move'
-  | 'independent-split'
-  | 'independent-merge'
 
 export type BatchSegment = {
   kind: BatchSegmentKind
   ops: Operation[]
 }
+
+export const batchNeedsSegmentPlanning = (ops: Operation[]) =>
+  ops.some(op => op.type === 'insert_node' || op.type === 'move_node')
 
 export const isSameParentInsertBatch = (
   ops: Operation[]
@@ -180,98 +179,6 @@ const getMoveSegmentEnd = (ops: Operation[], startIndex: number) => {
   return endIndex
 }
 
-const hasOverlappingPaths = (paths: Path[]) => {
-  for (let index = 0; index < paths.length; index++) {
-    for (let nextIndex = index + 1; nextIndex < paths.length; nextIndex++) {
-      const path = paths[index]
-      const nextPath = paths[nextIndex]
-
-      if (
-        Path.equals(path, nextPath) ||
-        Path.isAncestor(path, nextPath) ||
-        Path.isAncestor(nextPath, path)
-      ) {
-        return true
-      }
-    }
-  }
-
-  return false
-}
-
-export const isIndependentParentSplitBatch = (
-  ops: Operation[]
-): ops is BaseSplitNodeOperation[] => {
-  if (ops.length === 0 || ops.some(op => op.type !== 'split_node')) {
-    return false
-  }
-
-  const splitOps = ops as BaseSplitNodeOperation[]
-
-  if (splitOps.some(op => op.path.length <= 1)) {
-    return false
-  }
-
-  return !hasOverlappingPaths(splitOps.map(op => Path.parent(op.path)))
-}
-
-export const isIndependentParentMergeBatch = (
-  ops: Operation[]
-): ops is BaseMergeNodeOperation[] => {
-  if (ops.length === 0 || ops.some(op => op.type !== 'merge_node')) {
-    return false
-  }
-
-  const mergeOps = ops as BaseMergeNodeOperation[]
-
-  if (mergeOps.some(op => op.path.length <= 1)) {
-    return false
-  }
-
-  return !hasOverlappingPaths(mergeOps.map(op => Path.parent(op.path)))
-}
-
-const getIndependentParentSegmentEnd = (
-  ops: Operation[],
-  startIndex: number,
-  type: 'split_node' | 'merge_node'
-) => {
-  const firstOp = ops[startIndex]
-
-  if (!firstOp || firstOp.type !== type || firstOp.path.length <= 1) {
-    return startIndex
-  }
-
-  const parentPaths: Path[] = []
-  let endIndex = startIndex
-
-  while (endIndex < ops.length) {
-    const op = ops[endIndex]
-
-    if (op.type !== type || op.path.length <= 1) {
-      break
-    }
-
-    const parentPath = Path.parent(op.path)
-
-    if (
-      parentPaths.some(
-        path =>
-          Path.equals(path, parentPath) ||
-          Path.isAncestor(path, parentPath) ||
-          Path.isAncestor(parentPath, path)
-      )
-    ) {
-      break
-    }
-
-    parentPaths.push(parentPath)
-    endIndex++
-  }
-
-  return endIndex
-}
-
 const getSpecializedBatchSegment = (
   ops: Operation[],
   startIndex: number
@@ -304,26 +211,6 @@ const getSpecializedBatchSegment = (
 
   if (moveEnd - startIndex > 1) {
     return { endIndex: moveEnd, kind: 'move' }
-  }
-
-  const independentSplitEnd = getIndependentParentSegmentEnd(
-    ops,
-    startIndex,
-    'split_node'
-  )
-
-  if (independentSplitEnd - startIndex > 1) {
-    return { endIndex: independentSplitEnd, kind: 'independent-split' }
-  }
-
-  const independentMergeEnd = getIndependentParentSegmentEnd(
-    ops,
-    startIndex,
-    'merge_node'
-  )
-
-  if (independentMergeEnd - startIndex > 1) {
-    return { endIndex: independentMergeEnd, kind: 'independent-merge' }
   }
 
   return null
@@ -362,3 +249,12 @@ export const planOperationBatchSegments = (
 
   return segments
 }
+
+export const shouldPreferWholeBatchExecution = (segments: BatchSegment[]) =>
+  segments.length >= 3 &&
+  segments.every(
+    segment =>
+      segment.kind === 'generic' ||
+      segment.kind === 'move' ||
+      segment.kind === 'same-parent-move'
+  )

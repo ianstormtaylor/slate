@@ -1,6 +1,8 @@
 import assert from 'assert'
+import { createEditor, Editor, Transforms } from '../src'
 import { createMatrixCases, runBatchReplayCase } from './utils/batch-matrix'
 import { assertBatchMatrixManifest } from './utils/batch-matrix-manifest'
+import { DIRTY_PATHS } from '../src/utils/weak-maps'
 
 const paragraph = text => ({ type: 'paragraph', children: [{ text }] })
 
@@ -404,6 +406,66 @@ const TREE_OP_SCENARIOS = [
     compareDirtyPaths: true,
   },
   {
+    id: 'mixedSetNodeSplitDirtyPaths',
+    children: [
+      paragraph('zero'),
+      paragraph('one'),
+      paragraph('two'),
+      paragraph('three'),
+    ],
+    ops: [
+      {
+        type: 'set_node',
+        path: [0],
+        properties: {},
+        newProperties: { id: 'zero' },
+      },
+      {
+        type: 'set_node',
+        path: [1],
+        properties: {},
+        newProperties: { id: 'one' },
+      },
+      {
+        type: 'set_node',
+        path: [2],
+        properties: {},
+        newProperties: { id: 'two' },
+      },
+      {
+        type: 'set_node',
+        path: [3],
+        properties: {},
+        newProperties: { id: 'three' },
+      },
+      {
+        type: 'split_node',
+        path: [0, 0],
+        position: 1,
+        properties: {},
+      },
+      {
+        type: 'split_node',
+        path: [1, 0],
+        position: 1,
+        properties: {},
+      },
+      {
+        type: 'split_node',
+        path: [2, 0],
+        position: 1,
+        properties: {},
+      },
+      {
+        type: 'split_node',
+        path: [3, 0],
+        position: 1,
+        properties: {},
+      },
+    ],
+    compareDirtyPaths: true,
+  },
+  {
     id: 'mergeNode',
     children: [
       {
@@ -516,6 +578,10 @@ const TREE_OP_OBSERVATION_SCENARIOS = [
     persistRefPath: [0],
   },
   {
+    scenario: 'mergeNodeDirtyPaths',
+    persistRefPath: [0],
+  },
+  {
     scenario: 'splitNode',
     persistRefPath: [0],
   },
@@ -618,4 +684,112 @@ describe('Transforms.applyBatch generic tree ops', () => {
       })
     })
   }
+
+  it('keeps applyBatch and manual withBatch equivalent for mixed set_node and merge_node batches', () => {
+    const children = [
+      {
+        type: 'paragraph',
+        children: [{ text: 'one ' }, { text: 'two' }],
+      },
+      {
+        type: 'paragraph',
+        children: [{ text: 'three ' }, { text: 'four' }],
+      },
+    ]
+    const ops = [
+      {
+        type: 'set_node',
+        path: [0],
+        properties: {},
+        newProperties: { id: 'one' },
+      },
+      {
+        type: 'set_node',
+        path: [1],
+        properties: {},
+        newProperties: { id: 'two' },
+      },
+      {
+        type: 'merge_node',
+        path: [0, 1],
+        position: 4,
+        properties: {},
+      },
+      {
+        type: 'merge_node',
+        path: [1, 1],
+        position: 6,
+        properties: {},
+      },
+    ]
+    const applyBatchEditor = createEditor()
+    const manualEditor = createEditor()
+
+    applyBatchEditor.children = JSON.parse(JSON.stringify(children))
+    manualEditor.children = JSON.parse(JSON.stringify(children))
+
+    Transforms.applyBatch(applyBatchEditor, JSON.parse(JSON.stringify(ops)))
+
+    Editor.withBatch(manualEditor, () => {
+      for (const op of JSON.parse(JSON.stringify(ops))) {
+        manualEditor.apply(op)
+      }
+    })
+
+    assert.deepEqual(applyBatchEditor.children, manualEditor.children)
+    assert.deepEqual(applyBatchEditor.selection, manualEditor.selection)
+    assert.deepEqual(applyBatchEditor.operations, manualEditor.operations)
+    assert.deepEqual(
+      (DIRTY_PATHS.get(applyBatchEditor) ?? [])
+        .map(path => path.join(','))
+        .sort(),
+      (DIRTY_PATHS.get(manualEditor) ?? []).map(path => path.join(',')).sort()
+    )
+  })
+
+  it('keeps applyBatch and manual withBatch equivalent for same-parent split_node dirty paths', () => {
+    const children = [
+      {
+        type: 'paragraph',
+        children: [{ text: 'one' }, { text: 'two' }],
+      },
+    ]
+    const ops = [
+      {
+        type: 'split_node',
+        path: [0, 0],
+        position: 1,
+        properties: {},
+      },
+      {
+        type: 'split_node',
+        path: [0, 2],
+        position: 1,
+        properties: {},
+      },
+    ]
+    const applyBatchEditor = createEditor()
+    const manualEditor = createEditor()
+
+    applyBatchEditor.children = JSON.parse(JSON.stringify(children))
+    manualEditor.children = JSON.parse(JSON.stringify(children))
+
+    Transforms.applyBatch(applyBatchEditor, JSON.parse(JSON.stringify(ops)))
+
+    Editor.withBatch(manualEditor, () => {
+      for (const op of JSON.parse(JSON.stringify(ops))) {
+        manualEditor.apply(op)
+      }
+    })
+
+    assert.deepEqual(applyBatchEditor.children, manualEditor.children)
+    assert.deepEqual(applyBatchEditor.selection, manualEditor.selection)
+    assert.deepEqual(applyBatchEditor.operations, manualEditor.operations)
+    assert.deepEqual(
+      (DIRTY_PATHS.get(applyBatchEditor) ?? [])
+        .map(path => path.join(','))
+        .sort(),
+      (DIRTY_PATHS.get(manualEditor) ?? []).map(path => path.join(',')).sort()
+    )
+  })
 })

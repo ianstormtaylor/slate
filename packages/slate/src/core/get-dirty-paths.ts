@@ -73,6 +73,12 @@ export const getDirtyPaths: WithEditorFirstArg<Editor['getDirtyPaths']> = (
 
     case 'split_node': {
       const { path } = op
+      const node = Node.get(editor, path)
+
+      if (Node.isText(node)) {
+        return [Path.parent(path)]
+      }
+
       const levels = Path.levels(path)
       const nextPath = Path.next(path)
       return [...levels, nextPath]

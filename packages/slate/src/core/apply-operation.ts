@@ -54,6 +54,25 @@ export const transformOperationSelection = (editor: Editor, op: Operation) => {
   }
 }
 
+export const transformOperationSelectionPoints = (
+  editor: Editor,
+  op: Operation
+) => {
+  if (!editor.selection) {
+    return
+  }
+
+  const selection = { ...editor.selection }
+
+  for (const [point, key] of Range.points(selection)) {
+    selection[key] = Point.transform(point, op)!
+  }
+
+  if (!Range.equals(selection, editor.selection)) {
+    editor.selection = selection
+  }
+}
+
 export const updateOperationDirtyPaths = (editor: Editor, op: Operation) => {
   if (!isBatchingDirtyPaths(editor)) {
     const transform = Path.operationCanTransformPath(op)

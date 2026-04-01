@@ -1,9 +1,11 @@
-import { Descendant } from '../interfaces/node'
+import { Descendant, Node } from '../interfaces/node'
 import {
   BaseInsertNodeOperation,
   BaseInsertTextOperation,
+  BaseMergeNodeOperation,
   BaseRemoveTextOperation,
   BaseSetNodeOperation,
+  BaseSplitNodeOperation,
 } from '../interfaces/operation'
 import { Editor } from '../interfaces/editor'
 import { Path } from '../interfaces/path'
@@ -19,12 +21,15 @@ import {
   clearLiveInsertMoveBatch,
   clearLiveMergeBatch,
   clearLiveMoveBatch,
+  clearLiveSplitBatch,
   flushLiveInsertMoveBatch,
   flushLiveMergeBatch,
   flushLiveMoveBatch,
+  flushLiveSplitBatch,
   hasLiveInsertMoveBatch,
   hasLiveMergeBatch,
   hasLiveMoveBatch,
+  hasLiveSplitBatch,
 } from './live-move-dirty-paths'
 import {
   BATCH_DRAFT_CHILDREN,
@@ -36,6 +41,16 @@ import {
   BATCH_EXACT_SET_NODE_OPS,
   BATCH_EXACT_SET_NODE_SNAPSHOT,
   BATCH_EXACT_SET_NODE_SNAPSHOT_OPS,
+  BATCH_MERGE_NODE_BASE,
+  BATCH_MERGE_NODE_OPS,
+  BATCH_MERGE_NODE_PARENT_INDEXES,
+  BATCH_MERGE_NODE_SNAPSHOT,
+  BATCH_MERGE_NODE_SNAPSHOT_OPS,
+  BATCH_SPLIT_NODE_BASE,
+  BATCH_SPLIT_NODE_OPS,
+  BATCH_SPLIT_NODE_PARENT_INDEXES,
+  BATCH_SPLIT_NODE_SNAPSHOT,
+  BATCH_SPLIT_NODE_SNAPSHOT_OPS,
   BATCH_TEXT_OPS,
   BATCH_TEXT_SNAPSHOT,
   BATCH_TEXT_SNAPSHOT_OPS,
@@ -47,6 +62,8 @@ import {
   applySetNodeBatchToChildren,
   validateExactSetNodeOperation,
 } from './exact-set-node-children'
+import { applyDirectTextMergeBatchToChildren } from './direct-text-merge-batch-children'
+import { applyDirectTextSplitBatchToChildren } from './direct-text-split-batch-children'
 import { applyInsertNodeBatchToChildren } from './same-parent-insert-node-children'
 import { applyTextBatchToChildren } from './text-batch-children'
 
@@ -57,6 +74,10 @@ const getCurrentChildren = (editor: Editor): Descendant[] =>
     ? materializeInsertNodeDraft(editor)
     : hasTextDraft(editor)
     ? materializeTextDraft(editor)
+    : hasMergeNodeDraft(editor)
+    ? materializeMergeNodeDraft(editor)
+    : hasSplitNodeDraft(editor)
+    ? materializeSplitNodeDraft(editor)
     : hasExactSetNodeDraft(editor)
     ? materializeExactSetNodeDraft(editor)
     : hasDraftChildren(editor)
@@ -87,6 +108,10 @@ const getObservedChildren = (editor: Editor): Descendant[] => {
     flushLiveMoveBatch(editor)
   }
 
+  if (hasLiveSplitBatch(editor)) {
+    flushLiveSplitBatch(editor)
+  }
+
   // A batch read is an observation barrier. Normalize the live draft in place
   // so later ops continue from replay-equivalent structure, and so internal
   // normalize ops still flow through editor.apply wrappers.
@@ -104,6 +129,7 @@ const getObservedChildren = (editor: Editor): Descendant[] => {
     flushLiveInsertMoveBatch(editor)
     flushLiveMergeBatch(editor)
     flushLiveMoveBatch(editor)
+    flushLiveSplitBatch(editor)
 
     shouldForce = false
     operation = undefined
@@ -125,13 +151,16 @@ export const getCommittedChildren = (editor: Editor): Descendant[] =>
 export const setChildren = (editor: Editor, children: Descendant[]) => {
   clearInsertNodeDraft(editor)
   clearTextDraft(editor)
+  clearMergeNodeDraft(editor)
+  clearSplitNodeDraft(editor)
   clearExactSetNodeDraft(editor)
-  clearLiveInsertMoveBatch(editor)
-  clearLiveMergeBatch(editor)
-  clearLiveMoveBatch(editor)
 
   if (isBatching(editor)) {
     if (!isWritingBatchInternals(editor)) {
+      clearLiveInsertMoveBatch(editor)
+      clearLiveMergeBatch(editor)
+      clearLiveMoveBatch(editor)
+      clearLiveSplitBatch(editor)
       clearQueuedBatchNormalize(editor)
       DIRTY_PATHS.delete(editor)
       DIRTY_PATH_KEYS.delete(editor)
@@ -142,6 +171,10 @@ export const setChildren = (editor: Editor, children: Descendant[]) => {
     return
   }
 
+  clearLiveInsertMoveBatch(editor)
+  clearLiveMergeBatch(editor)
+  clearLiveMoveBatch(editor)
+  clearLiveSplitBatch(editor)
   clearDraftChildren(editor)
   CHILDREN.set(editor, children)
 }
@@ -155,6 +188,8 @@ export const getDraftChildren = (editor: Editor): Descendant[] =>
 export const setDraftChildren = (editor: Editor, children: Descendant[]) => {
   clearInsertNodeDraft(editor)
   clearTextDraft(editor)
+  clearMergeNodeDraft(editor)
+  clearSplitNodeDraft(editor)
   clearExactSetNodeDraft(editor)
   BATCH_DRAFT_CHILDREN.set(editor, children)
 }
@@ -328,6 +363,190 @@ export const clearTextDraft = (editor: Editor) => {
   BATCH_TEXT_SNAPSHOT_OPS.delete(editor)
 }
 
+export const hasMergeNodeDraft = (editor: Editor) =>
+  (BATCH_MERGE_NODE_OPS.get(editor)?.length ?? 0) > 0
+
+export const canStageMergeNodeOperation = (
+  editor: Editor,
+  op: BaseMergeNodeOperation
+) => {
+  if (op.path.length !== 2 || !Path.hasPrevious(op.path)) {
+    return false
+  }
+
+  const prevPath = Path.previous(op.path)
+  const node = Node.get(editor, op.path)
+  const prevNode = Node.get(editor, prevPath)
+
+  if (!Node.isText(node) || !Node.isText(prevNode)) {
+    return false
+  }
+
+  const parentIndexes = BATCH_MERGE_NODE_PARENT_INDEXES.get(editor)
+
+  return !parentIndexes || !parentIndexes.has(op.path[0])
+}
+
+export const stageMergeNodeOperation = (
+  editor: Editor,
+  op: BaseMergeNodeOperation
+) => {
+  const ops = BATCH_MERGE_NODE_OPS.get(editor)
+
+  if (ops) {
+    ops.push(op)
+    BATCH_MERGE_NODE_PARENT_INDEXES.get(editor)?.add(op.path[0])
+    return
+  }
+
+  BATCH_MERGE_NODE_BASE.set(editor, getCurrentChildren(editor))
+  clearDraftChildren(editor)
+  BATCH_MERGE_NODE_OPS.set(editor, [op])
+  BATCH_MERGE_NODE_PARENT_INDEXES.set(editor, new Set([op.path[0]]))
+}
+
+export const materializeMergeNodeDraft = (editor: Editor): Descendant[] => {
+  const ops = BATCH_MERGE_NODE_OPS.get(editor) ?? []
+  const baseChildren =
+    BATCH_MERGE_NODE_BASE.get(editor) ?? getCommittedChildren(editor)
+  const snapshot = BATCH_MERGE_NODE_SNAPSHOT.get(editor)
+  const snapshotOps = BATCH_MERGE_NODE_SNAPSHOT_OPS.get(editor) ?? 0
+
+  if (ops.length === 0) {
+    return baseChildren
+  }
+
+  if (snapshot && snapshotOps === ops.length) {
+    return snapshot
+  }
+
+  const nextChildren = applyDirectTextMergeBatchToChildren(
+    snapshot ?? baseChildren,
+    ops.slice(snapshotOps)
+  )
+
+  BATCH_MERGE_NODE_SNAPSHOT.set(editor, nextChildren)
+  BATCH_MERGE_NODE_SNAPSHOT_OPS.set(editor, ops.length)
+
+  return nextChildren
+}
+
+export const promoteMergeNodeDraftToDraftChildren = (editor: Editor) => {
+  if (!hasMergeNodeDraft(editor)) {
+    return
+  }
+
+  setDraftChildren(editor, materializeMergeNodeDraft(editor))
+}
+
+export const commitMergeNodeDraft = (editor: Editor) => {
+  if (!hasMergeNodeDraft(editor)) {
+    return
+  }
+
+  CHILDREN.set(editor, materializeMergeNodeDraft(editor))
+  clearMergeNodeDraft(editor)
+}
+
+export const clearMergeNodeDraft = (editor: Editor) => {
+  BATCH_MERGE_NODE_BASE.delete(editor)
+  BATCH_MERGE_NODE_OPS.delete(editor)
+  BATCH_MERGE_NODE_PARENT_INDEXES.delete(editor)
+  BATCH_MERGE_NODE_SNAPSHOT.delete(editor)
+  BATCH_MERGE_NODE_SNAPSHOT_OPS.delete(editor)
+}
+
+export const hasSplitNodeDraft = (editor: Editor) =>
+  (BATCH_SPLIT_NODE_OPS.get(editor)?.length ?? 0) > 0
+
+export const canStageSplitNodeOperation = (
+  editor: Editor,
+  op: BaseSplitNodeOperation
+) => {
+  if (op.path.length !== 2) {
+    return false
+  }
+
+  const node = Node.get(editor, op.path)
+
+  if (!Node.isText(node)) {
+    return false
+  }
+
+  const parentIndexes = BATCH_SPLIT_NODE_PARENT_INDEXES.get(editor)
+
+  return !parentIndexes || !parentIndexes.has(op.path[0])
+}
+
+export const stageSplitNodeOperation = (
+  editor: Editor,
+  op: BaseSplitNodeOperation
+) => {
+  const ops = BATCH_SPLIT_NODE_OPS.get(editor)
+
+  if (ops) {
+    ops.push(op)
+    BATCH_SPLIT_NODE_PARENT_INDEXES.get(editor)?.add(op.path[0])
+    return
+  }
+
+  BATCH_SPLIT_NODE_BASE.set(editor, getCurrentChildren(editor))
+  clearDraftChildren(editor)
+  BATCH_SPLIT_NODE_OPS.set(editor, [op])
+  BATCH_SPLIT_NODE_PARENT_INDEXES.set(editor, new Set([op.path[0]]))
+}
+
+export const materializeSplitNodeDraft = (editor: Editor): Descendant[] => {
+  const ops = BATCH_SPLIT_NODE_OPS.get(editor) ?? []
+  const baseChildren =
+    BATCH_SPLIT_NODE_BASE.get(editor) ?? getCommittedChildren(editor)
+  const snapshot = BATCH_SPLIT_NODE_SNAPSHOT.get(editor)
+  const snapshotOps = BATCH_SPLIT_NODE_SNAPSHOT_OPS.get(editor) ?? 0
+
+  if (ops.length === 0) {
+    return baseChildren
+  }
+
+  if (snapshot && snapshotOps === ops.length) {
+    return snapshot
+  }
+
+  const nextChildren = applyDirectTextSplitBatchToChildren(
+    snapshot ?? baseChildren,
+    ops.slice(snapshotOps)
+  )
+
+  BATCH_SPLIT_NODE_SNAPSHOT.set(editor, nextChildren)
+  BATCH_SPLIT_NODE_SNAPSHOT_OPS.set(editor, ops.length)
+
+  return nextChildren
+}
+
+export const promoteSplitNodeDraftToDraftChildren = (editor: Editor) => {
+  if (!hasSplitNodeDraft(editor)) {
+    return
+  }
+
+  setDraftChildren(editor, materializeSplitNodeDraft(editor))
+}
+
+export const commitSplitNodeDraft = (editor: Editor) => {
+  if (!hasSplitNodeDraft(editor)) {
+    return
+  }
+
+  CHILDREN.set(editor, materializeSplitNodeDraft(editor))
+  clearSplitNodeDraft(editor)
+}
+
+export const clearSplitNodeDraft = (editor: Editor) => {
+  BATCH_SPLIT_NODE_BASE.delete(editor)
+  BATCH_SPLIT_NODE_OPS.delete(editor)
+  BATCH_SPLIT_NODE_PARENT_INDEXES.delete(editor)
+  BATCH_SPLIT_NODE_SNAPSHOT.delete(editor)
+  BATCH_SPLIT_NODE_SNAPSHOT_OPS.delete(editor)
+}
+
 export const hasExactSetNodeDraft = (editor: Editor) =>
   (BATCH_EXACT_SET_NODE_OPS.get(editor)?.length ?? 0) > 0
 
@@ -403,6 +622,16 @@ export const commitDraftChildren = (editor: Editor) => {
 
   if (hasTextDraft(editor)) {
     commitTextDraft(editor)
+    return
+  }
+
+  if (hasMergeNodeDraft(editor)) {
+    commitMergeNodeDraft(editor)
+    return
+  }
+
+  if (hasSplitNodeDraft(editor)) {
+    commitSplitNodeDraft(editor)
     return
   }
 

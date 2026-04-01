@@ -44,6 +44,35 @@ const TEXT_OP_SCENARIOS = {
     ],
     persistRefPath: [0, 0],
   },
+  distinctParentTextOps: {
+    children: [
+      { type: 'paragraph', children: [{ text: 'aa' }, { text: '11' }] },
+      { type: 'paragraph', children: [{ text: 'bb' }, { text: '22' }] },
+      { type: 'paragraph', children: [{ text: 'cc' }, { text: '33' }] },
+    ],
+    ops: [
+      {
+        type: 'insert_text',
+        path: [0, 0],
+        offset: 1,
+        text: 'X',
+      },
+      {
+        type: 'insert_text',
+        path: [1, 0],
+        offset: 1,
+        text: 'Y',
+      },
+      {
+        type: 'insert_text',
+        path: [2, 0],
+        offset: 1,
+        text: 'Z',
+      },
+    ],
+    persistRefPath: [0],
+    compareOperations: false,
+  },
 }
 
 const TEXT_OP_MATRIX = createMatrixCases({
@@ -72,6 +101,7 @@ describe('Transforms.applyBatch text ops', () => {
           matrixCase.observationMode === 'persistRef'
             ? scenario.persistRefPath
             : null,
+        compareOperations: scenario.compareOperations,
       })
     })
   }

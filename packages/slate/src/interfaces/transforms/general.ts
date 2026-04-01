@@ -123,6 +123,23 @@ export const GeneralTransforms: GeneralTransforms = {
 
         const node = Node.get(editor, path)
 
+        const truePath = Path.transform(path, op)!
+
+        if (Path.equals(Path.parent(path), Path.parent(truePath))) {
+          const parentPath = Path.parent(path)
+          const newIndex = truePath[truePath.length - 1]
+
+          modifyChildren(editor, parentPath, children => {
+            const nextChildren = children.slice()
+            nextChildren.splice(index, 1)
+            nextChildren.splice(newIndex, 0, node)
+            return nextChildren
+          })
+
+          transformSelection = true
+          break
+        }
+
         modifyChildren(editor, Path.parent(path), children =>
           removeChildren(children, index, 1)
         )
@@ -133,7 +150,6 @@ export const GeneralTransforms: GeneralTransforms = {
         // of date. So instead of using the `op.newPath` directly, we
         // transform `op.path` to ascertain what the `newPath` would be after
         // the operation was applied.
-        const truePath = Path.transform(path, op)!
         const newIndex = truePath[truePath.length - 1]
 
         modifyChildren(editor, Path.parent(truePath), children =>

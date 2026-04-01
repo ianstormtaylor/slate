@@ -4,6 +4,7 @@ import {
   BaseInsertNodeOperation,
   BaseMergeNodeOperation,
   BaseMoveNodeOperation,
+  BaseSplitNodeOperation,
   Operation,
 } from '../interfaces/operation'
 import { Editor } from '../interfaces/editor'
@@ -15,22 +16,31 @@ import {
   runOperation,
   transformOperationRefs,
   transformOperationSelection,
+  transformOperationSelectionPoints,
   transformOperationTree,
   updateOperationDirtyPaths,
 } from './apply-operation'
 import {
+  canStageSplitNodeOperation,
   canStageInsertNodeOperation,
+  canStageMergeNodeOperation,
   clearInsertNodeDraft,
   getInsertNodeDraftOps,
   hasDraftChildren,
   hasExactSetNodeDraft,
   hasInsertNodeDraft,
+  hasMergeNodeDraft,
+  hasSplitNodeDraft,
   hasTextDraft,
   promoteExactSetNodeDraftToDraftChildren,
   promoteInsertNodeDraftToDraftChildren,
+  promoteMergeNodeDraftToDraftChildren,
+  promoteSplitNodeDraftToDraftChildren,
   promoteTextDraftToDraftChildren,
   stageExactSetNodeOperation,
   stageInsertNodeOperation,
+  stageMergeNodeOperation,
+  stageSplitNodeOperation,
   stageTextOperation,
   applyTextOperationToDraftChildren,
 } from './children'
@@ -40,28 +50,31 @@ import {
   flushLiveInsertMoveBatch,
   flushLiveMergeBatch,
   flushLiveMoveBatch,
+  flushLiveSplitBatch,
   getSameParentInsertMoveDirtyPathState,
   getSameParentMoveDirtyPaths as getLiveSameParentMoveDirtyPaths,
   hasLiveInsertMoveBatch,
   hasLiveMergeBatch,
   hasLiveMoveBatch,
+  hasLiveSplitBatch,
   isMoveNodeBatch as isLiveMoveNodeBatch,
   isSameParentInsertMoveBatch,
   isSameParentMoveBatch as isLiveSameParentMoveBatch,
   stageLiveInsertMoveBatchOperations,
   stageLiveMergeBatchOperation,
   stageLiveMoveBatchOperation,
+  stageLiveSplitBatchOperation,
 } from './live-move-dirty-paths'
 import { updateDirtyPaths } from './update-dirty-paths'
 import { DIRTY_PATH_KEYS, DIRTY_PATHS } from '../utils/weak-maps'
 import {
   BatchSegment,
-  isIndependentParentMergeBatch,
-  isIndependentParentSplitBatch,
+  batchNeedsSegmentPlanning,
   isSameParentInsertBatch,
   planOperationBatchSegments,
+  shouldPreferWholeBatchExecution,
 } from './apply-batch-planner'
-import { isObservingBatchNormalize, withInternalBatchReads } from './batch'
+import { withInternalBatchReads } from './batch'
 
 const transformPathThroughOps = (path: Path, ops: Operation[]) => {
   let nextPath: Path | null = path
@@ -352,17 +365,11 @@ const applyBatchSegment = (editor: Editor, segment: BatchSegment) => {
         applyDirtyPathSimulatedBatch(editor, segment.ops)
       )
       return
-    case 'independent-split':
-    case 'independent-merge':
-      applyDirtyPathBatchedOperations(
-        editor,
-        segment.ops,
-        withInternalBatchReads(editor, () =>
-          segment.ops.flatMap(op => editor.getDirtyPaths(op))
-        )
-      )
-      return
     case 'generic':
+      if (applyWholeBatchFastPath(editor, segment.ops)) {
+        return
+      }
+
       for (const op of segment.ops) {
         editor.apply(op)
       }
@@ -370,15 +377,11 @@ const applyBatchSegment = (editor: Editor, segment: BatchSegment) => {
   }
 }
 
-const shouldSkipObservedTextMergeDirtyPaths = (
+const shouldSkipTextMergeDirtyPaths = (
   editor: Editor,
   op: BaseMergeNodeOperation
 ) => {
-  if (
-    !isObservingBatchNormalize(editor) ||
-    op.path.length === 0 ||
-    !Path.hasPrevious(op.path)
-  ) {
+  if (op.path.length === 0 || !Path.hasPrevious(op.path)) {
     return false
   }
 
@@ -405,6 +408,10 @@ const flushConflictingLiveBatches = (editor: Editor, op: Operation) => {
 
   if (op.type !== 'merge_node' && hasLiveMergeBatch(editor)) {
     flushLiveMergeBatch(editor)
+  }
+
+  if (op.type !== 'split_node' && hasLiveSplitBatch(editor)) {
+    flushLiveSplitBatch(editor)
   }
 
   if (
@@ -442,8 +449,40 @@ const promoteBufferedDraftsToDraftChildren = (editor: Editor) => {
     promoteTextDraftToDraftChildren(editor)
   }
 
+  if (hasMergeNodeDraft(editor)) {
+    promoteMergeNodeDraftToDraftChildren(editor)
+  }
+
   if (hasInsertNodeDraft(editor)) {
     promoteInsertNodeDraftToDraftChildren(editor)
+  }
+
+  if (hasSplitNodeDraft(editor)) {
+    promoteSplitNodeDraftToDraftChildren(editor)
+  }
+}
+
+const promoteDraftsBeforeLiveStructuralOp = (
+  editor: Editor,
+  options: {
+    includeInsert?: boolean
+    includeSplit?: boolean
+  } = {}
+) => {
+  if (hasExactSetNodeDraft(editor)) {
+    promoteExactSetNodeDraftToDraftChildren(editor)
+  }
+
+  if (options.includeInsert && hasInsertNodeDraft(editor)) {
+    promoteInsertNodeDraftToDraftChildren(editor)
+  }
+
+  if (hasTextDraft(editor)) {
+    promoteTextDraftToDraftChildren(editor)
+  }
+
+  if (options.includeSplit && hasSplitNodeDraft(editor)) {
+    promoteSplitNodeDraftToDraftChildren(editor)
   }
 }
 
@@ -531,7 +570,29 @@ const tryStageLiveMergeOperation = (editor: Editor, op: Operation) => {
     return false
   }
 
-  const shouldSkipDirtyPaths = shouldSkipObservedTextMergeDirtyPaths(editor, op)
+  const shouldSkipDirtyPaths = shouldSkipTextMergeDirtyPaths(editor, op)
+
+  promoteDraftsBeforeLiveStructuralOp(editor, {
+    includeInsert: true,
+    includeSplit: true,
+  })
+
+  if (canStageMergeNodeOperation(editor, op)) {
+    transformOperationRefs(editor, op)
+    transformOperationSelectionPoints(editor, op)
+    stageMergeNodeOperation(editor, op)
+    finalizeOperation(editor, op)
+
+    if (!shouldSkipDirtyPaths) {
+      stageLiveMergeBatchOperation(editor, op)
+    }
+
+    return true
+  }
+
+  if (hasMergeNodeDraft(editor)) {
+    promoteMergeNodeDraftToDraftChildren(editor)
+  }
 
   transformOperationRefs(editor, op)
   transformOperationTree(editor, op)
@@ -540,6 +601,34 @@ const tryStageLiveMergeOperation = (editor: Editor, op: Operation) => {
   if (!shouldSkipDirtyPaths) {
     stageLiveMergeBatchOperation(editor, op)
   }
+
+  return true
+}
+
+const tryStageLiveSplitOperation = (editor: Editor, op: Operation) => {
+  if (op.type !== 'split_node' || isBatchingDirtyPaths(editor)) {
+    return false
+  }
+
+  promoteDraftsBeforeLiveStructuralOp(editor, { includeInsert: true })
+
+  if (canStageSplitNodeOperation(editor, op)) {
+    transformOperationRefs(editor, op)
+    transformOperationSelectionPoints(editor, op)
+    stageSplitNodeOperation(editor, op)
+    finalizeOperation(editor, op)
+    stageLiveSplitBatchOperation(editor, op)
+    return true
+  }
+
+  if (hasSplitNodeDraft(editor)) {
+    promoteSplitNodeDraftToDraftChildren(editor)
+  }
+
+  transformOperationRefs(editor, op)
+  transformOperationTree(editor, op)
+  finalizeOperation(editor, op)
+  stageLiveSplitBatchOperation(editor, op)
 
   return true
 }
@@ -575,13 +664,7 @@ const tryStageLiveMoveOperation = (editor: Editor, op: Operation) => {
     }
   }
 
-  if (hasExactSetNodeDraft(editor)) {
-    promoteExactSetNodeDraftToDraftChildren(editor)
-  }
-
-  if (hasInsertNodeDraft(editor)) {
-    promoteInsertNodeDraftToDraftChildren(editor)
-  }
+  promoteDraftsBeforeLiveStructuralOp(editor)
 
   transformOperationRefs(editor, op)
   transformOperationTree(editor, op)
@@ -597,6 +680,14 @@ export const applyOperationInBatch: WithEditorFirstArg<Editor['apply']> = (
 ) =>
   withInternalBatchReads(editor, () => {
     flushConflictingLiveBatches(editor, op)
+
+    if (op.type !== 'merge_node' && hasMergeNodeDraft(editor)) {
+      promoteMergeNodeDraftToDraftChildren(editor)
+    }
+
+    if (op.type !== 'split_node' && hasSplitNodeDraft(editor)) {
+      promoteSplitNodeDraftToDraftChildren(editor)
+    }
 
     if (tryStageTextBatchOperation(editor, op)) {
       return
@@ -618,6 +709,10 @@ export const applyOperationInBatch: WithEditorFirstArg<Editor['apply']> = (
       return
     }
 
+    if (tryStageLiveSplitOperation(editor, op)) {
+      return
+    }
+
     if (tryStageLiveMoveOperation(editor, op)) {
       return
     }
@@ -630,11 +725,15 @@ export const applyOperationInBatch: WithEditorFirstArg<Editor['apply']> = (
       flushLiveMergeBatch(editor)
     }
 
+    if (hasLiveSplitBatch(editor)) {
+      flushLiveSplitBatch(editor)
+    }
+
     promoteBufferedDraftsToDraftChildren(editor)
     runOperation(editor, op)
   })
 
-const applyWholeBatchFastPath = (editor: Editor, ops: Operation[]) => {
+function applyWholeBatchFastPath(editor: Editor, ops: Operation[]) {
   if (isSameParentInsertBatch(ops)) {
     applyInsertBatchWithDirtyPathBatching(editor, ops)
     return true
@@ -661,20 +760,6 @@ const applyWholeBatchFastPath = (editor: Editor, ops: Operation[]) => {
     return true
   }
 
-  if (
-    isIndependentParentSplitBatch(ops) ||
-    isIndependentParentMergeBatch(ops)
-  ) {
-    applyDirtyPathBatchedOperations(
-      editor,
-      ops,
-      withInternalBatchReads(editor, () =>
-        ops.flatMap(op => editor.getDirtyPaths(op))
-      )
-    )
-    return true
-  }
-
   return false
 }
 
@@ -687,7 +772,25 @@ export const applyOperationBatch = (editor: Editor, ops: Operation[]) => {
     return
   }
 
+  if (!batchNeedsSegmentPlanning(ops)) {
+    Editor.withBatch(editor, () => {
+      for (const op of ops) {
+        editor.apply(op)
+      }
+    })
+    return
+  }
+
   const segments = planOperationBatchSegments(ops)
+
+  if (shouldPreferWholeBatchExecution(segments)) {
+    Editor.withBatch(editor, () => {
+      for (const op of ops) {
+        editor.apply(op)
+      }
+    })
+    return
+  }
 
   Editor.withBatch(editor, () => {
     for (const segment of segments) {

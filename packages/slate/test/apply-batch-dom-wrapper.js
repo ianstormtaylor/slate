@@ -157,6 +157,7 @@ const DOM_WRAPPER_SCENARIOS = {
 const DOM_WRAPPER_MATRIX = createMatrixCases({
   batchEntry: ['applyBatch', 'manualWithBatch'],
   editorMode: ['dom', 'domHistory'],
+  observationMode: ['none', 'readAfterEach', 'persistRef'],
   scenario: Object.keys(DOM_WRAPPER_SCENARIOS),
 })
 
@@ -175,7 +176,9 @@ describe('Transforms.applyBatch DOM wrapper state', () => {
         ops: scenario.ops,
         batchEntry: matrixCase.batchEntry,
         wrapperMode: 'plain',
-        observationMode: 'none',
+        observationMode: matrixCase.observationMode,
+        persistRefPath:
+          matrixCase.observationMode === 'persistRef' ? [0] : null,
         createBatchEditor: createEditorForMode,
         createReplayEditor: createEditorForMode,
         setupBatchEditor: scenario.setup,

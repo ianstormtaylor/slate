@@ -127,7 +127,11 @@ export const applyTextBatchToChildren = (
       branch = child
     }
 
-    branch.ops = branch.ops ? [...branch.ops, op] : [op]
+    if (branch.ops) {
+      branch.ops.push(op)
+    } else {
+      branch.ops = [op]
+    }
   }
 
   const nextChildren = children.slice()

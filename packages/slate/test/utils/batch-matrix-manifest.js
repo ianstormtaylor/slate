@@ -10,15 +10,15 @@ const BATCH_MATRIX_MANIFEST = {
     file: 'packages/slate/test/apply-batch-generic-ops.js',
   },
   textOps: {
-    count: 24,
+    count: 36,
     file: 'packages/slate/test/apply-batch-text-ops.js',
   },
   genericTreeOps: {
-    count: 44,
+    count: 46,
     file: 'packages/slate/test/apply-batch-generic-tree-ops.js',
   },
   genericTreeOpsObservation: {
-    count: 44,
+    count: 52,
     file: 'packages/slate/test/apply-batch-generic-tree-ops.js',
   },
   genericTreeOpsRewrite: {
@@ -33,16 +33,24 @@ const BATCH_MATRIX_MANIFEST = {
     count: 40,
     file: 'packages/slate/test/apply-batch-mixed-op-pairs.js',
   },
+  mixedOpTriples: {
+    count: 8,
+    file: 'packages/slate/test/apply-batch-mixed-op-triples.js',
+  },
+  mixedOpTriplesObservation: {
+    count: 32,
+    file: 'packages/slate/test/apply-batch-mixed-op-triples.js',
+  },
   failureSemantics: {
-    count: 12,
+    count: 60,
     file: 'packages/slate/test/apply-batch-failure-semantics.js',
   },
   domWrapper: {
-    count: 16,
+    count: 48,
     file: 'packages/slate/test/apply-batch-dom-wrapper.js',
   },
   wrapperStacks: {
-    count: 24,
+    count: 48,
     file: 'packages/slate/test/apply-batch-wrapper-stacks.js',
   },
   directAssignment: {

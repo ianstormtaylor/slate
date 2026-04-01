@@ -6,6 +6,10 @@ import { withHistory } from '../../slate-history/src'
 import { withReact } from '../../slate-react/src'
 
 const paragraph = text => ({ type: 'paragraph', children: [{ text }] })
+const paragraphWithTexts = (...texts) => ({
+  type: 'paragraph',
+  children: texts.map(text => ({ text })),
+})
 
 const createHistoryReactEditor = () => withReact(withHistory(createEditor()))
 
@@ -38,6 +42,65 @@ const WRAPPER_STACK_SCENARIOS = {
           type: 'insert_node',
           path: [1],
           node: paragraph('middle'),
+        },
+      ])
+    },
+  },
+  mixedStructuralTriple: {
+    children: [
+      paragraphWithTexts('aa', 'bb'),
+      paragraph('cc'),
+      paragraph('dd'),
+      paragraph('ee'),
+    ],
+    ops: [
+      {
+        type: 'set_node',
+        path: [2],
+        properties: {},
+        newProperties: { id: 'c0' },
+      },
+      {
+        type: 'insert_node',
+        path: [1],
+        node: paragraph('middle'),
+      },
+      {
+        type: 'move_node',
+        path: [4],
+        newPath: [2],
+      },
+      {
+        type: 'merge_node',
+        path: [0, 1],
+        position: 2,
+        properties: {},
+      },
+    ],
+    assertHistory(editor, wrapperMode) {
+      assert.equal(editor.history.undos.length, 1)
+      assert.deepEqual(editor.history.undos[0].operations, [
+        {
+          type: 'set_node',
+          path: [2],
+          properties: {},
+          newProperties: { id: wrapperMode === 'rewrite' ? 'orange' : 'c0' },
+        },
+        {
+          type: 'insert_node',
+          path: [1],
+          node: paragraph('middle'),
+        },
+        {
+          type: 'move_node',
+          path: [4],
+          newPath: [2],
+        },
+        {
+          type: 'merge_node',
+          path: [0, 1],
+          position: 2,
+          properties: {},
         },
       ])
     },
@@ -97,6 +160,55 @@ const WRAPPER_STACK_SCENARIOS = {
       })
     },
   },
+  mixedTextSelectionStructural: {
+    children: [paragraph('abcd'), paragraph('efgh')],
+    selection: {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 0], offset: 0 },
+    },
+    ops: [
+      {
+        type: 'insert_text',
+        path: [0, 0],
+        offset: 1,
+        text: 'X',
+      },
+      {
+        type: 'set_selection',
+        properties: {
+          anchor: { path: [0, 0], offset: 0 },
+          focus: { path: [0, 0], offset: 0 },
+        },
+        newProperties: {
+          anchor: { path: [0, 0], offset: 2 },
+          focus: { path: [0, 0], offset: 2 },
+        },
+      },
+      {
+        type: 'move_node',
+        path: [1],
+        newPath: [0],
+      },
+      {
+        type: 'split_node',
+        path: [1, 0],
+        position: 2,
+        properties: {},
+      },
+    ],
+    assertHistory(editor, _wrapperMode, replayEditor) {
+      assert.equal(editor.history.undos.length, 1)
+      assert.equal(replayEditor.history.undos.length, 1)
+      assert.deepEqual(
+        editor.history.undos[0].operations,
+        replayEditor.history.undos[0].operations
+      )
+      assert.deepEqual(editor.history.undos[0].selectionBefore, {
+        anchor: { path: [0, 0], offset: 0 },
+        focus: { path: [0, 0], offset: 0 },
+      })
+    },
+  },
 }
 
 const WRAPPER_STACK_MATRIX = createMatrixCases({
@@ -126,8 +238,12 @@ describe('Transforms.applyBatch wrapper stacks', () => {
           matrixCase.observationMode === 'persistRef' ? [0] : null,
         createBatchEditor: createHistoryReactEditor,
         createReplayEditor: createHistoryReactEditor,
-        assertResult: ({ batchEditor }) => {
-          scenario.assertHistory(batchEditor, matrixCase.wrapperMode)
+        assertResult: ({ batchEditor, replayEditor }) => {
+          scenario.assertHistory(
+            batchEditor,
+            matrixCase.wrapperMode,
+            replayEditor
+          )
         },
       })
     })

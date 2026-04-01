@@ -5,6 +5,7 @@ import {
   BaseMoveNodeOperation,
   BaseRemoveTextOperation,
   BaseSetNodeOperation,
+  BaseSplitNodeOperation,
   Descendant,
   Editor,
   Operation,
@@ -43,9 +44,35 @@ export const BATCH_TEXT_OPS: WeakMap<
 > = new WeakMap()
 export const BATCH_TEXT_SNAPSHOT: WeakMap<Editor, Descendant[]> = new WeakMap()
 export const BATCH_TEXT_SNAPSHOT_OPS: WeakMap<Editor, number> = new WeakMap()
+export const BATCH_MERGE_NODE_OPS: WeakMap<Editor, BaseMergeNodeOperation[]> =
+  new WeakMap()
+export const BATCH_MERGE_NODE_PARENT_INDEXES: WeakMap<
+  Editor,
+  Set<number>
+> = new WeakMap()
+export const BATCH_MERGE_NODE_BASE: WeakMap<Editor, Descendant[]> =
+  new WeakMap()
+export const BATCH_MERGE_NODE_SNAPSHOT: WeakMap<Editor, Descendant[]> =
+  new WeakMap()
+export const BATCH_MERGE_NODE_SNAPSHOT_OPS: WeakMap<Editor, number> =
+  new WeakMap()
+export const BATCH_SPLIT_NODE_OPS: WeakMap<Editor, BaseSplitNodeOperation[]> =
+  new WeakMap()
+export const BATCH_SPLIT_NODE_PARENT_INDEXES: WeakMap<
+  Editor,
+  Set<number>
+> = new WeakMap()
+export const BATCH_SPLIT_NODE_BASE: WeakMap<Editor, Descendant[]> =
+  new WeakMap()
+export const BATCH_SPLIT_NODE_SNAPSHOT: WeakMap<Editor, Descendant[]> =
+  new WeakMap()
+export const BATCH_SPLIT_NODE_SNAPSHOT_OPS: WeakMap<Editor, number> =
+  new WeakMap()
 export const BATCH_EXACT_SET_NODE_OPS: WeakMap<Editor, BaseSetNodeOperation[]> =
   new WeakMap()
 export const BATCH_LIVE_MERGE_OPS: WeakMap<Editor, BaseMergeNodeOperation[]> =
+  new WeakMap()
+export const BATCH_LIVE_SPLIT_OPS: WeakMap<Editor, BaseSplitNodeOperation[]> =
   new WeakMap()
 export const BATCH_LIVE_MOVE_OPS: WeakMap<Editor, BaseMoveNodeOperation[]> =
   new WeakMap()
