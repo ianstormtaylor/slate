@@ -1,5 +1,5 @@
 {
-  "last_turn_at": "2026-04-02T14:36:25.287Z",
-  "turn_count": 2,
-  "last_agent_output": "{\"message\":\"Restore legacy mark compatibility in Slate operations\"}"
+  "last_turn_at": "2026-04-02T15:59:19.565Z",
+  "turn_count": 3,
+  "last_agent_output": "{\"message\":\"Restore legacy editor and history compatibility\"}"
 }
