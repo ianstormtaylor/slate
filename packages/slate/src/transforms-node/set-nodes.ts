@@ -5,6 +5,7 @@ import { Range } from '../interfaces/range'
 import { Transforms } from '../interfaces/transforms'
 import { Node } from '../interfaces/node'
 import { Location } from '../interfaces'
+import { NON_SETTABLE_NODE_PROPERTIES } from '../interfaces/transforms/general'
 
 export const setNodes: NodeTransforms['setNodes'] = (
   editor,
@@ -79,9 +80,8 @@ export const setNodes: NodeTransforms['setNodes'] = (
       mode,
       voids,
     })) {
-      const properties: Partial<Node> = {}
-      // FIXME: is this correct?
-      const newProperties: Partial<Node> & { [key: string]: unknown } = {}
+      const properties: Record<string, unknown> = {}
+      const newProperties: Record<string, unknown> = {}
 
       // You can't set properties on the editor node.
       if (path.length === 0) {
@@ -91,25 +91,25 @@ export const setNodes: NodeTransforms['setNodes'] = (
       let hasChanges = false
 
       for (const k in props) {
-        if (k === 'children' || k === 'text') {
+        if (NON_SETTABLE_NODE_PROPERTIES.includes(k)) {
           continue
         }
 
-        if (compare(props[<keyof Node>k], node[<keyof Node>k])) {
+        const value: unknown = Object.hasOwn(node, k)
+          ? node[<keyof Node>k]
+          : undefined
+
+        const newValue: unknown = props[<keyof Node>k]
+
+        if (compare(newValue, value)) {
           hasChanges = true
           // Omit new properties from the old properties list
-          if (node.hasOwnProperty(k))
-            properties[<keyof Node>k] = node[<keyof Node>k]
+          if (Object.hasOwn(node, k)) properties[k] = value
           // Omit properties that have been removed from the new properties list
           if (merge) {
-            if (props[<keyof Node>k] != null)
-              newProperties[<keyof Node>k] = merge(
-                node[<keyof Node>k],
-                props[<keyof Node>k]
-              )
+            if (newValue != null) newProperties[k] = merge(value, newValue)
           } else {
-            if (props[<keyof Node>k] != null)
-              newProperties[<keyof Node>k] = props[<keyof Node>k]
+            if (newValue != null) newProperties[k] = newValue
           }
         }
       }
