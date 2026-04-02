@@ -41,9 +41,7 @@ export const Mark = {
    */
 
   isMarkSet(value: any): value is Mark[] {
-    return (
-      Array.isArray(value) && value.every(candidate => Mark.isMark(candidate))
-    )
+    return Array.isArray(value) && (value.length === 0 || Mark.isMark(value[0]))
   },
 
   /**

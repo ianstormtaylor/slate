@@ -1,5 +1,14 @@
 import { Operation, isObject } from 'slate'
 
+const isPlainObject = (value: any): value is Record<string, unknown> => {
+  if (!isObject(value)) {
+    return false
+  }
+
+  const prototype = Object.getPrototypeOf(value)
+  return prototype === Object.prototype || prototype === null
+}
+
 /**
  * `History` objects hold all of the operations that are applied to a value, so
  * they can be undone or redone as necessary.
@@ -18,7 +27,7 @@ export const History = {
 
   isHistory(value: any): value is History {
     return (
-      isObject(value) &&
+      isPlainObject(value) &&
       Array.isArray(value.redos) &&
       Array.isArray(value.undos) &&
       (value.redos.length === 0 || Operation.isOperationList(value.redos[0])) &&

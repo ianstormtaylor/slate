@@ -369,7 +369,9 @@ const PerformanceControls = ({ editor, config, setConfig }) => {
   const lastKeyPressDuration = keyPressDurations[0] ?? null
   const averageKeyPressDuration =
     keyPressDurations.length === 10
-      ? Math.round(keyPressDurations.reduce((total, d) => total + d) / 10)
+      ? Math.round(
+          keyPressDurations.reduce((total, duration) => total + duration) / 10
+        )
       : null
   useEffect(() => {
     if (!SUPPORTS_EVENT_TIMING) return

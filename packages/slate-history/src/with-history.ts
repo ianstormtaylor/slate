@@ -108,11 +108,26 @@ export const withHistory = <T extends Editor>(editor: T) => {
 
     if (redos.length > 0) {
       const batch = ensureBatch(redos[redos.length - 1])
+      const hasSelectionSnapshots =
+        batch.selectionBefore !== undefined &&
+        batch.selectionAfter !== undefined
 
       HistoryEditor.withoutSaving(e, () => {
         Editor.withoutNormalizing(e, () => {
-          for (const op of batch) {
+          if (hasSelectionSnapshots) {
+            e.operations = e.operations.filter(
+              operation => operation.type !== 'set_selection'
+            )
+          }
+
+          const operations = hasSelectionSnapshots ? batch.operations : batch
+
+          for (const op of operations) {
             e.apply(op)
+          }
+
+          if (hasSelectionSnapshots) {
+            restoreSelection(e, batch.selectionAfter)
           }
         })
       })
@@ -128,13 +143,24 @@ export const withHistory = <T extends Editor>(editor: T) => {
 
     if (undos.length > 0) {
       const batch = ensureBatch(undos[undos.length - 1])
+      const hasSelectionSnapshots =
+        batch.selectionBefore !== undefined &&
+        batch.selectionAfter !== undefined
 
       HistoryEditor.withoutSaving(e, () => {
         Editor.withoutNormalizing(e, () => {
-          const inverseOps = batch.map(Operation.inverse).reverse()
+          if (hasSelectionSnapshots) {
+            e.operations = e.operations.filter(
+              operation => operation.type !== 'set_selection'
+            )
+          }
+
+          const operations = hasSelectionSnapshots ? batch.operations : batch
+          const inverseOps = operations.map(Operation.inverse).reverse()
 
           for (const op of inverseOps) {
             if (
+              !hasSelectionSnapshots &&
               op === inverseOps[inverseOps.length - 1] &&
               op.type === 'set_selection' &&
               op.newProperties == null
@@ -143,6 +169,10 @@ export const withHistory = <T extends Editor>(editor: T) => {
             }
 
             e.apply(op)
+          }
+
+          if (hasSelectionSnapshots) {
+            restoreSelection(e, batch.selectionBefore)
           }
         })
       })
@@ -333,4 +363,23 @@ const upsertSelectionOperation = (batch: Operation[], op: Operation): void => {
   }
 
   batch.push(op)
+}
+
+const restoreSelection = (
+  editor: Editor,
+  selection: Editor['selection'] | undefined
+): void => {
+  if (selection === undefined) {
+    return
+  }
+
+  if (selection == null) {
+    if (editor.selection != null) {
+      Transforms.deselect(editor)
+    }
+
+    return
+  }
+
+  Transforms.select(editor, selection)
 }

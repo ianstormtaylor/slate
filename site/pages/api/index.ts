@@ -1,11 +1,5 @@
-import { readdirSync } from 'fs'
-import { join } from 'path'
-
-const examplePath = join(process.cwd(), 'examples/ts')
+import { EXAMPLE_NAMES_AND_PATHS } from '../../constants/examples'
 
 export function getAllExamples() {
-  const slugs = readdirSync(examplePath)
-  return slugs
-    .filter(name => name.match(/.tsx$/))
-    .map(n => n.replace(/.tsx$/, ''))
+  return EXAMPLE_NAMES_AND_PATHS.map(([, path]) => path)
 }

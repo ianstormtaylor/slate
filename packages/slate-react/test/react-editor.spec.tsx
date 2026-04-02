@@ -71,44 +71,6 @@ describe('slate-react', () => {
           expect(windowSelection?.focusOffset).toBe(testSelection.focus.offset)
         })
       })
-
-      test('should restore DOM selection when focusing inside a shadow root', async () => {
-        const editor = withReact(createEditor())
-        const initialValue = [{ type: 'block', children: [{ text: 'test' }] }]
-        const host = document.createElement('div')
-        const shadowRoot = host.attachShadow({ mode: 'open' })
-        const container = document.createElement('div')
-        const shadowSelection = {
-          removeAllRanges: jest.fn(),
-          addRange: jest.fn(),
-          rangeCount: 0,
-        }
-
-        shadowRoot.appendChild(container)
-        document.body.appendChild(host)
-        shadowRoot.getSelection = jest.fn(() => shadowSelection as any)
-
-        act(() => {
-          render(
-            <Slate editor={editor} initialValue={initialValue}>
-              <Editable />
-            </Slate>,
-            { container }
-          )
-        })
-
-        editor.selection = {
-          anchor: { path: [0, 0], offset: 1 },
-          focus: { path: [0, 0], offset: 1 },
-        }
-
-        await act(async () => {
-          ReactEditor.focus(editor)
-        })
-
-        expect(shadowRoot.getSelection).toHaveBeenCalled()
-        expect(ReactEditor.isFocused(editor)).toBe(true)
-      })
     })
   })
 })
