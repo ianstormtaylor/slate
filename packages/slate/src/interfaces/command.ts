@@ -1,5 +1,14 @@
 import { Mark, Node, isObject } from '..'
 
+const isPlainObject = (value: any): value is Record<string, unknown> => {
+  if (!isObject(value)) {
+    return false
+  }
+
+  const prototype = Object.getPrototypeOf(value)
+  return prototype === Object.prototype || prototype === null
+}
+
 /**
  * `Command` objects represent an action that a user is taking on the editor.
  * They capture the semantic "intent" of a user while they edit a document.
@@ -17,7 +26,7 @@ export const Command = {
    */
 
   isCommand(value: any): value is Command {
-    return isObject(value) && typeof value.type === 'string'
+    return isPlainObject(value) && typeof value.type === 'string'
   },
 
   /**

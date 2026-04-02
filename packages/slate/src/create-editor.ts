@@ -110,12 +110,29 @@ export const createEditor = (): Editor => {
         return
       }
 
+      const getLegacyMarkKeyValue = (mark: any) => {
+        if (!mark || typeof mark !== 'object') {
+          return null
+        }
+
+        if (typeof mark.key === 'string') {
+          return {
+            key: mark.key,
+            value: Object.prototype.hasOwnProperty.call(mark, 'value')
+              ? mark.value
+              : true,
+          }
+        }
+
+        return null
+      }
+
       switch (command.type) {
         case 'add_mark': {
-          if (command.mark && typeof command.mark === 'object') {
-            for (const key in command.mark) {
-              editor.addMark(key, command.mark[key])
-            }
+          const legacyMark = getLegacyMarkKeyValue(command.mark)
+
+          if (legacyMark) {
+            editor.addMark(legacyMark.key, legacyMark.value)
           } else if (typeof command.key === 'string') {
             editor.addMark(command.key, command.value)
           }
@@ -158,10 +175,10 @@ export const createEditor = (): Editor => {
         }
 
         case 'remove_mark': {
-          if (command.mark && typeof command.mark === 'object') {
-            for (const key in command.mark) {
-              editor.removeMark(key)
-            }
+          const legacyMark = getLegacyMarkKeyValue(command.mark)
+
+          if (legacyMark) {
+            editor.removeMark(legacyMark.key)
           } else if (typeof command.key === 'string') {
             editor.removeMark(command.key)
           }

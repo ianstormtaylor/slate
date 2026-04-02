@@ -1,5 +1,14 @@
 import { Path, Text, isObject } from '..'
 
+const isPlainObject = (value: any): value is Record<string, unknown> => {
+  if (!isObject(value)) {
+    return false
+  }
+
+  const prototype = Object.getPrototypeOf(value)
+  return prototype === Object.prototype || prototype === null
+}
+
 /**
  * `Mark` objects represent formatting that is applied to text in a Slate
  * document. They appear in leaf text nodes in the document.
@@ -24,7 +33,7 @@ export const Mark = {
    */
 
   isMark(value: any): value is Mark {
-    return isObject(value)
+    return isPlainObject(value)
   },
 
   /**
