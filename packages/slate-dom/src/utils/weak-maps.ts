@@ -1,4 +1,13 @@
-import { Ancestor, Editor, Node, Point, Range, RangeRef, Text } from 'slate'
+import {
+  Ancestor,
+  Editor,
+  Node,
+  Operation,
+  Point,
+  Range,
+  RangeRef,
+  Text,
+} from 'slate'
 import { TextDiff } from './diff-text'
 import { Key } from './key'
 
@@ -46,7 +55,7 @@ export const EDITOR_TO_USER_SELECTION: WeakMap<Editor, RangeRef | null> =
 
 export const EDITOR_TO_ON_CHANGE = new WeakMap<
   Editor,
-  (...args: any[]) => void
+  (options?: { operation?: Operation }) => void
 >()
 
 /**

@@ -4,8 +4,6 @@ import { runOperation } from './apply-operation'
 import { isBatching, scheduleOnChange } from './batch'
 import { applyOperationBatch, applyOperationInBatch } from './batching/executor'
 
-export { applyOperationBatch } from './batching/executor'
-
 // Keep the public apply seam boring: single-op execution lives here, while
 // batch planning and execution stay under ./batching/.
 const applyOperationNormally: WithEditorFirstArg<Editor['apply']> = (

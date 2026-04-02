@@ -1,4 +1,4 @@
-export { apply } from './apply'
+export * from './apply'
 export { isWritingBatchInternals, wrapApply } from './batch'
 export * from './get-dirty-paths'
 export * from './get-fragment'
