@@ -22,7 +22,7 @@ import { HistoryEditor } from './history-editor'
 export const withHistory = <T extends Editor>(editor: T) => {
   const e = editor as T & HistoryEditor
   e.history = { undos: [], redos: [] }
-  let applyDepth = 0
+  const applyOperationStack: number[] = []
 
   const restoreSelection = (selection: T['selection']) => {
     if (selection) {
@@ -110,16 +110,16 @@ export const withHistory = <T extends Editor>(editor: T) => {
       save = shouldSave(op, lastOp)
     }
 
-      if (save) {
-        if (merge == null) {
-          if (lastBatch == null) {
-            merge = false
-          } else if (hasPendingSavedOperations) {
-            merge = true
-          } else {
-            merge = shouldMerge(op, lastOp)
-          }
+    if (save) {
+      if (merge == null) {
+        if (lastBatch == null) {
+          merge = false
+        } else if (hasPendingSavedOperations) {
+          merge = true
+        } else {
+          merge = shouldMerge(op, lastOp)
         }
+      }
 
       if (HistoryEditor.isSplittingOnce(e)) {
         merge = false
@@ -146,12 +146,12 @@ export const withHistory = <T extends Editor>(editor: T) => {
       history.redos = []
     }
 
-    applyDepth++
+    applyOperationStack.push(e.operations.length)
 
     try {
       apply(op)
     } finally {
-      applyDepth--
+      applyOperationStack.pop()
     }
 
     if (trackedBatch) {
@@ -162,7 +162,6 @@ export const withHistory = <T extends Editor>(editor: T) => {
       lastBatch
     ) {
       lastBatch.selectionAfter = e.selection
-      history.redos = []
     }
   })
 
@@ -179,7 +178,14 @@ export const withHistory = <T extends Editor>(editor: T) => {
       set(children) {
         setChildren.call(e, children)
 
-        if (applyDepth > 0 || isWritingBatchInternals(e)) {
+        const operationsLengthBeforeApply =
+          applyOperationStack[applyOperationStack.length - 1]
+
+        if (
+          isWritingBatchInternals(e) ||
+          (operationsLengthBeforeApply !== undefined &&
+            e.operations.length === operationsLengthBeforeApply)
+        ) {
           return
         }
 

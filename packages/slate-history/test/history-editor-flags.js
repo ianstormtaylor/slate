@@ -125,6 +125,41 @@ describe('slate-history helper cleanup', () => {
     assert.deepEqual(editor.children, replacement)
   })
 
+  it('clears stale undo history when an inner apply wrapper replaces children', () => {
+    const replacement = [
+      { type: 'paragraph', children: [{ text: 'replacement' }] },
+    ]
+    const editor = withHistory(createEditor())
+    const { apply } = editor
+
+    editor.apply = op => {
+      apply(op)
+
+      if (op.type === 'set_node') {
+        editor.children = replacement
+      }
+    }
+
+    editor.children = [
+      { type: 'paragraph', children: [{ text: 'one' }] },
+      { type: 'paragraph', children: [{ text: 'two' }] },
+    ]
+
+    editor.apply({
+      type: 'set_node',
+      path: [0],
+      properties: {},
+      newProperties: { id: 'x' },
+    })
+
+    assert.equal(editor.history.undos.length, 0)
+    assert.equal(editor.history.redos.length, 0)
+
+    editor.undo()
+
+    assert.deepEqual(editor.children, replacement)
+  })
+
   it('restores merge state when withoutMerging throws', () => {
     const editor = createHistoryEditor()
 
