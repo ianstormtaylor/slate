@@ -21,66 +21,6 @@ const flushMicrotasks = async () => {
 }
 
 describe('slate-history helper cleanup', () => {
-  it('restores merge state when withMerging throws', async () => {
-    const editor = createHistoryEditor()
-
-    Transforms.insertText(editor, '!')
-    await flushMicrotasks()
-    Transforms.select(editor, createSelection(0))
-
-    assert.throws(() => {
-      HistoryEditor.withMerging(editor, () => {
-        throw new Error('boom')
-      })
-    }, /boom/)
-
-    assert.equal(HistoryEditor.isMerging(editor), undefined)
-
-    Transforms.insertText(editor, '?')
-
-    assert.equal(editor.history.undos.length, 2)
-  })
-
-  it('restores merge and split state when withNewBatch throws', () => {
-    const editor = createHistoryEditor()
-
-    Transforms.insertText(editor, '!')
-
-    assert.throws(() => {
-      HistoryEditor.withNewBatch(editor, () => {
-        throw new Error('boom')
-      })
-    }, /boom/)
-
-    assert.equal(HistoryEditor.isMerging(editor), undefined)
-    assert.equal(HistoryEditor.isSplittingOnce(editor), undefined)
-
-    Transforms.insertText(editor, '?')
-
-    assert.equal(editor.history.undos.length, 1)
-  })
-
-  it('consumes the split flag across nested withNewBatch calls', async () => {
-    const editor = createHistoryEditor()
-
-    Transforms.insertText(editor, '!')
-    await flushMicrotasks()
-
-    HistoryEditor.withNewBatch(editor, () => {
-      HistoryEditor.withNewBatch(editor, () => {
-        Transforms.insertText(editor, 'x')
-      })
-
-      Transforms.insertText(editor, 'y')
-    })
-
-    assert.equal(editor.history.undos.length, 2)
-    assert.deepEqual(
-      editor.history.undos[1].operations.map(op => op.text),
-      ['x', 'y']
-    )
-  })
-
   it('clears stale undo history after direct children replacement post-flush', async () => {
     const editor = createHistoryEditor()
     const replacement = [
@@ -125,21 +65,6 @@ describe('slate-history helper cleanup', () => {
     assert.deepEqual(editor.children, replacement)
   })
 
-  it('delegates undo commands when the local history is empty', () => {
-    const withExecSpy = editor => {
-      editor.exec = command => {
-        editor.commandLog = [...(editor.commandLog || []), command]
-      }
-
-      return editor
-    }
-    const historyEditor = withHistory(withExecSpy(createEditor()))
-
-    historyEditor.exec({ type: 'undo' })
-
-    assert.deepEqual(historyEditor.commandLog, [{ type: 'undo' }])
-  })
-
   it('clears stale undo history when an inner apply wrapper replaces children', () => {
     const replacement = [
       { type: 'paragraph', children: [{ text: 'replacement' }] },
@@ -173,23 +98,5 @@ describe('slate-history helper cleanup', () => {
     editor.undo()
 
     assert.deepEqual(editor.children, replacement)
-  })
-
-  it('restores merge state when withoutMerging throws', () => {
-    const editor = createHistoryEditor()
-
-    Transforms.insertText(editor, '!')
-
-    assert.throws(() => {
-      HistoryEditor.withoutMerging(editor, () => {
-        throw new Error('boom')
-      })
-    }, /boom/)
-
-    assert.equal(HistoryEditor.isMerging(editor), undefined)
-
-    Transforms.insertText(editor, '?')
-
-    assert.equal(editor.history.undos.length, 1)
   })
 })

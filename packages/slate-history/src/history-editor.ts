@@ -1,4 +1,4 @@
-import { Editor, Operation } from 'slate'
+import { BaseEditor, Editor } from 'slate'
 import { History } from './history'
 
 /**
@@ -14,12 +14,11 @@ export const SPLITTING_ONCE = new WeakMap<Editor, boolean | undefined>()
  * `HistoryEditor` contains helpers for history-enabled editors.
  */
 
-export interface HistoryEditor extends Editor {
+export interface HistoryEditor extends BaseEditor {
   history: History
   undo: () => void
   redo: () => void
-  exec: (command: any) => void
-  writeHistory: (stack: 'undos' | 'redos', batch: Operation[]) => void
+  writeHistory: (stack: 'undos' | 'redos', batch: any) => void
 }
 
 // eslint-disable-next-line no-redeclare
@@ -29,11 +28,7 @@ export const HistoryEditor = {
    */
 
   isHistoryEditor(value: any): value is HistoryEditor {
-    if (!Editor.isEditor(value)) {
-      return false
-    }
-
-    return History.isHistory((value as { history?: unknown }).history)
+    return History.isHistory(value.history) && Editor.isEditor(value)
   },
 
   /**
@@ -87,11 +82,8 @@ export const HistoryEditor = {
   withMerging(editor: HistoryEditor, fn: () => void): void {
     const prev = HistoryEditor.isMerging(editor)
     MERGING.set(editor, true)
-    try {
-      fn()
-    } finally {
-      MERGING.set(editor, prev)
-    }
+    fn()
+    MERGING.set(editor, prev)
   },
 
   /**
@@ -101,21 +93,11 @@ export const HistoryEditor = {
    */
   withNewBatch(editor: HistoryEditor, fn: () => void): void {
     const prev = HistoryEditor.isMerging(editor)
-    const prevSplittingOnce = HistoryEditor.isSplittingOnce(editor)
     MERGING.set(editor, true)
     SPLITTING_ONCE.set(editor, true)
-    try {
-      fn()
-    } finally {
-      MERGING.set(editor, prev)
-      const splittingOnce = HistoryEditor.isSplittingOnce(editor)
-
-      if (!splittingOnce || prevSplittingOnce === undefined) {
-        SPLITTING_ONCE.delete(editor)
-      } else {
-        SPLITTING_ONCE.set(editor, prevSplittingOnce)
-      }
-    }
+    fn()
+    MERGING.set(editor, prev)
+    SPLITTING_ONCE.delete(editor)
   },
 
   /**
@@ -126,11 +108,8 @@ export const HistoryEditor = {
   withoutMerging(editor: HistoryEditor, fn: () => void): void {
     const prev = HistoryEditor.isMerging(editor)
     MERGING.set(editor, false)
-    try {
-      fn()
-    } finally {
-      MERGING.set(editor, prev)
-    }
+    fn()
+    MERGING.set(editor, prev)
   },
 
   /**

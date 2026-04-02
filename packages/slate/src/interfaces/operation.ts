@@ -1,21 +1,4 @@
-import { ExtendedType, Mark, Node, Path, Range, isObject } from '..'
-
-const isPlainObject = (value: any): value is Record<string, unknown> => {
-  if (!isObject(value)) {
-    return false
-  }
-
-  const prototype = Object.getPrototypeOf(value)
-  return prototype === Object.prototype || prototype === null
-}
-
-export type BaseAddMarkOperation = {
-  type: 'add_mark'
-  path: Path
-  mark: Mark
-}
-
-export type AddMarkOperation = BaseAddMarkOperation
+import { ExtendedType, Node, Path, Range, isObject } from '..'
 
 export type BaseInsertNodeOperation = {
   type: 'insert_node'
@@ -74,14 +57,6 @@ export type RemoveNodeOperation = ExtendedType<
   BaseRemoveNodeOperation
 >
 
-export type BaseRemoveMarkOperation = {
-  type: 'remove_mark'
-  path: Path
-  mark: Mark
-}
-
-export type RemoveMarkOperation = BaseRemoveMarkOperation
-
 export type BaseRemoveTextOperation = {
   type: 'remove_text'
   path: Path
@@ -105,15 +80,6 @@ export type SetNodeOperation = ExtendedType<
   'SetNodeOperation',
   BaseSetNodeOperation
 >
-
-export type BaseSetMarkOperation = {
-  type: 'set_mark'
-  path: Path
-  properties: Partial<Mark>
-  newProperties: Partial<Mark>
-}
-
-export type SetMarkOperation = BaseSetMarkOperation
 
 export type BaseSetSelectionOperation =
   | {
@@ -157,11 +123,6 @@ export type NodeOperation =
   | SetNodeOperation
   | SplitNodeOperation
 
-export type MarkOperation =
-  | AddMarkOperation
-  | RemoveMarkOperation
-  | SetMarkOperation
-
 export type SelectionOperation = SetSelectionOperation
 
 export type TextOperation = InsertTextOperation | RemoveTextOperation
@@ -173,11 +134,7 @@ export type TextOperation = InsertTextOperation | RemoveTextOperation
  * collaboration, and other features.
  */
 
-export type BaseOperation =
-  | NodeOperation
-  | MarkOperation
-  | SelectionOperation
-  | TextOperation
+export type BaseOperation = NodeOperation | SelectionOperation | TextOperation
 export type Operation = ExtendedType<'Operation', BaseOperation>
 
 export interface OperationInterface {
@@ -195,11 +152,6 @@ export interface OperationInterface {
    * Check if a value is a list of `Operation` objects.
    */
   isOperationList: (value: any) => value is Operation[]
-
-  /**
-   * Check if a value is a `MarkOperation` object.
-   */
-  isMarkOperation: (value: any) => value is MarkOperation
 
   /**
    * Check if a value is a `SelectionOperation` object.
@@ -224,18 +176,12 @@ export const Operation: OperationInterface = {
     return Operation.isOperation(value) && value.type.endsWith('_node')
   },
 
-  isMarkOperation(value: any): value is MarkOperation {
-    return Operation.isOperation(value) && value.type.endsWith('_mark')
-  },
-
   isOperation(value: any): value is Operation {
-    if (!isPlainObject(value)) {
+    if (!isObject(value)) {
       return false
     }
 
     switch (value.type) {
-      case 'add_mark':
-        return Path.isPath(value.path) && Mark.isMark(value.mark)
       case 'insert_node':
         return Path.isPath(value.path) && Node.isNode(value.node)
       case 'insert_text':
@@ -248,12 +194,10 @@ export const Operation: OperationInterface = {
         return (
           typeof value.position === 'number' &&
           Path.isPath(value.path) &&
-          isPlainObject(value.properties)
+          isObject(value.properties)
         )
       case 'move_node':
         return Path.isPath(value.path) && Path.isPath(value.newPath)
-      case 'remove_mark':
-        return Path.isPath(value.path) && Mark.isMark(value.mark)
       case 'remove_node':
         return Path.isPath(value.path) && Node.isNode(value.node)
       case 'remove_text':
@@ -262,30 +206,23 @@ export const Operation: OperationInterface = {
           typeof value.text === 'string' &&
           Path.isPath(value.path)
         )
-      case 'set_mark':
-        return (
-          Path.isPath(value.path) &&
-          isPlainObject(value.properties) &&
-          isPlainObject(value.newProperties)
-        )
       case 'set_node':
         return (
           Path.isPath(value.path) &&
-          isPlainObject(value.properties) &&
-          isPlainObject(value.newProperties)
+          isObject(value.properties) &&
+          isObject(value.newProperties)
         )
       case 'set_selection':
         return (
           (value.properties === null && Range.isRange(value.newProperties)) ||
           (value.newProperties === null && Range.isRange(value.properties)) ||
-          (isPlainObject(value.properties) &&
-            isPlainObject(value.newProperties))
+          (isObject(value.properties) && isObject(value.newProperties))
         )
       case 'split_node':
         return (
           Path.isPath(value.path) &&
           typeof value.position === 'number' &&
-          isPlainObject(value.properties)
+          isObject(value.properties)
         )
       default:
         return false
@@ -308,10 +245,6 @@ export const Operation: OperationInterface = {
 
   inverse(op: Operation): Operation {
     switch (op.type) {
-      case 'add_mark': {
-        return { ...op, type: 'remove_mark' }
-      }
-
       case 'insert_node': {
         return { ...op, type: 'remove_node' }
       }
@@ -349,10 +282,6 @@ export const Operation: OperationInterface = {
         return { ...op, path: inversePath, newPath: inverseNewPath }
       }
 
-      case 'remove_mark': {
-        return { ...op, type: 'add_mark' }
-      }
-
       case 'remove_node': {
         return { ...op, type: 'insert_node' }
       }
@@ -361,7 +290,6 @@ export const Operation: OperationInterface = {
         return { ...op, type: 'insert_text' }
       }
 
-      case 'set_mark':
       case 'set_node': {
         const { properties, newProperties } = op
         return { ...op, properties: newProperties, newProperties: properties }

@@ -1,6 +1,5 @@
 import {
   addMark,
-  Command,
   deleteFragment,
   Editor,
   getDirtyPaths,
@@ -101,91 +100,10 @@ export const createEditor = (): Editor => {
     isSelectable: () => true,
     isVoid: () => false,
     markableVoid: () => false,
-    onChange: (..._args) => {},
+    onChange: () => {},
 
     // Core
     apply: (...args) => apply(editor, ...args),
-    exec: command => {
-      if (!Command.isCommand(command)) {
-        return
-      }
-
-      const getLegacyMarkKeyValue = (mark: any) => {
-        if (!mark || typeof mark !== 'object') {
-          return null
-        }
-
-        if (typeof mark.key === 'string') {
-          return {
-            key: mark.key,
-            value: Object.prototype.hasOwnProperty.call(mark, 'value')
-              ? mark.value
-              : true,
-          }
-        }
-
-        return null
-      }
-
-      switch (command.type) {
-        case 'add_mark': {
-          const legacyMark = getLegacyMarkKeyValue(command.mark)
-
-          if (legacyMark) {
-            editor.addMark(legacyMark.key, legacyMark.value)
-          } else if (typeof command.key === 'string') {
-            editor.addMark(command.key, command.value)
-          }
-          break
-        }
-
-        case 'delete_backward': {
-          editor.deleteBackward(command.unit)
-          break
-        }
-
-        case 'delete_forward': {
-          editor.deleteForward(command.unit)
-          break
-        }
-
-        case 'delete_fragment': {
-          editor.deleteFragment()
-          break
-        }
-
-        case 'insert_break': {
-          editor.insertBreak()
-          break
-        }
-
-        case 'insert_fragment': {
-          editor.insertFragment(command.fragment)
-          break
-        }
-
-        case 'insert_node': {
-          editor.insertNode(command.node)
-          break
-        }
-
-        case 'insert_text': {
-          editor.insertText(command.text)
-          break
-        }
-
-        case 'remove_mark': {
-          const legacyMark = getLegacyMarkKeyValue(command.mark)
-
-          if (legacyMark) {
-            editor.removeMark(legacyMark.key)
-          } else if (typeof command.key === 'string') {
-            editor.removeMark(command.key)
-          }
-          break
-        }
-      }
-    },
 
     // Editor
     addMark: (...args) => addMark(editor, ...args),

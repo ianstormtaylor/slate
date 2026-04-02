@@ -1,4 +1,5 @@
 export const EXAMPLE_NAMES_AND_PATHS = [
+  ['Android Tests', 'android-tests'],
   ['Checklists', 'check-lists'],
   ['Code Highlighting', 'code-highlighting'],
   ['Custom Placeholder', 'custom-placeholder'],
@@ -23,8 +24,8 @@ export const EXAMPLE_NAMES_AND_PATHS = [
   ['Tables', 'tables'],
 ] as const
 
-export const HIDDEN_EXAMPLES: readonly string[] = []
+export const HIDDEN_EXAMPLES = ['android-tests'] as const
 
 export const NON_HIDDEN_EXAMPLES = EXAMPLE_NAMES_AND_PATHS.filter(
-  ([, path]) => !HIDDEN_EXAMPLES.includes(path)
+  ([, path]) => !HIDDEN_EXAMPLES.includes(path as any)
 )

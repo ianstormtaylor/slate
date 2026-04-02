@@ -7,88 +7,6 @@ const flushMicrotasks = async () => {
 }
 
 describe('slate-history redo behavior', () => {
-  it('undoes a standalone selection change', () => {
-    const editor = withHistory(createEditor())
-
-    editor.children = [{ type: 'paragraph', children: [{ text: 'one' }] }]
-    editor.selection = {
-      anchor: { path: [0, 0], offset: 0 },
-      focus: { path: [0, 0], offset: 0 },
-    }
-
-    const selectionBefore = JSON.parse(JSON.stringify(editor.selection))
-    const selectionAfter = {
-      anchor: { path: [0, 0], offset: 1 },
-      focus: { path: [0, 0], offset: 1 },
-    }
-
-    Transforms.select(editor, selectionAfter)
-
-    assert.equal(editor.history.undos.length, 1)
-
-    editor.undo()
-
-    assert.deepEqual(editor.selection, selectionBefore)
-
-    editor.redo()
-
-    assert.deepEqual(editor.selection, selectionAfter)
-  })
-
-  it('undoes a selection change and immediate text insert in one step', () => {
-    const editor = withHistory(createEditor())
-
-    editor.children = [{ type: 'paragraph', children: [{ text: 'one' }] }]
-    editor.selection = {
-      anchor: { path: [0, 0], offset: 0 },
-      focus: { path: [0, 0], offset: 0 },
-    }
-
-    const selectionBefore = JSON.parse(JSON.stringify(editor.selection))
-
-    Transforms.select(editor, {
-      anchor: { path: [0, 0], offset: 1 },
-      focus: { path: [0, 0], offset: 1 },
-    })
-    Transforms.insertText(editor, 'X')
-
-    assert.equal(editor.history.undos.length, 1)
-
-    editor.undo()
-
-    assert.deepEqual(editor.children, [
-      { type: 'paragraph', children: [{ text: 'one' }] },
-    ])
-    assert.deepEqual(editor.selection, selectionBefore)
-  })
-
-  it('uses the public batch contents as the undo source of truth', () => {
-    const editor = withHistory(createEditor())
-
-    editor.children = [{ type: 'paragraph', children: [{ text: 'one' }] }]
-    editor.selection = {
-      anchor: { path: [0, 0], offset: 0 },
-      focus: { path: [0, 0], offset: 0 },
-    }
-
-    const selectionBefore = JSON.parse(JSON.stringify(editor.selection))
-
-    Transforms.select(editor, {
-      anchor: { path: [0, 0], offset: 1 },
-      focus: { path: [0, 0], offset: 1 },
-    })
-    Transforms.insertText(editor, 'X')
-
-    editor.history.undos[0].pop()
-
-    editor.undo()
-
-    assert.deepEqual(editor.children, [
-      { type: 'paragraph', children: [{ text: 'oXne' }] },
-    ])
-    assert.deepEqual(editor.selection, selectionBefore)
-  })
-
   it('restores the post-operation selection when redo replays a selecting command', async () => {
     const editor = withHistory(createEditor())
 
@@ -112,36 +30,6 @@ describe('slate-history redo behavior', () => {
     editor.redo()
 
     assert.deepEqual(editor.selection, selectionAfterInsert)
-  })
-
-  it('starts a new undo batch after a flushed selection-only tail', async () => {
-    const editor = withHistory(createEditor())
-
-    editor.children = [{ type: 'paragraph', children: [{ text: 'one' }] }]
-    editor.selection = {
-      anchor: { path: [0, 0], offset: 0 },
-      focus: { path: [0, 0], offset: 0 },
-    }
-
-    Transforms.insertText(editor, 'A')
-    Transforms.select(editor, {
-      anchor: { path: [0, 0], offset: 0 },
-      focus: { path: [0, 0], offset: 0 },
-    })
-    Transforms.select(editor, {
-      anchor: { path: [0, 0], offset: 1 },
-      focus: { path: [0, 0], offset: 1 },
-    })
-
-    await flushMicrotasks()
-
-    Transforms.insertText(editor, 'B')
-
-    assert.equal(editor.history.undos.length, 2)
-    assert.deepEqual(
-      editor.history.undos.map(batch => batch.map(op => op.type)),
-      [['insert_text', 'set_selection'], ['insert_text']]
-    )
   })
 
   it('keeps redo operations when undo runs before the pending flush', () => {
@@ -185,37 +73,5 @@ describe('slate-history redo behavior', () => {
     editor.redo()
 
     assert.equal(editor.selection, null)
-  })
-
-  it('restores a serialized selection-only history batch', () => {
-    const selectionBefore = {
-      anchor: { path: [0, 0], offset: 0 },
-      focus: { path: [0, 0], offset: 0 },
-    }
-    const selectionAfter = {
-      anchor: { path: [0, 0], offset: 1 },
-      focus: { path: [0, 0], offset: 1 },
-    }
-    const editor = withHistory(createEditor())
-
-    editor.children = [{ type: 'paragraph', children: [{ text: 'one' }] }]
-    editor.selection = selectionBefore
-
-    Transforms.select(editor, selectionAfter)
-
-    const snapshot = JSON.parse(JSON.stringify(editor.history))
-    const restored = withHistory(createEditor())
-
-    restored.children = [{ type: 'paragraph', children: [{ text: 'one' }] }]
-    restored.selection = selectionAfter
-    restored.history = snapshot
-
-    restored.undo()
-
-    assert.deepEqual(restored.selection, selectionBefore)
-
-    restored.redo()
-
-    assert.deepEqual(restored.selection, selectionAfter)
   })
 })

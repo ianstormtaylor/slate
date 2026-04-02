@@ -7,7 +7,6 @@ import {
   wrapApply,
 } from 'slate'
 
-import { HistoryCommand } from './history-command'
 import { HistoryEditor } from './history-editor'
 
 /**
@@ -22,84 +21,18 @@ import { HistoryEditor } from './history-editor'
 
 export const withHistory = <T extends Editor>(editor: T) => {
   const e = editor as T & HistoryEditor
-  type Batch = Operation[] & {
+  type Batch = {
     operations: Operation[]
-    selectionBefore?: T['selection']
+    selectionBefore: T['selection']
     selectionAfter?: T['selection']
   }
 
   e.history = { undos: [], redos: [] }
   const applyOperationStack: number[] = []
-  const exec = e.exec?.bind(e)
-
-  const createBatch = (
-    publicOperations: Operation[],
-    selectionBefore: T['selection'],
-    selectionAfter: T['selection']
-  ): Batch => ensureBatch(publicOperations, selectionBefore, selectionAfter)
-
-  const ensureBatch = (
-    publicOperations: Operation[],
-    selectionBefore?: T['selection'],
-    selectionAfter?: T['selection']
-  ): Batch => {
-    const batch = publicOperations as Batch
-
-    if (!Object.prototype.hasOwnProperty.call(batch, 'operations')) {
-      Object.defineProperty(batch, 'operations', {
-        get() {
-          return batch.filter(operation => operation.type !== 'set_selection')
-        },
-        enumerable: false,
-      })
-    }
-
-    if (!Object.prototype.hasOwnProperty.call(batch, 'selectionBefore')) {
-      Object.defineProperty(batch, 'selectionBefore', {
-        value: selectionBefore,
-        enumerable: false,
-        writable: true,
-      })
-    } else if (
-      selectionBefore !== undefined &&
-      batch.selectionBefore === undefined
-    ) {
-      batch.selectionBefore = selectionBefore
-    }
-
-    if (!Object.prototype.hasOwnProperty.call(batch, 'selectionAfter')) {
-      Object.defineProperty(batch, 'selectionAfter', {
-        value: selectionAfter,
-        enumerable: false,
-        writable: true,
-      })
-    } else if (
-      selectionAfter !== undefined &&
-      batch.selectionAfter === undefined
-    ) {
-      batch.selectionAfter = selectionAfter
-    }
-
-    return batch
-  }
 
   const resetHistoryAfterChildrenAssignment = () => {
     e.history.undos = []
     e.history.redos = []
-  }
-
-  e.exec = command => {
-    if (HistoryCommand.isUndoCommand(command) && e.history.undos.length > 0) {
-      e.undo()
-      return
-    }
-
-    if (HistoryCommand.isRedoCommand(command) && e.history.redos.length > 0) {
-      e.redo()
-      return
-    }
-
-    exec?.(command)
   }
 
   e.redo = () => {
@@ -107,26 +40,19 @@ export const withHistory = <T extends Editor>(editor: T) => {
     const { redos } = history
 
     if (redos.length > 0) {
-      const batch = ensureBatch(redos[redos.length - 1])
-      const hasSelectionSnapshots =
-        batch.selectionBefore !== undefined &&
-        batch.selectionAfter !== undefined
+      const batch = redos[redos.length - 1] as Batch
+
+      if (batch.selectionBefore) {
+        Transforms.setSelection(e, batch.selectionBefore)
+      }
 
       HistoryEditor.withoutSaving(e, () => {
         Editor.withoutNormalizing(e, () => {
-          if (hasSelectionSnapshots) {
-            e.operations = e.operations.filter(
-              operation => operation.type !== 'set_selection'
-            )
-          }
-
-          const operations = hasSelectionSnapshots ? batch.operations : batch
-
-          for (const op of operations) {
+          for (const op of batch.operations) {
             e.apply(op)
           }
 
-          if (hasSelectionSnapshots) {
+          if (batch.selectionAfter !== undefined) {
             restoreSelection(e, batch.selectionAfter)
           }
         })
@@ -142,38 +68,17 @@ export const withHistory = <T extends Editor>(editor: T) => {
     const { undos } = history
 
     if (undos.length > 0) {
-      const batch = ensureBatch(undos[undos.length - 1])
-      const hasSelectionSnapshots =
-        batch.selectionBefore !== undefined &&
-        batch.selectionAfter !== undefined
+      const batch = undos[undos.length - 1] as Batch
 
       HistoryEditor.withoutSaving(e, () => {
         Editor.withoutNormalizing(e, () => {
-          if (hasSelectionSnapshots) {
-            e.operations = e.operations.filter(
-              operation => operation.type !== 'set_selection'
-            )
-          }
-
-          const operations = hasSelectionSnapshots ? batch.operations : batch
-          const inverseOps = operations.map(Operation.inverse).reverse()
+          const inverseOps = batch.operations.map(Operation.inverse).reverse()
 
           for (const op of inverseOps) {
-            if (
-              !hasSelectionSnapshots &&
-              op === inverseOps[inverseOps.length - 1] &&
-              op.type === 'set_selection' &&
-              op.newProperties == null
-            ) {
-              continue
-            }
-
             e.apply(op)
           }
 
-          if (hasSelectionSnapshots) {
-            restoreSelection(e, batch.selectionBefore)
-          }
+          restoreSelection(e, batch.selectionBefore)
         })
       })
 
@@ -186,9 +91,9 @@ export const withHistory = <T extends Editor>(editor: T) => {
     const { operations, history } = e
     const { undos } = history
     const lastBatch =
-      undos.length > 0 ? ensureBatch(undos[undos.length - 1]) : undefined
-    const lastOp = lastBatch && lastBatch[lastBatch.length - 1]
-    const selectionBefore = e.selection
+      undos.length > 0 ? (undos[undos.length - 1] as Batch) : undefined
+    const lastOp =
+      lastBatch && lastBatch.operations[lastBatch.operations.length - 1]
     const hasPendingSavedOperations = operations.some(operation =>
       shouldSave(operation, undefined)
     )
@@ -222,17 +127,13 @@ export const withHistory = <T extends Editor>(editor: T) => {
       }
 
       if (lastBatch && merge) {
-        if (
-          lastBatch.operations.length === 0 &&
-          lastBatch.selectionBefore == null
-        ) {
-          lastBatch.selectionBefore = lastBatch.selectionAfter
-        }
-
-        lastBatch.push(op)
+        lastBatch.operations.push(op)
         trackedBatch = lastBatch
       } else {
-        const batch = createBatch([op], e.selection, e.selection)
+        const batch: Batch = {
+          operations: [op],
+          selectionBefore: e.selection,
+        }
         e.writeHistory('undos', batch)
         trackedBatch = batch
       }
@@ -253,27 +154,13 @@ export const withHistory = <T extends Editor>(editor: T) => {
     }
 
     if (trackedBatch) {
-      trackedBatch.selectionAfter = e.selection
+      setSelectionAfter(trackedBatch, e.selection)
     } else if (
       HistoryEditor.isSaving(e) !== false &&
       op.type === 'set_selection' &&
       lastBatch
     ) {
-      lastBatch.selectionAfter = e.selection
-      upsertSelectionOperation(lastBatch, op)
-      history.redos = []
-    } else if (
-      HistoryEditor.isSaving(e) !== false &&
-      op.type === 'set_selection' &&
-      op.newProperties != null
-    ) {
-      const batch = createBatch([op], selectionBefore, e.selection)
-      e.writeHistory('undos', batch)
-
-      while (undos.length > 100) {
-        undos.shift()
-      }
-
+      setSelectionAfter(lastBatch, e.selection)
       history.redos = []
     }
   })
@@ -307,7 +194,7 @@ export const withHistory = <T extends Editor>(editor: T) => {
     })
   }
 
-  e.writeHistory = (stack: 'undos' | 'redos', batch: Operation[]) => {
+  e.writeHistory = (stack: 'undos' | 'redos', batch: Batch) => {
     e.history[stack].push(batch)
   }
 
@@ -354,17 +241,6 @@ const shouldSave = (op: Operation, _prev: Operation | undefined): boolean => {
   return true
 }
 
-const upsertSelectionOperation = (batch: Operation[], op: Operation): void => {
-  const previousOp = batch[batch.length - 1]
-
-  if (previousOp?.type === 'set_selection') {
-    batch[batch.length - 1] = op
-    return
-  }
-
-  batch.push(op)
-}
-
 const restoreSelection = (
   editor: Editor,
   selection: Editor['selection'] | undefined
@@ -382,4 +258,20 @@ const restoreSelection = (
   }
 
   Transforms.select(editor, selection)
+}
+
+const setSelectionAfter = <T extends { selectionAfter?: Editor['selection'] }>(
+  batch: T,
+  selection: Editor['selection']
+): void => {
+  if (Object.prototype.hasOwnProperty.call(batch, 'selectionAfter')) {
+    batch.selectionAfter = selection
+    return
+  }
+
+  Object.defineProperty(batch, 'selectionAfter', {
+    value: selection,
+    enumerable: false,
+    writable: true,
+  })
 }

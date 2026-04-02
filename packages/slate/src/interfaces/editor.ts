@@ -50,13 +50,10 @@ export interface BaseEditor {
   // Overrideable core methods.
 
   apply: (operation: Operation) => void
-  exec: (command: any) => void
   getDirtyPaths: (operation: Operation) => Path[]
   getFragment: () => Descendant[]
   isElementReadOnly: (element: Element) => boolean
   isSelectable: (element: Element) => boolean
-  isInline: (element: Element) => boolean
-  isVoid: (element: Element) => boolean
   markableVoid: (element: Element) => boolean
   normalizeNode: (
     entry: NodeEntry,
@@ -66,7 +63,7 @@ export interface BaseEditor {
       force?: boolean
     }
   ) => void
-  onChange: EditorChangeHandler
+  onChange: (options?: { operation?: Operation }) => void
   shouldNormalize: ({
     iteration,
     initialDirtyPathsLength,
@@ -145,8 +142,10 @@ export interface BaseEditor {
   isEdge: OmitFirstArg<typeof Editor.isEdge>
   isEmpty: OmitFirstArg<typeof Editor.isEmpty>
   isEnd: OmitFirstArg<typeof Editor.isEnd>
+  isInline: OmitFirstArg<typeof Editor.isInline>
   isNormalizing: OmitFirstArg<typeof Editor.isNormalizing>
   isStart: OmitFirstArg<typeof Editor.isStart>
+  isVoid: OmitFirstArg<typeof Editor.isVoid>
   last: OmitFirstArg<typeof Editor.last>
   leaf: OmitFirstArg<typeof Editor.leaf>
   levels: <T extends Node>(
@@ -180,15 +179,9 @@ export interface BaseEditor {
   shouldMergeNodesRemovePrevNode: OmitFirstArg<
     typeof Editor.shouldMergeNodesRemovePrevNode
   >
-  [key: string]: any
 }
 
 export type Editor = ExtendedType<'Editor', BaseEditor>
-
-export interface EditorChangeHandler {
-  (children: Descendant[], operations: Operation[]): void
-  (...args: any[]): void
-}
 
 export type BaseSelection = Range | null
 
