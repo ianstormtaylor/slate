@@ -831,4 +831,72 @@ describe('Transforms.applyBatch generic tree ops', () => {
       (DIRTY_PATHS.get(manualEditor) ?? []).map(path => path.join(',')).sort()
     )
   })
+
+  it('falls back to whole-batch replay when a generic split_node segment is followed by a specialized segment', () => {
+    const children = [
+      {
+        type: 'paragraph',
+        children: [{ text: 'a' }],
+      },
+      {
+        type: 'paragraph',
+        children: [{ text: 'b' }],
+      },
+      {
+        type: 'paragraph',
+        children: [{ text: 'c' }],
+      },
+    ]
+    const ops = [
+      {
+        type: 'split_node',
+        path: [1, 0],
+        position: 0,
+        properties: {},
+      },
+      {
+        type: 'move_node',
+        path: [0],
+        newPath: [1],
+      },
+      {
+        type: 'insert_node',
+        path: [2],
+        node: {
+          type: 'paragraph',
+          children: [{ text: 'n0' }],
+        },
+      },
+    ]
+    const applyBatchEditor = createEditor()
+    const manualEditor = createEditor()
+
+    applyBatchEditor.children = JSON.parse(JSON.stringify(children))
+    manualEditor.children = JSON.parse(JSON.stringify(children))
+    applyBatchEditor.selection = {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 0], offset: 0 },
+    }
+    manualEditor.selection = JSON.parse(
+      JSON.stringify(applyBatchEditor.selection)
+    )
+
+    Transforms.applyBatch(applyBatchEditor, JSON.parse(JSON.stringify(ops)))
+
+    Editor.withBatch(manualEditor, () => {
+      for (const op of JSON.parse(JSON.stringify(ops))) {
+        manualEditor.apply(op)
+      }
+    })
+
+    assert.deepEqual(applyBatchEditor.children, manualEditor.children)
+    assert.deepEqual(applyBatchEditor.selection, manualEditor.selection)
+    assert.deepEqual(applyBatchEditor.operations, manualEditor.operations)
+    assert.deepEqual(
+      (DIRTY_PATHS.get(applyBatchEditor) ?? [])
+        .map(path => path.join(','))
+        .sort(),
+      (DIRTY_PATHS.get(manualEditor) ?? []).map(path => path.join(',')).sort()
+    )
+  })
 })

@@ -17,6 +17,7 @@ import {
   DIRTY_PATH_KEYS,
   DIRTY_PATHS,
 } from '../../utils/weak-maps'
+import { withInternalBatchReads } from '../batch'
 
 const transformPathThroughOps = (path: Path, ops: Operation[]) => {
   let nextPath: Path | null = path
@@ -543,7 +544,9 @@ export const getIndependentParentSplitDirtyPathState = (
   }
 
   for (const op of ops) {
-    for (const path of editor.getDirtyPaths(op)) {
+    for (const path of withInternalBatchReads(editor, () =>
+      editor.getDirtyPaths(op)
+    )) {
       add(path)
     }
   }
@@ -594,7 +597,9 @@ const calculateDirtyPathsAfterBatch = (editor: Editor, ops: Operation[]) => {
       dirtyPathKeys = nextDirtyPathKeys
     }
 
-    for (const path of editor.getDirtyPaths(op)) {
+    for (const path of withInternalBatchReads(editor, () =>
+      editor.getDirtyPaths(op)
+    )) {
       add(path)
     }
   }
@@ -726,7 +731,9 @@ export const flushLiveMergeBatch = (editor: Editor) => {
 
   updateDirtyPaths(
     editor,
-    mergeOps.flatMap(op => editor.getDirtyPaths(op)),
+    mergeOps.flatMap(op =>
+      withInternalBatchReads(editor, () => editor.getDirtyPaths(op))
+    ),
     createIndependentParentStructuralDirtyPathTransform(mergeOps)
   )
 }

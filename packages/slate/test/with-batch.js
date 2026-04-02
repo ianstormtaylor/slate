@@ -1,5 +1,5 @@
 import assert from 'assert'
-import { createEditor, Editor, Transforms } from '../src'
+import { createEditor, Editor, Text, Transforms } from '../src'
 import {
   getCommittedChildren,
   hasDraftChildren,
@@ -15,6 +15,72 @@ const createParagraphs = () => [
   { type: 'paragraph', children: [{ text: 'one' }] },
   { type: 'paragraph', children: [{ text: 'two' }] },
 ]
+
+const createTextTaggingEditor = () => {
+  const editor = createEditor()
+  const { normalizeNode } = editor
+
+  editor.normalizeNode = entry => {
+    const [node, path] = entry
+
+    if (Text.isText(node) && node.leafTag !== path.join(',')) {
+      Transforms.setNodes(
+        editor,
+        { leafTag: path.join(',') },
+        { at: path, voids: true }
+      )
+      return
+    }
+
+    normalizeNode(entry)
+  }
+
+  return editor
+}
+
+const deepClone = value => JSON.parse(JSON.stringify(value))
+
+const runBatchEntry = (editor, batchEntry, ops) => {
+  if (batchEntry === 'applyBatch') {
+    Transforms.applyBatch(editor, deepClone(ops))
+    return
+  }
+
+  Editor.withBatch(editor, () => {
+    for (const op of deepClone(ops)) {
+      editor.apply(op)
+    }
+  })
+}
+
+const assertBatchMatchesReplay = ({ children, ops, selection = null }) => {
+  for (const batchEntry of ['applyBatch', 'manualWithBatch']) {
+    const batchEditor = createEditor()
+    const replayEditor = createEditor()
+
+    batchEditor.children = deepClone(children)
+    replayEditor.children = deepClone(children)
+    batchEditor.selection = deepClone(selection)
+    replayEditor.selection = deepClone(selection)
+
+    runBatchEntry(batchEditor, batchEntry, ops)
+
+    for (const op of deepClone(ops)) {
+      replayEditor.apply(op)
+    }
+
+    assert.deepEqual(
+      batchEditor.children,
+      replayEditor.children,
+      `children diverged for batchEntry=${batchEntry}`
+    )
+    assert.deepEqual(
+      batchEditor.selection,
+      replayEditor.selection,
+      `selection diverged for batchEntry=${batchEntry}`
+    )
+  }
+}
 
 describe('Editor.withBatch', () => {
   it('defers normalization and flush until the outer batch boundary', async () => {
@@ -241,6 +307,100 @@ describe('Transforms.applyBatch', () => {
     assert.deepEqual(editor.operations, [])
   })
 
+  it('rebases selection for staged same-parent insert_node batches', () => {
+    const editor = createEditor()
+    const replayEditor = createEditor()
+    const ops = [
+      {
+        type: 'insert_node',
+        path: [0],
+        node: { type: 'paragraph', children: [{ text: 'zero' }] },
+      },
+    ]
+
+    editor.children = createParagraphs()
+    replayEditor.children = createParagraphs()
+    editor.selection = {
+      anchor: { path: [1, 0], offset: 1 },
+      focus: { path: [1, 0], offset: 1 },
+    }
+    replayEditor.selection = JSON.parse(JSON.stringify(editor.selection))
+
+    Transforms.applyBatch(editor, ops)
+
+    for (const op of ops) {
+      replayEditor.apply(op)
+    }
+
+    assert.deepEqual(editor.selection, replayEditor.selection)
+    assert.deepEqual(editor.selection, {
+      anchor: { path: [2, 0], offset: 1 },
+      focus: { path: [2, 0], offset: 1 },
+    })
+  })
+
+  it('normalizes every inserted sibling in non-monotonic same-parent insert_node batches', () => {
+    const createTaggingEditor = () => {
+      const editor = createEditor()
+      const { normalizeNode } = editor
+
+      editor.normalizeNode = entry => {
+        const [node, path] = entry
+
+        if (
+          path.length === 1 &&
+          node.type === 'paragraph' &&
+          node.tagged !== true
+        ) {
+          Transforms.setNodes(editor, { tagged: true }, { at: path })
+          return
+        }
+
+        normalizeNode(entry)
+      }
+
+      return editor
+    }
+
+    const editor = createTaggingEditor()
+    const replayEditor = createTaggingEditor()
+    const ops = [
+      {
+        type: 'insert_node',
+        path: [0],
+        node: { type: 'paragraph', children: [{ text: 'zero' }] },
+      },
+      {
+        type: 'insert_node',
+        path: [0],
+        node: { type: 'paragraph', children: [{ text: 'minus one' }] },
+      },
+    ]
+
+    editor.children = createParagraphs()
+    replayEditor.children = createParagraphs()
+
+    Transforms.applyBatch(editor, ops)
+
+    for (const op of ops) {
+      replayEditor.apply(op)
+    }
+
+    assert.deepEqual(editor.children, replayEditor.children)
+    assert.deepEqual(editor.children.slice(0, 2), [
+      {
+        type: 'paragraph',
+        tagged: true,
+        children: [{ text: 'minus one' }],
+      },
+      {
+        type: 'paragraph',
+        tagged: true,
+        children: [{ text: 'zero' }],
+      },
+    ])
+  })
+
   it('still routes each operation through editor.apply overrides', () => {
     const editor = createEditor()
     const { apply } = editor
@@ -270,6 +430,113 @@ describe('Transforms.applyBatch', () => {
       { type: 'paragraph', id: 'orange', children: [{ text: 'one' }] },
       { type: 'paragraph', children: [{ text: 'two' }] },
     ])
+  })
+
+  it('matches replay when split_node batches are followed by later text ops', () => {
+    assertBatchMatchesReplay({
+      children: [
+        { type: 'paragraph', children: [{ text: 'a' }] },
+        { type: 'paragraph', children: [{ text: 'b' }] },
+        { type: 'paragraph', children: [{ text: 'c' }] },
+      ],
+      selection: {
+        anchor: { path: [0, 0], offset: 0 },
+        focus: { path: [0, 0], offset: 0 },
+      },
+      ops: [
+        {
+          type: 'split_node',
+          path: [0, 0],
+          position: 0,
+          properties: {},
+        },
+        {
+          type: 'insert_text',
+          path: [0, 0],
+          offset: 1,
+          text: 'Y',
+        },
+      ],
+    })
+  })
+
+  it('normalizes text leaves after batched insert_text operations', () => {
+    for (const batchEntry of ['applyBatch', 'manualWithBatch']) {
+      const editor = createTextTaggingEditor()
+
+      editor.children = [{ type: 'paragraph', children: [{ text: 'one' }] }]
+
+      runBatchEntry(editor, batchEntry, [
+        {
+          type: 'insert_text',
+          path: [0, 0],
+          offset: 3,
+          text: '!',
+        },
+      ])
+
+      assert.deepEqual(editor.children, [
+        {
+          type: 'paragraph',
+          children: [{ text: 'one!', leafTag: '0,0' }],
+        },
+      ])
+    }
+  })
+
+  it('normalizes both text leaves after batched text splits', () => {
+    for (const batchEntry of ['applyBatch', 'manualWithBatch']) {
+      const editor = createTextTaggingEditor()
+
+      editor.children = [{ type: 'paragraph', children: [{ text: 'one' }] }]
+
+      runBatchEntry(editor, batchEntry, [
+        {
+          type: 'split_node',
+          path: [0, 0],
+          position: 1,
+          properties: {},
+        },
+      ])
+
+      assert.deepEqual(editor.children, [
+        {
+          type: 'paragraph',
+          children: [
+            { text: 'o', leafTag: '0,0' },
+            { text: 'ne', leafTag: '0,1' },
+          ],
+        },
+      ])
+    }
+  })
+
+  it('matches replay when merge_node batches are followed by later text ops', () => {
+    assertBatchMatchesReplay({
+      children: [
+        { type: 'paragraph', children: [{ text: 'a' }] },
+        { type: 'paragraph', children: [{ text: 'b' }] },
+        { type: 'paragraph', children: [{ text: 'c' }] },
+      ],
+      selection: {
+        anchor: { path: [0, 0], offset: 0 },
+        focus: { path: [0, 0], offset: 0 },
+      },
+      ops: [
+        {
+          type: 'merge_node',
+          path: [1],
+          position: 1,
+          properties: {},
+        },
+        {
+          type: 'insert_text',
+          path: [0, 0],
+          offset: 2,
+          text: 'Y',
+        },
+      ],
+    })
   })
 
   it('preserves read-after-apply semantics for custom apply overrides by falling back to replay', () => {
@@ -351,6 +618,35 @@ describe('Transforms.applyBatch', () => {
     await flushMicrotasks()
 
     assert.equal(onChangeCount, 1)
+  })
+
+  it('fully normalizes block-only parents when a multi-op batch is observed mid-flight', () => {
+    const editor = createEditor()
+    const { isInline } = editor
+
+    editor.isInline = element =>
+      element.inline === true ? true : isInline(element)
+    editor.children = createParagraphs()
+
+    let observedChildren
+
+    Editor.withBatch(editor, () => {
+      editor.apply({
+        type: 'insert_node',
+        path: [0],
+        node: { inline: true, children: [{ text: 'first' }] },
+      })
+      editor.apply({
+        type: 'insert_node',
+        path: [1],
+        node: { inline: true, children: [{ text: 'second' }] },
+      })
+
+      observedChildren = deepClone(editor.children)
+    })
+
+    assert.deepEqual(observedChildren, createParagraphs())
+    assert.deepEqual(editor.children, createParagraphs())
   })
 
   it('does not mutate previously published node references during exact-path fast batches', () => {

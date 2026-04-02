@@ -262,10 +262,20 @@ export const planOperationBatchSegments = (
 }
 
 export const shouldPreferWholeBatchExecution = (segments: BatchSegment[]) =>
-  segments.length >= 3 &&
-  segments.every(
-    segment =>
-      segment.kind === 'generic' ||
-      segment.kind === 'move' ||
-      segment.kind === 'same-parent-move'
+  (segments.length >= 3 &&
+    segments.every(
+      segment =>
+        segment.kind === 'generic' ||
+        segment.kind === 'move' ||
+        segment.kind === 'same-parent-move'
+    )) ||
+  segments.some(
+    (segment, index) =>
+      segment.kind === 'generic' &&
+      segment.ops.some(
+        op => op.type === 'merge_node' || op.type === 'split_node'
+      ) &&
+      segments
+        .slice(index + 1)
+        .some(nextSegment => nextSegment.kind !== 'generic')
   )

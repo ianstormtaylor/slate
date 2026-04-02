@@ -182,9 +182,10 @@ export const normalizeNode: WithEditorFirstArg<Editor['normalizeNode']> = (
       element = Node.get(editor, path) as Ancestor
     }
 
-    const childIndexesToValidate = force
-      ? null
-      : getBlockOnlyChildIndexesToValidate(path, operation)
+    const childIndexesToValidate =
+      force || editor.operations.length !== 1
+        ? null
+        : getBlockOnlyChildIndexesToValidate(path, operation)
 
     if (Array.isArray(childIndexesToValidate)) {
       for (const index of childIndexesToValidate) {

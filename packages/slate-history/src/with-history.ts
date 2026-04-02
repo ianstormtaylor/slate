@@ -99,6 +99,9 @@ export const withHistory = <T extends Editor>(editor: T) => {
     const lastBatch = undos[undos.length - 1]
     const lastOp =
       lastBatch && lastBatch.operations[lastBatch.operations.length - 1]
+    const hasPendingSavedOperations = operations.some(operation =>
+      shouldSave(operation, undefined)
+    )
     let save = HistoryEditor.isSaving(e)
     let merge = HistoryEditor.isMerging(e)
     let trackedBatch = null
@@ -107,16 +110,16 @@ export const withHistory = <T extends Editor>(editor: T) => {
       save = shouldSave(op, lastOp)
     }
 
-    if (save) {
-      if (merge == null) {
-        if (lastBatch == null) {
-          merge = false
-        } else if (operations.includes(lastOp)) {
-          merge = true
-        } else {
-          merge = shouldMerge(op, lastOp)
+      if (save) {
+        if (merge == null) {
+          if (lastBatch == null) {
+            merge = false
+          } else if (hasPendingSavedOperations) {
+            merge = true
+          } else {
+            merge = shouldMerge(op, lastOp)
+          }
         }
-      }
 
       if (HistoryEditor.isSplittingOnce(e)) {
         merge = false

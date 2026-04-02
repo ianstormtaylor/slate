@@ -1,5 +1,9 @@
 import assert from 'assert'
-import { createEditor, Editor } from 'slate'
+import { createEditor, Editor, Transforms } from 'slate'
+
+const flushMicrotasks = async () => {
+  await Promise.resolve()
+}
 
 describe('createEditor children accessor', () => {
   it('defines children as an enumerable accessor with normal editor semantics', () => {
@@ -16,5 +20,27 @@ describe('createEditor children accessor', () => {
     assert.equal(editor.children, value)
     assert(Object.keys(editor).includes('children'))
     assert(Editor.isEditor(editor, { deep: true }))
+  })
+
+  it('preserves pending operations across internal children rewrites', async () => {
+    const editor = createEditor()
+
+    editor.children = [
+      { type: 'paragraph', children: [{ text: 'one' }] },
+      { type: 'paragraph', children: [{ text: 'two' }] },
+    ]
+
+    Transforms.select(editor, {
+      anchor: { path: [1, 0], offset: 1 },
+      focus: { path: [1, 0], offset: 1 },
+    })
+    Transforms.mergeNodes(editor, { at: [1] })
+
+    assert.equal(editor.operations[0]?.type, 'set_selection')
+    assert(editor.operations.slice(1).some(op => op.type === 'merge_node'))
+
+    await flushMicrotasks()
+
+    assert.deepEqual(editor.operations, [])
   })
 })

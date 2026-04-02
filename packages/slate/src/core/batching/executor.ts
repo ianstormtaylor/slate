@@ -25,6 +25,7 @@ import {
   canStageInsertNodeOperation,
   canStageMergeNodeOperation,
   clearInsertNodeDraft,
+  getChildren,
   getInsertNodeDraftOps,
   hasDraftChildren,
   hasExactSetNodeDraft,
@@ -116,22 +117,86 @@ const applyDirtyPathBatchedOperations = (
   )
 }
 
-const applyInsertBatchWithDirtyPathBatching = (
+const getSameParentInsertDirtyPaths = (
   editor: Editor,
   ops: BaseInsertNodeOperation[]
 ) => {
   const parentPath = Path.parent(ops[0].path)
-  const newDirtyPaths: Path[] = Path.levels(parentPath)
+  const parent = parentPath.length === 0 ? editor : Node.get(editor, parentPath)
 
-  for (const op of ops) {
-    newDirtyPaths.push(op.path)
+  if (!Node.isEditor(parent) && !Node.isElement(parent)) {
+    throw new Error(
+      `Cannot batch insert_node operations beneath non-container node at path [${parentPath}].`
+    )
+  }
 
-    if (!Node.isText(op.node)) {
-      newDirtyPaths.push(
-        ...Array.from(Node.nodes(op.node), ([, path]) => op.path.concat(path))
-      )
+  const order: (number | string)[] = Array.from(
+    { length: parent.children.length },
+    (_, index) => index
+  )
+  const insertedNodes = new Map<string, Node>()
+  let insertedTokenIndex = 0
+  const newDirtyPaths: Path[] = []
+  const newDirtyPathKeys = new Set<string>()
+
+  const addDirtyPath = (path: Path) => {
+    const key = path.join(',')
+
+    if (!newDirtyPathKeys.has(key)) {
+      newDirtyPathKeys.add(key)
+      newDirtyPaths.push(path)
     }
   }
+
+  for (const op of ops) {
+    const targetIndex = op.path[op.path.length - 1]
+
+    if (targetIndex > order.length) {
+      throw new Error(
+        `Cannot apply an "insert_node" operation at path [${op.path}] because the destination is past the end of the node.`
+      )
+    }
+
+    const token = `inserted:${insertedTokenIndex++}`
+    insertedNodes.set(token, op.node)
+    order.splice(targetIndex, 0, token)
+  }
+
+  for (const path of Path.levels(parentPath)) {
+    addDirtyPath(path)
+  }
+
+  order.forEach((token, position) => {
+    if (typeof token === 'number') {
+      return
+    }
+
+    const node = insertedNodes.get(token)
+
+    if (!node) {
+      return
+    }
+
+    const finalPath = parentPath.concat(position)
+    addDirtyPath(finalPath)
+
+    if (!Node.isText(node)) {
+      for (const [, path] of Node.nodes(node)) {
+        addDirtyPath(finalPath.concat(path))
+      }
+    }
+  })
+
+  return newDirtyPaths
+}
+
+const applyInsertBatchWithDirtyPathBatching = (
+  editor: Editor,
+  ops: BaseInsertNodeOperation[]
+) => {
+  const newDirtyPaths = withInternalBatchReads(editor, () =>
+    getSameParentInsertDirtyPaths(editor, ops)
+  )
 
   applyDirtyPathBatchedOperations(editor, ops, newDirtyPaths)
 }
@@ -468,6 +533,28 @@ const promoteDraftsBeforeLiveStructuralOp = (
   }
 }
 
+const prepareStructuralDraftsForTextOperation = (editor: Editor) => {
+  if (
+    !hasDraftChildren(editor) &&
+    !hasMergeNodeDraft(editor) &&
+    !hasSplitNodeDraft(editor)
+  ) {
+    return
+  }
+
+  // A later text op must observe the replay-equivalent leaf layout, which can
+  // require queued normalization after split/merge staging.
+  getChildren(editor)
+
+  if (hasMergeNodeDraft(editor)) {
+    promoteMergeNodeDraftToDraftChildren(editor)
+  }
+
+  if (hasSplitNodeDraft(editor)) {
+    promoteSplitNodeDraftToDraftChildren(editor)
+  }
+}
+
 const tryStageTextBatchOperation = (editor: Editor, op: Operation) => {
   if (
     (op.type !== 'insert_text' && op.type !== 'remove_text') ||
@@ -476,6 +563,8 @@ const tryStageTextBatchOperation = (editor: Editor, op: Operation) => {
   ) {
     return false
   }
+
+  prepareStructuralDraftsForTextOperation(editor)
 
   transformOperationRefs(editor, op)
   transformOperationSelection(editor, op)
@@ -522,6 +611,7 @@ const tryStageInsertBatchOperation = (editor: Editor, op: Operation) => {
   }
 
   transformOperationRefs(editor, op)
+  transformOperationSelectionPoints(editor, op)
   updateOperationDirtyPaths(editor, op)
   stageInsertNodeOperation(editor, op)
   finalizeOperation(editor, op)

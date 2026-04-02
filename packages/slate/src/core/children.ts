@@ -172,6 +172,11 @@ export const setChildren = (editor: Editor, children: Descendant[]) => {
     return
   }
 
+  if (isWritingBatchInternals(editor)) {
+    CHILDREN.set(editor, children)
+    return
+  }
+
   clearLiveInsertMoveBatch(editor)
   clearLiveMergeBatch(editor)
   clearLiveMoveBatch(editor)

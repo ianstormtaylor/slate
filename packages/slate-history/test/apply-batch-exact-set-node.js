@@ -271,6 +271,51 @@ describe('HistoryEditor applyBatch exact-path set_node', () => {
     ])
   })
 
+  it('merges into the current undo batch when apply wrappers replace op objects', () => {
+    const editor = withHistory(createEditor())
+    const { apply } = editor
+
+    editor.children = [
+      { type: 'paragraph', children: [{ text: 'one' }] },
+      { type: 'paragraph', children: [{ text: 'two' }] },
+    ]
+
+    editor.apply = op => {
+      if (op.type === 'set_node') {
+        apply({ ...op, newProperties: { ...op.newProperties } })
+        return
+      }
+
+      apply(op)
+    }
+
+    Transforms.setNodes(editor, { id: 'a' }, { at: [0] })
+    Transforms.applyBatch(editor, [
+      {
+        type: 'set_node',
+        path: [1],
+        properties: {},
+        newProperties: { id: 'b' },
+      },
+    ])
+
+    assert.equal(editor.history.undos.length, 1)
+    assert.deepEqual(editor.history.undos[0].operations, [
+      {
+        type: 'set_node',
+        path: [0],
+        properties: {},
+        newProperties: { id: 'a' },
+      },
+      {
+        type: 'set_node',
+        path: [1],
+        properties: {},
+        newProperties: { id: 'b' },
+      },
+    ])
+  })
+
   it('starts a fresh undo batch inside HistoryEditor.withNewBatch', () => {
     const editor = withHistory(createEditor())
 
