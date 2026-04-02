@@ -1,5 +1,12 @@
 # slate-dom
 
+## 0.124.1
+
+### Patch Changes
+
+- [#6040](https://github.com/ianstormtaylor/slate/pull/6040) [`20a1a937`](https://github.com/ianstormtaylor/slate/commit/20a1a9371538dda1911d533e0f02b1655ffffa12) Thanks [@12joan](https://github.com/12joan)! - - Harden property accessors against untrusted keys
+  - Fix incorrect argument types for the `compare` and `merge` options of `Transforms.setNodes`
+
 ## 0.124.0
 
 ### Patch Changes
