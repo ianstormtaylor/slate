@@ -8,11 +8,13 @@ import React, {
   useState,
 } from 'react'
 import {
+  Ancestor,
   createEditor as slateCreateEditor,
   Descendant,
   Editor,
   Element as SlateElement,
   Node,
+  Operation,
   Path,
   Transforms,
 } from 'slate'
@@ -200,7 +202,7 @@ const comparisonBenchmarkModes: BenchmarkMode[] = [
 const createEditor = (config: Config) => {
   const editor = withReact(slateCreateEditor())
 
-  editor.getChunkSize = node =>
+  editor.getChunkSize = (node: Ancestor) =>
     config.chunking && node === editor ? config.chunkSize : null
 
   return editor
@@ -223,7 +225,9 @@ const runTopLevelBenchmark = (
   const propValue = `${mode}-${Date.now()}-${Math.random()
     .toString(36)
     .slice(2, 8)}`
-  const paths = editor.children.map((_, index) => [index] as Path)
+  const paths = editor.children.map(
+    (_: Descendant, index: number) => [index] as Path
+  )
   const start = performance.now()
 
   const applyToAllBlocks = () => {
@@ -234,7 +238,7 @@ const runTopLevelBenchmark = (
       }
 
       if (mode === 'directRewrite') {
-        editor.children = editor.children.map(node =>
+        editor.children = editor.children.map((node: Descendant) =>
           SlateElement.isElement(node)
             ? ({
                 ...node,
@@ -267,7 +271,7 @@ const runTopLevelBenchmark = (
       if (mode === 'applyBatch') {
         Transforms.applyBatch(
           editor,
-          paths.map(batchPath => ({
+          paths.map((batchPath: Path) => ({
             type: 'set_node',
             path: batchPath,
             properties: {},
@@ -317,17 +321,21 @@ const runDetachedBenchmarkSuite = (
   }
 
   const directRewriteAverage =
-    durationsByMode.get('directRewrite')!.reduce((total, duration) => {
-      return total + duration
-    }, 0) / repeats
+    durationsByMode
+      .get('directRewrite')!
+      .reduce((total: number, duration: number) => {
+        return total + duration
+      }, 0) / repeats
 
   return {
     blocks: children.length,
-    metrics: comparisonBenchmarkModes.map(mode => {
+    metrics: comparisonBenchmarkModes.map((mode: BenchmarkMode) => {
       const durations = durationsByMode.get(mode)!
       const averageMs =
-        durations.reduce((total, duration) => total + duration, 0) /
-        durations.length
+        durations.reduce(
+          (total: number, duration: number) => total + duration,
+          0
+        ) / durations.length
 
       return {
         averageMs: Math.round(averageMs * 100) / 100,
@@ -522,26 +530,32 @@ const PerformanceControls = ({
 
   const averageKeyPressDuration =
     keyPressDurations.length === 10
-      ? Math.round(keyPressDurations.reduce((total, d) => total + d) / 10)
+      ? Math.round(
+          keyPressDurations.reduce(
+            (total: number, duration: number) => total + duration
+          ) / 10
+        )
       : null
 
   useEffect(() => {
     if (!SUPPORTS_EVENT_TIMING) return
 
-    const observer = new PerformanceObserver(list => {
-      list.getEntries().forEach(entry => {
-        if (entry.name === 'keypress') {
-          const duration = Math.round(
-            // @ts-ignore Entry type is missing processingStart and processingEnd
-            entry.processingEnd - entry.processingStart
-          )
-          setKeyPressDurations(durations => [
-            duration,
-            ...durations.slice(0, 9),
-          ])
-        }
-      })
-    })
+    const observer = new PerformanceObserver(
+      (list: PerformanceObserverEntryList) => {
+        list.getEntries().forEach((entry: PerformanceEntry) => {
+          if (entry.name === 'keypress') {
+            const duration = Math.round(
+              // @ts-ignore Entry type is missing processingStart and processingEnd
+              entry.processingEnd - entry.processingStart
+            )
+            setKeyPressDurations(durations => [
+              duration,
+              ...durations.slice(0, 9),
+            ])
+          }
+        })
+      }
+    )
 
     // @ts-ignore Options type is missing durationThreshold
     observer.observe({ type: 'event', durationThreshold: 16 })
@@ -555,19 +569,21 @@ const PerformanceControls = ({
     const { apply } = editor
     let afterOperation = false
 
-    editor.apply = operation => {
+    editor.apply = (operation: Operation) => {
       apply(operation)
       afterOperation = true
     }
 
-    const observer = new PerformanceObserver(list => {
-      list.getEntries().forEach(entry => {
-        if (afterOperation) {
-          setLastLongAnimationFrameDuration(Math.round(entry.duration))
-          afterOperation = false
-        }
-      })
-    })
+    const observer = new PerformanceObserver(
+      (list: PerformanceObserverEntryList) => {
+        list.getEntries().forEach((entry: PerformanceEntry) => {
+          if (afterOperation) {
+            setLastLongAnimationFrameDuration(Math.round(entry.duration))
+            afterOperation = false
+          }
+        })
+      }
+    )
 
     // Register the observer for events
     observer.observe({ type: 'long-animation-frame' })

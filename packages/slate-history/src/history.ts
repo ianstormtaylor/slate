@@ -1,14 +1,4 @@
-import { Operation, Range, isObject } from 'slate'
-
-interface Batch {
-  operations: Operation[]
-  selectionBefore: Range | null
-  selectionAfter: Range | null
-}
-
-const isBatch = (value: any): value is Batch => {
-  return isObject(value) && Operation.isOperationList(value.operations)
-}
+import { Operation, isObject } from 'slate'
 
 /**
  * `History` objects hold all of the operations that are applied to a value, so
@@ -16,8 +6,8 @@ const isBatch = (value: any): value is Batch => {
  */
 
 export interface History {
-  redos: Batch[]
-  undos: Batch[]
+  redos: Operation[][]
+  undos: Operation[][]
 }
 
 // eslint-disable-next-line no-redeclare
@@ -31,8 +21,8 @@ export const History = {
       isObject(value) &&
       Array.isArray(value.redos) &&
       Array.isArray(value.undos) &&
-      (value.redos.length === 0 || isBatch(value.redos[0])) &&
-      (value.undos.length === 0 || isBatch(value.undos[0]))
+      (value.redos.length === 0 || Operation.isOperationList(value.redos[0])) &&
+      (value.undos.length === 0 || Operation.isOperationList(value.undos[0]))
     )
   },
 }

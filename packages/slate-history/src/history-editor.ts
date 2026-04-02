@@ -1,4 +1,4 @@
-import { BaseEditor, Editor } from 'slate'
+import { Editor, Operation } from 'slate'
 import { History } from './history'
 
 /**
@@ -14,11 +14,12 @@ export const SPLITTING_ONCE = new WeakMap<Editor, boolean | undefined>()
  * `HistoryEditor` contains helpers for history-enabled editors.
  */
 
-export interface HistoryEditor extends BaseEditor {
+export interface HistoryEditor extends Editor {
   history: History
   undo: () => void
   redo: () => void
-  writeHistory: (stack: 'undos' | 'redos', batch: any) => void
+  exec: (command: any) => void
+  writeHistory: (stack: 'undos' | 'redos', batch: Operation[]) => void
 }
 
 // eslint-disable-next-line no-redeclare
@@ -28,7 +29,11 @@ export const HistoryEditor = {
    */
 
   isHistoryEditor(value: any): value is HistoryEditor {
-    return Editor.isEditor(value) && History.isHistory(value.history)
+    if (!Editor.isEditor(value)) {
+      return false
+    }
+
+    return History.isHistory((value as { history?: unknown }).history)
   },
 
   /**

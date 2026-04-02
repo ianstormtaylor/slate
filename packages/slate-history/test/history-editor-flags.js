@@ -125,6 +125,21 @@ describe('slate-history helper cleanup', () => {
     assert.deepEqual(editor.children, replacement)
   })
 
+  it('delegates undo commands when the local history is empty', () => {
+    const withExecSpy = editor => {
+      editor.exec = command => {
+        editor.commandLog = [...(editor.commandLog || []), command]
+      }
+
+      return editor
+    }
+    const historyEditor = withHistory(withExecSpy(createEditor()))
+
+    historyEditor.exec({ type: 'undo' })
+
+    assert.deepEqual(historyEditor.commandLog, [{ type: 'undo' }])
+  })
+
   it('clears stale undo history when an inner apply wrapper replaces children', () => {
     const replacement = [
       { type: 'paragraph', children: [{ text: 'replacement' }] },

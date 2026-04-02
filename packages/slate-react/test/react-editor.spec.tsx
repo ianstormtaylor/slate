@@ -71,7 +71,6 @@ describe('slate-react', () => {
           expect(windowSelection?.focusOffset).toBe(testSelection.focus.offset)
         })
       })
-
     })
   })
 })

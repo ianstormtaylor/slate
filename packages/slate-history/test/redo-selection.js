@@ -35,6 +35,33 @@ describe('slate-history redo behavior', () => {
     assert.deepEqual(editor.selection, selectionAfter)
   })
 
+  it('undoes a selection change and immediate text insert in one step', () => {
+    const editor = withHistory(createEditor())
+
+    editor.children = [{ type: 'paragraph', children: [{ text: 'one' }] }]
+    editor.selection = {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 0], offset: 0 },
+    }
+
+    const selectionBefore = JSON.parse(JSON.stringify(editor.selection))
+
+    Transforms.select(editor, {
+      anchor: { path: [0, 0], offset: 1 },
+      focus: { path: [0, 0], offset: 1 },
+    })
+    Transforms.insertText(editor, 'X')
+
+    assert.equal(editor.history.undos.length, 1)
+
+    editor.undo()
+
+    assert.deepEqual(editor.children, [
+      { type: 'paragraph', children: [{ text: 'one' }] },
+    ])
+    assert.deepEqual(editor.selection, selectionBefore)
+  })
+
   it('restores the post-operation selection when redo replays a selecting command', async () => {
     const editor = withHistory(createEditor())
 
@@ -101,5 +128,37 @@ describe('slate-history redo behavior', () => {
     editor.redo()
 
     assert.equal(editor.selection, null)
+  })
+
+  it('restores a serialized selection-only history batch', () => {
+    const selectionBefore = {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 0], offset: 0 },
+    }
+    const selectionAfter = {
+      anchor: { path: [0, 0], offset: 1 },
+      focus: { path: [0, 0], offset: 1 },
+    }
+    const editor = withHistory(createEditor())
+
+    editor.children = [{ type: 'paragraph', children: [{ text: 'one' }] }]
+    editor.selection = selectionBefore
+
+    Transforms.select(editor, selectionAfter)
+
+    const snapshot = JSON.parse(JSON.stringify(editor.history))
+    const restored = withHistory(createEditor())
+
+    restored.children = [{ type: 'paragraph', children: [{ text: 'one' }] }]
+    restored.selection = selectionAfter
+    restored.history = snapshot
+
+    restored.undo()
+
+    assert.deepEqual(restored.selection, selectionBefore)
+
+    restored.redo()
+
+    assert.deepEqual(restored.selection, selectionAfter)
   })
 })

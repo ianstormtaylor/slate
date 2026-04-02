@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test'
 
 test.describe('readonly editor', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('http://localhost:3000/examples/read-only')
+    await page.goto('/examples/read-only')
   })
 
   test('should not be editable', async ({ page }) => {

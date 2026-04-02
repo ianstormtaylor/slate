@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test'
 
 test.describe('huge document example', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('http://localhost:3000/examples/huge-document')
+    await page.goto('/examples/huge-document')
   })
 
   test('uses chunking', async ({ page }) => {
