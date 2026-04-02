@@ -1,12 +1,40 @@
 import assert from 'assert'
 import { createEditor, Transforms } from '../../slate/src'
-import { HistoryEditor, withHistory } from '../src'
+import { withHistory } from '../src'
 
 const flushMicrotasks = async () => {
   await Promise.resolve()
 }
 
 describe('slate-history redo behavior', () => {
+  it('undoes a standalone selection change', () => {
+    const editor = withHistory(createEditor())
+
+    editor.children = [{ type: 'paragraph', children: [{ text: 'one' }] }]
+    editor.selection = {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 0], offset: 0 },
+    }
+
+    const selectionBefore = JSON.parse(JSON.stringify(editor.selection))
+    const selectionAfter = {
+      anchor: { path: [0, 0], offset: 1 },
+      focus: { path: [0, 0], offset: 1 },
+    }
+
+    Transforms.select(editor, selectionAfter)
+
+    assert.equal(editor.history.undos.length, 1)
+
+    editor.undo()
+
+    assert.deepEqual(editor.selection, selectionBefore)
+
+    editor.redo()
+
+    assert.deepEqual(editor.selection, selectionAfter)
+  })
+
   it('restores the post-operation selection when redo replays a selecting command', async () => {
     const editor = withHistory(createEditor())
 
@@ -73,43 +101,5 @@ describe('slate-history redo behavior', () => {
     editor.redo()
 
     assert.equal(editor.selection, null)
-  })
-
-  it('keeps redo operations after a pure selection change following undo', async () => {
-    const editor = withHistory(createEditor())
-
-    editor.children = [{ type: 'paragraph', children: [{ text: 'one' }] }]
-    editor.selection = {
-      anchor: { path: [0, 0], offset: 3 },
-      focus: { path: [0, 0], offset: 3 },
-    }
-
-    Transforms.insertText(editor, '!')
-    await flushMicrotasks()
-
-    HistoryEditor.withNewBatch(editor, () => {
-      Transforms.insertText(editor, '?')
-    })
-
-    await flushMicrotasks()
-
-    editor.undo()
-
-    assert.equal(editor.history.undos.length, 1)
-    assert.equal(editor.history.redos.length, 1)
-
-    Transforms.select(editor, {
-      anchor: { path: [0, 0], offset: 0 },
-      focus: { path: [0, 0], offset: 0 },
-    })
-
-    assert.equal(editor.history.undos.length, 1)
-    assert.equal(editor.history.redos.length, 1)
-
-    editor.redo()
-
-    assert.deepEqual(editor.children, [
-      { type: 'paragraph', children: [{ text: 'one!?' }] },
-    ])
   })
 })

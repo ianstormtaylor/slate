@@ -99,6 +99,7 @@ export const withHistory = <T extends Editor>(editor: T) => {
     const lastBatch = undos[undos.length - 1]
     const lastOp =
       lastBatch && lastBatch.operations[lastBatch.operations.length - 1]
+    const selectionBefore = e.selection
     const hasPendingSavedOperations = operations.some(operation =>
       shouldSave(operation, undefined)
     )
@@ -162,6 +163,25 @@ export const withHistory = <T extends Editor>(editor: T) => {
       lastBatch
     ) {
       lastBatch.selectionAfter = e.selection
+      history.redos = []
+    } else if (
+      HistoryEditor.isSaving(e) !== false &&
+      op.type === 'set_selection' &&
+      op.newProperties != null
+    ) {
+      const batch = {
+        operations: [],
+        selectionBefore,
+        selectionAfter: e.selection,
+      }
+
+      e.writeHistory('undos', batch)
+
+      while (undos.length > 100) {
+        undos.shift()
+      }
+
+      history.redos = []
     }
   })
 
