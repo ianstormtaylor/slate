@@ -448,7 +448,7 @@ export const DOMEditor: DOMEditorInterface = {
     const root = DOMEditor.findDocumentOrShadowRoot(editor)
     if (root.activeElement !== el) {
       // Ensure that the DOM selection state is set to the editor's selection
-      if (editor.selection && root instanceof Document) {
+      if (editor.selection) {
         const domSelection = getSelection(root)
         const domRange = DOMEditor.toDOMRange(editor, editor.selection)
         domSelection?.removeAllRanges()

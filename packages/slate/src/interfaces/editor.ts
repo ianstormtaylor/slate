@@ -50,6 +50,7 @@ export interface BaseEditor {
   // Overrideable core methods.
 
   apply: (operation: Operation) => void
+  exec: (command: any) => void
   getDirtyPaths: (operation: Operation) => Path[]
   getFragment: () => Descendant[]
   isElementReadOnly: (element: Element) => boolean
@@ -63,7 +64,7 @@ export interface BaseEditor {
       force?: boolean
     }
   ) => void
-  onChange: (options?: { operation?: Operation }) => void
+  onChange: EditorChangeHandler
   shouldNormalize: ({
     iteration,
     dirtyPaths,
@@ -181,6 +182,8 @@ export interface BaseEditor {
 }
 
 export type Editor = ExtendedType<'Editor', BaseEditor>
+
+export type EditorChangeHandler = (...args: any[]) => void
 
 export type BaseSelection = Range | null
 

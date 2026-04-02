@@ -188,13 +188,7 @@ export const clearQueuedBatchNormalize = (editor: Editor) => {
 
 const flushOnChange = (editor: Editor) => {
   FLUSHING.set(editor, false)
-
-  const options =
-    editor.operations.length === 1
-      ? { operation: editor.operations[0] }
-      : undefined
-
-  editor.onChange(options)
+  editor.onChange(editor.children, editor.operations)
   editor.operations = []
 }
 

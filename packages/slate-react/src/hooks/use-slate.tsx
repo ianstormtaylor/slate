@@ -41,9 +41,9 @@ const getEditorVersionRef = (editor: Editor): MutableRefObject<number> => {
   // Register the `onChange` handler exactly once per editor
   const { onChange } = editor
 
-  editor.onChange = options => {
+  editor.onChange = (...args) => {
     v!.current++
-    onChange(options)
+    onChange(...args)
   }
 
   return v

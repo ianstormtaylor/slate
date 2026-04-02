@@ -1,5 +1,6 @@
 import {
   addMark,
+  Command,
   deleteFragment,
   Editor,
   getDirtyPaths,
@@ -100,10 +101,74 @@ export const createEditor = (): Editor => {
     isSelectable: () => true,
     isVoid: () => false,
     markableVoid: () => false,
-    onChange: () => {},
+    onChange: (..._args) => {},
 
     // Core
     apply: (...args) => apply(editor, ...args),
+    exec: command => {
+      if (!Command.isCommand(command)) {
+        return
+      }
+
+      switch (command.type) {
+        case 'add_mark': {
+          if (command.mark && typeof command.mark === 'object') {
+            for (const key in command.mark) {
+              editor.addMark(key, command.mark[key])
+            }
+          } else if (typeof command.key === 'string') {
+            editor.addMark(command.key, command.value)
+          }
+          break
+        }
+
+        case 'delete_backward': {
+          editor.deleteBackward(command.unit)
+          break
+        }
+
+        case 'delete_forward': {
+          editor.deleteForward(command.unit)
+          break
+        }
+
+        case 'delete_fragment': {
+          editor.deleteFragment()
+          break
+        }
+
+        case 'insert_break': {
+          editor.insertBreak()
+          break
+        }
+
+        case 'insert_fragment': {
+          editor.insertFragment(command.fragment)
+          break
+        }
+
+        case 'insert_node': {
+          editor.insertNode(command.node)
+          break
+        }
+
+        case 'insert_text': {
+          editor.insertText(command.text)
+          break
+        }
+
+        case 'remove_mark': {
+          if (command.mark && typeof command.mark === 'object') {
+            for (const key in command.mark) {
+              editor.removeMark(key)
+            }
+          } else if (typeof command.key === 'string') {
+            editor.removeMark(command.key)
+          }
+          break
+        }
+      }
+    },
 
     // Editor
     addMark: (...args) => addMark(editor, ...args),

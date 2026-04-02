@@ -397,14 +397,14 @@ export const withDOM = <T extends BaseEditor>(
     return false
   }
 
-  e.onChange = options => {
+  e.onChange = (...args) => {
     const onContextChange = EDITOR_TO_ON_CHANGE.get(e)
 
     if (onContextChange) {
-      onContextChange(options)
+      onContextChange(...args)
     }
 
-    onChange(options)
+    onChange(...args)
   }
 
   return e

@@ -39,7 +39,7 @@ export const withReact = <T extends BaseEditor>(
     }
   }
 
-  e.onChange = options => {
+  e.onChange = (...args) => {
     // COMPAT: React < 18 doesn't batch `setState` hook calls, which means
     // that the children and selection can get out of sync for one render
     // pass. So we have to use this unstable API to ensure it batches them.
@@ -51,7 +51,7 @@ export const withReact = <T extends BaseEditor>(
         : (callback: () => void) => callback()
 
     maybeBatchUpdates(() => {
-      onChange(options)
+      onChange(...args)
     })
   }
 
