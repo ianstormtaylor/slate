@@ -46,8 +46,12 @@ function compareSelectionProps(
   value: unknown,
   newValue: unknown
 ) {
-  if (key === 'anchor' || key === 'focus') {
-    return !Point.equals(<Point>value, <Point>newValue)
+  if (
+    (key === 'anchor' || key === 'focus') &&
+    Point.isPoint(value) &&
+    Point.isPoint(newValue)
+  ) {
+    return !Point.equals(value, newValue)
   }
   return value !== newValue
 }
