@@ -5,8 +5,11 @@ import {
   hasDraftChildren,
   hasInsertNodeDraft,
 } from '../src/core/children'
+import { applySetNodeBatchToChildren } from '../src/core/batching/exact-set-node-children'
+import { applyInsertNodeBatchToChildren } from '../src/core/batching/same-parent-insert-node-children'
 import { applyDirectTextMergeBatchToChildren } from '../src/core/batching/direct-text-merge-batch-children'
 import { applyDirectTextSplitBatchToChildren } from '../src/core/batching/direct-text-split-batch-children'
+import { applyTextBatchToChildren } from '../src/core/batching/text-batch-children'
 import { wrapApply } from '../src/core/batch'
 
 const flushMicrotasks = async () => {
@@ -547,7 +550,27 @@ describe('Transforms.applyBatch', () => {
     }
   })
 
-  it('rejects non-numeric text merge and split batch indexes', () => {
+  it('rejects dangerous set_node properties in both single and batched paths', () => {
+    const createOp = () => ({
+      type: 'set_node',
+      path: [0],
+      properties: {},
+      newProperties: {
+        then() {},
+      },
+    })
+    const children = [{ type: 'paragraph', children: [{ text: 'one' }] }]
+    const singleEditor = createEditor()
+    singleEditor.children = deepClone(children)
+
+    assert.throws(() => singleEditor.apply(createOp()), /Cannot set the "then"/)
+    assert.throws(
+      () => applySetNodeBatchToChildren(deepClone(children), [createOp()]),
+      /Cannot set the "then"/
+    )
+  })
+
+  it('rejects non-numeric indexes in batch-only child helpers', () => {
     const children = [
       { type: 'paragraph', children: [{ text: 'one' }, { text: 'two' }] },
     ]
@@ -573,6 +596,44 @@ describe('Transforms.applyBatch', () => {
             path: [0, '1'],
             position: 3,
             properties: {},
+          },
+        ]),
+      /path indexes must be numbers/
+    )
+
+    assert.throws(
+      () =>
+        applyTextBatchToChildren(deepClone(children), [
+          {
+            type: 'insert_text',
+            path: [0, '1'],
+            offset: 0,
+            text: 'x',
+          },
+        ]),
+      /path indexes must be numbers/
+    )
+
+    assert.throws(
+      () =>
+        applySetNodeBatchToChildren(deepClone(children), [
+          {
+            type: 'set_node',
+            path: [0, '0'],
+            properties: {},
+            newProperties: { id: 'x' },
+          },
+        ]),
+      /path indexes must be numbers/
+    )
+
+    assert.throws(
+      () =>
+        applyInsertNodeBatchToChildren(deepClone(children), [
+          {
+            type: 'insert_node',
+            path: [0, '1'],
+            node: { text: 'x' },
           },
         ]),
       /path indexes must be numbers/

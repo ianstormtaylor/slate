@@ -1,6 +1,7 @@
 import { Descendant, Element, Node, Text } from '../..'
 import { BaseSplitNodeOperation } from '../../interfaces/operation'
 import { replaceChildren } from '../../utils/modify'
+import { validateOperationPathIndexes } from './validate-operation-path'
 
 export const applyDirectTextSplitBatchToChildren = (
   children: Descendant[],
@@ -14,13 +15,12 @@ export const applyDirectTextSplitBatchToChildren = (
   let hasChanges = false
 
   for (const op of ops) {
-    const [parentIndex, textIndex] = op.path
+    validateOperationPathIndexes(
+      op.path,
+      `Cannot apply batched split_node operations at path [${op.path}]`
+    )
 
-    if (typeof parentIndex !== 'number' || typeof textIndex !== 'number') {
-      throw new Error(
-        `Cannot apply batched split_node operations at path [${op.path}] because path indexes must be numbers.`
-      )
-    }
+    const [parentIndex, textIndex] = op.path
 
     if (typeof op.position !== 'number') {
       throw new Error(

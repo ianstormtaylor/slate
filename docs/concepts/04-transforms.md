@@ -255,4 +255,4 @@ Use `Transforms.applyBatch` when you already have an array of operations:
 Transforms.applyBatch(editor, [op1, op2])
 ```
 
-In both cases, Slate still applies operations one at a time through the editor's normal `apply` behavior. The difference is that normalization and `onChange` flush are deferred until the batch completes.
+In both cases, Slate still applies operations one at a time through the editor's normal `apply` behavior, but batch state stays live for the whole callback or operation array. The final normalization pass and `onChange` flush happen once at the end.

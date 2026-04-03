@@ -259,6 +259,12 @@ export const GeneralTransforms: GeneralTransforms = {
 
             const value = newProperties[<keyof Node>key]
 
+            if (key === 'then' && typeof value === 'function') {
+              throw new Error(
+                'Cannot set the "then" property of a node to a function'
+              )
+            }
+
             if (value == null) {
               delete newNode[<keyof Node>key]
             } else {
@@ -268,7 +274,7 @@ export const GeneralTransforms: GeneralTransforms = {
 
           // properties that were previously defined, but are now missing, must be deleted
           for (const key in properties) {
-            if (!newProperties.hasOwnProperty(key)) {
+            if (!Object.hasOwn(newProperties, key)) {
               delete newNode[<keyof Node>key]
             }
           }

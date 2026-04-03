@@ -53,7 +53,7 @@ Editor.withBatch(editor, () => {
 })
 ```
 
-This keeps `editor.apply` as the per-operation hook, but defers normalization and `onChange` flush until the callback completes.
+This keeps `editor.apply` as the per-operation hook, but batch state stays live for the whole callback and the final normalization pass plus `onChange` flush happen once at the end.
 
 If you already have an array of operations, use [`Transforms.applyBatch`](04-transforms.md#batched-operations).
 

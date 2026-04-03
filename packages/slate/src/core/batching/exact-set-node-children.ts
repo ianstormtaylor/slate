@@ -1,5 +1,6 @@
 import { Descendant, Node } from '../..'
 import { BaseSetNodeOperation } from '../../interfaces/operation'
+import { validateOperationPathIndexes } from './validate-operation-path'
 
 type BatchTreeNode = {
   children: Map<number, BatchTreeNode>
@@ -14,6 +15,11 @@ export const validateExactSetNodeOperation = (op: BaseSetNodeOperation) => {
   if (op.path.length === 0) {
     throw new Error('Cannot set properties on the root node!')
   }
+
+  validateOperationPathIndexes(
+    op.path,
+    `Cannot apply batched set_node operations at path [${op.path}]`
+  )
 
   for (const key in op.newProperties) {
     if (key === 'children' || key === 'text') {
@@ -32,6 +38,10 @@ const applySetNodeOperation = (node: Node, op: BaseSetNodeOperation): Node => {
   for (const key in newProperties) {
     const value = newProperties[key as keyof Node]
 
+    if (key === 'then' && typeof value === 'function') {
+      throw new Error('Cannot set the "then" property of a node to a function')
+    }
+
     if (value == null) {
       delete mutableNode[key]
     } else {
@@ -40,7 +50,7 @@ const applySetNodeOperation = (node: Node, op: BaseSetNodeOperation): Node => {
   }
 
   for (const key in properties) {
-    if (!newProperties.hasOwnProperty(key)) {
+    if (!Object.hasOwn(newProperties, key)) {
       delete mutableNode[key]
     }
   }

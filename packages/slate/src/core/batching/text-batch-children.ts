@@ -3,6 +3,7 @@ import {
   BaseInsertTextOperation,
   BaseRemoveTextOperation,
 } from '../../interfaces/operation'
+import { validateOperationPathIndexes } from './validate-operation-path'
 
 type TextBatchOperation = BaseInsertTextOperation | BaseRemoveTextOperation
 
@@ -114,6 +115,11 @@ export const applyTextBatchToChildren = (
   const root = createBatchTreeNode()
 
   for (const op of ops) {
+    validateOperationPathIndexes(
+      op.path,
+      `Cannot apply batched ${op.type} operations at path [${op.path}]`
+    )
+
     let branch = root
 
     for (const index of op.path) {

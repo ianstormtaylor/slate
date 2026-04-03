@@ -1,5 +1,6 @@
 import { Descendant, Element, Path } from '../..'
 import { BaseInsertNodeOperation } from '../../interfaces/operation'
+import { validateOperationPathIndexes } from './validate-operation-path'
 
 const getParentPath = (op: BaseInsertNodeOperation) => Path.parent(op.path)
 
@@ -73,6 +74,12 @@ export const applyInsertNodeBatchToChildren = (
 
     for (let index = ops.length - 1; index >= 0; index--) {
       const op = ops[index]
+
+      validateOperationPathIndexes(
+        op.path,
+        `Cannot apply batched insert_node operations at path [${op.path}]`
+      )
+
       const childIndex = op.path[op.path.length - 1]
       const order = childIndex + 1
       const availableSlots = parentChildren.length + index + 1
