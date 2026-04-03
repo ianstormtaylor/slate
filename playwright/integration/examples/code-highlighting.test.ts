@@ -30,10 +30,14 @@ test.describe('code highlighting', () => {
 
 // it also tests if select and code block button works the right way
 async function setText(page: Page, text: string, language: string) {
-  await page.locator('[data-slate-editor]').selectText()
-  await page.keyboard.press('Backspace') // clear editor
+  const editor = page.getByRole('textbox')
+
+  await editor.press('ControlOrMeta+A')
+  await editor.press('Backspace') // clear editor
   await page.getByTestId('code-block-button').click() // convert first and the only one paragraph to code block
-  await page.getByTestId('language-select').selectOption({ value: language }) // select the language option
+  await page.getByTestId('language-select').first().selectOption({
+    value: language,
+  }) // select the language option on the active code block
 
   await page.keyboard.type(text) // type text
 }
