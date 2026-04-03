@@ -69,6 +69,10 @@ import { applyInsertNodeBatchToChildren } from './batching/same-parent-insert-no
 import { applyTextBatchToChildren } from './batching/text-batch-children'
 
 type TextBatchOperation = BaseInsertTextOperation | BaseRemoveTextOperation
+type ChildrenAccessEditor = Editor & {
+  getChildren: () => Descendant[]
+  setChildren: (children: Descendant[]) => void
+}
 
 const getCurrentChildren = (editor: Editor): Descendant[] =>
   hasInsertNodeDraft(editor)
@@ -654,15 +658,15 @@ export const clearExactSetNodeDraft = (editor: Editor) => {
   BATCH_EXACT_SET_NODE_SNAPSHOT_OPS.delete(editor)
 }
 
-export const defineChildrenAccessor = (editor: Editor) => {
+export const defineChildrenAccessor = (editor: ChildrenAccessEditor) => {
   Object.defineProperty(editor, 'children', {
     configurable: true,
     enumerable: true,
     get() {
-      return getChildren(editor)
+      return editor.getChildren()
     },
     set(children: Descendant[]) {
-      setChildren(editor, children)
+      editor.setChildren(children)
     },
   })
 }

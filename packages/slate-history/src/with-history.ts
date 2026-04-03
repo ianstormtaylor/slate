@@ -1,4 +1,5 @@
 import {
+  Descendant,
   Editor,
   isWritingBatchInternals,
   Operation,
@@ -21,7 +22,11 @@ import { Batch } from './history'
  */
 
 export const withHistory = <T extends Editor>(editor: T) => {
-  const e = editor as T & HistoryEditor
+  const e = editor as T &
+    HistoryEditor & {
+      setChildren: (children: Descendant[]) => void
+    }
+  const { setChildren } = e
   e.history = { undos: [], redos: [] }
   const applyOperationStack: number[] = []
 
@@ -33,53 +38,55 @@ export const withHistory = <T extends Editor>(editor: T) => {
   e.redo = () => {
     const { history } = e
     const { redos } = history
+    const batch = redos[redos.length - 1]
 
-    if (redos.length > 0) {
-      const batch = redos[redos.length - 1]
-
-      if (batch.selectionBefore) {
-        Transforms.setSelection(e, batch.selectionBefore)
-      }
-
-      HistoryEditor.withoutSaving(e, () => {
-        Editor.withoutNormalizing(e, () => {
-          for (const op of batch.operations) {
-            e.apply(op)
-          }
-
-          if (batch.selectionAfter !== undefined) {
-            restoreSelection(e, batch.selectionAfter)
-          }
-        })
-      })
-
-      history.redos.pop()
-      e.writeHistory('undos', batch)
+    if (!batch) {
+      return
     }
+
+    if (batch.selectionBefore) {
+      Transforms.setSelection(e, batch.selectionBefore)
+    }
+
+    HistoryEditor.withoutSaving(e, () => {
+      Editor.withoutNormalizing(e, () => {
+        for (const op of batch.operations) {
+          e.apply(op)
+        }
+
+        if (batch.selectionAfter !== undefined) {
+          restoreSelection(e, batch.selectionAfter)
+        }
+      })
+    })
+
+    history.redos.pop()
+    e.writeHistory('undos', batch)
   }
 
   e.undo = () => {
     const { history } = e
     const { undos } = history
+    const batch = undos[undos.length - 1]
 
-    if (undos.length > 0) {
-      const batch = undos[undos.length - 1]
-
-      HistoryEditor.withoutSaving(e, () => {
-        Editor.withoutNormalizing(e, () => {
-          const inverseOps = batch.operations.map(Operation.inverse).reverse()
-
-          for (const op of inverseOps) {
-            e.apply(op)
-          }
-
-          restoreSelection(e, batch.selectionBefore)
-        })
-      })
-
-      e.writeHistory('redos', batch)
-      history.undos.pop()
+    if (!batch) {
+      return
     }
+
+    HistoryEditor.withoutSaving(e, () => {
+      Editor.withoutNormalizing(e, () => {
+        const inverseOps = batch.operations.map(Operation.inverse).reverse()
+
+        for (const op of inverseOps) {
+          e.apply(op)
+        }
+
+        restoreSelection(e, batch.selectionBefore)
+      })
+    })
+
+    e.writeHistory('redos', batch)
+    history.undos.pop()
   }
 
   wrapApply(e, apply => (op: Operation) => {
@@ -159,33 +166,21 @@ export const withHistory = <T extends Editor>(editor: T) => {
     }
   })
 
-  const childrenDescriptor = Object.getOwnPropertyDescriptor(e, 'children')
+  e.setChildren = children => {
+    setChildren(children)
 
-  if (childrenDescriptor?.get && childrenDescriptor?.set) {
-    const getChildren = childrenDescriptor.get
-    const setChildren = childrenDescriptor.set
+    const operationsLengthBeforeApply =
+      applyOperationStack[applyOperationStack.length - 1]
 
-    Object.defineProperty(e, 'children', {
-      configurable: true,
-      enumerable: childrenDescriptor.enumerable ?? true,
-      get: getChildren,
-      set(children) {
-        setChildren.call(e, children)
+    if (
+      isWritingBatchInternals(e) ||
+      (operationsLengthBeforeApply !== undefined &&
+        e.operations.length === operationsLengthBeforeApply)
+    ) {
+      return
+    }
 
-        const operationsLengthBeforeApply =
-          applyOperationStack[applyOperationStack.length - 1]
-
-        if (
-          isWritingBatchInternals(e) ||
-          (operationsLengthBeforeApply !== undefined &&
-            e.operations.length === operationsLengthBeforeApply)
-        ) {
-          return
-        }
-
-        resetHistoryAfterChildrenAssignment()
-      },
-    })
+    resetHistoryAfterChildrenAssignment()
   }
 
   e.writeHistory = (stack: 'undos' | 'redos', batch: Batch) => {

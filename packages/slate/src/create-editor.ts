@@ -14,7 +14,11 @@ import {
   shouldNormalize,
 } from './'
 import { apply } from './core'
-import { defineChildrenAccessor } from './core/children'
+import {
+  defineChildrenAccessor,
+  getChildren,
+  setChildren,
+} from './core/children'
 import {
   above,
   after,
@@ -86,11 +90,16 @@ import {
   wrapNodes,
 } from './transforms-node'
 
+type ChildrenAccessEditor = Editor & {
+  getChildren: () => ReturnType<typeof getChildren>
+  setChildren: (children: Parameters<typeof setChildren>[1]) => void
+}
+
 /**
  * Create a new Slate `Editor` object.
  */
 export const createEditor = (): Editor => {
-  const editor: Editor = {
+  const editor: ChildrenAccessEditor = {
     children: [],
     operations: [],
     selection: null,
@@ -110,6 +119,7 @@ export const createEditor = (): Editor => {
     deleteBackward: (...args) => deleteBackward(editor, ...args),
     deleteForward: (...args) => deleteForward(editor, ...args),
     deleteFragment: (...args) => deleteFragment(editor, ...args),
+    getChildren: () => getChildren(editor),
     getFragment: (...args) => getFragment(editor, ...args),
     insertBreak: (...args) => insertBreak(editor, ...args),
     insertSoftBreak: (...args) => insertSoftBreak(editor, ...args),
@@ -170,6 +180,7 @@ export const createEditor = (): Editor => {
     rangeRefs: (...args) => rangeRefs(editor, ...args),
     removeNodes: (...args) => removeNodes(editor, ...args),
     select: (...args) => select(editor, ...args),
+    setChildren: children => setChildren(editor, children),
     setNodes: (...args) => setNodes(editor, ...args),
     setNormalizing: (...args) => setNormalizing(editor, ...args),
     setPoint: (...args) => setPoint(editor, ...args),

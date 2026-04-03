@@ -43,4 +43,27 @@ describe('createEditor children accessor', () => {
 
     assert.deepEqual(editor.operations, [])
   })
+
+  it('routes children access through overrideable editor methods', () => {
+    const editor = createEditor()
+    const value = [{ type: 'paragraph', children: [{ text: 'one' }] }]
+    const calls = []
+    const getChildren = editor.getChildren
+    const setChildren = editor.setChildren
+
+    editor.getChildren = () => {
+      calls.push('get')
+      return getChildren()
+    }
+
+    editor.setChildren = children => {
+      calls.push('set')
+      setChildren(children)
+    }
+
+    editor.children = value
+
+    assert.equal(editor.children, value)
+    assert.deepEqual(calls, ['set', 'get'])
+  })
 })
