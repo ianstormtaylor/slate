@@ -13,9 +13,13 @@ test.describe('code highlighting', () => {
     test(`code highlighting ${language}`, async ({ page }) => {
       await setText(page, content, language)
 
-      const tokens = await page
-        .locator('[data-slate-editor] [data-slate-string]')
-        .all()
+      const tokenLocator = page.locator(
+        '[data-slate-editor] [data-slate-string]'
+      )
+
+      await expect(tokenLocator).toHaveCount(highlights.length)
+
+      const tokens = await tokenLocator.all()
 
       for (const [index, token] of tokens.entries()) {
         const highlight = highlights[index]
@@ -32,14 +36,14 @@ test.describe('code highlighting', () => {
 async function setText(page: Page, text: string, language: string) {
   const editor = page.getByRole('textbox')
 
-  await editor.press('ControlOrMeta+A')
+  await editor.selectText()
   await editor.press('Backspace') // clear editor
   await page.getByTestId('code-block-button').click() // convert first and the only one paragraph to code block
   await page.getByTestId('language-select').first().selectOption({
     value: language,
   }) // select the language option on the active code block
 
-  await page.keyboard.type(text) // type text
+  await editor.pressSequentially(text) // type text
 }
 
 function getTestCases() {
