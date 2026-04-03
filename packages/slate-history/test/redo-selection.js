@@ -32,6 +32,33 @@ describe('slate-history redo behavior', () => {
     assert.deepEqual(editor.selection, selectionAfterInsert)
   })
 
+  it('stores selectionAfter as a normal enumerable batch field', async () => {
+    const editor = withHistory(createEditor())
+
+    editor.children = [{ type: 'paragraph', children: [{ text: 'one' }] }]
+    editor.selection = {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 0], offset: 0 },
+    }
+
+    Transforms.insertNodes(
+      editor,
+      { type: 'paragraph', children: [{ text: 'two' }] },
+      { at: [1], select: true }
+    )
+
+    await flushMicrotasks()
+
+    assert.deepEqual(editor.history.undos[0].selectionAfter, editor.selection)
+    assert.equal(
+      Object.prototype.propertyIsEnumerable.call(
+        editor.history.undos[0],
+        'selectionAfter'
+      ),
+      true
+    )
+  })
+
   it('keeps redo operations when undo runs before the pending flush', () => {
     const editor = withHistory(createEditor())
 

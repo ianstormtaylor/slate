@@ -248,14 +248,5 @@ const setSelectionAfter = (
   batch: Batch,
   selection: Editor['selection']
 ): void => {
-  if (Object.hasOwn(batch, 'selectionAfter')) {
-    batch.selectionAfter = selection
-    return
-  }
-
-  Object.defineProperty(batch, 'selectionAfter', {
-    value: selection,
-    enumerable: false,
-    writable: true,
-  })
+  batch.selectionAfter = selection
 }
