@@ -16,6 +16,12 @@ export const applyDirectTextMergeBatchToChildren = (
   for (const op of ops) {
     const [parentIndex, textIndex] = op.path
 
+    if (typeof parentIndex !== 'number' || typeof textIndex !== 'number') {
+      throw new Error(
+        `Cannot apply batched merge_node operations at path [${op.path}] because path indexes must be numbers.`
+      )
+    }
+
     if (textIndex === 0) {
       throw new Error(
         `Cannot apply batched merge_node operations at path [${op.path}] because there is no previous sibling to merge.`

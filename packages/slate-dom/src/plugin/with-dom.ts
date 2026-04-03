@@ -256,6 +256,8 @@ export const withDOM = <T extends BaseEditor>(
           return
         }
 
+        // Direct children replacement invalidates every DOM cache derived from
+        // the previous tree. Internal batch writes stay inside the same batch.
         EDITOR_TO_PENDING_DIFFS.delete(e)
         EDITOR_TO_PENDING_SELECTION.delete(e)
         EDITOR_TO_PENDING_ACTION.delete(e)

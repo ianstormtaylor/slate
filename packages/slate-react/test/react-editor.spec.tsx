@@ -29,6 +29,17 @@ describe('slate-react', () => {
         })
 
         expect(editor.selection).toEqual(testSelection)
+
+        await act(async () => {
+          const windowSelection = ReactEditor.getWindow(editor).getSelection()
+          expect(windowSelection?.focusNode?.textContent).toBe('test')
+          expect(windowSelection?.anchorNode?.textContent).toBe('test')
+          expect(windowSelection?.anchorOffset).toBe(
+            testSelection.anchor.offset
+          )
+          expect(windowSelection?.focusOffset).toBe(testSelection.focus.offset)
+        })
+
         expect(ReactEditor.isFocused(editor)).toBe(true)
       })
 

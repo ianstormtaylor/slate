@@ -182,7 +182,10 @@ Options: `{at?: Location, voids?: boolean}`
 
 Apply many operations as one logical batch.
 
-This is useful when you already have an array of operations to apply. The operations still go through the editor's normal `apply` behavior one at a time, but normalization and `onChange` flush are deferred until the batch completes.
+This is useful when you already have an array of operations to apply. The
+operations still go through the editor's normal `apply` behavior one at a time,
+but batch state stays live across the whole array and normalization plus the
+final `onChange` flush run once at the end.
 
 #### `Transforms.transform(editor: Editor, transform: Transform)`
 

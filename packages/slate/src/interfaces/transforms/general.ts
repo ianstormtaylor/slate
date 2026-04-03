@@ -130,6 +130,8 @@ export const GeneralTransforms: GeneralTransforms = {
           const newIndex = truePath[truePath.length - 1]
 
           modifyChildren(editor, parentPath, children => {
+            // PERF: Same-parent moves can rewrite one cloned child array
+            // instead of paying separate remove/insert tree updates.
             const nextChildren = children.slice()
             nextChildren.splice(index, 1)
             nextChildren.splice(newIndex, 0, node)
@@ -342,7 +344,6 @@ export const GeneralTransforms: GeneralTransforms = {
               text: before,
             }
             nextNode = {
-              ...(properties as Partial<Text>),
               text: after,
             }
           } else {
@@ -353,8 +354,27 @@ export const GeneralTransforms: GeneralTransforms = {
               children: before,
             }
             nextNode = {
-              ...(properties as Partial<Element>),
               children: after,
+            }
+          }
+
+          const mutableNextNode = nextNode as unknown as Record<string, unknown>
+
+          for (const key in properties) {
+            if (key === 'children' || key === 'text') {
+              throw new Error(`Cannot set the "${key}" property of nodes!`)
+            }
+
+            const value = properties[<keyof Node>key]
+
+            if (key === 'then' && typeof value === 'function') {
+              throw new Error(
+                'Cannot set the "then" property of a node to a function'
+              )
+            }
+
+            if (value != null) {
+              mutableNextNode[key] = value
             }
           }
 

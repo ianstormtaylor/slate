@@ -5,6 +5,8 @@ import {
   hasDraftChildren,
   hasInsertNodeDraft,
 } from '../src/core/children'
+import { applyDirectTextMergeBatchToChildren } from '../src/core/batching/direct-text-merge-batch-children'
+import { applyDirectTextSplitBatchToChildren } from '../src/core/batching/direct-text-split-batch-children'
 import { wrapApply } from '../src/core/batch'
 
 const flushMicrotasks = async () => {
@@ -509,6 +511,72 @@ describe('Transforms.applyBatch', () => {
         },
       ])
     }
+  })
+
+  it('rejects dangerous split_node properties in both single and batched paths', () => {
+    const createOp = () => ({
+      type: 'split_node',
+      path: [0, 0],
+      position: 1,
+      properties: {
+        then() {},
+      },
+    })
+
+    const singleEditor = createEditor()
+    singleEditor.children = [{ type: 'paragraph', children: [{ text: 'one' }] }]
+
+    assert.throws(() => singleEditor.apply(createOp()), /Cannot set the "then"/)
+
+    for (const batchEntry of ['applyBatch', 'manualWithBatch']) {
+      const editor = createEditor()
+      editor.children = [{ type: 'paragraph', children: [{ text: 'one' }] }]
+
+      if (batchEntry === 'applyBatch') {
+        assert.throws(
+          () => Transforms.applyBatch(editor, [createOp()]),
+          /Cannot set the "then"/
+        )
+      } else {
+        assert.throws(() => {
+          Editor.withBatch(editor, () => {
+            editor.apply(createOp())
+          })
+        }, /Cannot set the "then"/)
+      }
+    }
+  })
+
+  it('rejects non-numeric text merge and split batch indexes', () => {
+    const children = [
+      { type: 'paragraph', children: [{ text: 'one' }, { text: 'two' }] },
+    ]
+
+    assert.throws(
+      () =>
+        applyDirectTextSplitBatchToChildren(deepClone(children), [
+          {
+            type: 'split_node',
+            path: [0, '0'],
+            position: 1,
+            properties: {},
+          },
+        ]),
+      /path indexes must be numbers/
+    )
+
+    assert.throws(
+      () =>
+        applyDirectTextMergeBatchToChildren(deepClone(children), [
+          {
+            type: 'merge_node',
+            path: [0, '1'],
+            position: 3,
+            properties: {},
+          },
+        ]),
+      /path indexes must be numbers/
+    )
   })
 
   it('matches replay when merge_node batches are followed by later text ops', () => {

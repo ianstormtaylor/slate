@@ -351,7 +351,10 @@ Options: `{force?: boolean; operation?: Operation}`
 
 #### `Editor.withBatch(editor: Editor, fn: () => void) => void`
 
-Call a function, deferring normalization and `onChange` flush until it completes.
+Call a synchronous function as one logical batch. Operations still go through
+`editor.apply` one at a time, but batch state stays live until the callback
+completes, and normalization plus the final `onChange` flush run once at the
+end.
 
 #### `Editor.withoutNormalizing(editor: Editor, fn: () => void) => void`
 

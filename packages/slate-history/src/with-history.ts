@@ -8,6 +8,7 @@ import {
 } from 'slate'
 
 import { HistoryEditor } from './history-editor'
+import { Batch } from './history'
 
 /**
  * The `withHistory` plugin keeps track of the operation history of a Slate
@@ -21,12 +22,6 @@ import { HistoryEditor } from './history-editor'
 
 export const withHistory = <T extends Editor>(editor: T) => {
   const e = editor as T & HistoryEditor
-  type Batch = {
-    operations: Operation[]
-    selectionBefore: T['selection']
-    selectionAfter?: T['selection']
-  }
-
   e.history = { undos: [], redos: [] }
   const applyOperationStack: number[] = []
 
@@ -40,7 +35,7 @@ export const withHistory = <T extends Editor>(editor: T) => {
     const { redos } = history
 
     if (redos.length > 0) {
-      const batch = redos[redos.length - 1] as Batch
+      const batch = redos[redos.length - 1]
 
       if (batch.selectionBefore) {
         Transforms.setSelection(e, batch.selectionBefore)
@@ -68,7 +63,7 @@ export const withHistory = <T extends Editor>(editor: T) => {
     const { undos } = history
 
     if (undos.length > 0) {
-      const batch = undos[undos.length - 1] as Batch
+      const batch = undos[undos.length - 1]
 
       HistoryEditor.withoutSaving(e, () => {
         Editor.withoutNormalizing(e, () => {
@@ -90,19 +85,18 @@ export const withHistory = <T extends Editor>(editor: T) => {
   wrapApply(e, apply => (op: Operation) => {
     const { operations, history } = e
     const { undos } = history
-    const lastBatch =
-      undos.length > 0 ? (undos[undos.length - 1] as Batch) : undefined
+    const lastBatch = undos[undos.length - 1]
     const lastOp =
       lastBatch && lastBatch.operations[lastBatch.operations.length - 1]
     const hasPendingSavedOperations = operations.some(operation =>
-      shouldSave(operation, undefined)
+      shouldSave(operation)
     )
     let save = HistoryEditor.isSaving(e)
     let merge = HistoryEditor.isMerging(e)
     let trackedBatch: Batch | null = null
 
     if (save == null) {
-      save = shouldSave(op, lastOp)
+      save = shouldSave(op)
     }
 
     if (save) {
@@ -233,22 +227,12 @@ const shouldMerge = (op: Operation, prev: Operation | undefined): boolean => {
  * Check whether an operation needs to be saved to the history.
  */
 
-const shouldSave = (op: Operation, _prev: Operation | undefined): boolean => {
-  if (op.type === 'set_selection') {
-    return false
-  }
-
-  return true
-}
+const shouldSave = (op: Operation): boolean => op.type !== 'set_selection'
 
 const restoreSelection = (
   editor: Editor,
-  selection: Editor['selection'] | undefined
+  selection: Editor['selection']
 ): void => {
-  if (selection === undefined) {
-    return
-  }
-
   if (selection == null) {
     if (editor.selection != null) {
       Transforms.deselect(editor)
@@ -260,11 +244,11 @@ const restoreSelection = (
   Transforms.select(editor, selection)
 }
 
-const setSelectionAfter = <T extends { selectionAfter?: Editor['selection'] }>(
-  batch: T,
+const setSelectionAfter = (
+  batch: Batch,
   selection: Editor['selection']
 ): void => {
-  if (Object.prototype.hasOwnProperty.call(batch, 'selectionAfter')) {
+  if (Object.hasOwn(batch, 'selectionAfter')) {
     batch.selectionAfter = selection
     return
   }
