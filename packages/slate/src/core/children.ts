@@ -69,10 +69,17 @@ import { applyInsertNodeBatchToChildren } from './batching/same-parent-insert-no
 import { applyTextBatchToChildren } from './batching/text-batch-children'
 
 type TextBatchOperation = BaseInsertTextOperation | BaseRemoveTextOperation
-type ChildrenAccessEditor = Editor & {
-  getChildren: () => Descendant[]
-  setChildren: (children: Descendant[]) => void
+type GetChildrenHook = () => Descendant[]
+type SetChildrenHook = (children: Descendant[]) => void
+const GET_CHILDREN_HOOK = Symbol.for('slate.getChildrenHook')
+const SET_CHILDREN_HOOK = Symbol.for('slate.setChildrenHook')
+type HookedChildrenEditor = Editor & {
+  [GET_CHILDREN_HOOK]?: GetChildrenHook
+  [SET_CHILDREN_HOOK]?: SetChildrenHook
 }
+
+const getHookedChildrenEditor = (editor: Editor) =>
+  editor as HookedChildrenEditor
 
 const getCurrentChildren = (editor: Editor): Descendant[] =>
   hasInsertNodeDraft(editor)
@@ -658,15 +665,65 @@ export const clearExactSetNodeDraft = (editor: Editor) => {
   BATCH_EXACT_SET_NODE_SNAPSHOT_OPS.delete(editor)
 }
 
-export const defineChildrenAccessor = (editor: ChildrenAccessEditor) => {
+export const wrapGetChildren = (
+  editor: Editor,
+  wrapper: (getChildren: GetChildrenHook) => GetChildrenHook
+) => {
+  const hookedEditor = getHookedChildrenEditor(editor)
+  const getChildrenHook = hookedEditor[GET_CHILDREN_HOOK]
+
+  if (!getChildrenHook) {
+    throw new Error('Children accessor hooks have not been initialized.')
+  }
+
+  const wrapped = wrapper(getChildrenHook)
+  hookedEditor[GET_CHILDREN_HOOK] = wrapped
+
+  return wrapped
+}
+
+export const wrapSetChildren = (
+  editor: Editor,
+  wrapper: (setChildren: SetChildrenHook) => SetChildrenHook
+) => {
+  const hookedEditor = getHookedChildrenEditor(editor)
+  const setChildrenHook = hookedEditor[SET_CHILDREN_HOOK]
+
+  if (!setChildrenHook) {
+    throw new Error('Children accessor hooks have not been initialized.')
+  }
+
+  const wrapped = wrapper(setChildrenHook)
+  hookedEditor[SET_CHILDREN_HOOK] = wrapped
+
+  return wrapped
+}
+
+export const defineChildrenAccessor = (editor: Editor) => {
+  const hookedEditor = getHookedChildrenEditor(editor)
+  hookedEditor[GET_CHILDREN_HOOK] = () => getChildren(editor)
+  hookedEditor[SET_CHILDREN_HOOK] = children => setChildren(editor, children)
+
   Object.defineProperty(editor, 'children', {
     configurable: true,
     enumerable: true,
     get() {
-      return editor.getChildren()
+      const getChildrenHook = hookedEditor[GET_CHILDREN_HOOK]
+
+      if (!getChildrenHook) {
+        throw new Error('Children getter hook has not been initialized.')
+      }
+
+      return getChildrenHook()
     },
     set(children: Descendant[]) {
-      editor.setChildren(children)
+      const setChildrenHook = hookedEditor[SET_CHILDREN_HOOK]
+
+      if (!setChildrenHook) {
+        throw new Error('Children setter hook has not been initialized.')
+      }
+
+      setChildrenHook(children)
     },
   })
 }

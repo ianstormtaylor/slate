@@ -1,5 +1,6 @@
 import assert from 'assert'
 import { createEditor, Editor, Transforms } from 'slate'
+import { wrapGetChildren, wrapSetChildren } from '../src/core/children'
 
 const flushMicrotasks = async () => {
   await Promise.resolve()
@@ -48,18 +49,19 @@ describe('createEditor children accessor', () => {
     const editor = createEditor()
     const value = [{ type: 'paragraph', children: [{ text: 'one' }] }]
     const calls = []
-    const getChildren = editor.getChildren
-    const setChildren = editor.setChildren
 
-    editor.getChildren = () => {
+    assert.equal('getChildren' in editor, false)
+    assert.equal('setChildren' in editor, false)
+
+    wrapGetChildren(editor, getChildren => () => {
       calls.push('get')
       return getChildren()
-    }
+    })
 
-    editor.setChildren = children => {
+    wrapSetChildren(editor, setChildren => children => {
       calls.push('set')
       setChildren(children)
-    }
+    })
 
     editor.children = value
 
