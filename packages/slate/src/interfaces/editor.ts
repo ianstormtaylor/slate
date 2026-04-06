@@ -219,6 +219,7 @@ export interface EditorFragmentDeletionOptions {
   direction?: TextDirection
 }
 
+/** @expand */
 export interface EditorIsEditorOptions {
   deep?: boolean
 }
