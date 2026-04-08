@@ -26,11 +26,6 @@ export const withHistory = <T extends Editor>(editor: T) => {
   e.history = { undos: [], redos: [] }
   const applyOperationStack: number[] = []
 
-  const resetHistoryAfterChildrenAssignment = () => {
-    e.history.undos = []
-    e.history.redos = []
-  }
-
   e.redo = () => {
     const { history } = e
     const { redos } = history
@@ -176,7 +171,10 @@ export const withHistory = <T extends Editor>(editor: T) => {
       return
     }
 
-    resetHistoryAfterChildrenAssignment()
+    // Direct tree replacement invalidates both history stacks because the
+    // saved batches no longer describe the current document.
+    e.history.undos = []
+    e.history.redos = []
   }
 
   e.writeHistory = (stack: 'undos' | 'redos', batch: Batch) => {

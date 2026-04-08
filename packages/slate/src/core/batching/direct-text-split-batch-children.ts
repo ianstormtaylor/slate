@@ -22,12 +22,6 @@ export const applyDirectTextSplitBatchToChildren = (
 
     const [parentIndex, textIndex] = op.path
 
-    if (typeof op.position !== 'number') {
-      throw new Error(
-        `Cannot apply batched split_node operations at path [${op.path}] because the split position must be a number.`
-      )
-    }
-
     const parent = nextChildren[parentIndex]
 
     if (!parent || !Element.isElement(parent)) {
