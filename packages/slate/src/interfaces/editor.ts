@@ -50,6 +50,7 @@ export interface BaseEditor {
   // Overrideable core methods.
 
   apply: (operation: Operation) => void
+  getChildren: () => Descendant[]
   getDirtyPaths: (operation: Operation) => Path[]
   getFragment: () => Descendant[]
   isElementReadOnly: (element: Element) => boolean
@@ -99,6 +100,7 @@ export interface BaseEditor {
   removeMark: OmitFirstArg<typeof Editor.removeMark>
   removeNodes: OmitFirstArg<typeof Transforms.removeNodes>
   select: OmitFirstArg<typeof Transforms.select>
+  setChildren: (children: Descendant[]) => void
   setNodes: <T extends Node>(
     props: Partial<T>,
     options?: {

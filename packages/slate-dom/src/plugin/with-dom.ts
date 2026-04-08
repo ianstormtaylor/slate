@@ -9,7 +9,6 @@ import {
   PathRef,
   Range,
   Transforms,
-  wrapSetChildren,
 } from 'slate'
 import {
   TextDiff,
@@ -53,7 +52,8 @@ export const withDOM = <T extends BaseEditor>(
   clipboardFormatKey = 'x-slate-fragment'
 ): T & DOMEditor => {
   const e = editor as T & DOMEditor
-  const { apply, onChange, deleteBackward, addMark, removeMark } = e
+  const { apply, onChange, deleteBackward, addMark, removeMark, setChildren } =
+    e
 
   // The WeakMap which maps a key to a specific HTMLElement must be scoped to the editor instance to
   // avoid collisions between editors in the DOM that share the same value.
@@ -240,7 +240,7 @@ export const withDOM = <T extends BaseEditor>(
     }
   }
 
-  wrapSetChildren(e, setChildren => children => {
+  e.setChildren = children => {
     setChildren(children)
 
     if (isWritingBatchInternals(e)) {
@@ -257,7 +257,7 @@ export const withDOM = <T extends BaseEditor>(
     EDITOR_TO_USER_SELECTION.get(e)?.unref()
     EDITOR_TO_USER_SELECTION.delete(e)
     IS_NODE_MAP_DIRTY.set(e, true)
-  })
+  }
 
   e.setFragmentData = (data: Pick<DataTransfer, 'getData' | 'setData'>) => {
     const { selection } = e

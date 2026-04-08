@@ -5,7 +5,6 @@ import {
   Path,
   Transforms,
   wrapApply,
-  wrapSetChildren,
 } from 'slate'
 
 import { HistoryEditor } from './history-editor'
@@ -23,6 +22,7 @@ import { Batch } from './history'
 
 export const withHistory = <T extends Editor>(editor: T) => {
   const e = editor as T & HistoryEditor
+  const { setChildren } = e
   e.history = { undos: [], redos: [] }
   const applyOperationStack: number[] = []
 
@@ -162,7 +162,7 @@ export const withHistory = <T extends Editor>(editor: T) => {
     }
   })
 
-  wrapSetChildren(e, setChildren => children => {
+  e.setChildren = children => {
     setChildren(children)
 
     const operationsLengthBeforeApply =
@@ -177,7 +177,7 @@ export const withHistory = <T extends Editor>(editor: T) => {
     }
 
     resetHistoryAfterChildrenAssignment()
-  })
+  }
 
   e.writeHistory = (stack: 'undos' | 'redos', batch: Batch) => {
     e.history[stack].push(batch)
