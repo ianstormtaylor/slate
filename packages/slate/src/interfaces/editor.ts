@@ -119,13 +119,13 @@ export interface BaseEditor {
 
   /**
    * Collapse the selection.
-   * @see {@link EditorInterface.collapse}
+   * @see {@link Transforms.collapse}
    */
   collapse: (options?: SelectionCollapseOptions) => void
 
   /**
    * Delete content in the editor.
-   * @see {@link EditorInterface.delete}
+   * @see {@link Transforms.delete}
    */
   delete: (options?: TextDeleteOptions) => void
 
@@ -149,7 +149,7 @@ export interface BaseEditor {
 
   /**
    * Unset the selection.
-   * @see {@link EditorInterface.deselect}
+   * @see {@link Transforms.deselect}
    */
   deselect: () => void
 
@@ -177,7 +177,7 @@ export interface BaseEditor {
   /**
    * Insert nodes in the editor at the specified location or (if not defined)
    * the current selection or (if not defined) the end of the document.
-   * @see {@link EditorInterface.insertNodes}
+   * @see {@link Transforms.insertNodes}
    */
   insertNodes: <T extends Node>(nodes: Node | Node[], options?: NodeInsertNodesOptions<T>) => void
 
@@ -222,7 +222,7 @@ export interface BaseEditor {
 
   /**
    * Move the selection's point forward or backward.
-   * @see {@link EditorInterface.move}
+   * @see {@link Transforms.move}
    */
   move: (options?: SelectionMoveOptions) => void
 
@@ -267,7 +267,7 @@ export interface BaseEditor {
 
   /**
    * Set the selection to a new value.
-   * @see {@link EditorInterface.select}
+   * @see {@link Transforms.select}
    */
   select: (target: Location) => void
 
@@ -299,13 +299,13 @@ export interface BaseEditor {
 
   /**
    * Set new properties on one of the selection's points.
-   * @see {@link EditorInterface.setPoint}
+   * @see {@link Transforms.setPoint}
    */
   setPoint: (props: Partial<Point>, options?: SelectionSetPointOptions) => void
 
   /**
    * Set new properties on the selection.
-   * @see {@link EditorInterface.setSelection}
+   * @see {@link Transforms.setSelection}
    */
   setSelection: (props: Partial<Range>) => void
 
