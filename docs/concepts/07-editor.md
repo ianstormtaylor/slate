@@ -53,7 +53,12 @@ Editor.withBatch(editor, () => {
 })
 ```
 
-This keeps `editor.apply` as the per-operation hook, but batch state stays live for the whole callback and the final normalization pass plus `onChange` flush happen once at the end.
+This keeps `editor.apply` as the per-operation hook, but does so against a
+draft `editor.children` structure. Slate turns that draft back into immutable
+`editor.children` when the callback completes, or when code reads
+`editor.children` during the batch. The final normalization pass and `onChange`
+flush happen once at the end, which can be more performant for large batches
+of similar synchronous operations.
 
 If you already have an array of operations, use [`Transforms.applyBatch`](04-transforms.md#batched-operations).
 

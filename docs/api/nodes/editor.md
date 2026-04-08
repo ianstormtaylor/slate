@@ -351,10 +351,13 @@ Options: `{force?: boolean; operation?: Operation}`
 
 #### `Editor.withBatch(editor: Editor, fn: () => void) => void`
 
-Call a synchronous function as one logical batch. Operations still go through
-`editor.apply` one at a time, but batch state stays live until the callback
-completes, and normalization plus the final `onChange` flush run once at the
-end.
+Call a synchronous function as one logical batch. During a batch, operations
+still go through `editor.apply` one at a time, but Slate mutates a draft
+`editor.children` structure and turns it back into immutable `editor.children`
+when the callback completes, or when code reads `editor.children` during the
+batch. Normalization and the final `onChange` flush run once at the end. When
+applying large numbers of similar synchronous operations, this can be more
+performant than applying them outside a batch.
 
 #### `Editor.withoutNormalizing(editor: Editor, fn: () => void) => void`
 

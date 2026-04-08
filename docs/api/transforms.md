@@ -182,10 +182,13 @@ Options: `{at?: Location, voids?: boolean}`
 
 Apply many operations as one logical batch.
 
-This is useful when you already have an array of operations to apply. The
-operations still go through the editor's normal `apply` behavior one at a time,
-but batch state stays live across the whole array and normalization plus the
-final `onChange` flush run once at the end.
+This is useful when you already have an array of operations to apply. During a
+batch, operations still go through the editor's normal `apply` behavior one at
+a time, but Slate mutates a draft `editor.children` structure and turns it back
+into immutable `editor.children` when the batch completes, or when code reads
+`editor.children` during the batch. Normalization and the final `onChange`
+flush run once at the end. When applying large numbers of similar synchronous
+operations, this can be more performant than applying them outside a batch.
 
 #### `Transforms.transform(editor: Editor, transform: Transform)`
 
