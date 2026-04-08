@@ -134,10 +134,7 @@ const getSameParentInsertDirtyPaths = (
     )
   }
 
-  const order: Array<number | Node> = Array.from(
-    { length: parent.children.length },
-    (_, index) => index
-  )
+  const order: Array<Node | null> = new Array(parent.children.length).fill(null)
   const newDirtyPaths: Path[] = []
   const newDirtyPathKeys = new Set<string>()
 
@@ -167,7 +164,7 @@ const getSameParentInsertDirtyPaths = (
   }
 
   order.forEach((entry, position) => {
-    if (typeof entry === 'number') {
+    if (entry == null) {
       return
     }
 
