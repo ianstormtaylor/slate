@@ -21,6 +21,10 @@ import {
   removeChildren,
   replaceChildren,
 } from '../../utils/modify'
+import {
+  NON_SETTABLE_NODE_PROPERTIES,
+  NON_SETTABLE_SELECTION_PROPERTIES,
+} from '../../utils/non-settable-properties'
 
 export interface GeneralTransforms {
   /**
@@ -253,7 +257,7 @@ export const GeneralTransforms: GeneralTransforms = {
           const newNode = { ...node }
 
           for (const key in newProperties) {
-            if (key === 'children' || key === 'text') {
+            if (NON_SETTABLE_NODE_PROPERTIES.includes(key)) {
               throw new Error(`Cannot set the "${key}" property of nodes!`)
             }
 
@@ -309,7 +313,19 @@ export const GeneralTransforms: GeneralTransforms = {
         const selection = { ...editor.selection }
 
         for (const key in newProperties) {
+          if (NON_SETTABLE_SELECTION_PROPERTIES.includes(key)) {
+            throw new Error(
+              `Cannot set the "${key}" property of the selection!`
+            )
+          }
+
           const value = newProperties[<keyof Range>key]
+
+          if (key === 'then' && typeof value === 'function') {
+            throw new Error(
+              'Cannot set the "then" property of the selection to a function'
+            )
+          }
 
           if (value == null) {
             if (key === 'anchor' || key === 'focus') {

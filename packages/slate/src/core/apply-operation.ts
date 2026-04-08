@@ -107,10 +107,14 @@ export const runOperation = (editor: Editor, op: Operation) => {
   finalizeOperation(editor, op)
 }
 
-export const batchOperationDirtyPaths = (
-  editor: Editor,
-  fn: () => void,
+export const batchOperationDirtyPaths = ({
+  editor,
+  fn,
+  applyDirtyPaths,
+}: {
+  editor: Editor
+  fn: () => void
   applyDirtyPaths: () => void
-) => {
+}) => {
   batchDirtyPaths(editor, fn, applyDirtyPaths)
 }

@@ -548,6 +548,22 @@ describe('Transforms.applyBatch', () => {
         }, /Cannot set the "then"/)
       }
     }
+
+    assert.throws(
+      () =>
+        applyDirectTextSplitBatchToChildren(
+          deepClone([{ type: 'paragraph', children: [{ text: 'one' }] }]),
+          [
+            {
+              type: 'split_node',
+              path: [0, 0],
+              position: 1,
+              properties: { constructor: 'x' },
+            },
+          ]
+        ),
+      /Cannot set the "constructor"/
+    )
   })
 
   it('rejects dangerous set_node properties in both single and batched paths', () => {
@@ -567,6 +583,21 @@ describe('Transforms.applyBatch', () => {
     assert.throws(
       () => applySetNodeBatchToChildren(deepClone(children), [createOp()]),
       /Cannot set the "then"/
+    )
+
+    assert.throws(
+      () =>
+        applySetNodeBatchToChildren(deepClone(children), [
+          {
+            type: 'set_node',
+            path: [0],
+            properties: {},
+            newProperties: {
+              constructor: 'x',
+            },
+          },
+        ]),
+      /Cannot set the "constructor"/
     )
   })
 

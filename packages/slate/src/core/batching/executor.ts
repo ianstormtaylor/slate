@@ -95,16 +95,20 @@ const transformPathThroughOps = (path: Path, ops: Operation[]) => {
   return nextPath
 }
 
-const applyDirtyPathBatchedOperations = (
-  editor: Editor,
-  ops: Operation[],
-  newDirtyPaths: Path[],
-  transformDirtyPath: (path: Path) => Path | null = path =>
-    transformPathThroughOps(path, ops)
-) => {
-  batchOperationDirtyPaths(
+const applyDirtyPathBatchedOperations = ({
+  editor,
+  ops,
+  newDirtyPaths,
+  transformDirtyPath = (path: Path) => transformPathThroughOps(path, ops),
+}: {
+  editor: Editor
+  ops: Operation[]
+  newDirtyPaths: Path[]
+  transformDirtyPath?: (path: Path) => Path | null
+}) => {
+  batchOperationDirtyPaths({
     editor,
-    () => {
+    fn: () => {
       Editor.withBatch(editor, () => {
         for (const op of ops) {
           editor.apply(op)
@@ -113,8 +117,8 @@ const applyDirtyPathBatchedOperations = (
         updateDirtyPaths(editor, newDirtyPaths, transformDirtyPath)
       })
     },
-    () => {}
-  )
+    applyDirtyPaths: () => {},
+  })
 }
 
 const getSameParentInsertDirtyPaths = (
@@ -130,12 +134,10 @@ const getSameParentInsertDirtyPaths = (
     )
   }
 
-  const order: (number | string)[] = Array.from(
+  const order: Array<number | Node> = Array.from(
     { length: parent.children.length },
     (_, index) => index
   )
-  const insertedNodes = new Map<string, Node>()
-  let insertedTokenIndex = 0
   const newDirtyPaths: Path[] = []
   const newDirtyPathKeys = new Set<string>()
 
@@ -157,25 +159,19 @@ const getSameParentInsertDirtyPaths = (
       )
     }
 
-    const token = `inserted:${insertedTokenIndex++}`
-    insertedNodes.set(token, op.node)
-    order.splice(targetIndex, 0, token)
+    order.splice(targetIndex, 0, op.node)
   }
 
   for (const path of Path.levels(parentPath)) {
     addDirtyPath(path)
   }
 
-  order.forEach((token, position) => {
-    if (typeof token === 'number') {
+  order.forEach((entry, position) => {
+    if (typeof entry === 'number') {
       return
     }
 
-    const node = insertedNodes.get(token)
-
-    if (!node) {
-      return
-    }
+    const node = entry
 
     const finalPath = parentPath.concat(position)
     addDirtyPath(finalPath)
@@ -198,7 +194,7 @@ const applyInsertBatchWithDirtyPathBatching = (
     getSameParentInsertDirtyPaths(editor, ops)
   )
 
-  applyDirtyPathBatchedOperations(editor, ops, newDirtyPaths)
+  applyDirtyPathBatchedOperations({ editor, ops, newDirtyPaths })
 }
 
 const getSameParentMoveDirtyPaths = (
@@ -373,12 +369,12 @@ const applyBatchSegment = (editor: Editor, segment: BatchSegment) => {
           )
       )
 
-      applyDirtyPathBatchedOperations(
+      applyDirtyPathBatchedOperations({
         editor,
-        segment.ops,
+        ops: segment.ops,
         newDirtyPaths,
-        transformDirtyPath
-      )
+        transformDirtyPath,
+      })
       return
     }
     case 'same-parent-insert':
@@ -388,22 +384,22 @@ const applyBatchSegment = (editor: Editor, segment: BatchSegment) => {
       )
       return
     case 'same-parent-move':
-      applyDirtyPathBatchedOperations(
+      applyDirtyPathBatchedOperations({
         editor,
-        segment.ops,
-        withInternalBatchReads(editor, () =>
+        ops: segment.ops,
+        newDirtyPaths: withInternalBatchReads(editor, () =>
           getSameParentMoveDirtyPaths(
             editor,
             segment.ops as BaseMoveNodeOperation[]
           )
         ),
-        withInternalBatchReads(editor, () =>
+        transformDirtyPath: withInternalBatchReads(editor, () =>
           createSameParentMoveDirtyPathTransform(
             editor,
             segment.ops as BaseMoveNodeOperation[]
           )
-        )
-      )
+        ),
+      })
       return
     case 'move':
       for (const op of segment.ops) {
@@ -813,16 +809,16 @@ function applyWholeBatchFastPath(editor: Editor, ops: Operation[]) {
   }
 
   if (isLiveSameParentMoveBatch(ops)) {
-    applyDirtyPathBatchedOperations(
+    applyDirtyPathBatchedOperations({
       editor,
       ops,
-      withInternalBatchReads(editor, () =>
+      newDirtyPaths: withInternalBatchReads(editor, () =>
         getLiveSameParentMoveDirtyPaths(editor, ops)
       ),
-      withInternalBatchReads(editor, () =>
+      transformDirtyPath: withInternalBatchReads(editor, () =>
         createLiveSameParentMoveDirtyPathTransform(editor, ops)
-      )
-    )
+      ),
+    })
     return true
   }
 

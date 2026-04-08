@@ -1,5 +1,6 @@
 import { Descendant, Element, Node, Text } from '../..'
 import { BaseSplitNodeOperation } from '../../interfaces/operation'
+import { NON_SETTABLE_NODE_PROPERTIES } from '../../utils/non-settable-properties'
 import { replaceChildren } from '../../utils/modify'
 import { validateOperationPathIndexes } from './validate-operation-path'
 
@@ -44,7 +45,7 @@ export const applyDirectTextSplitBatchToChildren = (
     const mutableNextNode = nextNode as unknown as Record<string, unknown>
 
     for (const key in op.properties) {
-      if (key === 'children' || key === 'text') {
+      if (NON_SETTABLE_NODE_PROPERTIES.includes(key)) {
         throw new Error(`Cannot set the "${key}" property of nodes!`)
       }
 

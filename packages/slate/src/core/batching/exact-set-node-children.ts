@@ -1,5 +1,6 @@
 import { Descendant, Node } from '../..'
 import { BaseSetNodeOperation } from '../../interfaces/operation'
+import { NON_SETTABLE_NODE_PROPERTIES } from '../../utils/non-settable-properties'
 import { validateOperationPathIndexes } from './validate-operation-path'
 
 type BatchTreeNode = {
@@ -22,7 +23,7 @@ export const validateExactSetNodeOperation = (op: BaseSetNodeOperation) => {
   )
 
   for (const key in op.newProperties) {
-    if (key === 'children' || key === 'text') {
+    if (NON_SETTABLE_NODE_PROPERTIES.includes(key)) {
       throw new Error(`Cannot set the "${key}" property of nodes!`)
     }
   }
