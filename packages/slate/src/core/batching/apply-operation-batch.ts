@@ -72,13 +72,13 @@ import {
   BatchSegment,
   batchNeedsSegmentPlanning,
   isSameParentInsertBatch,
-  planOperationBatchSegments,
+  segmentOperationBatch,
   shouldPreferWholeBatchExecution,
-} from './planner'
+} from './batch-segments'
 import { withInternalBatchReads } from '../batch'
 
-// The executor owns staged draft mutation and dirty-path batching once a
-// segment shape has already been chosen by planner.ts.
+// Operation-batch application owns staged draft mutation and dirty-path
+// batching once a segment shape has already been chosen by batch-segments.ts.
 const transformPathThroughOps = (path: Path, ops: Operation[]) => {
   let nextPath: Path | null = path
 
@@ -357,7 +357,7 @@ const calculateDirtyPathsAfterBatch = (editor: Editor, ops: Operation[]) => {
   return { dirtyPathKeys, dirtyPaths }
 }
 
-const applyBatchSegment = (editor: Editor, segment: BatchSegment) => {
+const applyOperationBatchSegment = (editor: Editor, segment: BatchSegment) => {
   switch (segment.kind) {
     case 'same-parent-insert-move': {
       const { newDirtyPaths, transformDirtyPath } = withInternalBatchReads(
@@ -843,7 +843,7 @@ export const applyOperationBatch = (editor: Editor, ops: Operation[]) => {
     return
   }
 
-  const segments = planOperationBatchSegments(ops)
+  const segments = segmentOperationBatch(ops)
 
   if (shouldPreferWholeBatchExecution(segments)) {
     Editor.withBatch(editor, () => {
@@ -856,7 +856,7 @@ export const applyOperationBatch = (editor: Editor, ops: Operation[]) => {
 
   Editor.withBatch(editor, () => {
     for (const segment of segments) {
-      applyBatchSegment(editor, segment)
+      applyOperationBatchSegment(editor, segment)
     }
   })
 }

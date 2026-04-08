@@ -5,8 +5,8 @@ import {
   Operation,
 } from '../../interfaces/operation'
 
-// The planner only decides which contiguous op runs deserve a specialized
-// execution path. It does not mutate the editor.
+// Batch segmentation only decides which contiguous op runs deserve a
+// specialized execution path. It does not mutate the editor.
 export type BatchSegmentKind =
   | 'generic'
   | 'same-parent-insert-move'
@@ -227,9 +227,7 @@ const getSpecializedBatchSegment = (
   return null
 }
 
-export const planOperationBatchSegments = (
-  ops: Operation[]
-): BatchSegment[] => {
+export const segmentOperationBatch = (ops: Operation[]): BatchSegment[] => {
   const segments: BatchSegment[] = []
   let startIndex = 0
 

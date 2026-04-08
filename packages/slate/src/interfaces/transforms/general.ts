@@ -12,7 +12,7 @@ import {
   Selection,
   Text,
 } from '../../index'
-import { applyOperationBatch } from '../../core/batching/executor'
+import { applyOperationBatch } from '../../core/batching/apply-operation-batch'
 import {
   insertChildren,
   modifyChildren,
