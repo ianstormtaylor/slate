@@ -21,3 +21,4 @@ coverage
 !/.yarn/sdks/**/lib/
 !.yarn/versions
 .pnp.*
+.omx/
