@@ -14,7 +14,6 @@ import { RangeDirection } from '../types/types'
  * document. They can define a span inside a single node or a can span across
  * multiple nodes.
  */
-
 export interface BaseRange {
   anchor: Point
   focus: Point
@@ -38,7 +37,8 @@ export interface RangeInterface {
   edges: (range: Range, options?: RangeEdgesOptions) => [Point, Point]
 
   /**
-   * Get the end point of a range.
+   * Get the end point of a range according to the order in which it appears in
+   * the document.
    */
   end: (range: Range) => Point
 
@@ -48,7 +48,10 @@ export interface RangeInterface {
   equals: (range: Range, another: Range) => boolean
 
   /**
-   * Check if a range includes a path, a point or part of another range.
+   * Check if a `range` includes a path, a point, or part of another range.
+   * 
+   * For clarity the definition of `includes` can mean partially includes.
+   * Another way to describe this is if one Range intersects the other Range.
    */
   includes: (range: Range, target: Location) => boolean
 
@@ -58,7 +61,8 @@ export interface RangeInterface {
   surrounds: (range: Range, target: Range) => boolean
 
   /**
-   * Get the intersection of a range with another.
+   * Get the intersection of one `range` with `another`. If the two ranges do
+   * not overlap, return `null`.
    */
   intersection: (range: Range, another: Range) => Range | null
 
@@ -77,29 +81,31 @@ export interface RangeInterface {
   /**
    * Check if a range is expanded.
    *
-   * This is the opposite of [[Range.isCollapsed]] and is provided for legibility.
+   * This is the opposite of {@link Range.isCollapsed} and is provided for
+   * legibility.
    */
   isExpanded: (range: Range) => boolean
 
   /**
-   * Check if a range is forward.
-   *
-   * This is the opposite of [[Range.isBackward]] and is provided for legibility.
+   * Check if a range is forward, meaning that its anchor point appears in the
+   * document _before_ its focus point.
    */
   isForward: (range: Range) => boolean
 
   /**
-   * Check if a value implements the [[Range]] interface.
+   * Check if a value implements the {@link Range} interface.
    */
   isRange: (value: any) => value is Range
 
   /**
-   * Iterate through all of the point entries in a range.
+   * Iterate through the two point entries in a `Range`. First it will yield a
+   * {@link PointEntry} representing the `anchor`, then the `focus`.
    */
   points: (range: Range) => Generator<PointEntry, void, undefined>
 
   /**
-   * Get the start point of a range.
+   * Get the start point of a range according to the order in which it appears
+   * in the document.
    */
   start: (range: Range) => Point
 
