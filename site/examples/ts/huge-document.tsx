@@ -18,6 +18,7 @@ import {
   Path,
   Transforms,
 } from 'slate'
+import { HistoryEditor, withHistory } from 'slate-history'
 import {
   Editable,
   RenderElementProps,
@@ -45,6 +46,7 @@ interface Config {
   contentVisibilityMode: 'none' | 'element' | 'chunk'
   showSelectedHeadings: boolean
   strictMode: boolean
+  history: boolean
 }
 
 type BenchmarkMode =
@@ -121,6 +123,7 @@ const initialConfig: Config = {
   ),
   showSelectedHeadings: parseBoolean('selected_headings', false),
   strictMode: parseBoolean('strict', false),
+  history: parseBoolean('history', false),
 }
 
 const setSearchParams = (config: Config) => {
@@ -136,6 +139,7 @@ const setSearchParams = (config: Config) => {
       config.showSelectedHeadings ? 'true' : 'false'
     )
     searchParams.set('strict', config.strictMode ? 'true' : 'false')
+    searchParams.set('history', config.history ? 'true' : 'false')
     history.replaceState({}, '', `?${searchParams.toString()}`)
   }
 }
@@ -200,7 +204,9 @@ const comparisonBenchmarkModes: BenchmarkMode[] = [
 ]
 
 const createEditor = (config: Config) => {
-  const editor = withReact(slateCreateEditor())
+  const editor = config.history
+    ? withHistory(withReact(slateCreateEditor()))
+    : withReact(slateCreateEditor())
 
   editor.getChunkSize = (node: Ancestor) =>
     config.chunking && node === editor ? config.chunkSize : null
@@ -427,6 +433,39 @@ const HugeDocumentExample = () => {
         config={config}
         setConfig={setConfig}
       />
+
+      {config.history ? (
+        <div
+          style={{
+            display: 'flex',
+            gap: 8,
+            marginBottom: 12,
+          }}
+        >
+          <button
+            id="huge-document-undo"
+            onClick={() => {
+              if (HistoryEditor.isHistoryEditor(editor)) {
+                HistoryEditor.undo(editor)
+              }
+            }}
+            type="button"
+          >
+            Undo
+          </button>
+          <button
+            id="huge-document-redo"
+            onClick={() => {
+              if (HistoryEditor.isHistoryEditor(editor)) {
+                HistoryEditor.redo(editor)
+              }
+            }}
+            type="button"
+          >
+            Redo
+          </button>
+        </div>
+      ) : null}
 
       {editableWithStrictMode}
     </>
