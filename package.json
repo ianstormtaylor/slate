@@ -119,6 +119,8 @@
     "slate-react": "workspace:*",
     "source-map-loader": "^4.0.1",
     "ts-jest": "^29.1.1",
+    "typedoc": "^0.28.18",
+    "typedoc-plugin-markdown": "^4.11.0",
     "typescript": "5.2.2"
   },
   "simple-git-hooks": {
