@@ -59,6 +59,7 @@ export interface BaseEditor {
     options?: {
       operation?: Operation
       fallbackElement?: () => Element
+      force?: boolean
     }
   ) => void
   onChange: (options?: { operation?: Operation }) => void
@@ -1007,5 +1008,5 @@ export type NodeMatch<T extends Node> =
   | ((node: Node, path: Path) => node is T)
   | ((node: Node, path: Path) => boolean)
 
-export type PropsCompare = (prop: Partial<Node>, node: Partial<Node>) => boolean
-export type PropsMerge = (prop: Partial<Node>, node: Partial<Node>) => object
+export type PropsCompare = (prop: unknown, node: unknown) => boolean
+export type PropsMerge = (prop: unknown, node: unknown) => object

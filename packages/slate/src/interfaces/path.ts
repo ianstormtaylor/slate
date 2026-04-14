@@ -199,6 +199,10 @@ export const Path: PathInterface = {
       const av = path[i]
       const bv = another[i]
 
+      if (typeof av !== 'number' || typeof bv !== 'number') {
+        throw new Error('Got non-numeric path index')
+      }
+
       if (av !== bv) {
         break
       }

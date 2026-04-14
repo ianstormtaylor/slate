@@ -31,8 +31,12 @@ export const mergeNodes: NodeTransforms['mergeNodes'] = (
       return
     }
 
+    const isPathMerge = Location.isPath(at)
+    const pathAt = isPathMerge ? (at as Path) : null
+    const usesDefaultSiblingMatch = match == null && isPathMerge
+
     if (match == null) {
-      if (Location.isPath(at)) {
+      if (isPathMerge) {
         const [parent] = Editor.parent(editor, at)
         match = n => parent.children.includes(n)
       } else {
@@ -60,7 +64,13 @@ export const mergeNodes: NodeTransforms['mergeNodes'] = (
     }
 
     const [current] = Editor.nodes(editor, { at, match, voids, mode })
-    const prev = Editor.previous(editor, { at, match, voids, mode })
+    const previousPath =
+      usesDefaultSiblingMatch && pathAt && Path.hasPrevious(pathAt)
+        ? Path.previous(pathAt)
+        : null
+    const prev = previousPath
+      ? Editor.node(editor, previousPath)
+      : Editor.previous(editor, { at, match, voids, mode })
 
     if (!current || !prev) {
       return

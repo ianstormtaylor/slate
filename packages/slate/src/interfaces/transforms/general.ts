@@ -22,6 +22,23 @@ import {
   smartReplaceChildren,
 } from '../../utils/modify'
 
+/**
+ * The set of properties that cannot be set using set_node.
+ */
+export const NON_SETTABLE_NODE_PROPERTIES = [
+  'children',
+  'text',
+  // Do not allow overriding any property on the Object prototype
+  ...Object.getOwnPropertyNames(Object.prototype),
+]
+
+/**
+ * The set of properties that cannot be set using set_selection.
+ */
+export const NON_SETTABLE_SELECTION_PROPERTIES = Object.getOwnPropertyNames(
+  Object.prototype
+)
+
 export interface GeneralTransforms {
   /**
    * Transform the editor by an operation.
@@ -81,6 +98,16 @@ export const GeneralTransforms: GeneralTransforms = {
         }
         const index = path[path.length - 1]
         const prevIndex = index - 1
+
+        if (path.length === 0) {
+          throw new Error(
+            `Cannot apply a "merge_node" operation at path [${path}] because the root node cannot be merged.`
+          )
+        }
+
+        // Defend against malicious paths containing strings
+        if (typeof index !== 'number' || typeof prevIndex !== 'number')
+          throw new Error('Index must be number')
 
         modifyChildren(editor, Path.parent(path), children => {
           const node = children[index]
@@ -253,11 +280,21 @@ export const GeneralTransforms: GeneralTransforms = {
           const newNode = { ...node }
 
           for (const key in newProperties) {
-            if (key === 'children' || key === 'text') {
+            if (NON_SETTABLE_NODE_PROPERTIES.includes(key)) {
               throw new Error(`Cannot set the "${key}" property of nodes!`)
             }
 
             const value = newProperties[<keyof Node>key]
+
+            // Make sure we're not setting `then` to a function, since this will
+            // cause the node to be treated as a Promise-like object, which can
+            // cause unexpected behaviour when returning the node from async
+            // functions.
+            if (key === 'then' && typeof value === 'function') {
+              throw new Error(
+                'Cannot set the "then" property of a node to a function'
+              )
+            }
 
             if (value == null) {
               delete newNode[<keyof Node>key]
@@ -268,7 +305,7 @@ export const GeneralTransforms: GeneralTransforms = {
 
           // properties that were previously defined, but are now missing, must be deleted
           for (const key in properties) {
-            if (!newProperties.hasOwnProperty(key)) {
+            if (!Object.hasOwn(newProperties, key)) {
               delete newNode[<keyof Node>key]
             }
           }
@@ -303,7 +340,23 @@ export const GeneralTransforms: GeneralTransforms = {
         const selection = { ...editor.selection }
 
         for (const key in newProperties) {
+          if (NON_SETTABLE_SELECTION_PROPERTIES.includes(key)) {
+            throw new Error(
+              `Cannot set the "${key}" property of the selection!`
+            )
+          }
+
           const value = newProperties[<keyof Range>key]
+
+          // Make sure we're not setting `then` to a function, since this will
+          // cause the selection to be treated as a Promise-like object, which
+          // can cause unexpected behaviour when returning the selection from
+          // async functions.
+          if (key === 'then' && typeof value === 'function') {
+            throw new Error(
+              'Cannot set the "then" property of the selection to a function'
+            )
+          }
 
           if (value == null) {
             if (key === 'anchor' || key === 'focus') {
@@ -331,6 +384,31 @@ export const GeneralTransforms: GeneralTransforms = {
           )
         }
 
+        // Defend against malicious paths containing strings
+        if (typeof index !== 'number') throw new Error('Index must be number')
+
+        // defend against malicious 
+        for (const key in properties) {
+          if (NON_SETTABLE_NODE_PROPERTIES.includes(key)) {
+            throw new Error(`Cannot set the "${key}" property of nodes!`)
+          }
+
+          const value = properties[<keyof Node>key]
+
+          // Make sure we're not setting `then` to a function, since this will
+          // cause the node to be treated as a Promise-like object, which can
+          // cause unexpected behaviour when returning the node from async
+          // functions.
+          if (key === 'then' && typeof value === 'function') {
+            throw new Error(
+              'Cannot set the "then" property of a node to a function'
+            )
+          }
+        }
+        if (Object.getOwnPropertySymbols(properties).length !== 0) {
+            throw new Error(`Cannot set symbol properties of nodes!`)
+        }
+
         modifyChildren(editor, Path.parent(path), children => {
           const node = children[index]
           let newNode: Descendant
@@ -346,7 +424,7 @@ export const GeneralTransforms: GeneralTransforms = {
               text: before,
             }
             nextNode = {
-              ...(properties as Partial<Text>),
+              ...(properties as Partial<Element>),
               text: after,
             }
           } else {

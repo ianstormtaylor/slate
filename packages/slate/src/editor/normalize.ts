@@ -57,7 +57,7 @@ export const normalize: EditorInterface['normalize'] = (
           by definition adding children to an empty node can't cause other paths to change.
         */
         if (Node.isElement(node) && node.children.length === 0) {
-          editor.normalizeNode(entry, { operation })
+          editor.normalizeNode(entry, { operation, force })
         }
       }
     }
@@ -83,7 +83,7 @@ export const normalize: EditorInterface['normalize'] = (
       // If the node doesn't exist in the tree, it does not need to be normalized.
       if (Node.has(editor, dirtyPath)) {
         const entry = Editor.node(editor, dirtyPath)
-        editor.normalizeNode(entry, { operation })
+        editor.normalizeNode(entry, { operation, force })
       }
       iteration++
       dirtyPaths = getDirtyPaths(editor)

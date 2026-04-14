@@ -32,8 +32,11 @@ test.describe('code highlighting', () => {
 async function setText(page: Page, text: string, language: string) {
   await page.locator('[data-slate-editor]').selectText()
   await page.keyboard.press('Backspace') // clear editor
-  await page.getByTestId('code-block-button').click() // convert first and the only one paragraph to code block
-  await page.getByTestId('language-select').selectOption({ value: language }) // select the language option
+  await page.getByTestId('code-block-button').click() // convert the first paragraph to a code block
+  await page
+    .locator('[data-slate-editor] [data-test-id="language-select"]')
+    .first()
+    .selectOption({ value: language }) // select the language option for the code block we just created
 
   await page.keyboard.type(text) // type text
 }
