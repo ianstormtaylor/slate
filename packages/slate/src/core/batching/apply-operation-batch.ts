@@ -9,9 +9,7 @@ import {
 } from '../../interfaces/operation'
 import { Editor } from '../../interfaces/editor'
 import { Node } from '../../interfaces/node'
-import { isBatchingDirtyPaths } from './dirty-paths'
 import {
-  batchOperationDirtyPaths,
   finalizeOperation,
   runOperation,
   transformOperationRefs,
@@ -47,13 +45,12 @@ import {
 } from '../children'
 import {
   canExtendLiveInsertMoveBatch,
-  createSameParentMoveDirtyPathTransform as createLiveSameParentMoveDirtyPathTransform,
   flushLiveInsertMoveBatch,
   flushLiveMergeBatch,
   flushLiveMoveBatch,
   flushLiveSplitBatch,
   getSameParentInsertMoveDirtyPathState,
-  getSameParentMoveDirtyPaths as getLiveSameParentMoveDirtyPaths,
+  getSameParentMoveDirtyPaths,
   hasLiveInsertMoveBatch,
   hasLiveMergeBatch,
   hasLiveMoveBatch,
@@ -65,9 +62,8 @@ import {
   stageLiveMergeBatchOperation,
   stageLiveMoveBatchOperation,
   stageLiveSplitBatchOperation,
+  createSameParentMoveDirtyPathTransform,
 } from './live-dirty-paths'
-import { updateDirtyPaths } from '../update-dirty-paths'
-import { DIRTY_PATH_KEYS, DIRTY_PATHS } from '../../utils/weak-maps'
 import {
   BatchSegment,
   batchNeedsSegmentPlanning,
@@ -76,51 +72,13 @@ import {
   shouldPreferWholeBatchExecution,
 } from './batch-segments'
 import { withInternalBatchReads } from '../batch'
+import {
+  applyDirtyPathBatchedOperations,
+  isBatchingDirtyPaths,
+} from './dirty-paths'
 
 // Operation-batch application owns staged draft mutation and dirty-path
 // batching once a segment shape has already been chosen by batch-segments.ts.
-const transformPathThroughOps = (path: Path, ops: Operation[]) => {
-  let nextPath: Path | null = path
-
-  for (const op of ops) {
-    if (Path.operationCanTransformPath(op)) {
-      nextPath = Path.transform(nextPath, op)
-
-      if (!nextPath) {
-        return null
-      }
-    }
-  }
-
-  return nextPath
-}
-
-const applyDirtyPathBatchedOperations = ({
-  editor,
-  ops,
-  newDirtyPaths,
-  transformDirtyPath = (path: Path) => transformPathThroughOps(path, ops),
-}: {
-  editor: Editor
-  ops: Operation[]
-  newDirtyPaths: Path[]
-  transformDirtyPath?: (path: Path) => Path | null
-}) => {
-  batchOperationDirtyPaths({
-    editor,
-    fn: () => {
-      Editor.withBatch(editor, () => {
-        for (const op of ops) {
-          editor.apply(op)
-        }
-
-        updateDirtyPaths(editor, newDirtyPaths, transformDirtyPath)
-      })
-    },
-    applyDirtyPaths: () => {},
-  })
-}
-
 const getSameParentInsertDirtyPaths = (
   editor: Editor,
   ops: BaseInsertNodeOperation[]
@@ -192,166 +150,6 @@ const applyInsertBatchWithDirtyPathBatching = (
   )
 
   applyDirtyPathBatchedOperations({ editor, ops, newDirtyPaths })
-}
-
-const getSameParentMoveDirtyPaths = (
-  editor: Editor,
-  ops: BaseMoveNodeOperation[]
-) => {
-  const parentPath = Path.parent(ops[0].path)
-  const parent = parentPath.length === 0 ? editor : Node.get(editor, parentPath)
-
-  if (!Node.isEditor(parent) && !Node.isElement(parent)) {
-    throw new Error(
-      `Cannot batch move_node operations beneath non-container node at path [${parentPath}].`
-    )
-  }
-
-  const order = Array.from(
-    { length: parent.children.length },
-    (_, index) => index
-  )
-  const movedIndexes = new Set<number>()
-
-  for (const op of ops) {
-    const sourceIndex = op.path[op.path.length - 1]
-    const [movedIndex] = order.splice(sourceIndex, 1)
-
-    if (movedIndex == null) {
-      throw new Error(
-        `Cannot apply a "move_node" operation at path [${op.path}] because the source does not exist.`
-      )
-    }
-
-    const truePath = Path.transform(op.path, op)
-
-    if (!truePath) {
-      throw new Error(
-        `Cannot apply a "move_node" operation at path [${op.path}] because the transformed destination is invalid.`
-      )
-    }
-
-    const targetIndex = truePath[truePath.length - 1]
-    order.splice(targetIndex, 0, movedIndex)
-    movedIndexes.add(movedIndex)
-  }
-
-  const newDirtyPaths = Path.levels(parentPath)
-
-  order.forEach((index, position) => {
-    if (movedIndexes.has(index)) {
-      newDirtyPaths.push(parentPath.concat(position))
-    }
-  })
-
-  return newDirtyPaths
-}
-
-const createSameParentMoveDirtyPathTransform = (
-  editor: Editor,
-  ops: BaseMoveNodeOperation[]
-) => {
-  const parentPath = Path.parent(ops[0].path)
-  const parent = parentPath.length === 0 ? editor : Node.get(editor, parentPath)
-
-  if (!Node.isEditor(parent) && !Node.isElement(parent)) {
-    return (path: Path) => transformPathThroughOps(path, ops)
-  }
-
-  const order = Array.from(
-    { length: parent.children.length },
-    (_, index) => index
-  )
-
-  for (const op of ops) {
-    const sourceIndex = op.path[op.path.length - 1]
-    const [movedIndex] = order.splice(sourceIndex, 1)
-
-    if (movedIndex == null) {
-      return (path: Path) => transformPathThroughOps(path, ops)
-    }
-
-    const truePath = Path.transform(op.path, op)
-
-    if (!truePath) {
-      return (path: Path) => transformPathThroughOps(path, ops)
-    }
-
-    order.splice(truePath[truePath.length - 1], 0, movedIndex)
-  }
-
-  const finalPositions = new Map<number, number>()
-  order.forEach((originalIndex, position) => {
-    finalPositions.set(originalIndex, position)
-  })
-
-  return (path: Path) => {
-    if (path.length <= parentPath.length) {
-      return path
-    }
-
-    if (!Path.equals(path.slice(0, parentPath.length), parentPath)) {
-      return transformPathThroughOps(path, ops)
-    }
-
-    const originalIndex = path[parentPath.length]
-    const nextIndex = finalPositions.get(originalIndex)
-
-    if (nextIndex == null) {
-      return transformPathThroughOps(path, ops)
-    }
-
-    return parentPath.concat(nextIndex, ...path.slice(parentPath.length + 1))
-  }
-}
-
-const calculateDirtyPathsAfterBatch = (editor: Editor, ops: Operation[]) => {
-  let dirtyPaths = [...(DIRTY_PATHS.get(editor) ?? [])]
-  let dirtyPathKeys = new Set(DIRTY_PATH_KEYS.get(editor) ?? [])
-
-  const add = (path: Path | null) => {
-    if (!path) {
-      return
-    }
-
-    const key = path.join(',')
-
-    if (!dirtyPathKeys.has(key)) {
-      dirtyPathKeys.add(key)
-      dirtyPaths.push(path)
-    }
-  }
-
-  for (const op of ops) {
-    if (Path.operationCanTransformPath(op)) {
-      const nextDirtyPaths: Path[] = []
-      const nextDirtyPathKeys = new Set<string>()
-
-      for (const path of dirtyPaths) {
-        const nextPath = Path.transform(path, op)
-
-        if (!nextPath) {
-          continue
-        }
-
-        const key = nextPath.join(',')
-
-        if (!nextDirtyPathKeys.has(key)) {
-          nextDirtyPathKeys.add(key)
-          nextDirtyPaths.push(nextPath)
-        }
-      }
-
-      dirtyPaths = nextDirtyPaths
-      dirtyPathKeys = nextDirtyPathKeys
-    }
-
-    for (const path of editor.getDirtyPaths(op)) {
-      add(path)
-    }
-  }
-
-  return { dirtyPathKeys, dirtyPaths }
 }
 
 const applyOperationBatchSegment = (editor: Editor, segment: BatchSegment) => {
@@ -810,10 +608,10 @@ function applyWholeBatchFastPath(editor: Editor, ops: Operation[]) {
       editor,
       ops,
       newDirtyPaths: withInternalBatchReads(editor, () =>
-        getLiveSameParentMoveDirtyPaths(editor, ops)
+        getSameParentMoveDirtyPaths(editor, ops)
       ),
       transformDirtyPath: withInternalBatchReads(editor, () =>
-        createLiveSameParentMoveDirtyPathTransform(editor, ops)
+        createSameParentMoveDirtyPathTransform(editor, ops)
       ),
     })
     return true

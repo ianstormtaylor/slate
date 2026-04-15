@@ -18,22 +18,10 @@ import {
   DIRTY_PATHS,
 } from '../../utils/weak-maps'
 import { withInternalBatchReads } from '../batch'
-
-const transformPathThroughOps = (path: Path, ops: Operation[]) => {
-  let nextPath: Path | null = path
-
-  for (const op of ops) {
-    if (Path.operationCanTransformPath(op)) {
-      nextPath = Path.transform(nextPath, op)
-
-      if (!nextPath) {
-        return null
-      }
-    }
-  }
-
-  return nextPath
-}
+import {
+  calculateDirtyPathsAfterBatch,
+  transformPathThroughOps,
+} from './dirty-paths'
 
 export const isMoveNodeBatch = (ops: Operation[]) =>
   ops.length > 0 && ops.every(op => op.type === 'move_node')
@@ -556,55 +544,6 @@ export const getIndependentParentSplitDirtyPathState = (
     transformDirtyPath:
       createIndependentParentStructuralDirtyPathTransform(ops),
   }
-}
-
-const calculateDirtyPathsAfterBatch = (editor: Editor, ops: Operation[]) => {
-  let dirtyPaths = [...(DIRTY_PATHS.get(editor) ?? [])]
-  let dirtyPathKeys = new Set(DIRTY_PATH_KEYS.get(editor) ?? [])
-
-  const add = (path: Path | null) => {
-    if (!path) return
-
-    const key = path.join(',')
-
-    if (!dirtyPathKeys.has(key)) {
-      dirtyPathKeys.add(key)
-      dirtyPaths.push(path)
-    }
-  }
-
-  for (const op of ops) {
-    if (Path.operationCanTransformPath(op)) {
-      const nextDirtyPaths: Path[] = []
-      const nextDirtyPathKeys = new Set<string>()
-
-      for (const path of dirtyPaths) {
-        const nextPath = Path.transform(path, op)
-
-        if (!nextPath) {
-          continue
-        }
-
-        const key = nextPath.join(',')
-
-        if (!nextDirtyPathKeys.has(key)) {
-          nextDirtyPathKeys.add(key)
-          nextDirtyPaths.push(nextPath)
-        }
-      }
-
-      dirtyPaths = nextDirtyPaths
-      dirtyPathKeys = nextDirtyPathKeys
-    }
-
-    for (const path of withInternalBatchReads(editor, () =>
-      editor.getDirtyPaths(op)
-    )) {
-      add(path)
-    }
-  }
-
-  return { dirtyPathKeys, dirtyPaths }
 }
 
 export const hasLiveMoveBatch = (editor: Editor) =>

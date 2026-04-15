@@ -12,16 +12,30 @@ export const insertChildren = <T>(
   xs: T[],
   index: number,
   ...newValues: T[]
-) => [...xs.slice(0, index), ...newValues, ...xs.slice(index)]
+) => {
+  const next = xs.slice()
+  next.splice(index, 0, ...newValues)
+  return next
+}
 
 export const replaceChildren = <T>(
   xs: T[],
   index: number,
   removeCount: number,
   ...newValues: T[]
-) => [...xs.slice(0, index), ...newValues, ...xs.slice(index + removeCount)]
+) => {
+  const next = xs.slice()
+  next.splice(index, removeCount, ...newValues)
+  return next
+}
 
 export const removeChildren = replaceChildren
+
+export const replaceChild = <T>(xs: T[], index: number, value: T) => {
+  const next = xs.slice()
+  next[index] = value
+  return next
+}
 
 /**
  * Replace a descendant with a new node, replacing all ancestors
@@ -39,18 +53,22 @@ export const modifyDescendant = <N extends Descendant>(
   const slicedPath = path.slice()
   let modifiedNode: Node = f(node)
 
+  if (modifiedNode === node) {
+    return
+  }
+
   while (slicedPath.length > 1) {
     const index = slicedPath.pop()!
     const ancestorNode = Node.get(root, slicedPath) as Ancestor
 
     modifiedNode = {
       ...ancestorNode,
-      children: replaceChildren(ancestorNode.children, index, 1, modifiedNode),
+      children: replaceChild(ancestorNode.children, index, modifiedNode),
     }
   }
 
   const index = slicedPath.pop()!
-  root.children = replaceChildren(root.children, index, 1, modifiedNode)
+  root.children = replaceChild(root.children, index, modifiedNode)
 }
 
 /**

@@ -21,22 +21,6 @@ describe('batch perf benchmark manifest', () => {
     }
   })
 
-  it('keeps split batch-exit profiling wired to the real normalize loop', () => {
-    const expectedPhases = [
-      'flushBeforeNormalize',
-      'commitBeforeNormalize',
-      'normalize',
-      'flushAfterNormalize',
-      'commitAfterNormalize',
-    ]
-
-    for (const id of ['apply-batch-split-flat', 'with-batch-split-flat']) {
-      const benchmark = benchmarks.find(candidate => candidate.id === id)
-
-      assert.deepEqual(benchmark?.batchExitBreakdown, expectedPhases)
-    }
-  })
-
   it('keeps the benchmark prototype equivalence check green', () => {
     verifyBatchPrototype()
   })

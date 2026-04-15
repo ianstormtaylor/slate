@@ -16,10 +16,7 @@ const {
   updateOperationDirtyPaths,
 } = require('../../src/core/apply-operation')
 const {
-  clearSplitNodeDraft,
   clearExactSetNodeDraft,
-  materializeSplitNodeDraft,
-  stageSplitNodeOperation,
   commitExactSetNodeDraft,
   materializeExactSetNodeDraft,
   stageExactSetNodeOperation,
@@ -28,11 +25,6 @@ const {
   clearQueuedBatchNormalize,
   withBatchTrace,
 } = require('../../src/core/batch')
-const {
-  clearLiveSplitBatch,
-  flushLiveSplitBatch,
-  stageLiveSplitBatchOperation,
-} = require('../../src/core/batching/live-dirty-paths')
 const { modifyDescendant } = require('../../src/utils/modify')
 const { BATCH_DEPTH } = require('../../src/utils/weak-maps')
 
@@ -95,6 +87,36 @@ const buildGroupedValue = (blockCount, groupSize) => {
   }))
 }
 
+const buildDeepValue = (blockCount, groupSize) => {
+  const columnCount = 5
+  const paragraphsPerColumn = Math.max(1, Math.floor(groupSize / columnCount))
+  const paragraphsPerSection = columnCount * paragraphsPerColumn
+  const sectionCount = Math.ceil(blockCount / paragraphsPerSection)
+  let nextIndex = 0
+
+  return Array.from({ length: sectionCount }, (_, sectionIndex) => ({
+    type: 'section',
+    sectionIndex,
+    children: Array.from({ length: columnCount }, (_, columnIndex) => ({
+      type: 'column',
+      columnIndex,
+      children: Array.from({ length: paragraphsPerColumn }, () => {
+        if (nextIndex >= blockCount) {
+          return null
+        }
+
+        const blockIndex = nextIndex
+        nextIndex++
+
+        return {
+          type: 'paragraph',
+          children: [{ text: `Block ${blockIndex}` }],
+        }
+      }).filter(Boolean),
+    })).filter(column => column.children.length > 0),
+  }))
+}
+
 const createEditorWithValue = value => {
   const editor = createEditor()
   editor.children = value
@@ -109,6 +131,8 @@ const createBenchmarkEditor = ({ benchmark, blockCount, groupSize }) =>
           ? buildFlatValue(blockCount)
           : benchmark.shape === 'grouped'
           ? buildGroupedValue(blockCount, groupSize)
+          : benchmark.shape === 'deep'
+          ? buildDeepValue(blockCount, groupSize)
           : []
       )
 
@@ -235,6 +259,35 @@ const createInsertTextOps = targetPaths =>
     offset: 1,
     text: 'X',
   }))
+
+const createPasteLines = blockCount =>
+  Array.from({ length: blockCount }, (_, index) => `Line ${index}`)
+
+const createPasteEditor = () => {
+  const editor = createEditorWithValue([
+    { type: 'paragraph', children: [{ text: '' }] },
+  ])
+
+  editor.selection = {
+    anchor: { path: [0, 0], offset: 0 },
+    focus: { path: [0, 0], offset: 0 },
+  }
+
+  return editor
+}
+
+const insertPasteLines = (editor, lines) => {
+  let split = false
+
+  for (const line of lines) {
+    if (split) {
+      Transforms.splitNodes(editor, { always: true })
+    }
+
+    editor.insertText(line)
+    split = true
+  }
+}
 
 const installReadAfterEachObserver = editor => {
   const { apply } = editor
@@ -570,117 +623,6 @@ const timeOperationLoopBreakdown = ({
   return breakdown
 }
 
-const timeSplitNodeBatchBreakdown = ({
-  benchmark,
-  blockCount,
-  groupSize,
-  repeats,
-}) => {
-  if (!benchmark.splitBreakdown) {
-    return null
-  }
-
-  const phaseFactories = {
-    refs:
-      ({ editor, ops }) =>
-      () => {
-        for (const op of ops) {
-          transformOperationRefs(editor, op)
-        }
-      },
-    stageDraft:
-      ({ editor, ops }) =>
-      () => {
-        for (const op of ops) {
-          stageSplitNodeOperation(editor, op)
-        }
-      },
-    stageDirtyPaths:
-      ({ editor, ops }) =>
-      () => {
-        for (const op of ops) {
-          stageLiveSplitBatchOperation(editor, op)
-        }
-      },
-    finalize:
-      ({ editor, ops }) =>
-      () => {
-        BATCH_DEPTH.set(editor, 1)
-
-        try {
-          for (const op of ops) {
-            finalizeOperation(editor, op)
-          }
-        } finally {
-          BATCH_DEPTH.delete(editor)
-          clearQueuedBatchNormalize(editor)
-          editor.operations = []
-        }
-      },
-    materialize:
-      ({ editor, ops }) =>
-      () => {
-        for (const op of ops) {
-          stageSplitNodeOperation(editor, op)
-        }
-
-        materializeSplitNodeDraft(editor)
-      },
-    dirtyPathFlush:
-      ({ editor, ops }) =>
-      () => {
-        for (const op of ops) {
-          stageLiveSplitBatchOperation(editor, op)
-        }
-
-        flushLiveSplitBatch(editor)
-      },
-  }
-
-  const breakdown = {}
-
-  for (const phase of benchmark.splitBreakdown) {
-    const durations = []
-
-    for (let repeat = 0; repeat < repeats; repeat++) {
-      const editor = createBenchmarkEditor({
-        benchmark,
-        blockCount,
-        groupSize,
-      })
-      const { prepared, targetPaths } = prepareBenchmark({
-        benchmark,
-        blockCount,
-        editor,
-        groupSize,
-      })
-      const ops = benchmark.getBreakdownOps
-        ? benchmark.getBreakdownOps({
-            blockCount,
-            editor,
-            groupSize,
-            prepared,
-            targetPaths,
-          })
-        : prepared
-      const run = phaseFactories[phase]({ editor, ops })
-      const start = performance.now()
-
-      run()
-
-      durations.push(performance.now() - start)
-      clearLiveSplitBatch(editor)
-      clearSplitNodeDraft(editor)
-      clearQueuedBatchNormalize(editor)
-      editor.operations = []
-    }
-
-    breakdown[phase] = Number(median(durations).toFixed(2))
-  }
-
-  return breakdown
-}
-
 const timeBatchExitBreakdown = ({
   benchmark,
   blockCount,
@@ -793,12 +735,6 @@ const runScenario = async ({ benchmark, blockCount, groupSize, repeats }) => {
     durationMs: median(runs.map(run => run.durationMs)),
     breakdown: {
       ...(timeExactSetNodeBreakdown({
-        benchmark,
-        blockCount,
-        groupSize,
-        repeats,
-      }) ?? {}),
-      ...(timeSplitNodeBatchBreakdown({
         benchmark,
         blockCount,
         groupSize,
@@ -957,6 +893,39 @@ const benchmarks = [
     shape: 'flat',
     run: ({ editor, targetPaths }) => {
       installReadAfterEachWrapper(editor)
+      Editor.withBatch(editor, () => {
+        createSetNodeOps(targetPaths).forEach(op => {
+          editor.apply(op)
+        })
+      })
+    },
+  },
+  {
+    id: 'apply-deep-no-normalize',
+    label:
+      'editor.apply(set_node) per path inside Editor.withoutNormalizing on deep document',
+    shape: 'deep',
+    run: ({ editor, targetPaths }) => {
+      Editor.withoutNormalizing(editor, () => {
+        createSetNodeOps(targetPaths).forEach(op => {
+          editor.apply(op)
+        })
+      })
+    },
+  },
+  {
+    id: 'apply-batch-deep',
+    label: 'Transforms.applyBatch exact-path set_node batch on deep document',
+    shape: 'deep',
+    run: ({ editor, targetPaths }) => {
+      Transforms.applyBatch(editor, createSetNodeOps(targetPaths))
+    },
+  },
+  {
+    id: 'with-batch-deep',
+    label: 'Editor.withBatch exact-path set_node loop on deep document',
+    shape: 'deep',
+    run: ({ editor, targetPaths }) => {
       Editor.withBatch(editor, () => {
         createSetNodeOps(targetPaths).forEach(op => {
           editor.apply(op)
@@ -1277,6 +1246,28 @@ const benchmarks = [
     },
   },
   {
+    id: 'paste-lines',
+    label: 'splitNodes plus insertText paste-style line insertion',
+    shape: 'paste',
+    createEditor: createPasteEditor,
+    prepare: ({ blockCount }) => createPasteLines(blockCount),
+    run: ({ editor, prepared: lines }) => {
+      insertPasteLines(editor, lines)
+    },
+  },
+  {
+    id: 'with-batch-paste-lines',
+    label: 'Editor.withBatch splitNodes plus insertText paste-style insertion',
+    shape: 'paste',
+    createEditor: createPasteEditor,
+    prepare: ({ blockCount }) => createPasteLines(blockCount),
+    run: ({ editor, prepared: lines }) => {
+      Editor.withBatch(editor, () => {
+        insertPasteLines(editor, lines)
+      })
+    },
+  },
+  {
     id: 'apply-insert-empty-no-normalize',
     label:
       'editor.apply(insert_node) batch on empty document inside Editor.withoutNormalizing',
@@ -1476,14 +1467,6 @@ const benchmarks = [
       'flushAfterNormalize',
       'commitAfterNormalize',
     ],
-    splitBreakdown: [
-      'refs',
-      'stageDraft',
-      'stageDirtyPaths',
-      'finalize',
-      'materialize',
-      'dirtyPathFlush',
-    ],
     prepare: ({ targetPaths }) => createSplitNodeOps(targetPaths),
     run: ({ editor, prepared: ops }) => {
       Transforms.applyBatch(editor, ops)
@@ -1635,6 +1618,9 @@ const REQUIRED_BENCHMARK_IDS = [
   'with-batch-flat-observe-each',
   'apply-batch-flat-wrapper-read',
   'with-batch-flat-wrapper-read',
+  'apply-deep-no-normalize',
+  'apply-batch-deep',
+  'with-batch-deep',
   'apply-batch-flat-mixed-set-move',
   'with-batch-flat-mixed-set-move',
   'apply-batch-flat-mixed-set-merge',
@@ -1655,12 +1641,12 @@ const REQUIRED_BENCHMARK_IDS = [
   'apply-batch-insert-empty-prepend',
   'apply-batch-interleaved-insert-move-empty',
   'with-batch-interleaved-insert-move-empty',
+  'modify-flat',
+  'modify-grouped',
+  'paste-lines',
+  'with-batch-paste-lines',
   'apply-batch-remove-flat',
   'apply-batch-move-flat',
-  'apply-batch-merge-flat',
-  'with-batch-merge-flat',
-  'apply-batch-split-flat',
-  'with-batch-split-flat',
   'apply-batch-insert-text-flat',
   'apply-batch-insert-text-flat-observe-each',
   'with-batch-insert-text-flat',
