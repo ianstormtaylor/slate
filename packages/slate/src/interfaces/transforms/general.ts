@@ -387,7 +387,7 @@ export const GeneralTransforms: GeneralTransforms = {
         // Defend against malicious paths containing strings
         if (typeof index !== 'number') throw new Error('Index must be number')
 
-        // defend against malicious 
+        // defend against malicious properties
         for (const key in properties) {
           if (NON_SETTABLE_NODE_PROPERTIES.includes(key)) {
             throw new Error(`Cannot set the "${key}" property of nodes!`)
@@ -406,7 +406,7 @@ export const GeneralTransforms: GeneralTransforms = {
           }
         }
         if (Object.getOwnPropertySymbols(properties).length !== 0) {
-            throw new Error(`Cannot set symbol properties of nodes!`)
+          throw new Error(`Cannot set symbol properties of nodes!`)
         }
 
         modifyChildren(editor, Path.parent(path), children => {
