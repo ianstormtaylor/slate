@@ -91,6 +91,16 @@ export const GeneralTransforms: GeneralTransforms = {
         const prevPath = Path.previous(path)
         const prevIndex = prevPath[prevPath.length - 1]
 
+        if (path.length === 0) {
+          throw new Error(
+            `Cannot apply a "merge_node" operation at path [${path}] because the root node cannot be merged.`
+          )
+        }
+
+        // Defend against malicious paths containing strings
+        if (typeof index !== 'number' || typeof prevIndex !== 'number')
+          throw new Error('Index must be number')
+
         modifyChildren(editor, Path.parent(path), children => {
           const node = children[index]
           const prev = children[prevIndex]
@@ -263,6 +273,10 @@ export const GeneralTransforms: GeneralTransforms = {
 
             const value = newProperties[<keyof Node>key]
 
+            // Make sure we're not setting `then` to a function, since this will
+            // cause the node to be treated as a Promise-like object, which can
+            // cause unexpected behaviour when returning the node from async
+            // functions.
             if (key === 'then' && typeof value === 'function') {
               throw new Error(
                 'Cannot set the "then" property of a node to a function'
@@ -321,6 +335,10 @@ export const GeneralTransforms: GeneralTransforms = {
 
           const value = newProperties[<keyof Range>key]
 
+          // Make sure we're not setting `then` to a function, since this will
+          // cause the selection to be treated as a Promise-like object, which
+          // can cause unexpected behaviour when returning the selection from
+          // async functions.
           if (key === 'then' && typeof value === 'function') {
             throw new Error(
               'Cannot set the "then" property of the selection to a function'
@@ -353,6 +371,9 @@ export const GeneralTransforms: GeneralTransforms = {
           )
         }
 
+        // Defend against malicious paths containing strings
+        if (typeof index !== 'number') throw new Error('Index must be number')
+
         modifyChildren(editor, Path.parent(path), children => {
           const node = children[index]
           let newNode: Descendant
@@ -383,12 +404,16 @@ export const GeneralTransforms: GeneralTransforms = {
           const mutableNextNode = nextNode as unknown as Record<string, unknown>
 
           for (const key in properties) {
-            if (key === 'children' || key === 'text') {
+            if (NON_SETTABLE_NODE_PROPERTIES.includes(key)) {
               throw new Error(`Cannot set the "${key}" property of nodes!`)
             }
 
             const value = properties[<keyof Node>key]
 
+            // Make sure we're not setting `then` to a function, since this will
+            // cause the node to be treated as a Promise-like object, which can
+            // cause unexpected behaviour when returning the node from async
+            // functions.
             if (key === 'then' && typeof value === 'function') {
               throw new Error(
                 'Cannot set the "then" property of a node to a function'

@@ -39,9 +39,10 @@ async function setText(page: Page, text: string, language: string) {
   await editor.selectText()
   await editor.press('Backspace') // clear editor
   await page.getByTestId('code-block-button').click() // convert first and the only one paragraph to code block
-  await page.getByTestId('language-select').first().selectOption({
-    value: language,
-  }) // select the language option on the active code block
+  await page
+    .locator('[data-slate-editor] [data-test-id="language-select"]')
+    .first()
+    .selectOption({ value: language }) // select the language option on the active code block
 
   await editor.pressSequentially(text) // type text
 }

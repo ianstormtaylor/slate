@@ -273,6 +273,10 @@ export const Node: NodeInterface = {
       )
     }
 
+    if (typeof index !== 'number') {
+      throw new Error('Expected index to be a number')
+    }
+
     const c = root.children[index] as Descendant
 
     if (c == null) {
@@ -449,6 +453,10 @@ export const Node: NodeInterface = {
 
     for (let i = 0; i < path.length; i++) {
       const p = path[i]
+
+      if (typeof p !== 'number') {
+        throw new Error('Got non-numeric path index')
+      }
 
       if (Node.isText(node) || !node.children[p]) {
         return false
