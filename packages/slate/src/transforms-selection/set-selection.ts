@@ -1,7 +1,7 @@
 import { SelectionTransforms } from '../interfaces/transforms/selection'
 import { Range } from '../interfaces/range'
 import { Point } from '../interfaces/point'
-import { NON_SETTABLE_SELECTION_PROPERTIES } from '../interfaces/transforms/general'
+import { NON_SETTABLE_SELECTION_PROPERTIES } from '../utils/non-settable-properties'
 
 export const setSelection: SelectionTransforms['setSelection'] = (
   editor,
