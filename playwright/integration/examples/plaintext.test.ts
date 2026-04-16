@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test'
 test.describe('plaintext example', () => {
   test.beforeEach(
     async ({ page }) =>
-      await page.goto('http://localhost:3000/examples/plaintext')
+      await page.goto('http://localhost:3100/examples/plaintext')
   )
 
   test('inserts text when typed', async ({ page }) => {

@@ -1,7 +1,7 @@
 import { act, render } from '@testing-library/react'
 import { useEffect } from 'react'
 import { createEditor, Text, Transforms } from 'slate'
-import { Editable, Slate, withReact } from '../src'
+import { Editable, Slate, withReact } from '../../src'
 
 describe('slate-react', () => {
   describe('Editable', () => {

@@ -1,3 +1,9 @@
+/** @jsx jsx */
+
+import { jsx } from '../..'
+
+jsx
+
 export const run = (editor) => {
   editor.deleteBackward()
 }

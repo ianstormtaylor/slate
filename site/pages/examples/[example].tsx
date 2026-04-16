@@ -11,15 +11,40 @@ import { getAllExamples } from '../api'
 
 type ExampleTuple = [name: string, component: React.ComponentType, path: string]
 
+const EXAMPLE_IMPORTERS: Record<
+  string,
+  () => Promise<{ default: React.ComponentType }>
+> = {
+  'android-tests': () => import('../../examples/ts/android-tests'),
+  'check-lists': () => import('../../examples/ts/check-lists'),
+  'code-highlighting': () => import('../../examples/ts/code-highlighting'),
+  'custom-placeholder': () => import('../../examples/ts/custom-placeholder'),
+  'editable-voids': () => import('../../examples/ts/editable-voids'),
+  embeds: () => import('../../examples/ts/embeds'),
+  'forced-layout': () => import('../../examples/ts/forced-layout'),
+  'hovering-toolbar': () => import('../../examples/ts/hovering-toolbar'),
+  'huge-document': () => import('../../examples/ts/huge-document'),
+  images: () => import('../../examples/ts/images'),
+  inlines: () => import('../../examples/ts/inlines'),
+  'markdown-preview': () => import('../../examples/ts/markdown-preview'),
+  'markdown-shortcuts': () => import('../../examples/ts/markdown-shortcuts'),
+  mentions: () => import('../../examples/ts/mentions'),
+  'paste-html': () => import('../../examples/ts/paste-html'),
+  plaintext: () => import('../../examples/ts/plaintext'),
+  'read-only': () => import('../../examples/ts/read-only'),
+  iframe: () => import('../../examples/ts/iframe'),
+  richtext: () => import('../../examples/ts/richtext'),
+  'search-highlighting': () => import('../../examples/ts/search-highlighting'),
+  'shadow-dom': () => import('../../examples/ts/shadow-dom'),
+  styling: () => import('../../examples/ts/styling'),
+  tables: () => import('../../examples/ts/tables'),
+}
+
 const EXAMPLES: ExampleTuple[] = EXAMPLE_NAMES_AND_PATHS.map(([name, path]) => [
   name,
-  path === 'huge-document'
-    ? dynamic(() => import('../../examples/ts/huge-document'), {
-        loading: HugeDocumentLoader,
-      })
-    : dynamic(() => import(`../../examples/ts/${path}`), {
-        loading: ComponentLoader,
-      }),
+  dynamic(EXAMPLE_IMPORTERS[path], {
+    loading: path === 'huge-document' ? HugeDocumentLoader : ComponentLoader,
+  }),
   path,
 ])
 

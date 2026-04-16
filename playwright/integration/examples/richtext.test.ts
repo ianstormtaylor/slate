@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test'
 test.describe('On richtext example', () => {
   test.beforeEach(
     async ({ page }) =>
-      await page.goto('http://localhost:3000/examples/richtext')
+      await page.goto('http://localhost:3100/examples/richtext')
   )
 
   test('renders rich text', async ({ page }) => {

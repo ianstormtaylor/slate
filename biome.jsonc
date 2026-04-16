@@ -22,7 +22,7 @@
       "!!**/playwright-report",
       "!!**/test-results",
       "!**/next-env.d.ts",
-      "!!config/rollup/rollup.config-*.cjs",
+      "!!config/bun-test-globals.d.ts",
       "!!**/*.html"
     ]
   },
@@ -106,7 +106,6 @@
         "vite.config.*",
         "vitest.config.*",
         "jest.config.*",
-        "rollup.config.*",
         "webpack.config.*",
         "eslint.config.*",
         "stylelint.config.*",

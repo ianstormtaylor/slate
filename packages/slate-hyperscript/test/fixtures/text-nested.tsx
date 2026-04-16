@@ -1,3 +1,9 @@
+/** @jsx jsx */
+
+import { jsx } from '../jsx'
+
+jsx
+
 export const input = (
   <text b>
     <text a>word</text>

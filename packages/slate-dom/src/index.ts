@@ -14,16 +14,18 @@ export {
   targetRange,
   verifyDiffState,
 } from './utils/diff-text'
-export type { DOMPoint } from './utils/dom'
-export {
-  closestShadowAware,
-  containsShadowAware,
+export type {
   DOMElement,
   DOMNode,
+  DOMPoint,
   DOMRange,
   DOMSelection,
   DOMStaticRange,
   DOMText,
+} from './utils/dom'
+export {
+  closestShadowAware,
+  containsShadowAware,
   getActiveElement,
   getDefaultView,
   getSelection,

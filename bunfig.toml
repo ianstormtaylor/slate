@@ -1,0 +1,4 @@
+[test]
+preload = ["./config/bun-test-setup.ts"]
+tsconfig = "./config/tsconfig.test.json"
+onlyFailures = true

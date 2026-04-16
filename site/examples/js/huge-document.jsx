@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker'
-import React, { StrictMode, useCallback, useEffect, useState } from 'react'
+import { StrictMode, useCallback, useEffect, useState } from 'react'
 import { createEditor as slateCreateEditor } from 'slate'
 import { Editable, Slate, useSelected, withReact } from 'slate-react'
 
@@ -180,15 +180,18 @@ const Chunk = ({
     </div>
   )
 }
-const Heading = React.forwardRef(
-  ({ style: styleProp, showSelectedHeadings = false, ...props }, ref) => {
-    // Fine since the editor is remounted if the config changes
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const selected = showSelectedHeadings ? useSelected() : false
-    const style = { ...styleProp, color: selected ? 'green' : undefined }
-    return <h1 ref={ref} {...props} aria-selected={selected} style={style} />
-  }
-)
+const Heading = ({
+  style: styleProp,
+  showSelectedHeadings = false,
+  ref,
+  ...props
+}) => {
+  // Fine since the editor is remounted if the config changes
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const selected = showSelectedHeadings ? useSelected() : false
+  const style = { ...styleProp, color: selected ? 'green' : undefined }
+  return <h1 ref={ref} {...props} aria-selected={selected} style={style} />
+}
 const Paragraph = 'p'
 const Element = ({
   attributes,

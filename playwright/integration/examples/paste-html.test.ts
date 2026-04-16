@@ -3,7 +3,7 @@ import { expect, Page, test } from '@playwright/test'
 test.describe('paste html example', () => {
   test.beforeEach(
     async ({ page }) =>
-      await page.goto('http://localhost:3000/examples/paste-html')
+      await page.goto('http://localhost:3100/examples/paste-html')
   )
 
   const pasteHtml = async (page: Page, htmlContent: string) => {

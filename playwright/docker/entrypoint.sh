@@ -7,7 +7,7 @@ echo "=========================================="
 
 # Default to host.docker.internal if not overridden
 if [ -z "$PLAYWRIGHT_BASE_URL" ]; then
-  PLAYWRIGHT_BASE_URL="http://host.docker.internal:3000"
+  PLAYWRIGHT_BASE_URL="http://host.docker.internal:3100"
 fi
 
 echo "Waiting for development server on host..."
@@ -25,9 +25,9 @@ done
 
 echo "✓ Server is ready on host"
 
-# Forward localhost:3000 to host for tests that use hardcoded localhost URLs
-echo "Setting up port forwarding from localhost:3000 to host..."
-socat TCP-LISTEN:3000,fork,reuseaddr TCP:host.docker.internal:3000 &
+# Forward localhost:3100 to host for tests that use hardcoded localhost URLs
+echo "Setting up port forwarding from localhost:3100 to host..."
+socat TCP-LISTEN:3100,fork,reuseaddr TCP:host.docker.internal:3100 &
 SOCAT_PID=$!
 
 sleep 1

@@ -5,24 +5,18 @@
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
   "type": "module",
-  "main": "dist/index.cjs",
-  "module": "dist/index.es.js",
-  "types": "dist/index.d.ts",
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.es.js",
-      "require": "./dist/index.cjs"
-    }
+    ".": "./dist/index.js"
   },
-  "umd": "dist/slate.js",
-  "umdMin": "dist/slate.min.js",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "sideEffects": false,
   "files": [
     "dist/"
   ],
   "scripts": {
-    "build": "ROLLUP_PACKAGES=slate pnpm --dir ../.. build:rollup",
+    "build": "pnpm exec tsdown --config ../../config/tsdown.config.mts --log-level warn",
     "clean": "rimraf dist lib",
     "test": "node ../../scripts/run-from-root.mjs pnpm exec mocha --require ./config/babel/register.cjs ./packages/slate/test/**/*.ts",
     "typecheck": "pnpm exec tsc --project tsconfig.json --noEmit --pretty false"

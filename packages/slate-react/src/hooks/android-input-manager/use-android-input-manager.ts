@@ -9,7 +9,7 @@ import {
 } from './android-input-manager'
 
 type UseAndroidInputManagerOptions = {
-  node: RefObject<HTMLElement>
+  node: RefObject<HTMLElement | null>
 } & Omit<
   CreateAndroidInputManagerOptions,
   'editor' | 'onUserInput' | 'receivedUserInput'

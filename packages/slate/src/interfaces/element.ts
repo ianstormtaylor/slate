@@ -120,7 +120,8 @@ export const Element: ElementInterface = {
     elementKey = 'type'
   ): value is T => {
     return (
-      isElement(value) && value[<keyof Descendant>elementKey] === elementVal
+      isElement(value) &&
+      (value as unknown as Record<string, unknown>)[elementKey] === elementVal
     )
   },
 

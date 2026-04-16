@@ -1,6 +1,9 @@
 /** @jsx jsx */
 
 import { Editor, Transforms } from 'slate'
+import { jsx } from '../..'
+
+jsx
 
 export const run = (editor) => {
   // focus at the end

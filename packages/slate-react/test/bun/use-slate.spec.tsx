@@ -3,7 +3,7 @@
 import { act, render } from '@testing-library/react'
 import { createEditor, Transforms } from 'slate'
 import '@testing-library/jest-dom'
-import { Editable, Slate, useSlateWithV, withReact } from '../src'
+import { Editable, Slate, useSlateWithV, withReact } from '../../src'
 
 describe('useSlateWithV', () => {
   const ShowVersion = () => {

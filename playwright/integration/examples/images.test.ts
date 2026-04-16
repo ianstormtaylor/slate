@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test'
 
 test.describe('images example', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('http://localhost:3000/examples/images')
+    await page.goto('http://localhost:3100/examples/images')
   })
 
   test('contains image', async ({ page }) => {

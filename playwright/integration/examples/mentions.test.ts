@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test'
 test.describe('mentions example', () => {
   test.beforeEach(
     async ({ page }) =>
-      await page.goto('http://localhost:3000/examples/mentions')
+      await page.goto('http://localhost:3100/examples/mentions')
   )
 
   test('renders mention element', async ({ page }) => {

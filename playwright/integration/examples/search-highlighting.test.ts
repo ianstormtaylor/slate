@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test'
 test.describe('search highlighting', () => {
   test.beforeEach(
     async ({ page }) =>
-      await page.goto('http://localhost:3000/examples/search-highlighting')
+      await page.goto('http://localhost:3100/examples/search-highlighting')
   )
 
   test('highlights the searched text', async ({ page }) => {

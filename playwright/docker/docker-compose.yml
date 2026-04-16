@@ -8,7 +8,7 @@ services:
       - ../../test-results:/app/test-results:rw
     environment:
       - CI=true
-      - PLAYWRIGHT_BASE_URL=http://host.docker.internal:3000
+      - PLAYWRIGHT_BASE_URL=http://host.docker.internal:3100
       - NODE_PATH=/usr/local/lib/node_modules
     extra_hosts:
       - "host.docker.internal:host-gateway"

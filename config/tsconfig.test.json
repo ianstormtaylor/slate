@@ -1,0 +1,7 @@
+{
+  "extends": "./typescript/tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "..",
+    "types": ["bun-types/test-globals", "node"]
+  }
+}

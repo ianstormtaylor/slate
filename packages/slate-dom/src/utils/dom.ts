@@ -2,28 +2,31 @@
  * Types.
  */
 
-// COMPAT: This is required to prevent TypeScript aliases from doing some very
-// weird things for Slate's types with the same name as globals. (2019/11/27)
-// https://github.com/microsoft/TypeScript/issues/35002
-import DOMNode = globalThis.Node
-import DOMComment = globalThis.Comment
-import DOMElement = globalThis.Element
-import DOMText = globalThis.Text
-import DOMRange = globalThis.Range
-import DOMSelection = globalThis.Selection
-import DOMStaticRange = globalThis.StaticRange
+// COMPAT: Keep explicit aliases so Slate can talk about DOM types without
+// colliding with its own exported node/range names.
+type DOMNode = globalThis.Node
+type DOMComment = globalThis.Comment
+type DOMElement = globalThis.Element
+type DOMText = globalThis.Text
+type DOMRange = globalThis.Range
+type DOMSelection = globalThis.Selection
+type DOMStaticRange = globalThis.StaticRange
+
+const DOMNode = globalThis.Node
+const DOMText = globalThis.Text
 
 import { DOMEditor } from '../plugin/dom-editor'
 
-export {
+export type {
   DOMComment,
   DOMElement,
   DOMNode,
   DOMRange,
   DOMSelection,
   DOMStaticRange,
-  DOMText,
 }
+
+export { DOMText }
 
 declare global {
   interface Window {

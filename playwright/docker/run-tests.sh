@@ -13,8 +13,8 @@ echo "=========================================="
 echo "Docker Integration Tests"
 echo "=========================================="
 
-if curl -s http://localhost:3000 > /dev/null 2>&1; then
-  echo "✓ Development server already running on port 3000"
+if curl -s http://localhost:3100 > /dev/null 2>&1; then
+  echo "✓ Development server already running on port 3100"
   SERVER_STARTED_HERE=false
 else
   echo "Starting development server..."
@@ -27,7 +27,7 @@ else
   echo "Waiting for server to be ready..."
   timeout=60
   elapsed=0
-  while ! curl -s http://localhost:3000 > /dev/null 2>&1; do
+  while ! curl -s http://localhost:3100 > /dev/null 2>&1; do
     if [ $elapsed -ge $timeout ]; then
       echo "❌ Server did not start within ${timeout}s"
       exit 1

@@ -4,7 +4,7 @@ test.setTimeout(60 * 1000)
 
 test.describe('code highlighting', () => {
   test.beforeEach(async ({ page }) => {
-    page.goto('http://localhost:3000/examples/code-highlighting')
+    page.goto('http://localhost:3100/examples/code-highlighting')
   })
 
   for (const testCase of getTestCases()) {

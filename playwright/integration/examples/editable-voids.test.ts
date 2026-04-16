@@ -9,7 +9,7 @@ test.describe('editable voids', () => {
   ]
 
   test.beforeEach(async ({ page }) => {
-    await page.goto('http://localhost:3000/examples/editable-voids')
+    await page.goto('http://localhost:3100/examples/editable-voids')
   })
 
   test('checks for the elements', async ({ page }) => {

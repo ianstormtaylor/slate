@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test'
 test.describe('styling example', () => {
   test.beforeEach(
     async ({ page }) =>
-      await page.goto('http://localhost:3000/examples/styling')
+      await page.goto('http://localhost:3100/examples/styling')
   )
 
   test('applies styles to editor from style prop', async ({ page }) => {

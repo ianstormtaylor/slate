@@ -2,6 +2,7 @@
   "extends": "./tsconfig.json",
   "include": ["src/**/*", "test/**/*"],
   "compilerOptions": {
+    "isolatedModules": true,
     "noEmit": true
   }
 }

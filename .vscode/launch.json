@@ -8,7 +8,6 @@
       "args": [
         "mocha",
         "--require",
-        "${workspaceFolder}/config/babel/register.cjs",
         "${workspaceFolder}/packages/{slate,slate-history,slate-hyperscript}/test/**/*.{js,ts}",
         "--grep",
         "${fileBasenameNoExtension}",

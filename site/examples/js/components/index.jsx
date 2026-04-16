@@ -1,25 +1,20 @@
 import { css, cx } from '@emotion/css'
-import React from 'react'
 import ReactDOM from 'react-dom'
 
-export const Button = React.forwardRef(
-  ({ className, active, reversed, ...props }, ref) => (
-    <span
-      {...props}
-      className={cx(
-        className,
-        css`
-          cursor: pointer;
-          color: ${
-            reversed ? (active ? 'white' : '#aaa') : active ? 'black' : '#ccc'
-          };
-        `
-      )}
-      ref={ref}
-    />
-  )
+export const Button = ({ className, active, reversed, ref, ...props }) => (
+  <span
+    {...props}
+    className={cx(
+      className,
+      css`
+        cursor: pointer;
+        color: ${reversed ? (active ? 'white' : '#aaa') : active ? 'black' : '#ccc'};
+      `
+    )}
+    ref={ref}
+  />
 )
-export const Icon = React.forwardRef(({ className, ...props }, ref) => (
+export const Icon = ({ className, ref, ...props }) => (
   <span
     {...props}
     className={cx(
@@ -32,8 +27,8 @@ export const Icon = React.forwardRef(({ className, ...props }, ref) => (
     )}
     ref={ref}
   />
-))
-export const Instruction = React.forwardRef(({ className, ...props }, ref) => (
+)
+export const Instruction = ({ className, ref, ...props }) => (
   <div
     {...props}
     className={cx(
@@ -48,8 +43,8 @@ export const Instruction = React.forwardRef(({ className, ...props }, ref) => (
     )}
     ref={ref}
   />
-))
-export const Menu = React.forwardRef(({ className, ...props }, ref) => (
+)
+export const Menu = ({ className, ref, ...props }) => (
   <div
     {...props}
     className={cx(
@@ -67,13 +62,13 @@ export const Menu = React.forwardRef(({ className, ...props }, ref) => (
     data-test-id="menu"
     ref={ref}
   />
-))
+)
 export const Portal = ({ children }) => {
   return typeof document === 'object'
     ? ReactDOM.createPortal(children, document.body)
     : null
 }
-export const Toolbar = React.forwardRef(({ className, ...props }, ref) => (
+export const Toolbar = ({ className, ref, ...props }) => (
   <Menu
     {...props}
     className={cx(
@@ -88,4 +83,4 @@ export const Toolbar = React.forwardRef(({ className, ...props }, ref) => (
     )}
     ref={ref}
   />
-))
+)

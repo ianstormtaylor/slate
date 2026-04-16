@@ -248,16 +248,21 @@ const Chunk = ({
   )
 }
 
-const Heading = React.forwardRef<
-  HTMLHeadingElement,
-  React.ComponentProps<'h1'> & { showSelectedHeadings: boolean }
->(({ style: styleProp, showSelectedHeadings = false, ...props }, ref) => {
+const Heading = ({
+  style: styleProp,
+  showSelectedHeadings = false,
+  ref,
+  ...props
+}: React.ComponentProps<'h1'> & {
+  showSelectedHeadings: boolean
+  ref?: React.Ref<HTMLHeadingElement>
+}) => {
   // Fine since the editor is remounted if the config changes
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const selected = showSelectedHeadings ? useSelected() : false
   const style = { ...styleProp, color: selected ? 'green' : undefined }
   return <h1 ref={ref} {...props} aria-selected={selected} style={style} />
-})
+}
 
 const Paragraph = 'p'
 

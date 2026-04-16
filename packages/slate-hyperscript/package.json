@@ -4,19 +4,20 @@
   "version": "0.115.0",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
-  "main": "dist/index.js",
-  "module": "dist/index.es.js",
-  "types": "dist/index.d.ts",
-  "umd": "dist/slate-hyperscript.js",
-  "umdMin": "dist/slate-hyperscript.min.js",
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "sideEffects": false,
   "files": [
     "dist/"
   ],
   "scripts": {
-    "build": "ROLLUP_PACKAGES=slate-hyperscript pnpm --dir ../.. build:rollup",
+    "build": "pnpm exec tsdown --config ../../config/tsdown.config.mts --log-level warn",
     "clean": "rimraf dist lib",
-    "test": "node ../../scripts/run-from-root.mjs pnpm exec mocha --require ./config/babel/register.cjs ./packages/slate-hyperscript/test/index.js",
     "typecheck": "pnpm exec tsc --project tsconfig.json --noEmit --pretty false"
   },
   "devDependencies": {
@@ -26,9 +27,6 @@
   },
   "peerDependencies": {
     "slate": ">=0.114.3"
-  },
-  "umdGlobals": {
-    "slate": "Slate"
   },
   "keywords": [
     "deserialize",

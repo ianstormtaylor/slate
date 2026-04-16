@@ -1,5 +1,13 @@
 const config = {
+  testPathIgnorePatterns: ['<rootDir>/packages/slate-react/test/bun/'],
   testMatch: ['<rootDir>/packages/slate-react/test/**/*.{js,ts,tsx,jsx}'],
+  moduleNameMapper: {
+    '^slate$': '<rootDir>/packages/slate/src/index.ts',
+    '^slate-dom$': '<rootDir>/packages/slate-dom/src/index.ts',
+    '^slate-history$': '<rootDir>/packages/slate-history/src/index.ts',
+    '^slate-hyperscript$': '<rootDir>/packages/slate-hyperscript/src/index.ts',
+    '^slate-react$': '<rootDir>/packages/slate-react/src/index.ts',
+  },
   preset: 'ts-jest',
   transform: {
     '^.+\\.(ts|tsx)$': [

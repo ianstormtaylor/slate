@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test'
 
 test.describe('On markdown-shortcuts example', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('http://localhost:3000/examples/markdown-shortcuts')
+    await page.goto('http://localhost:3100/examples/markdown-shortcuts')
   })
 
   test('contains quote', async ({ page }) => {

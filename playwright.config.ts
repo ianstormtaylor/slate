@@ -80,7 +80,7 @@ const config: PlaywrightTestConfig = {
     actionTimeout: 0,
     /* Base URL to use in actions like `await page.goto('/')`. */
     // Can be overridden with PLAYWRIGHT_BASE_URL env var (used by Docker tests)
-    baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3000',
+    baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3100',
 
     /* Collect trace if the first attempt fails. See https://playwright.dev/docs/trace-viewer */
     trace: 'retain-on-first-failure',

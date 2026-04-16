@@ -31,13 +31,10 @@ export const fixtures = (...args) => {
         !file.endsWith('custom-types.ts') &&
         !file.endsWith('type-guards.ts') &&
         !file.startsWith('.') &&
-        // Ignoring `index.js` files allows us to use the fixtures directly
-        // from the top-level directory itself, instead of only children.
         file !== 'index.js'
       ) {
         const name = basename(file, extname(file))
 
-        // This needs to be a non-arrow function to use `this.skip()`.
         it(`${name} `, function () {
           const module = require(p)
 

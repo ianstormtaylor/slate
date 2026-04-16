@@ -1,4 +1,4 @@
-import { forwardRef, memo, useRef, useState } from 'react'
+import { memo, useRef, useState } from 'react'
 import { Editor, type Element, Node, Path, type Text } from 'slate'
 import { IS_ANDROID, MARK_PLACEHOLDER_SYMBOL } from 'slate-dom'
 import { ReactEditor, useSlateStatic } from '..'
@@ -91,15 +91,20 @@ const TextString = (props: { text: string; isTrailing?: boolean }) => {
   return <MemoizedText ref={ref}>{initialText}</MemoizedText>
 }
 
-const MemoizedText = memo(
-  forwardRef<HTMLSpanElement, { children: string }>((props, ref) => {
-    return (
-      <span data-slate-string ref={ref}>
-        {props.children}
-      </span>
-    )
-  })
-)
+type MemoizedTextProps = Omit<
+  React.ComponentPropsWithRef<'span'>,
+  'children'
+> & {
+  children: string
+}
+
+const MemoizedText = memo(({ children, ref }: MemoizedTextProps) => {
+  return (
+    <span data-slate-string ref={ref}>
+      {children}
+    </span>
+  )
+})
 
 /**
  * Leaf strings without text, render as zero-width strings.

@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test'
 test.describe('shadow-dom example', () => {
   test.beforeEach(
     async ({ page }) =>
-      await page.goto('http://localhost:3000/examples/shadow-dom')
+      await page.goto('http://localhost:3100/examples/shadow-dom')
   )
 
   test('renders slate editor inside nested shadow', async ({ page }) => {
