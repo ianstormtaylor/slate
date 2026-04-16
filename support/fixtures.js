@@ -1,5 +1,5 @@
-import fs from 'fs'
-import { basename, extname, resolve } from 'path'
+import fs from 'node:fs'
+import { basename, extname, resolve } from 'node:path'
 
 export const fixtures = (...args) => {
   let fn = args.pop()

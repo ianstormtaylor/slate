@@ -1053,7 +1053,9 @@ export const Editable = forwardRef(
                       !isEventHandled(
                         event,
                         attributes.onBeforeInput as
-                          | ((event: React.FormEvent<HTMLDivElement>) => boolean | void)
+                          | ((
+                              event: React.FormEvent<HTMLDivElement>
+                            ) => boolean | void)
                           | undefined
                       ) &&
                       ReactEditor.hasSelectableTarget(editor, event.target)

@@ -236,9 +236,6 @@ importers:
       lodash:
         specifier: ^4.17.21
         version: 4.18.1
-      slate-hyperscript:
-        specifier: workspace:*
-        version: link:../slate-hyperscript
       source-map-loader:
         specifier: ^4.0.1
         version: 4.0.2

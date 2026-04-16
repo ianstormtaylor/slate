@@ -4,7 +4,8 @@
   "compilerOptions": {
     "rootDir": ".",
     "outDir": "./lib",
-    "composite": true
+    "composite": true,
+    "types": ["node"]
   },
   "references": [{ "path": "../slate" }]
 }

@@ -14,7 +14,6 @@
       "!!**/node_modules",
       "!!**/.pnpm-store",
       "!!**/.turbo",
-      "!!config/rollup/rollup.config-*.cjs",
       "!!**/.next",
       "!!**/dist",
       "!!**/lib",
@@ -22,15 +21,16 @@
       "!!**/coverage",
       "!!**/playwright-report",
       "!!**/test-results",
-      "!!**/*.html",
-      "!**/next-env.d.ts"
+      "!**/next-env.d.ts",
+      "!!config/rollup/rollup.config-*.cjs",
+      "!!**/*.html"
     ]
   },
   "assist": {
     "actions": {
       "source": {
-        "noDuplicateClasses": "off",
         "useSortedInterfaceMembers": "off",
+        "noDuplicateClasses": "off",
         "useSortedProperties": "off"
       }
     }
@@ -38,6 +38,8 @@
   "linter": {
     "rules": {
       "correctness": {
+        // temp
+        "noUnusedFunctionParameters": "off",
         "useExhaustiveDependencies": "off",
         "useHookAtTopLevel": "off",
         "noUndeclaredVariables": "off",
@@ -151,6 +153,9 @@
         "packages/**/test/**",
         "playwright/**"
       ],
+      "javascript": {
+        "jsxRuntime": "reactClassic"
+      },
       "linter": {
         "rules": {
           "correctness": {

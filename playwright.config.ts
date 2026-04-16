@@ -1,5 +1,5 @@
+import * as os from 'node:os'
 import { devices, type PlaywrightTestConfig } from '@playwright/test'
-import * as os from 'os'
 
 const projects = [
   {

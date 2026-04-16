@@ -1,4 +1,4 @@
-import assert from 'assert'
+import assert from 'node:assert/strict'
 import { createHyperscript } from 'slate-hyperscript'
 import { fixtures } from '../../../support/fixtures'
 import { History, withHistory } from '..'
