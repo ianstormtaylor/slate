@@ -1,16 +1,15 @@
 import {
-  Descendant,
-  Editor,
-  Element,
+  type Descendant,
+  type Editor,
   Node,
-  NodeEntry,
-  Operation,
+  type NodeEntry,
+  type Operation,
   Path,
   Point,
   Range,
   Scrubber,
-  Selection,
-  Text,
+  type Selection,
+  type Text,
 } from '../../index'
 import {
   insertChildren,
@@ -54,7 +53,7 @@ export const GeneralTransforms: GeneralTransforms = {
       case 'insert_node': {
         const { path, node } = op
 
-        modifyChildren(editor, Path.parent(path), children => {
+        modifyChildren(editor, Path.parent(path), (children) => {
           const index = path[path.length - 1]
 
           if (index > children.length) {
@@ -74,7 +73,7 @@ export const GeneralTransforms: GeneralTransforms = {
         const { path, offset, text } = op
         if (text.length === 0) break
 
-        modifyLeaf(editor, path, node => {
+        modifyLeaf(editor, path, (node) => {
           const before = node.text.slice(0, offset)
           const after = node.text.slice(offset)
 
@@ -104,7 +103,7 @@ export const GeneralTransforms: GeneralTransforms = {
         if (typeof index !== 'number' || typeof prevIndex !== 'number')
           throw new Error('Index must be number')
 
-        modifyChildren(editor, Path.parent(path), children => {
+        modifyChildren(editor, Path.parent(path), (children) => {
           const node = children[index]
           const prev = children[prevIndex]
           let newNode: Descendant
@@ -140,7 +139,7 @@ export const GeneralTransforms: GeneralTransforms = {
 
         const node = Node.get(editor, path)
 
-        modifyChildren(editor, Path.parent(path), children =>
+        modifyChildren(editor, Path.parent(path), (children) =>
           removeChildren(children, index, 1)
         )
 
@@ -153,7 +152,7 @@ export const GeneralTransforms: GeneralTransforms = {
         const truePath = Path.transform(path, op)!
         const newIndex = truePath[truePath.length - 1]
 
-        modifyChildren(editor, Path.parent(truePath), children =>
+        modifyChildren(editor, Path.parent(truePath), (children) =>
           insertChildren(children, newIndex, node)
         )
 
@@ -165,7 +164,7 @@ export const GeneralTransforms: GeneralTransforms = {
         const { path } = op
         const index = path[path.length - 1]
 
-        modifyChildren(editor, Path.parent(path), children =>
+        modifyChildren(editor, Path.parent(path), (children) =>
           removeChildren(children, index, 1)
         )
 
@@ -227,7 +226,7 @@ export const GeneralTransforms: GeneralTransforms = {
         const { path, offset, text } = op
         if (text.length === 0) break
 
-        modifyLeaf(editor, path, node => {
+        modifyLeaf(editor, path, (node) => {
           const before = node.text.slice(0, offset)
           const after = node.text.slice(offset + text.length)
 
@@ -245,10 +244,10 @@ export const GeneralTransforms: GeneralTransforms = {
         const { path, properties, newProperties } = op
 
         if (path.length === 0) {
-          throw new Error(`Cannot set properties on the root node!`)
+          throw new Error('Cannot set properties on the root node!')
         }
 
-        modifyDescendant(editor, path, node => {
+        modifyDescendant(editor, path, (node) => {
           const newNode = { ...node }
 
           for (const key in newProperties) {
@@ -359,7 +358,7 @@ export const GeneralTransforms: GeneralTransforms = {
         // Defend against malicious paths containing strings
         if (typeof index !== 'number') throw new Error('Index must be number')
 
-        modifyChildren(editor, Path.parent(path), children => {
+        modifyChildren(editor, Path.parent(path), (children) => {
           const node = children[index]
           let newNode: Descendant
           let nextNode: Descendant

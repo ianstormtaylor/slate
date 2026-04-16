@@ -1,6 +1,5 @@
 /** @jsx jsx */
 import { Editor } from 'slate'
-import { jsx } from '../../..'
 
 /**
  * This test verifies that when double clicking a marked word in Firefox,
@@ -22,7 +21,7 @@ export const input = (
     <block>block two</block>
   </editor>
 )
-export const test = editor => {
+export const test = (editor) => {
   return Editor.marks(editor)
 }
 export const output = { bold: true }

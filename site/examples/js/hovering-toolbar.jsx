@@ -1,6 +1,6 @@
 import { css } from '@emotion/css'
-import React, { useEffect, useMemo, useRef } from 'react'
-import { Editor, Range, createEditor } from 'slate'
+import { useEffect, useMemo, useRef } from 'react'
+import { createEditor, Editor, Range } from 'slate'
 import { withHistory } from 'slate-history'
 import { Editable, Slate, useFocused, useSlate, withReact } from 'slate-react'
 import { Button, Icon, Menu, Portal } from './components'
@@ -11,9 +11,7 @@ const HoveringMenuExample = () => {
     <Slate editor={editor} initialValue={initialValue}>
       <HoveringToolbar />
       <Editable
-        renderLeaf={props => <Leaf {...props} />}
-        placeholder="Enter some text..."
-        onDOMBeforeInput={event => {
+        onDOMBeforeInput={(event) => {
           switch (event.inputType) {
             case 'formatBold':
               event.preventDefault()
@@ -26,6 +24,8 @@ const HoveringMenuExample = () => {
               return toggleMark(editor, 'underline')
           }
         }}
+        placeholder="Enter some text..."
+        renderLeaf={(props) => <Leaf {...props} />}
       />
     </Slate>
   )
@@ -85,7 +85,6 @@ const HoveringToolbar = () => {
   return (
     <Portal>
       <Menu
-        ref={ref}
         className={css`
           padding: 8px 7px 6px;
           position: absolute;
@@ -98,10 +97,11 @@ const HoveringToolbar = () => {
           border-radius: 4px;
           transition: opacity 0.75s;
         `}
-        onMouseDown={e => {
+        onMouseDown={(e) => {
           // prevent toolbar from taking focus away from editor
           e.preventDefault()
         }}
+        ref={ref}
       >
         <FormatButton format="bold" icon="format_bold" />
         <FormatButton format="italic" icon="format_italic" />
@@ -114,9 +114,9 @@ const FormatButton = ({ format, icon }) => {
   const editor = useSlate()
   return (
     <Button
-      reversed
       active={isMarkActive(editor, format)}
       onClick={() => toggleMark(editor, format)}
+      reversed
     >
       <Icon>{icon}</Icon>
     </Button>

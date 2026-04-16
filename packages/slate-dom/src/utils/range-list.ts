@@ -1,6 +1,6 @@
-import { Ancestor, DecoratedRange, Editor, Range } from 'slate'
-import { PLACEHOLDER_SYMBOL } from './weak-maps'
+import { type Ancestor, type DecoratedRange, Editor, Range } from 'slate'
 import { DOMEditor } from '../plugin/dom-editor'
+import { PLACEHOLDER_SYMBOL } from './weak-maps'
 
 export const shallowCompare = (
   obj1: { [key: string]: unknown },
@@ -8,7 +8,7 @@ export const shallowCompare = (
 ) =>
   Object.keys(obj1).length === Object.keys(obj2).length &&
   Object.keys(obj1).every(
-    key => obj2.hasOwnProperty(key) && obj1[key] === obj2[key]
+    (key) => Object.hasOwn(obj2, key) && obj1[key] === obj2[key]
   )
 
 const isDecorationFlagsEqual = (range: Range, other: Range) => {

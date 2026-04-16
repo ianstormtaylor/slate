@@ -1,5 +1,5 @@
-import { Range, isObject, Node } from '..'
-import { ExtendedType } from '../types/custom-types'
+import { isObject, Range } from '..'
+import type { ExtendedType } from '../types/custom-types'
 import { isDeepEqual } from '../utils/deep-equal'
 
 /**
@@ -96,7 +96,7 @@ export const Text: TextInterface = {
   },
 
   isTextList(value: any): value is Text[] {
-    return Array.isArray(value) && value.every(val => Text.isText(val))
+    return Array.isArray(value) && value.every((val) => Text.isText(val))
   },
 
   isTextProps(props: any): props is Partial<Text> {
@@ -110,7 +110,7 @@ export const Text: TextInterface = {
       }
 
       if (
-        !text.hasOwnProperty(key) ||
+        !Object.hasOwn(text, key) ||
         text[<keyof Text>key] !== props[<keyof Text>key]
       ) {
         return false

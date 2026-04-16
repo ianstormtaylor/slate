@@ -1,11 +1,11 @@
-import { useEffect } from 'react'
 import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 
 const Example = () => {
   const router = useRouter()
 
   useEffect(() => {
-    router.replace(`/examples/richtext`)
+    router.replace('/examples/richtext')
   })
 
   return null

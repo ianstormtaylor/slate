@@ -1,6 +1,6 @@
 import { Editor, Path, Range, Scrubber, Text } from '..'
-import { Element, ElementEntry } from './element'
 import { modifyChildren, modifyLeaf, removeChildren } from '../utils/modify'
+import { Element, type ElementEntry } from './element'
 
 /**
  * The `Node` union type represents all of the different types of nodes that
@@ -357,11 +357,10 @@ export const Node: NodeInterface = {
       const { text, ...properties } = node
 
       return properties
-    } else {
-      const { children, ...properties } = node
-
-      return properties
     }
+    const { children, ...properties } = node
+
+    return properties
   },
 
   first(root: Node, path: Path): NodeEntry {
@@ -371,10 +370,9 @@ export const Node: NodeInterface = {
     while (n) {
       if (Node.isText(n) || n.children.length === 0) {
         break
-      } else {
-        n = n.children[0]
-        p.push(0)
       }
+      n = n.children[0]
+      p.push(0)
     }
 
     return [n, p]
@@ -393,20 +391,20 @@ export const Node: NodeInterface = {
       if (!Range.includes(range, path)) {
         const index = path[path.length - 1]
 
-        modifyChildren(newRoot, Path.parent(path), children =>
+        modifyChildren(newRoot, Path.parent(path), (children) =>
           removeChildren(children, index, 1)
         )
       }
 
       if (Path.equals(path, end.path)) {
-        modifyLeaf(newRoot, path, node => {
+        modifyLeaf(newRoot, path, (node) => {
           const before = node.text.slice(0, end.offset)
           return { ...node, text: before }
         })
       }
 
       if (Path.equals(path, start.path)) {
-        modifyLeaf(newRoot, path, node => {
+        modifyLeaf(newRoot, path, (node) => {
           const before = node.text.slice(start.offset)
           return { ...node, text: before }
         })
@@ -496,7 +494,7 @@ export const Node: NodeInterface = {
     { deep = false }: NodeIsNodeOptions = {}
   ): value is Node[] {
     return (
-      Array.isArray(value) && value.every(val => Node.isNode(val, { deep }))
+      Array.isArray(value) && value.every((val) => Node.isNode(val, { deep }))
     )
   },
 
@@ -511,11 +509,10 @@ export const Node: NodeInterface = {
     while (n) {
       if (Node.isText(n) || n.children.length === 0) {
         break
-      } else {
-        const i = n.children.length - 1
-        n = n.children[i]
-        p.push(i)
       }
+      const i = n.children.length - 1
+      n = n.children[i]
+      p.push(i)
     }
 
     return [n, p]
@@ -643,9 +640,8 @@ export const Node: NodeInterface = {
   string(node: Node): string {
     if (Node.isText(node)) {
       return node.text
-    } else {
-      return node.children.map(Node.string).join('')
     }
+    return node.children.map(Node.string).join('')
   },
 
   *texts(

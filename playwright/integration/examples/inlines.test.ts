@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 
 test.describe('Inlines example', () => {
   test.beforeEach(async ({ page }) => {
@@ -16,7 +16,7 @@ test.describe('Inlines example', () => {
     const badge = page.locator('text=Approved >> xpath=../../..')
 
     // Put cursor after the badge
-    await badge.evaluate(badgeElement => {
+    await badge.evaluate((badgeElement) => {
       const range = document.createRange()
       range.setStartAfter(badgeElement)
       range.setEndAfter(badgeElement)

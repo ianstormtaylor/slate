@@ -1,7 +1,6 @@
-import React from 'react'
-import { createEditor, Transforms } from 'slate'
 import { act, render } from '@testing-library/react'
-import { Slate, withReact, Editable, ReactEditor } from '../src'
+import { createEditor, Transforms } from 'slate'
+import { Editable, ReactEditor, Slate, withReact } from '../src'
 
 describe('slate-react', () => {
   describe('ReactEditor', () => {
@@ -98,9 +97,9 @@ describe('slate-react', () => {
             <Slate
               editor={editor}
               initialValue={initialValue}
-              onValueChange={onValueChange}
               onChange={onChange}
               onSelectionChange={onSlectionChange}
+              onValueChange={onValueChange}
             >
               <Editable />
             </Slate>

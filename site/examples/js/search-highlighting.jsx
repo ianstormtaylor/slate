@@ -1,6 +1,6 @@
 import { css } from '@emotion/css'
-import React, { useCallback, useMemo, useState } from 'react'
-import { Node, createEditor } from 'slate'
+import { useCallback, useMemo, useState } from 'react'
+import { createEditor, Node } from 'slate'
 import { withHistory } from 'slate-history'
 import { Editable, Slate, withReact } from 'slate-react'
 import { Icon, Toolbar } from './components'
@@ -12,7 +12,7 @@ const SearchHighlightingExample = () => {
     ([node, path]) => {
       const ranges = []
       if (search && Node.isElement(node) && node.children.every(Node.isText)) {
-        const texts = node.children.map(it => it.text)
+        const texts = node.children.map((it) => it.text)
         const str = texts.join('')
         const length = search.length
         let start = str.indexOf(search)
@@ -74,17 +74,20 @@ const SearchHighlightingExample = () => {
             search
           </Icon>
           <input
-            type="search"
-            placeholder="Search the text..."
-            onChange={e => setSearch(e.target.value)}
             className={css`
               padding-left: 2.5em !important;
               width: 100%;
             `}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search the text..."
+            type="search"
           />
         </div>
       </Toolbar>
-      <Editable decorate={decorate} renderLeaf={props => <Leaf {...props} />} />
+      <Editable
+        decorate={decorate}
+        renderLeaf={(props) => <Leaf {...props} />}
+      />
     </Slate>
   )
 }

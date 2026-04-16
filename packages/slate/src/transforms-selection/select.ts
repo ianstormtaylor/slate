@@ -1,8 +1,8 @@
-import { SelectionTransforms } from '../interfaces/transforms/selection'
-import { Editor } from '../interfaces/editor'
-import { Transforms } from '../interfaces/transforms'
-import { Scrubber } from '../interfaces/scrubber'
 import { Location } from '../interfaces'
+import { Editor } from '../interfaces/editor'
+import { Scrubber } from '../interfaces/scrubber'
+import { Transforms } from '../interfaces/transforms'
+import type { SelectionTransforms } from '../interfaces/transforms/selection'
 
 export const select: SelectionTransforms['select'] = (editor, target) => {
   const { selection } = editor

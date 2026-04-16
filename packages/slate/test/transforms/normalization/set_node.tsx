@@ -1,11 +1,11 @@
 /** @jsx jsx */
-import { Editor, Element, Transforms } from 'slate'
-import { jsx } from '../..'
+
 import _ from 'lodash'
+import { Editor, Element, Transforms } from 'slate'
 
 export const input = (
   <editor>
-    <block type="body" attr={{ a: true }}>
+    <block attr={{ a: true }} type="body">
       one
     </block>
   </editor>
@@ -13,7 +13,7 @@ export const input = (
 
 const editor = input as unknown as Editor
 const defaultNormalize = editor.normalizeNode
-editor.normalizeNode = entry => {
+editor.normalizeNode = (entry) => {
   const [node, path] = entry
   if (
     Element.isElement(node) &&
@@ -30,13 +30,13 @@ editor.normalizeNode = entry => {
   defaultNormalize(entry)
 }
 
-export const run = editor => {
+export const run = (editor) => {
   Editor.normalize(editor, { force: true })
 }
 
 export const output = (
   <editor>
-    <block type="body" attr={{ a: false }}>
+    <block attr={{ a: false }} type="body">
       one
     </block>
   </editor>

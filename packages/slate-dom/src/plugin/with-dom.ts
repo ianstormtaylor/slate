@@ -1,16 +1,16 @@
 import {
-  BaseEditor,
+  type BaseEditor,
   Editor,
   Location,
   Node,
-  Operation,
+  type Operation,
   Path,
-  PathRef,
+  type PathRef,
   Range,
   Transforms,
 } from 'slate'
 import {
-  TextDiff,
+  type TextDiff,
   transformPendingPoint,
   transformPendingRange,
   transformTextDiff,
@@ -20,10 +20,9 @@ import {
   getSlateFragmentAttribute,
   isDOMText,
 } from '../utils/dom'
-import { Key } from '../utils/key'
+import type { Key } from '../utils/key'
 import { findCurrentLineRange } from '../utils/lines'
 import {
-  IS_NODE_MAP_DIRTY,
   EDITOR_TO_KEY_TO_ELEMENT,
   EDITOR_TO_ON_CHANGE,
   EDITOR_TO_PENDING_ACTION,
@@ -33,6 +32,7 @@ import {
   EDITOR_TO_SCHEDULE_FLUSH,
   EDITOR_TO_USER_MARKS,
   EDITOR_TO_USER_SELECTION,
+  IS_NODE_MAP_DIRTY,
   NODE_TO_KEY,
 } from '../utils/weak-maps'
 import { DOMEditor } from './dom-editor'
@@ -74,7 +74,7 @@ export const withDOM = <T extends BaseEditor>(
     addMark(key, value)
   }
 
-  e.removeMark = key => {
+  e.removeMark = (key) => {
     if (
       !EDITOR_TO_PENDING_INSERTION_MARKS.get(e) &&
       EDITOR_TO_PENDING_DIFFS.get(e)?.length
@@ -89,14 +89,14 @@ export const withDOM = <T extends BaseEditor>(
     removeMark(key)
   }
 
-  e.deleteBackward = unit => {
+  e.deleteBackward = (unit) => {
     if (unit !== 'line') {
       return deleteBackward(unit)
     }
 
     if (e.selection && Range.isCollapsed(e.selection)) {
       const parentBlockEntry = Editor.above(e, {
-        match: n => Node.isElement(n) && Editor.isBlock(e, n),
+        match: (n) => Node.isElement(n) && Editor.isBlock(e, n),
         at: e.selection,
       })
 
@@ -126,7 +126,7 @@ export const withDOM = <T extends BaseEditor>(
     const pendingDiffs = EDITOR_TO_PENDING_DIFFS.get(e)
     if (pendingDiffs?.length) {
       const transformed = pendingDiffs
-        .map(textDiff => transformTextDiff(textDiff, op))
+        .map((textDiff) => transformTextDiff(textDiff, op))
         .filter(Boolean) as TextDiff[]
 
       EDITOR_TO_PENDING_DIFFS.set(e, transformed)
@@ -256,7 +256,7 @@ export const withDOM = <T extends BaseEditor>(
     let attach = contents.childNodes[0] as HTMLElement
 
     // Make sure attach is non-empty, since empty nodes will not get copied.
-    contents.childNodes.forEach(node => {
+    contents.childNodes.forEach((node) => {
       if (node.textContent && node.textContent.trim() !== '') {
         attach = node as HTMLElement
       }
@@ -284,7 +284,7 @@ export const withDOM = <T extends BaseEditor>(
     // Remove any zero-width space spans from the cloned DOM so that they don't
     // show up elsewhere when pasted.
     Array.from(contents.querySelectorAll('[data-slate-zero-width]')).forEach(
-      zw => {
+      (zw) => {
         const isNewline = zw.getAttribute('data-slate-zero-width') === 'n'
         zw.textContent = isNewline ? '\n' : ''
       }
@@ -363,7 +363,7 @@ export const withDOM = <T extends BaseEditor>(
     return false
   }
 
-  e.onChange = options => {
+  e.onChange = (options) => {
     const onContextChange = EDITOR_TO_ON_CHANGE.get(e)
 
     if (onContextChange) {

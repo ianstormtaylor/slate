@@ -1,5 +1,5 @@
+import type { EditorInterface } from '../interfaces/editor'
 import { Transforms } from '../interfaces/transforms'
-import { EditorInterface } from '../interfaces/editor'
 
 export const insertText: EditorInterface['insertText'] = (
   editor,

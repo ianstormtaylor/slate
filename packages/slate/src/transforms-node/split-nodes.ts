@@ -1,12 +1,12 @@
-import { NodeTransforms } from '../interfaces/transforms/node'
-import { Editor } from '../interfaces/editor'
-import { Range } from '../interfaces/range'
-import { Path } from '../interfaces/path'
-import { PointRef } from '../interfaces/point-ref'
-import { Transforms } from '../interfaces/transforms'
-import { Node } from '../interfaces/node'
-import { Point } from '../interfaces/point'
 import { Location } from '../interfaces'
+import { Editor } from '../interfaces/editor'
+import { Node } from '../interfaces/node'
+import { Path } from '../interfaces/path'
+import type { Point } from '../interfaces/point'
+import type { PointRef } from '../interfaces/point-ref'
+import { Range } from '../interfaces/range'
+import { Transforms } from '../interfaces/transforms'
+import type { NodeTransforms } from '../interfaces/transforms/node'
 
 /**
  * Convert a range into a point by deleting it's content.
@@ -14,12 +14,11 @@ import { Location } from '../interfaces'
 const deleteRange = (editor: Editor, range: Range): Point | null => {
   if (Range.isCollapsed(range)) {
     return range.anchor
-  } else {
-    const [, end] = Range.edges(range)
-    const pointRef = Editor.pointRef(editor, end)
-    Transforms.delete(editor, { at: range })
-    return pointRef.unref()
   }
+  const [, end] = Range.edges(range)
+  const pointRef = Editor.pointRef(editor, end)
+  Transforms.delete(editor, { at: range })
+  return pointRef.unref()
 }
 
 export const splitNodes: NodeTransforms['splitNodes'] = (
@@ -33,7 +32,7 @@ export const splitNodes: NodeTransforms['splitNodes'] = (
     if (!at) return
 
     if (match == null) {
-      match = n => Node.isElement(n) && Editor.isBlock(editor, n)
+      match = (n) => Node.isElement(n) && Editor.isBlock(editor, n)
     }
 
     if (Location.isRange(at)) {
@@ -47,7 +46,7 @@ export const splitNodes: NodeTransforms['splitNodes'] = (
       const path = at
       const point = Editor.point(editor, path)
       const [parent] = Editor.parent(editor, path)
-      match = n => n === parent
+      match = (n) => n === parent
       height = point.path.length - path.length + 1
       at = point
       always = true

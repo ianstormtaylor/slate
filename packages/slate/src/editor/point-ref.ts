@@ -1,5 +1,5 @@
-import { Editor, EditorInterface } from '../interfaces/editor'
-import { PointRef } from '../interfaces/point-ref'
+import { Editor, type EditorInterface } from '../interfaces/editor'
+import type { PointRef } from '../interfaces/point-ref'
 
 export const pointRef: EditorInterface['pointRef'] = (
   editor,

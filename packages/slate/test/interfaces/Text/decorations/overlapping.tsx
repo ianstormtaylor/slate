@@ -24,7 +24,7 @@ export const input = [
     decoration2: 'decoration2',
   },
 ]
-export const test = decorations => {
+export const test = (decorations) => {
   return Text.decorations({ text: 'abc', mark: 'mark' }, decorations)
 }
 export const output = [

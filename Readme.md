@@ -141,7 +141,7 @@ If you're maintaining a translation, feel free to pull request it here!
 
 ### Packages
 
-Slate's codebase is monorepo managed with [Lerna](https://lerna.js.org/). It consists of a handful of packages—although you won't always use all of them. They are:
+Slate's codebase is a pnpm workspace orchestrated with [Turbo](https://turbo.build/). It consists of a handful of packages—although you won't always use all of them. They are:
 
 | **Package**                                         |                                                                                                                           **Version** |                                                                                                                                                                                       **Size** | **Description**                                  |
 | :-------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------: | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------- |
@@ -153,6 +153,20 @@ Slate's codebase is monorepo managed with [Lerna](https://lerna.js.org/). It con
 <br />
 
 ### Contributing!
+
+Before opening a pull request, run the repository gate:
+
+```text
+pnpm check
+```
+
+This is the canonical local and CI gate. It runs lint, typecheck, tests, and
+integration. For formatting
+fixes, run:
+
+```text
+pnpm lint:fix
+```
 
 All contributions are super welcome! Check out the [Contributing instructions](https://docs.slatejs.org/general/contributing) for more info!
 

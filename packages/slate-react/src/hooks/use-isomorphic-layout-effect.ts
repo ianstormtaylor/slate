@@ -1,4 +1,4 @@
-import { useLayoutEffect, useEffect } from 'react'
+import { useEffect, useLayoutEffect } from 'react'
 import { CAN_USE_DOM } from 'slate-dom'
 
 /**

@@ -1,6 +1,6 @@
 import assert from 'assert'
-import { fixtures } from '../../../support/fixtures'
 import { createHyperscript } from 'slate-hyperscript'
+import { fixtures } from '../../../support/fixtures'
 import { History, withHistory } from '..'
 
 describe('slate-history', () => {
@@ -29,22 +29,22 @@ export const jsx = createHyperscript({
   },
 })
 
-const withTest = editor => {
+const withTest = (editor) => {
   const { isInline, isVoid, isElementReadOnly, isSelectable } = editor
 
-  editor.isInline = element => {
+  editor.isInline = (element) => {
     return element.inline === true ? true : isInline(element)
   }
 
-  editor.isVoid = element => {
+  editor.isVoid = (element) => {
     return element.void === true ? true : isVoid(element)
   }
 
-  editor.isElementReadOnly = element => {
+  editor.isElementReadOnly = (element) => {
     return element.readOnly === true ? true : isElementReadOnly(element)
   }
 
-  editor.isSelectable = element => {
+  editor.isSelectable = (element) => {
     return element.nonSelectable === true ? false : isSelectable(element)
   }
 

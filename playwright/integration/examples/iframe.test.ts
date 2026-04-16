@@ -1,4 +1,4 @@
-import { test, expect, Page } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 
 test.describe('iframe editor', () => {
   test.beforeEach(async ({ page }) => {

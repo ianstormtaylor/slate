@@ -1,13 +1,13 @@
 import {
-  ExtendedType,
+  type ExtendedType,
+  isObject,
   Location,
-  Operation,
+  type Operation,
   Path,
   Point,
-  PointEntry,
-  isObject,
+  type PointEntry,
 } from '..'
-import { RangeDirection } from '../types/types'
+import type { RangeDirection } from '../types/types'
 
 /**
  * `Range` objects are a set of points that refer to a specific span of a Slate
@@ -181,9 +181,8 @@ export const Range: RangeInterface = {
 
     if (Point.isBefore(end, start)) {
       return null
-    } else {
-      return { anchor: start, focus: end, ...rest }
     }
+    return { anchor: start, focus: end, ...rest }
   },
 
   isBackward(range: Range): boolean {

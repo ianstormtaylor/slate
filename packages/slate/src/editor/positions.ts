@@ -1,8 +1,8 @@
-import { Editor, EditorPositionsOptions } from '../interfaces/editor'
+import { Editor, type EditorPositionsOptions } from '../interfaces/editor'
 import { Node } from '../interfaces/node'
-import { Point } from '../interfaces/point'
-import { Range } from '../interfaces/range'
 import { Path } from '../interfaces/path'
+import type { Point } from '../interfaces/point'
+import { Range } from '../interfaces/range'
 import {
   getCharacterDistance,
   getWordDistance,
@@ -65,7 +65,9 @@ export function* positions(
   })) {
     // If the node is inside a skipped ancestor, do not return any points, but
     // still process its content so that the iteration state remains correct.
-    const hasSkippedAncestor = skippedPaths.some(p => Path.isAncestor(p, path))
+    const hasSkippedAncestor = skippedPaths.some((p) =>
+      Path.isAncestor(p, path)
+    )
 
     function* maybeYield(point: Point) {
       if (!hasSkippedAncestor) {
@@ -87,13 +89,12 @@ export function* positions(
             yield* maybeYield(Editor.end(editor, Path.previous(path)))
           }
           continue
-        } else {
-          const nextPath = Path.next(path)
-          if (Editor.hasPath(editor, nextPath)) {
-            yield* maybeYield(Editor.start(editor, nextPath))
-          }
-          continue
         }
+        const nextPath = Path.next(path)
+        if (Editor.hasPath(editor, nextPath)) {
+          yield* maybeYield(Editor.start(editor, nextPath))
+        }
+        continue
       }
 
       // Void nodes are a special case, so by default we will always
@@ -207,9 +208,11 @@ export function* positions(
   function calcDistance(text: string, unit: string, reverse?: boolean) {
     if (unit === 'character') {
       return getCharacterDistance(text, reverse)
-    } else if (unit === 'word') {
+    }
+    if (unit === 'word') {
       return getWordDistance(text, reverse)
-    } else if (unit === 'line' || unit === 'block') {
+    }
+    if (unit === 'line' || unit === 'block') {
       return text.length
     }
     return 1

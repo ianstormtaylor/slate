@@ -1,7 +1,7 @@
-import { Editor, EditorInterface } from '../interfaces/editor'
-import { Range } from '../interfaces/range'
+import type { Editor, EditorInterface } from '../interfaces/editor'
 import { Node } from '../interfaces/node'
 import { Operation } from '../interfaces/operation'
+import { Range } from '../interfaces/range'
 import { isObject } from '../utils'
 
 export const isEditor: EditorInterface['isEditor'] = (

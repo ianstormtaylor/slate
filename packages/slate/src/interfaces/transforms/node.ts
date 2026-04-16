@@ -1,6 +1,6 @@
-import { Editor, Element, Location, Node, Path } from '../../index'
-import { NodeMatch, PropsCompare, PropsMerge } from '../editor'
-import { MaximizeMode, RangeMode } from '../../types/types'
+import type { Editor, Element, Location, Node, Path } from '../../index'
+import type { MaximizeMode, RangeMode } from '../../types/types'
+import type { NodeMatch, PropsCompare, PropsMerge } from '../editor'
 
 export interface NodeInsertNodesOptions<T extends Node> {
   at?: Location

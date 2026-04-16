@@ -1,19 +1,20 @@
 import { css } from '@emotion/css'
-import React, { useCallback, useMemo } from 'react'
-import { Descendant, Transforms, createEditor } from 'slate'
+import type React from 'react'
+import { useCallback, useMemo } from 'react'
+import { createEditor, type Descendant, Transforms } from 'slate'
 import { withHistory } from 'slate-history'
 import { jsx } from 'slate-hyperscript'
 import {
   Editable,
-  RenderElementProps,
-  RenderLeafProps,
+  type RenderElementProps,
+  type RenderLeafProps,
   Slate,
   useFocused,
   useSelected,
   withReact,
 } from 'slate-react'
 
-import {
+import type {
   CustomEditor,
   CustomElement,
   CustomElementType,
@@ -27,7 +28,7 @@ interface ElementAttributes {
 }
 
 const ELEMENT_TAGS: Record<string, (el: HTMLElement) => ElementAttributes> = {
-  A: el => ({ type: 'link', url: el.getAttribute('href')! }),
+  A: (el) => ({ type: 'link', url: el.getAttribute('href')! }),
   BLOCKQUOTE: () => ({ type: 'block-quote' }),
   H1: () => ({ type: 'heading-one' }),
   H2: () => ({ type: 'heading-two' }),
@@ -35,7 +36,7 @@ const ELEMENT_TAGS: Record<string, (el: HTMLElement) => ElementAttributes> = {
   H4: () => ({ type: 'heading-four' }),
   H5: () => ({ type: 'heading-five' }),
   H6: () => ({ type: 'heading-six' }),
-  IMG: el => ({ type: 'image', url: el.getAttribute('src')! }),
+  IMG: (el) => ({ type: 'image', url: el.getAttribute('src')! }),
   LI: () => ({ type: 'list-item' }),
   OL: () => ({ type: 'numbered-list' }),
   P: () => ({ type: 'paragraph' }),
@@ -65,9 +66,11 @@ const TEXT_TAGS: Record<string, () => TextAttributes> = {
 export const deserialize = (el: HTMLElement | ChildNode): any => {
   if (el.nodeType === 3) {
     return el.textContent
-  } else if (el.nodeType !== 1) {
+  }
+  if (el.nodeType !== 1) {
     return null
-  } else if (el.nodeName === 'BR') {
+  }
+  if (el.nodeName === 'BR') {
     return '\n'
   }
 
@@ -81,7 +84,7 @@ export const deserialize = (el: HTMLElement | ChildNode): any => {
   ) {
     parent = el.childNodes[0]
   }
-  let children = Array.from(parent.childNodes).map(deserialize).flat()
+  let children = Array.from(parent.childNodes).flatMap(deserialize)
 
   if (children.length === 0) {
     children = [{ text: '' }]
@@ -98,7 +101,7 @@ export const deserialize = (el: HTMLElement | ChildNode): any => {
 
   if (TEXT_TAGS[nodeName]) {
     const attrs = TEXT_TAGS[nodeName]()
-    return children.map(child => jsx('text', attrs, child))
+    return children.map((child) => jsx('text', attrs, child))
   }
 
   return children
@@ -120,9 +123,9 @@ const PasteHtmlExample = () => {
   return (
     <Slate editor={editor} initialValue={initialValue}>
       <Editable
+        placeholder="Paste in some HTML..."
         renderElement={renderElement}
         renderLeaf={renderLeaf}
-        placeholder="Paste in some HTML..."
       />
     </Slate>
   )
@@ -139,7 +142,7 @@ const withHtml = (editor: CustomEditor) => {
     return element.type === 'image' ? true : isVoid(element)
   }
 
-  editor.insertData = data => {
+  editor.insertData = (data) => {
     const html = data.getData('text/html')
 
     if (html) {
@@ -189,7 +192,7 @@ const Element = (props: RenderElementProps) => {
       return <ol {...attributes}>{children}</ol>
     case 'link':
       return (
-        <SafeLink href={element.url} attributes={attributes}>
+        <SafeLink attributes={attributes} href={element.url}>
           {children}
         </SafeLink>
       )
@@ -237,13 +240,13 @@ const ImageElement = ({
     <div {...attributes}>
       {children}
       <img
-        src={element.url}
         className={css`
           display: block;
           max-width: 100%;
           max-height: 20em;
           box-shadow: ${selected && focused ? '0 0 0 2px blue;' : 'none'};
         `}
+        src={element.url}
       />
     </div>
   )

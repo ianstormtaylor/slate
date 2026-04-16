@@ -1,5 +1,3 @@
-import React from 'react'
-
 export function ComponentLoader() {
   return (
     <div className="loading-container loading-spinner">

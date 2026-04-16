@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react'
-import { createEditor, Text, Transforms } from 'slate'
 import { act, render } from '@testing-library/react'
-import { Slate, withReact, Editable } from '../src'
+import { useEffect } from 'react'
+import { createEditor, Text, Transforms } from 'slate'
+import { Editable, Slate, withReact } from '../src'
 
 describe('slate-react', () => {
   describe('Editable', () => {
@@ -89,8 +89,8 @@ describe('slate-react', () => {
             editor={editor}
             initialValue={initialValue}
             onChange={onChange}
-            onValueChange={onValueChange}
             onSelectionChange={onSelectionChange}
+            onValueChange={onValueChange}
           >
             <Editable />
           </Slate>
@@ -119,8 +119,8 @@ describe('slate-react', () => {
             editor={editor}
             initialValue={initialValue}
             onChange={onChange}
-            onValueChange={onValueChange}
             onSelectionChange={onSelectionChange}
+            onValueChange={onValueChange}
           >
             <Editable />
           </Slate>
@@ -147,8 +147,8 @@ describe('slate-react', () => {
             editor={editor}
             initialValue={initialValue}
             onChange={onChange}
-            onValueChange={onValueChange}
             onSelectionChange={onSelectionChange}
+            onValueChange={onValueChange}
           >
             <Editable />
           </Slate>
@@ -158,7 +158,7 @@ describe('slate-react', () => {
       await act(async () =>
         Transforms.setNodes(
           editor,
-          // @ts-ignore
+          // @ts-expect-error
           { bold: true },
           {
             at: { path: [0, 0], offset: 2 },
@@ -186,8 +186,8 @@ describe('slate-react', () => {
             editor={editor}
             initialValue={initialValue}
             onChange={onChange}
-            onValueChange={onValueChange}
             onSelectionChange={onSelectionChange}
+            onValueChange={onValueChange}
           >
             <Editable />
           </Slate>

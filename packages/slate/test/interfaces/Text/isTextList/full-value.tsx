@@ -6,7 +6,7 @@ export const input = [
     selection: null,
   },
 ]
-export const test = value => {
+export const test = (value) => {
   return Text.isTextList(value)
 }
 export const output = false

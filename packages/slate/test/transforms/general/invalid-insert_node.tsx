@@ -1,7 +1,6 @@
 /** @jsx jsx */
 import assert from 'assert'
 import { Transforms } from 'slate'
-import { jsx } from '../..'
 
 export const input = (
   <editor>
@@ -11,7 +10,7 @@ export const input = (
     </block>
   </editor>
 )
-export const run = editor => {
+export const run = (editor) => {
   // position 2 is past the end of the block children
   assert.throws(() => {
     Transforms.insertNodes(editor, <text>another</text>, { at: [0, 2] })

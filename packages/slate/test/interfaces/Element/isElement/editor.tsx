@@ -24,7 +24,7 @@ export const input = {
   removeMark() {},
   getDirtyPaths() {},
 }
-export const test = value => {
+export const test = (value) => {
   return Element.isElement(value)
 }
 export const output = false

@@ -1,14 +1,14 @@
-import { WithEditorFirstArg } from '../utils/types'
 import {
-  Editor,
-  Element,
-  Descendant,
+  type Ancestor,
+  type Descendant,
+  type Editor,
+  type Element,
+  Node,
+  type Path,
   Text,
   Transforms,
-  Node,
-  Path,
-  Ancestor,
 } from '../interfaces'
+import type { WithEditorFirstArg } from '../utils/types'
 
 export const normalizeNode: WithEditorFirstArg<Editor['normalizeNode']> = (
   editor,
@@ -82,34 +82,32 @@ export const normalizeNode: WithEditorFirstArg<Editor['normalizeNode']> = (
             n--
           }
         }
-      } else {
-        if (editor.isInline(child)) {
-          // Ensure that inline nodes are surrounded by text nodes.
-          if (prev == null || !Node.isText(prev)) {
-            const newChild = { text: '' }
-            Transforms.insertNodes(editor, newChild, {
-              at: path.concat(n),
-              voids: true,
-            })
-            element = Node.get(editor, path) as Element
-            n++
-          }
-          if (n === element.children.length - 1) {
-            const newChild = { text: '' }
-            Transforms.insertNodes(editor, newChild, {
-              at: path.concat(n + 1),
-              voids: true,
-            })
-            element = Node.get(editor, path) as Element
-            n++
-          }
-        } else {
-          // Allow only inline nodes to be in other inline nodes, or in parent blocks that only
-          // contain inlines and text.
-          Transforms.unwrapNodes(editor, { at: path.concat(n), voids: true })
+      } else if (editor.isInline(child)) {
+        // Ensure that inline nodes are surrounded by text nodes.
+        if (prev == null || !Node.isText(prev)) {
+          const newChild = { text: '' }
+          Transforms.insertNodes(editor, newChild, {
+            at: path.concat(n),
+            voids: true,
+          })
           element = Node.get(editor, path) as Element
-          n--
+          n++
         }
+        if (n === element.children.length - 1) {
+          const newChild = { text: '' }
+          Transforms.insertNodes(editor, newChild, {
+            at: path.concat(n + 1),
+            voids: true,
+          })
+          element = Node.get(editor, path) as Element
+          n++
+        }
+      } else {
+        // Allow only inline nodes to be in other inline nodes, or in parent blocks that only
+        // contain inlines and text.
+        Transforms.unwrapNodes(editor, { at: path.concat(n), voids: true })
+        element = Node.get(editor, path) as Element
+        n--
       }
     }
   } else {

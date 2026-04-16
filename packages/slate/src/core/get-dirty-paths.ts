@@ -1,7 +1,7 @@
-import { WithEditorFirstArg } from '../utils/types'
-import { Path } from '../interfaces/path'
+import type { Editor } from '../interfaces/editor'
 import { Node } from '../interfaces/node'
-import { Editor } from '../interfaces/editor'
+import { Path } from '../interfaces/path'
+import type { WithEditorFirstArg } from '../utils/types'
 
 /**
  * Get the "dirty" paths generated from an operation.

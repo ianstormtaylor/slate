@@ -1,15 +1,22 @@
-import React, { useCallback, useMemo } from 'react'
-import { Descendant, Editor, Node, Point, Range, createEditor } from 'slate'
+import { css } from '@emotion/css'
+import { useCallback, useMemo } from 'react'
+import {
+  createEditor,
+  type Descendant,
+  Editor,
+  Node,
+  Point,
+  Range,
+} from 'slate'
 import { withHistory } from 'slate-history'
 import {
   Editable,
-  RenderElementProps,
-  RenderLeafProps,
+  type RenderElementProps,
+  type RenderLeafProps,
   Slate,
   withReact,
 } from 'slate-react'
-import { CustomEditor } from './custom-types.d'
-import { css } from '@emotion/css'
+import type { CustomEditor } from './custom-types.d'
 
 const TablesExample = () => {
   const renderElement = useCallback(
@@ -39,7 +46,7 @@ const withTables = (editor: CustomEditor) => {
 
     if (selection && Range.isCollapsed(selection)) {
       const [cell] = Editor.nodes(editor, {
-        match: n => Node.isElement(n) && n.type === 'table-cell',
+        match: (n) => Node.isElement(n) && n.type === 'table-cell',
       })
 
       if (cell) {
@@ -55,12 +62,12 @@ const withTables = (editor: CustomEditor) => {
     deleteBackward(unit)
   }
 
-  editor.deleteForward = unit => {
+  editor.deleteForward = (unit) => {
     const { selection } = editor
 
     if (selection && Range.isCollapsed(selection)) {
       const [cell] = Editor.nodes(editor, {
-        match: n => Node.isElement(n) && n.type === 'table-cell',
+        match: (n) => Node.isElement(n) && n.type === 'table-cell',
       })
 
       if (cell) {
@@ -81,7 +88,7 @@ const withTables = (editor: CustomEditor) => {
 
     if (selection) {
       const [table] = Editor.nodes(editor, {
-        match: n => Node.isElement(n) && n.type === 'table',
+        match: (n) => Node.isElement(n) && n.type === 'table',
       })
 
       if (table) {

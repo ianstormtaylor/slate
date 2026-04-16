@@ -1,12 +1,12 @@
-import React, { useCallback, useMemo } from 'react'
-import { Editor, Node, Point, Range, createEditor } from 'slate'
+import { css } from '@emotion/css'
+import { useCallback, useMemo } from 'react'
+import { createEditor, Editor, Node, Point, Range } from 'slate'
 import { withHistory } from 'slate-history'
 import { Editable, Slate, withReact } from 'slate-react'
-import { css } from '@emotion/css'
 
 const TablesExample = () => {
-  const renderElement = useCallback(props => <Element {...props} />, [])
-  const renderLeaf = useCallback(props => <Leaf {...props} />, [])
+  const renderElement = useCallback((props) => <Element {...props} />, [])
+  const renderLeaf = useCallback((props) => <Leaf {...props} />, [])
   const editor = useMemo(
     () => withTables(withHistory(withReact(createEditor()))),
     []
@@ -17,13 +17,13 @@ const TablesExample = () => {
     </Slate>
   )
 }
-const withTables = editor => {
+const withTables = (editor) => {
   const { deleteBackward, deleteForward, insertBreak } = editor
-  editor.deleteBackward = unit => {
+  editor.deleteBackward = (unit) => {
     const { selection } = editor
     if (selection && Range.isCollapsed(selection)) {
       const [cell] = Editor.nodes(editor, {
-        match: n => Node.isElement(n) && n.type === 'table-cell',
+        match: (n) => Node.isElement(n) && n.type === 'table-cell',
       })
       if (cell) {
         const [, cellPath] = cell
@@ -35,11 +35,11 @@ const withTables = editor => {
     }
     deleteBackward(unit)
   }
-  editor.deleteForward = unit => {
+  editor.deleteForward = (unit) => {
     const { selection } = editor
     if (selection && Range.isCollapsed(selection)) {
       const [cell] = Editor.nodes(editor, {
-        match: n => Node.isElement(n) && n.type === 'table-cell',
+        match: (n) => Node.isElement(n) && n.type === 'table-cell',
       })
       if (cell) {
         const [, cellPath] = cell
@@ -55,7 +55,7 @@ const withTables = editor => {
     const { selection } = editor
     if (selection) {
       const [table] = Editor.nodes(editor, {
-        match: n => Node.isElement(n) && n.type === 'table',
+        match: (n) => Node.isElement(n) && n.type === 'table',
       })
       if (table) {
         return

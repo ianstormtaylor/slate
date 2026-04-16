@@ -1,4 +1,4 @@
-import { EditorInterface } from '../interfaces/editor'
+import type { EditorInterface } from '../interfaces/editor'
 import { NORMALIZING } from '../utils/weak-maps'
 
 export const setNormalizing: EditorInterface['setNormalizing'] = (

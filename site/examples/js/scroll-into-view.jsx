@@ -1,9 +1,10 @@
-import React, { useMemo } from 'react'
-import { createEditor } from 'slate'
-import { Slate, Editable, withReact } from 'slate-react'
-import { withHistory } from 'slate-history'
 import { css } from '@emotion/css'
 import range from 'lodash/range'
+import { useMemo } from 'react'
+import { createEditor } from 'slate'
+import { withHistory } from 'slate-history'
+import { Editable, Slate, withReact } from 'slate-react'
+
 /**
  * This is an example we can use to test the scrollIntoView functionality in
  * `Editable`. Keeping it here for now as we may need it to make sure it is

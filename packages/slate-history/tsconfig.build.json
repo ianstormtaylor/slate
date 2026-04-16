@@ -1,0 +1,11 @@
+{
+  "extends": "../../config/typescript/tsconfig.json",
+  "include": ["src/**/*"],
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./lib",
+    "composite": true,
+    "types": []
+  },
+  "references": [{ "path": "../slate" }]
+}

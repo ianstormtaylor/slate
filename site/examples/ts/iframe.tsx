@@ -1,20 +1,21 @@
 import isHotkey from 'is-hotkey'
-import React, { PointerEvent, useCallback, useMemo, useState } from 'react'
+import type React from 'react'
+import { type PointerEvent, useCallback, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { Editor, createEditor, Descendant } from 'slate'
+import { createEditor, type Descendant, Editor } from 'slate'
 import { withHistory } from 'slate-history'
 import {
   Editable,
   ReactEditor,
-  RenderElementProps,
-  RenderLeafProps,
+  type RenderElementProps,
+  type RenderLeafProps,
   Slate,
   useSlate,
   withReact,
 } from 'slate-react'
 
 import { Button, Icon, Toolbar } from './components'
-import { CustomEditor, CustomTextKey } from './custom-types.d'
+import type { CustomEditor, CustomTextKey } from './custom-types.d'
 
 const HOTKEYS: Record<string, CustomTextKey> = {
   'mod+b': 'bold',
@@ -51,12 +52,8 @@ const IFrameExample = () => {
       </Toolbar>
       <IFrame onBlur={handleBlur}>
         <Editable
-          renderElement={renderElement}
-          renderLeaf={renderLeaf}
-          placeholder="Enter some rich text…"
-          spellCheck
           autoFocus
-          onKeyDown={event => {
+          onKeyDown={(event) => {
             for (const hotkey in HOTKEYS) {
               if (isHotkey(hotkey, event as any)) {
                 event.preventDefault()
@@ -65,6 +62,10 @@ const IFrameExample = () => {
               }
             }
           }}
+          placeholder="Enter some rich text…"
+          renderElement={renderElement}
+          renderLeaf={renderLeaf}
+          spellCheck
         />
       </IFrame>
     </Slate>
@@ -115,10 +116,10 @@ const MarkButton = ({ format, icon }: MarkButtonProps) => {
   return (
     <Button
       active={isMarkActive(editor, format)}
+      onClick={() => toggleMark(editor, format)}
       onPointerDown={(event: PointerEvent<HTMLButtonElement>) => {
         event.preventDefault()
       }}
-      onClick={() => toggleMark(editor, format)}
     >
       <Icon>{icon}</Icon>
     </Button>
@@ -137,7 +138,7 @@ const IFrame = ({ children, ...props }: IFrameProps) => {
     setIframeBody(iframe.contentDocument.body)
   }
   return (
-    <iframe srcDoc={`<!DOCTYPE html>`} {...props} onLoad={handleLoad}>
+    <iframe srcDoc={'<!DOCTYPE html>'} {...props} onLoad={handleLoad}>
       {iframeBody && createPortal(children, iframeBody)}
     </iframe>
   )

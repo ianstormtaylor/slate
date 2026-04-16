@@ -1,5 +1,5 @@
 import { css, cx } from '@emotion/css'
-import React, { PropsWithChildren, ReactNode, Ref } from 'react'
+import React, { type PropsWithChildren, type ReactNode, type Ref } from 'react'
 import ReactDOM from 'react-dom'
 
 interface BaseProps {
@@ -24,23 +24,19 @@ export const Button = React.forwardRef(
   ) => (
     <button
       {...props}
-      ref={ref}
       className={cx(
         css`
           border: none;
           background: none;
           padding: 0;
           cursor: pointer;
-          color: ${reversed
-            ? active
-              ? 'white'
-              : '#aaa'
-            : active
-            ? 'black'
-            : '#ccc'};
+          color: ${
+            reversed ? (active ? 'white' : '#aaa') : active ? 'black' : '#ccc'
+          };
         `,
         className
       )}
+      ref={ref}
     />
   )
 )
@@ -52,7 +48,6 @@ export const Icon = React.forwardRef(
   ) => (
     <span
       {...props}
-      ref={ref}
       className={cx(
         'material-icons',
         className,
@@ -61,6 +56,7 @@ export const Icon = React.forwardRef(
           vertical-align: text-bottom;
         `
       )}
+      ref={ref}
     />
   )
 )
@@ -72,7 +68,6 @@ export const Instruction = React.forwardRef(
   ) => (
     <div
       {...props}
-      ref={ref}
       className={cx(
         className,
         css`
@@ -83,6 +78,7 @@ export const Instruction = React.forwardRef(
           background: #f8f8e8;
         `
       )}
+      ref={ref}
     />
   )
 )
@@ -94,8 +90,6 @@ export const Menu = React.forwardRef(
   ) => (
     <div
       {...props}
-      data-test-id="menu"
-      ref={ref}
       className={cx(
         className,
         css`
@@ -108,6 +102,8 @@ export const Menu = React.forwardRef(
           }
         `
       )}
+      data-test-id="menu"
+      ref={ref}
     />
   )
 )
@@ -125,7 +121,6 @@ export const Toolbar = React.forwardRef(
   ) => (
     <Menu
       {...props}
-      ref={ref}
       className={cx(
         className,
         css`
@@ -136,6 +131,7 @@ export const Toolbar = React.forwardRef(
           margin-bottom: 20px;
         `
       )}
+      ref={ref}
     />
   )
 )

@@ -1,7 +1,7 @@
 /** @jsx jsx  */
-import { Node } from 'slate'
-import { jsx } from 'slate-hyperscript'
+
 import { cloneDeep } from 'lodash'
+import { Node } from 'slate'
 
 export const input = (
   <editor>
@@ -10,7 +10,7 @@ export const input = (
     </element>
   </editor>
 )
-export const test = value => {
+export const test = (value) => {
   return Node.getIf(value, [])
 }
 export const skip = true // TODO: see https://github.com/ianstormtaylor/slate/pull/4188

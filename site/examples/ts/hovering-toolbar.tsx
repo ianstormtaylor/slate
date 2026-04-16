@@ -1,10 +1,10 @@
 import { css } from '@emotion/css'
-import React, { MouseEvent, useEffect, useMemo, useRef } from 'react'
-import { Descendant, Editor, Range, createEditor } from 'slate'
+import { type MouseEvent, useEffect, useMemo, useRef } from 'react'
+import { createEditor, type Descendant, Editor, Range } from 'slate'
 import { withHistory } from 'slate-history'
 import {
   Editable,
-  RenderLeafProps,
+  type RenderLeafProps,
   Slate,
   useFocused,
   useSlate,
@@ -12,7 +12,7 @@ import {
 } from 'slate-react'
 
 import { Button, Icon, Menu, Portal } from './components'
-import { CustomEditor, CustomTextKey } from './custom-types.d'
+import type { CustomEditor, CustomTextKey } from './custom-types.d'
 
 const HoveringMenuExample = () => {
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
@@ -21,8 +21,6 @@ const HoveringMenuExample = () => {
     <Slate editor={editor} initialValue={initialValue}>
       <HoveringToolbar />
       <Editable
-        renderLeaf={props => <Leaf {...props} />}
-        placeholder="Enter some text..."
         onDOMBeforeInput={(event: InputEvent) => {
           switch (event.inputType) {
             case 'formatBold':
@@ -36,6 +34,8 @@ const HoveringMenuExample = () => {
               return toggleMark(editor, 'underline')
           }
         }}
+        placeholder="Enter some text..."
+        renderLeaf={(props) => <Leaf {...props} />}
       />
     </Slate>
   )
@@ -108,7 +108,6 @@ const HoveringToolbar = () => {
   return (
     <Portal>
       <Menu
-        ref={ref}
         className={css`
           padding: 8px 7px 6px;
           position: absolute;
@@ -125,6 +124,7 @@ const HoveringToolbar = () => {
           // prevent toolbar from taking focus away from editor
           e.preventDefault()
         }}
+        ref={ref}
       >
         <FormatButton format="bold" icon="format_bold" />
         <FormatButton format="italic" icon="format_italic" />
@@ -143,9 +143,9 @@ const FormatButton = ({ format, icon }: FormatButtonProps) => {
   const editor = useSlate()
   return (
     <Button
-      reversed
       active={isMarkActive(editor, format)}
       onClick={() => toggleMark(editor, format)}
+      reversed
     >
       <Icon>{icon}</Icon>
     </Button>

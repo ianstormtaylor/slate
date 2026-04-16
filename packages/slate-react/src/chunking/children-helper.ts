@@ -1,7 +1,7 @@
-import { Editor, Descendant } from 'slate'
-import { Key } from 'slate-dom'
-import { ChunkLeaf } from './types'
+import type { Descendant, Editor } from 'slate'
+import type { Key } from 'slate-dom'
 import { ReactEditor } from '../plugin/react-editor'
+import type { ChunkLeaf } from './types'
 
 /**
  * Traverse an array of children, providing helpers useful for reconciling the

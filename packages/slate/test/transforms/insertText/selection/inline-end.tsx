@@ -1,7 +1,4 @@
-/** @jsx jsx */
-import { jsx } from '../../..'
-
-export const run = editor => {
+export const run = (editor) => {
   editor.insertText('four')
 }
 export const input = (

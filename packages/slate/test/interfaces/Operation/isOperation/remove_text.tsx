@@ -6,7 +6,7 @@ export const input = {
   offset: 0,
   text: 'string',
 }
-export const test = value => {
+export const test = (value) => {
   return Operation.isOperation(value)
 }
 export const output = true

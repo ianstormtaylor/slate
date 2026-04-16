@@ -1,6 +1,6 @@
+import type { Editor } from '../interfaces/editor'
+import type { Path } from '../interfaces/path'
 import { DIRTY_PATH_KEYS, DIRTY_PATHS } from '../utils/weak-maps'
-import { Path } from '../interfaces/path'
-import { Editor } from '../interfaces/editor'
 
 /**
  * update editor dirty paths

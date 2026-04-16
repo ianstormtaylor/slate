@@ -1,6 +1,6 @@
 import isHotkey from 'is-hotkey'
-import React, { useCallback, useMemo } from 'react'
-import { Editor, Node, Transforms, createEditor } from 'slate'
+import { useCallback, useMemo } from 'react'
+import { createEditor, Editor, Node, Transforms } from 'slate'
 import { withHistory } from 'slate-history'
 import { Editable, Slate, useSlate, withReact } from 'slate-react'
 import { Button, Icon, Toolbar } from './components'
@@ -14,8 +14,8 @@ const HOTKEYS = {
 const LIST_TYPES = ['numbered-list', 'bulleted-list']
 const TEXT_ALIGN_TYPES = ['left', 'center', 'right', 'justify']
 const RichTextExample = () => {
-  const renderElement = useCallback(props => <Element {...props} />, [])
-  const renderLeaf = useCallback(props => <Leaf {...props} />, [])
+  const renderElement = useCallback((props) => <Element {...props} />, [])
+  const renderLeaf = useCallback((props) => <Leaf {...props} />, [])
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
   return (
     <Slate editor={editor} initialValue={initialValue}>
@@ -35,12 +35,8 @@ const RichTextExample = () => {
         <BlockButton format="justify" icon="format_align_justify" />
       </Toolbar>
       <Editable
-        renderElement={renderElement}
-        renderLeaf={renderLeaf}
-        placeholder="Enter some rich text…"
-        spellCheck
         autoFocus
-        onKeyDown={event => {
+        onKeyDown={(event) => {
           for (const hotkey in HOTKEYS) {
             if (isHotkey(hotkey, event)) {
               event.preventDefault()
@@ -49,6 +45,10 @@ const RichTextExample = () => {
             }
           }
         }}
+        placeholder="Enter some rich text…"
+        renderElement={renderElement}
+        renderLeaf={renderLeaf}
+        spellCheck
       />
     </Slate>
   )
@@ -61,7 +61,8 @@ const toggleBlock = (editor, format) => {
   )
   const isList = isListType(format)
   Transforms.unwrapNodes(editor, {
-    match: n => Node.isElement(n) && isListType(n.type) && !isAlignType(format),
+    match: (n) =>
+      Node.isElement(n) && isListType(n.type) && !isAlignType(format),
     split: true,
   })
   let newProperties
@@ -94,7 +95,7 @@ const isBlockActive = (editor, format, blockType = 'type') => {
   const [match] = Array.from(
     Editor.nodes(editor, {
       at: Editor.unhangRange(editor, selection),
-      match: n => {
+      match: (n) => {
         if (Node.isElement(n)) {
           if (blockType === 'align' && isAlignElement(n)) {
             return n.align === format
@@ -185,9 +186,9 @@ const BlockButton = ({ format, icon }) => {
         format,
         isAlignType(format) ? 'align' : 'type'
       )}
-      onPointerDown={event => event.preventDefault()}
-      onClick={() => toggleBlock(editor, format)}
       data-test-id={`block-button-${format}`}
+      onClick={() => toggleBlock(editor, format)}
+      onPointerDown={(event) => event.preventDefault()}
     >
       <Icon>{icon}</Icon>
     </Button>
@@ -198,20 +199,20 @@ const MarkButton = ({ format, icon }) => {
   return (
     <Button
       active={isMarkActive(editor, format)}
-      onPointerDown={event => event.preventDefault()}
       onClick={() => toggleMark(editor, format)}
+      onPointerDown={(event) => event.preventDefault()}
     >
       <Icon>{icon}</Icon>
     </Button>
   )
 }
-const isAlignType = format => {
+const isAlignType = (format) => {
   return TEXT_ALIGN_TYPES.includes(format)
 }
-const isListType = format => {
+const isListType = (format) => {
   return LIST_TYPES.includes(format)
 }
-const isAlignElement = element => {
+const isAlignElement = (element) => {
   return 'align' in element
 }
 const initialValue = [

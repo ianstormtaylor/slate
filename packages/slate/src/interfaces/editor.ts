@@ -1,4 +1,4 @@
-import {
+import type {
   Ancestor,
   Descendant,
   Element,
@@ -17,7 +17,8 @@ import {
   Text,
   Transforms,
 } from '..'
-import {
+import { isEditor } from '../editor/is-editor'
+import type {
   LeafEdge,
   MaximizeMode,
   RangeDirection,
@@ -26,13 +27,12 @@ import {
   TextUnit,
   TextUnitAdjustment,
 } from '../types/types'
-import { OmitFirstArg } from '../utils/types'
-import { isEditor } from '../editor/is-editor'
-import {
+import type { OmitFirstArg } from '../utils/types'
+import type { NodeInsertNodesOptions } from './transforms/node'
+import type {
   TextInsertFragmentOptions,
   TextInsertTextOptions,
 } from './transforms/text'
-import { NodeInsertNodesOptions } from './transforms/node'
 
 /**
  * The `Editor` interface stores all the state of a Slate editor. It is extended

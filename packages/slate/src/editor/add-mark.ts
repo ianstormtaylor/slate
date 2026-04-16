@@ -1,9 +1,9 @@
+import { Editor, type EditorInterface } from '../interfaces/editor'
 import { Node } from '../interfaces/node'
-import { Path } from '../interfaces/path'
+import type { Path } from '../interfaces/path'
 import { Range } from '../interfaces/range'
 import { Transforms } from '../interfaces/transforms'
 import { FLUSHING } from '../utils/weak-maps'
-import { Editor, EditorInterface } from '../interfaces/editor'
 
 export const addMark: EditorInterface['addMark'] = (editor, key, value) => {
   const { selection } = editor

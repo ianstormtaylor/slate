@@ -46,9 +46,7 @@ export const getCharacterDistance = (str: string, isRTL = false): number => {
       intersects(left, CodepointType.RI) &&
       intersects(right, CodepointType.RI)
     ) {
-      if (gb12Or13 !== null) {
-        gb12Or13 = !gb12Or13
-      } else {
+      if (gb12Or13 === null) {
         if (isLTR) {
           gb12Or13 = true
         } else {
@@ -56,6 +54,8 @@ export const getCharacterDistance = (str: string, isRTL = false): number => {
             str.substring(0, str.length - distance)
           )
         }
+      } else {
+        gb12Or13 = !gb12Or13
       }
       if (!gb12Or13) break
     }
@@ -94,10 +94,10 @@ export const getWordDistance = (text: string, isRTL = false): number => {
     if (isWordCharacter(char, remaining, isRTL)) {
       started = true
       dist += charDist
-    } else if (!started) {
-      dist += charDist
-    } else {
+    } else if (started) {
       break
+    } else {
+      dist += charDist
     }
 
     text = remaining
@@ -191,7 +191,7 @@ export const codepointsIteratorRTL = function* (str: string) {
  */
 
 const isHighSurrogate = (charCode: number) => {
-  return charCode >= 0xd800 && charCode <= 0xdbff
+  return charCode >= 0xd8_00 && charCode <= 0xdb_ff
 }
 
 /**
@@ -201,7 +201,7 @@ const isHighSurrogate = (charCode: number) => {
  */
 
 const isLowSurrogate = (charCode: number) => {
-  return charCode >= 0xdc00 && charCode <= 0xdfff
+  return charCode >= 0xdc_00 && charCode <= 0xdf_ff
 }
 
 enum CodepointType {
@@ -239,10 +239,10 @@ const getCodepointType = (char: string, code: number): CodepointType => {
   if (char.search(reExtend) !== -1) {
     type |= CodepointType.Extend
   }
-  if (code === 0x200d) {
+  if (code === 0x20_0d) {
     type |= CodepointType.ZWJ
   }
-  if (code >= 0x1f1e6 && code <= 0x1f1ff) {
+  if (code >= 0x1_f1_e6 && code <= 0x1_f1_ff) {
     type |= CodepointType.RI
   }
   if (char.search(rePrepend) !== -1) {
@@ -302,7 +302,7 @@ const NonBoundaryPairs: [CodepointType, CodepointType][] = [
 function isBoundaryPair(left: CodepointType, right: CodepointType) {
   return (
     NonBoundaryPairs.findIndex(
-      r => intersects(left, r[0]) && intersects(right, r[1])
+      (r) => intersects(left, r[0]) && intersects(right, r[1])
     ) === -1
   )
 }
@@ -317,9 +317,8 @@ const endsWithOddNumberOfRIs = (str: string): boolean => {
   const match = str.match(endingRIs)
   if (match === null) {
     return false
-  } else {
-    // A RI is represented by a surrogate pair.
-    const numRIs = match[0].length / 2
-    return numRIs % 2 === 1
   }
+  // A RI is represented by a surrogate pair.
+  const numRIs = match[0].length / 2
+  return numRIs % 2 === 1
 }

@@ -7,7 +7,7 @@ export const input = {
     children: [],
   },
 }
-export const test = value => {
+export const test = (value) => {
   return Operation.isOperation(value)
 }
 export const output = true

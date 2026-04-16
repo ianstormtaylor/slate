@@ -1,5 +1,5 @@
-import { Descendant } from 'slate'
-import { Key } from 'slate-dom'
+import type { Descendant } from 'slate'
+import type { Key } from 'slate-dom'
 
 export interface ChunkTree {
   type: 'root'

@@ -1,8 +1,8 @@
-import { Editor, EditorInterface } from '../interfaces/editor'
+import type { Point } from '../interfaces'
+import { Editor, type EditorInterface } from '../interfaces/editor'
 import { Node } from '../interfaces/node'
-import { Range } from '../interfaces/range'
 import { Path } from '../interfaces/path'
-import { Point } from '../interfaces'
+import { Range } from '../interfaces/range'
 
 export const marks: EditorInterface['marks'] = (editor, options = {}) => {
   const { marks, selection } = editor
@@ -45,9 +45,8 @@ export const marks: EditorInterface['marks'] = (editor, options = {}) => {
       const [node] = match
       const { text, ...rest } = node
       return rest
-    } else {
-      return {}
     }
+    return {}
   }
 
   const { path } = anchor
@@ -57,12 +56,12 @@ export const marks: EditorInterface['marks'] = (editor, options = {}) => {
   if (anchor.offset === 0) {
     const prev = Editor.previous(editor, { at: path, match: Node.isText })
     const markedVoid = Editor.above(editor, {
-      match: n =>
+      match: (n) =>
         Node.isElement(n) && Editor.isVoid(editor, n) && editor.markableVoid(n),
     })
     if (!markedVoid) {
       const block = Editor.above(editor, {
-        match: n => Node.isElement(n) && Editor.isBlock(editor, n),
+        match: (n) => Node.isElement(n) && Editor.isBlock(editor, n),
       })
 
       if (prev && block) {

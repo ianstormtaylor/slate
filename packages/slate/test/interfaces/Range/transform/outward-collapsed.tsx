@@ -14,7 +14,7 @@ export const input = {
     offset: 1,
   },
 }
-export const test = value => {
+export const test = (value) => {
   return Range.transform(
     value,
     {

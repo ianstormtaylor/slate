@@ -1,7 +1,7 @@
-import { Editor, EditorInterface } from '../interfaces/editor'
-import { Range } from '../interfaces/range'
-import { Path } from '../interfaces/path'
 import { Node } from '../interfaces'
+import { Editor, type EditorInterface } from '../interfaces/editor'
+import { Path } from '../interfaces/path'
+import { Range } from '../interfaces/range'
 
 export const string: EditorInterface['string'] = (editor, at, options = {}) => {
   const { voids = false } = options

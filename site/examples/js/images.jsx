@@ -2,8 +2,8 @@ import { css } from '@emotion/css'
 import imageExtensions from 'image-extensions'
 import isHotkey from 'is-hotkey'
 import isUrl from 'is-url'
-import React, { useMemo } from 'react'
-import { Transforms, createEditor } from 'slate'
+import { useMemo } from 'react'
+import { createEditor, Transforms } from 'slate'
 import { withHistory } from 'slate-history'
 import {
   Editable,
@@ -27,28 +27,28 @@ const ImagesExample = () => {
         <InsertImageButton />
       </Toolbar>
       <Editable
-        onKeyDown={event => {
+        onKeyDown={(event) => {
           if (isHotkey('mod+a', event)) {
             event.preventDefault()
             Transforms.select(editor, [])
           }
         }}
-        renderElement={props => <Element {...props} />}
         placeholder="Enter some text..."
+        renderElement={(props) => <Element {...props} />}
       />
     </Slate>
   )
 }
-const withImages = editor => {
+const withImages = (editor) => {
   const { insertData, isVoid } = editor
-  editor.isVoid = element => {
+  editor.isVoid = (element) => {
     return element.type === 'image' ? true : isVoid(element)
   }
-  editor.insertData = data => {
+  editor.insertData = (data) => {
     const text = data.getData('text/plain')
     const { files } = data
     if (files && files.length > 0) {
-      Array.from(files).forEach(file => {
+      Array.from(files).forEach((file) => {
         const reader = new FileReader()
         const [mime] = file.type.split('/')
         if (mime === 'image') {
@@ -77,7 +77,7 @@ const insertImage = (editor, url) => {
   }
   Transforms.insertNodes(editor, paragraph)
 }
-const Element = props => {
+const Element = (props) => {
   const { attributes, children, element } = props
   switch (element.type) {
     case 'image':
@@ -95,23 +95,22 @@ const Image = ({ attributes, children, element }) => {
     <div {...attributes}>
       {children}
       <div
-        contentEditable={false}
         className={css`
           position: relative;
         `}
+        contentEditable={false}
       >
         <img
-          src={element.url}
           className={css`
             display: block;
             max-width: 100%;
             max-height: 20em;
             box-shadow: ${selected && focused ? '0 0 0 3px #B4D5FF' : 'none'};
           `}
+          src={element.url}
         />
         <Button
           active
-          onClick={() => Transforms.removeNodes(editor, { at: path })}
           className={css`
             display: ${selected && focused ? 'inline' : 'none'};
             position: absolute;
@@ -119,6 +118,7 @@ const Image = ({ attributes, children, element }) => {
             left: 0.5em;
             background-color: white;
           `}
+          onClick={() => Transforms.removeNodes(editor, { at: path })}
         >
           <Icon>delete</Icon>
         </Button>
@@ -130,7 +130,7 @@ const InsertImageButton = () => {
   const editor = useSlateStatic()
   return (
     <Button
-      onMouseDown={event => {
+      onMouseDown={(event) => {
         event.preventDefault()
         const url = window.prompt('Enter the URL of the image:')
         if (url && !isImageUrl(url)) {
@@ -144,7 +144,7 @@ const InsertImageButton = () => {
     </Button>
   )
 }
-const isImageUrl = url => {
+const isImageUrl = (url) => {
   if (!url) return false
   if (!isUrl(url)) return false
   const ext = new URL(url).pathname.split('.').pop()

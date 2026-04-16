@@ -5,7 +5,7 @@ export interface ScrubberInterface {
   stringify(value: any): string
 }
 
-let _scrubber: Scrubber | undefined = undefined
+let _scrubber: Scrubber | undefined
 
 /**
  * This interface implements a stringify() function, which is used by Slate

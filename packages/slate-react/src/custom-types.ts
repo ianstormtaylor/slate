@@ -1,5 +1,5 @@
-import { BaseRange, BaseText } from 'slate'
-import { ReactEditor } from './plugin/react-editor'
+import type { BaseRange, BaseText } from 'slate'
+import type { ReactEditor } from './plugin/react-editor'
 
 declare module 'slate' {
   interface CustomTypes {
@@ -41,5 +41,3 @@ declare global {
     getRootNode(options?: GetRootNodeOptions): Document | ShadowRoot
   }
 }
-
-export {}

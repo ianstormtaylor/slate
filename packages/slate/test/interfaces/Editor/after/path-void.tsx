@@ -1,7 +1,6 @@
 /** @jsx jsx */
 
 import { Editor } from 'slate'
-import { jsx } from '../../..'
 
 export const input = (
   <editor>
@@ -12,7 +11,7 @@ export const input = (
   </editor>
 )
 
-export const test = editor => {
+export const test = (editor) => {
   return Editor.after(editor, [0, 0], { voids: true })
 }
 

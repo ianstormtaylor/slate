@@ -7,7 +7,7 @@ export const input = [
   },
   'a string',
 ]
-export const test = value => {
+export const test = (value) => {
   return Node.isNodeList(value)
 }
 export const output = false

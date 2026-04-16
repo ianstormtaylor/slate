@@ -1,19 +1,15 @@
-import { DebouncedFunc } from 'lodash'
-import { Editor, Location, Node, Path, Point, Range, Transforms } from 'slate'
-import { ReactEditor } from '../../plugin/react-editor'
+import type { DebouncedFunc } from 'lodash'
+import {
+  Editor,
+  Location,
+  Node,
+  Path,
+  type Point,
+  Range,
+  Transforms,
+} from 'slate'
 import {
   applyStringDiff,
-  mergeStringDiffs,
-  normalizePoint,
-  normalizeRange,
-  normalizeStringDiff,
-  StringDiff,
-  targetRange,
-  TextDiff,
-  verifyDiffState,
-} from 'slate-dom'
-import { isDOMSelection, isTrackedMutation } from 'slate-dom'
-import {
   EDITOR_TO_FORCE_RENDER,
   EDITOR_TO_PENDING_ACTION,
   EDITOR_TO_PENDING_DIFFS,
@@ -23,7 +19,18 @@ import {
   EDITOR_TO_USER_MARKS,
   IS_COMPOSING,
   IS_NODE_MAP_DIRTY,
+  isDOMSelection,
+  isTrackedMutation,
+  mergeStringDiffs,
+  normalizePoint,
+  normalizeRange,
+  normalizeStringDiff,
+  type StringDiff,
+  type TextDiff,
+  targetRange,
+  verifyDiffState,
 } from 'slate-dom'
+import { ReactEditor } from '../../plugin/react-editor'
 
 export type Action = { at?: Point | Range; run: () => void }
 
@@ -293,7 +300,9 @@ export function createAndroidInputManager({
     EDITOR_TO_PENDING_DIFFS.set(editor, pendingDiffs)
 
     const target = Node.leaf(editor, path)
-    const idx = pendingDiffs.findIndex(change => Path.equals(change.path, path))
+    const idx = pendingDiffs.findIndex((change) =>
+      Path.equals(change.path, path)
+    )
     if (idx < 0) {
       const normalized = normalizeStringDiff(target.text, diff)
       if (normalized) {
@@ -400,24 +409,26 @@ export function createAndroidInputManager({
       let [start, end] = Range.edges(targetRange)
       let [leaf, path] = Editor.leaf(editor, start.path)
 
-      if (Range.isExpanded(targetRange)) {
-        if (leaf.text.length === start.offset && end.offset === 0) {
-          const next = Editor.next(editor, {
-            at: start.path,
-            match: Node.isText,
-          })
-          if (next && Path.equals(next[1], end.path)) {
-            // when deleting a linebreak, targetRange will span across the break (ie start in the node before and end in the node after)
-            // if the node before is empty, this will look like a hanging range and get unhung later--which will take the break we want to remove out of the range
-            // so to avoid this we collapse the target range to default to single character deletion
-            if (direction === 'backward') {
-              targetRange = { anchor: end, focus: end }
-              start = end
-              ;[leaf, path] = next
-            } else {
-              targetRange = { anchor: start, focus: start }
-              end = start
-            }
+      if (
+        Range.isExpanded(targetRange) &&
+        leaf.text.length === start.offset &&
+        end.offset === 0
+      ) {
+        const next = Editor.next(editor, {
+          at: start.path,
+          match: Node.isText,
+        })
+        if (next && Path.equals(next[1], end.path)) {
+          // when deleting a linebreak, targetRange will span across the break (ie start in the node before and end in the node after)
+          // if the node before is empty, this will look like a hanging range and get unhung later--which will take the break we want to remove out of the range
+          // so to avoid this we collapse the target range to default to single character deletion
+          if (direction === 'backward') {
+            targetRange = { anchor: end, focus: end }
+            start = end
+            ;[leaf, path] = next
+          } else {
+            targetRange = { anchor: start, focus: start }
+            end = start
           }
         }
       }
@@ -428,7 +439,7 @@ export function createAndroidInputManager({
         end: end.offset,
       }
       const pendingDiffs = EDITOR_TO_PENDING_DIFFS.get(editor)
-      const relevantPendingDiffs = pendingDiffs?.find(change =>
+      const relevantPendingDiffs = pendingDiffs?.find((change) =>
         Path.equals(change.path, path)
       )
       const diffs = relevantPendingDiffs
@@ -797,7 +808,9 @@ export function createAndroidInputManager({
     }
 
     if (
-      mutations.some(mutation => isTrackedMutation(editor, mutation, mutations))
+      mutations.some((mutation) =>
+        isTrackedMutation(editor, mutation, mutations)
+      )
     ) {
       // Cause a re-render to restore the dom state if we encounter tracked mutations without
       // a corresponding pending action.

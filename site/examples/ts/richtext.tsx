@@ -1,24 +1,30 @@
 import isHotkey from 'is-hotkey'
-import React, { KeyboardEvent, PointerEvent, useCallback, useMemo } from 'react'
+import type React from 'react'
 import {
-  Descendant,
+  type KeyboardEvent,
+  type PointerEvent,
+  useCallback,
+  useMemo,
+} from 'react'
+import {
+  createEditor,
+  type Descendant,
   Editor,
   Node,
-  Element as SlateElement,
+  type Element as SlateElement,
   Transforms,
-  createEditor,
 } from 'slate'
 import { withHistory } from 'slate-history'
 import {
   Editable,
-  RenderElementProps,
-  RenderLeafProps,
+  type RenderElementProps,
+  type RenderLeafProps,
   Slate,
   useSlate,
   withReact,
 } from 'slate-react'
 import { Button, Icon, Toolbar } from './components'
-import {
+import type {
   CustomEditor,
   CustomElement,
   CustomElementType,
@@ -69,10 +75,6 @@ const RichTextExample = () => {
         <BlockButton format="justify" icon="format_align_justify" />
       </Toolbar>
       <Editable
-        renderElement={renderElement}
-        renderLeaf={renderLeaf}
-        placeholder="Enter some rich text…"
-        spellCheck
         autoFocus
         onKeyDown={(event: KeyboardEvent<HTMLDivElement>) => {
           for (const hotkey in HOTKEYS) {
@@ -83,6 +85,10 @@ const RichTextExample = () => {
             }
           }
         }}
+        placeholder="Enter some rich text…"
+        renderElement={renderElement}
+        renderLeaf={renderLeaf}
+        spellCheck
       />
     </Slate>
   )
@@ -97,7 +103,8 @@ const toggleBlock = (editor: CustomEditor, format: CustomElementFormat) => {
   const isList = isListType(format)
 
   Transforms.unwrapNodes(editor, {
-    match: n => Node.isElement(n) && isListType(n.type) && !isAlignType(format),
+    match: (n) =>
+      Node.isElement(n) && isListType(n.type) && !isAlignType(format),
     split: true,
   })
   let newProperties: Partial<SlateElement>
@@ -139,7 +146,7 @@ const isBlockActive = (
   const [match] = Array.from(
     Editor.nodes(editor, {
       at: Editor.unhangRange(editor, selection),
-      match: n => {
+      match: (n) => {
         if (Node.isElement(n)) {
           if (blockType === 'align' && isAlignElement(n)) {
             return n.align === format
@@ -244,11 +251,11 @@ const BlockButton = ({ format, icon }: BlockButtonProps) => {
         format,
         isAlignType(format) ? 'align' : 'type'
       )}
+      data-test-id={`block-button-${format}`}
+      onClick={() => toggleBlock(editor, format)}
       onPointerDown={(event: PointerEvent<HTMLButtonElement>) =>
         event.preventDefault()
       }
-      onClick={() => toggleBlock(editor, format)}
-      data-test-id={`block-button-${format}`}
     >
       <Icon>{icon}</Icon>
     </Button>
@@ -265,10 +272,10 @@ const MarkButton = ({ format, icon }: MarkButtonProps) => {
   return (
     <Button
       active={isMarkActive(editor, format)}
+      onClick={() => toggleMark(editor, format)}
       onPointerDown={(event: PointerEvent<HTMLButtonElement>) =>
         event.preventDefault()
       }
-      onClick={() => toggleMark(editor, format)}
     >
       <Icon>{icon}</Icon>
     </Button>

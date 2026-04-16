@@ -1,6 +1,6 @@
-import { SelectionTransforms } from '../interfaces/transforms/selection'
-import { Transforms } from '../interfaces/transforms'
 import { Range } from '../interfaces/range'
+import { Transforms } from '../interfaces/transforms'
+import type { SelectionTransforms } from '../interfaces/transforms/selection'
 
 export const collapse: SelectionTransforms['collapse'] = (
   editor,
@@ -11,7 +11,8 @@ export const collapse: SelectionTransforms['collapse'] = (
 
   if (!selection) {
     return
-  } else if (edge === 'anchor') {
+  }
+  if (edge === 'anchor') {
     Transforms.select(editor, selection.anchor)
   } else if (edge === 'focus') {
     Transforms.select(editor, selection.focus)

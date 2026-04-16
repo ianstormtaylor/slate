@@ -1,4 +1,4 @@
-import { Editor, EditorInterface } from '../interfaces/editor'
+import { Editor, type EditorInterface } from '../interfaces/editor'
 
 export const before: EditorInterface['before'] = (editor, at, options = {}) => {
   const anchor = Editor.start(editor, [])

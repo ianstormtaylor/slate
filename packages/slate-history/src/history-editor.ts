@@ -1,4 +1,4 @@
-import { BaseEditor, Editor } from 'slate'
+import { type BaseEditor, Editor } from 'slate'
 import { History } from './history'
 
 /**

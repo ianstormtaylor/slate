@@ -1,26 +1,26 @@
 import { css } from '@emotion/css'
-import React, { ChangeEvent, useCallback, useMemo } from 'react'
+import { type ChangeEvent, useCallback, useMemo } from 'react'
 import {
-  Descendant,
+  createEditor,
+  type Descendant,
   Editor,
   Node,
   Point,
   Range,
-  Element as SlateElement,
+  type Element as SlateElement,
   Transforms,
-  createEditor,
 } from 'slate'
 import { withHistory } from 'slate-history'
 import {
   Editable,
   ReactEditor,
-  RenderElementProps,
+  type RenderElementProps,
   Slate,
   useReadOnly,
   useSlateStatic,
   withReact,
 } from 'slate-react'
-import {
+import type {
   CheckListItemElement as CheckListItemType,
   CustomEditor,
   RenderElementPropsFor,
@@ -84,10 +84,10 @@ const CheckListsExample = () => {
   return (
     <Slate editor={editor} initialValue={initialValue}>
       <Editable
-        renderElement={renderElement}
-        placeholder="Get to work…"
-        spellCheck
         autoFocus
+        placeholder="Get to work…"
+        renderElement={renderElement}
+        spellCheck
       />
     </Slate>
   )
@@ -101,7 +101,7 @@ const withChecklists = (editor: CustomEditor) => {
 
     if (selection && Range.isCollapsed(selection)) {
       const [match] = Editor.nodes(editor, {
-        match: n => Node.isElement(n) && n.type === 'check-list-item',
+        match: (n) => Node.isElement(n) && n.type === 'check-list-item',
       })
 
       if (match) {
@@ -113,7 +113,7 @@ const withChecklists = (editor: CustomEditor) => {
             type: 'paragraph',
           }
           Transforms.setNodes(editor, newProperties, {
-            match: n => Node.isElement(n) && n.type === 'check-list-item',
+            match: (n) => Node.isElement(n) && n.type === 'check-list-item',
           })
           return
         }
@@ -159,13 +159,12 @@ const CheckListItemElement = ({
       `}
     >
       <span
-        contentEditable={false}
         className={css`
           margin-right: 0.75em;
         `}
+        contentEditable={false}
       >
         <input
-          type="checkbox"
           checked={checked}
           onChange={(event: ChangeEvent<HTMLInputElement>) => {
             const path = ReactEditor.findPath(editor, element)
@@ -174,20 +173,21 @@ const CheckListItemElement = ({
             }
             Transforms.setNodes(editor, newProperties, { at: path })
           }}
+          type="checkbox"
         />
       </span>
       <span
-        contentEditable={!readOnly}
-        suppressContentEditableWarning
         className={css`
           flex: 1;
           opacity: ${checked ? 0.666 : 1};
-          text-decoration: ${!checked ? 'none' : 'line-through'};
+          text-decoration: ${checked ? 'line-through' : 'none'};
 
           &:focus {
             outline: none;
           }
         `}
+        contentEditable={!readOnly}
+        suppressContentEditableWarning
       >
         {children}
       </span>

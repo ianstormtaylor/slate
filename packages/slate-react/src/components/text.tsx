@@ -1,19 +1,19 @@
 import React, { useCallback, useRef } from 'react'
-import { Element, Text as SlateText, DecoratedRange } from 'slate'
-import { ReactEditor, useSlateStatic } from '..'
-import { isTextDecorationsEqual } from 'slate-dom'
+import { type DecoratedRange, type Element, Text as SlateText } from 'slate'
 import {
   EDITOR_TO_KEY_TO_ELEMENT,
   ELEMENT_TO_NODE,
+  isTextDecorationsEqual,
   NODE_TO_ELEMENT,
 } from 'slate-dom'
-import {
+import { ReactEditor, useSlateStatic } from '..'
+import { useDecorations } from '../hooks/use-decorations'
+import type {
   RenderLeafProps,
   RenderPlaceholderProps,
   RenderTextProps,
 } from './editable'
 import Leaf from './leaf'
-import { useDecorations } from '../hooks/use-decorations'
 
 const defaultRenderText = (props: RenderTextProps) => <DefaultText {...props} />
 
@@ -54,12 +54,12 @@ const Text = (props: {
       <Leaf
         isLast={isLast && i === decoratedLeaves.length - 1}
         key={`${key.id}-${i}`}
-        renderPlaceholder={renderPlaceholder}
         leaf={leaf}
         leafPosition={position}
-        text={text}
         parent={parent}
         renderLeaf={renderLeaf}
+        renderPlaceholder={renderPlaceholder}
+        text={text}
       />
     )
   }

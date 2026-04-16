@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { Descendant, Editor, Node, Operation, Scrubber, Selection } from 'slate'
+import { type Descendant, Editor, Node, Scrubber, type Selection } from 'slate'
 import { EDITOR_TO_ON_CHANGE } from 'slate-dom'
 import { FocusedContext } from '../hooks/use-focused'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
 import {
-  useSelectorContext,
   SlateSelectorContext,
+  useSelectorContext,
 } from '../hooks/use-slate-selector'
 import { EditorContext } from '../hooks/use-slate-static'
 import { ReactEditor } from '../plugin/react-editor'
@@ -63,13 +63,13 @@ export const Slate = (props: {
     }
     if (
       onSelectionChange &&
-      editor.operations.find(op => op.type === 'set_selection')
+      editor.operations.find((op) => op.type === 'set_selection')
     ) {
       onSelectionChange(editor.selection)
     }
     if (
       onValueChange &&
-      editor.operations.find(op => op.type !== 'set_selection')
+      editor.operations.find((op) => op.type !== 'set_selection')
     ) {
       onValueChange(editor.children)
     }
@@ -103,13 +103,12 @@ export const Slate = (props: {
         document.removeEventListener('focusin', fn)
         document.removeEventListener('focusout', fn)
       }
-    } else {
-      document.addEventListener('focus', fn, true)
-      document.addEventListener('blur', fn, true)
-      return () => {
-        document.removeEventListener('focus', fn, true)
-        document.removeEventListener('blur', fn, true)
-      }
+    }
+    document.addEventListener('focus', fn, true)
+    document.addEventListener('blur', fn, true)
+    return () => {
+      document.removeEventListener('focus', fn, true)
+      document.removeEventListener('blur', fn, true)
     }
   }, [editor])
 

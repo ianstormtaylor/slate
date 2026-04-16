@@ -1,0 +1,271 @@
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "extends": ["ultracite/core", "ultracite/react", "ultracite/next"],
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single",
+      "semicolons": "asNeeded"
+    }
+  },
+  "files": {
+    "ignoreUnknown": true,
+    "includes": [
+      "**",
+      "!!**/node_modules",
+      "!!**/.pnpm-store",
+      "!!**/.turbo",
+      "!!config/rollup/rollup.config-*.cjs",
+      "!!**/.next",
+      "!!**/dist",
+      "!!**/lib",
+      "!!**/out",
+      "!!**/coverage",
+      "!!**/playwright-report",
+      "!!**/test-results",
+      "!!**/*.html",
+      "!**/next-env.d.ts"
+    ]
+  },
+  "assist": {
+    "actions": {
+      "source": {
+        "noDuplicateClasses": "off",
+        "useSortedInterfaceMembers": "off",
+        "useSortedProperties": "off"
+      }
+    }
+  },
+  "linter": {
+    "rules": {
+      "correctness": {
+        "useExhaustiveDependencies": "off",
+        "useHookAtTopLevel": "off",
+        "noUndeclaredVariables": "off",
+        "noUnusedVariables": {
+          "level": "error",
+          "options": {
+            "ignoreRestSiblings": true
+          }
+        }
+      },
+      "suspicious": {
+        "noConsole": "off",
+        "noExplicitAny": "off",
+        "noArrayIndexKey": "off",
+        "noUnknownAtRules": "off",
+        "noEmptyBlockStatements": "off",
+        "useAwait": "off",
+        "noBitwiseOperators": "off",
+        "noConfusingVoidType": "off",
+        "noBiomeFirstException": "off"
+      },
+      "style": {
+        "noMagicNumbers": "off",
+        "useFilenamingConvention": "off",
+        "noNestedTernary": "off",
+        "noNonNullAssertion": "off",
+        "useDefaultSwitchClause": "off",
+        "useBlockStatements": "off",
+        "useConsistentTypeDefinitions": "off"
+      },
+      "nursery": {
+        "noShadow": "off",
+        "noIncrementDecrement": "off"
+      },
+      "complexity": {
+        "useSimplifiedLogicExpression": "off",
+        "noExcessiveCognitiveComplexity": "off",
+        "noForEach": "off",
+        "noVoid": "off",
+        "noBannedTypes": "off"
+      },
+      "a11y": {
+        "noNoninteractiveElementInteractions": "off",
+        "useKeyWithClickEvents": "off",
+        "useSemanticElements": "off",
+        "useFocusableInteractive": "off"
+      },
+      "security": {
+        "noDangerouslySetInnerHtml": "off"
+      },
+      "performance": {
+        "noNamespaceImport": "off",
+        "noImgElement": "off",
+        "noBarrelFile": "off"
+      }
+    }
+  },
+  "overrides": [
+    {
+      "includes": [
+        "*.config.{js,ts,mjs,cjs,mts,cts}",
+        "vite.config.*",
+        "vitest.config.*",
+        "jest.config.*",
+        "rollup.config.*",
+        "webpack.config.*",
+        "eslint.config.*",
+        "stylelint.config.*",
+        "commitlint.config.*",
+        "postcss.config.*",
+        "tailwind.config.*",
+        "playwright.config.*",
+        "cypress.config.*",
+        "babel.config.*",
+        "metro.config.*",
+        "next.config.*",
+        "**/next.config.*",
+        "nuxt.config.*",
+        "astro.config.*",
+        "svelte.config.*",
+        "tsup.config.*"
+      ],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noGlobalDirnameFilename": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["**/scripts/**/*", "**/bin/**/*", "*.mjs", "*.cjs"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noConsole": "off"
+          },
+          "correctness": {
+            "noGlobalDirnameFilename": "off"
+          },
+          "style": {
+            "noProcessEnv": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": [
+        "**/*.spec.*",
+        "**/*.test.*",
+        "packages/**/test/**",
+        "playwright/**"
+      ],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noGlobalDirnameFilename": "off",
+            "useJsxKeyInIterable": "off"
+          },
+          "style": {
+            "useImportType": "off",
+            "noUnusedTemplateLiteral": "off",
+            "noNamespace": "off"
+          },
+          "suspicious": {
+            "noThenProperty": "off",
+            "noSkippedTests": "off",
+            "noNonNullAssertedOptionalChain": "off",
+            "noCommentText": "off",
+            "noMisplacedAssertion": "off",
+            "noEvolvingTypes": "off"
+          },
+          "a11y": "off",
+          "performance": "off"
+        }
+      }
+    },
+    {
+      "includes": [
+        "packages/slate/src/core/**",
+        "packages/slate/src/range-ref-transform.ts"
+      ],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "useIterableCallbackReturn": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["site/examples/**"],
+      "linter": {
+        "rules": {
+          "a11y": "off",
+          "performance": "off",
+          "correctness": {
+            "noChildrenProp": "off",
+            "useImageSize": "off"
+          },
+          "nursery": {
+            "useSortedClasses": "off"
+          },
+          "suspicious": {
+            "noAssignInExpressions": "off",
+            "noImplicitAnyLet": "off",
+            "noEvolvingTypes": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["site/pages/**", "site/next.config.js"],
+      "linter": {
+        "rules": {
+          "a11y": "off",
+          "performance": "off"
+        }
+      }
+    },
+    {
+      "includes": ["**/*.d.ts", "**/{env,global,types}.d.ts"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noUnusedVariables": "off",
+            "noUndeclaredVariables": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": [
+        "**/dist/**/*",
+        "**/build/**/*",
+        "**/.next/**/*",
+        "**/out/**/*",
+        "**/coverage/**/*",
+        "**/*.min.js",
+        "**/*.min.css",
+        "**/*.md",
+        "**/*.mdx",
+        "**/*.graphql",
+        "**/*.gql",
+        ".env",
+        ".env.*"
+      ],
+      "formatter": {
+        "enabled": false
+      },
+      "linter": {
+        "enabled": false
+      }
+    },
+    {
+      "includes": [
+        "**/package.json",
+        "**/{tsconfig,jsconfig}.json",
+        "**/tsconfig.*.json",
+        ".vscode/*.json",
+        ".github/**/*.json"
+      ],
+      "json": {
+        "parser": {
+          "allowComments": true,
+          "allowTrailingCommas": true
+        }
+      }
+    }
+  ]
+}

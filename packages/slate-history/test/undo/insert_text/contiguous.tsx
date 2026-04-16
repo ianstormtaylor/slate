@@ -1,8 +1,8 @@
 /** @jsx jsx */
-import { jsx } from '../..'
+
 import { cloneDeep } from 'lodash'
 
-export const run = editor => {
+export const run = (editor) => {
   editor.insertText('t')
   editor.insertText('w')
   editor.insertText('o')

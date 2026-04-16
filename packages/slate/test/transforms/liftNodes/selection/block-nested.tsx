@@ -1,9 +1,8 @@
 /** @jsx jsx */
 import { Transforms } from 'slate'
-import { jsx } from '../../..'
 
-export const run = editor => {
-  Transforms.liftNodes(editor, { match: n => n.c })
+export const run = (editor) => {
+  Transforms.liftNodes(editor, { match: (n) => n.c })
 }
 export const input = (
   <editor>

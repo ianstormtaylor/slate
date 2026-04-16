@@ -1,10 +1,9 @@
 /** @jsx jsx */
-import { Editor, Transforms, Element } from 'slate'
-import { jsx } from '../../..'
+import { Editor, Element, Transforms } from 'slate'
 
-export const run = editor => {
+export const run = (editor) => {
   Transforms.splitNodes(editor, {
-    match: n => Element.isElement(n) && Editor.isBlock(editor, n),
+    match: (n) => Element.isElement(n) && Editor.isBlock(editor, n),
     always: true,
   })
 }

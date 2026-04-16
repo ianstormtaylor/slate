@@ -1,7 +1,6 @@
 /** @jsx jsx */
 import assert from 'assert'
-import { Editor, Transforms, Operation } from 'slate'
-import { jsx } from '../../..'
+import { Editor, Operation, Transforms } from 'slate'
 
 export const run = (editor: Editor) => {
   Transforms.setNodes(editor, { someKey: true }, { at: [0] })

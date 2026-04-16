@@ -1,12 +1,12 @@
-import React, { ComponentProps, Fragment, useEffect } from 'react'
-import { Element } from 'slate'
-import { Key } from 'slate-dom'
-import { RenderChunkProps } from './editable'
-import {
+import React, { type ComponentProps, Fragment, useEffect } from 'react'
+import type { Element } from 'slate'
+import type { Key } from 'slate-dom'
+import type {
   Chunk as TChunk,
   ChunkAncestor as TChunkAncestor,
   ChunkTree as TChunkTree,
 } from '../chunking'
+import type { RenderChunkProps } from './editable'
 
 const defaultRenderChunk = ({ children }: RenderChunkProps) => children
 
@@ -23,20 +23,20 @@ const ChunkAncestor = <C extends TChunkAncestor>(props: {
     renderChunk = defaultRenderChunk,
   } = props
 
-  return ancestor.children.map(chunkNode => {
+  return ancestor.children.map((chunkNode) => {
     if (chunkNode.type === 'chunk') {
       const key = chunkNode.key.id
 
       const renderedChunk = renderChunk({
         highest: ancestor === root,
-        lowest: chunkNode.children.some(c => c.type === 'leaf'),
+        lowest: chunkNode.children.some((c) => c.type === 'leaf'),
         attributes: { 'data-slate-chunk': true },
         children: (
           <MemoizedChunk
-            root={root}
             ancestor={chunkNode}
-            renderElement={renderElement}
             renderChunk={renderChunk}
+            renderElement={renderElement}
+            root={root}
           />
         ),
       })

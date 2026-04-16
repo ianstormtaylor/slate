@@ -1,13 +1,12 @@
 /** @jsx jsx */
 
 import { Editor } from 'slate'
-import { jsx } from '../../..'
 
 export const input = (
   <editor>
     <block>
       one
-      <inline void nonSelectable>
+      <inline nonSelectable void>
         <text />
       </inline>
       three
@@ -15,7 +14,7 @@ export const input = (
   </editor>
 )
 
-export const test = editor => {
+export const test = (editor) => {
   return Editor.after(editor, { path: [0, 0], offset: 3 })
 }
 

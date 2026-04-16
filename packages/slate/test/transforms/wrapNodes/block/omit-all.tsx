@@ -1,8 +1,7 @@
 /** @jsx jsx */
-import { Editor, Node, Text, Transforms } from 'slate'
-import { jsx } from '../../..'
+import { Node, Transforms } from 'slate'
 
-export const run = editor => {
+export const run = (editor) => {
   Transforms.wrapNodes(editor, <block a />, {
     match: (node, currentPath) => {
       // reject all nodes inside blocks tagged `noneditable`. Which is everything.

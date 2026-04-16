@@ -1,21 +1,20 @@
-import React from 'react'
+import { act, render } from '@testing-library/react'
 import {
   DecoratedRange,
+  Editor,
   Node,
   NodeEntry,
   Path,
   createEditor as slateCreateEditor,
-  Editor,
   Text,
   Transforms,
 } from 'slate'
-import { act, render } from '@testing-library/react'
 import {
+  Editable,
+  ReactEditor,
+  RenderLeafProps,
   Slate,
   withReact,
-  Editable,
-  RenderLeafProps,
-  ReactEditor,
 } from '../src'
 
 const renderLeaf = ({ leaf, attributes, children }: RenderLeafProps) => {
@@ -54,7 +53,7 @@ const getDecoratedLeaves = (
   const text = ReactEditor.toDOMNode(editor, Node.leaf(editor, path))
   const leaves = Array.from(text.children) as HTMLElement[]
 
-  return leaves.map(leaf => ({
+  return leaves.map((leaf) => ({
     text: leaf.textContent!,
     decorations: JSON.parse(leaf.dataset.decorations!),
   }))
@@ -469,7 +468,7 @@ describe('decorations', () => {
         const decorate = decoratePaths(editor, [
           {
             path: [0, 0],
-            decorations: node =>
+            decorations: (node) =>
               Text.isText(node) && node.text.includes('box')
                 ? [
                     {
@@ -516,7 +515,7 @@ describe('decorations', () => {
         const decorate = decoratePaths(editor, [
           {
             path: [0, 0],
-            decorations: node =>
+            decorations: (node) =>
               Text.isText(node) && node.text.includes('box')
                 ? [
                     {
@@ -567,7 +566,7 @@ describe('decorations', () => {
         const decorate = decoratePaths(editor, [
           {
             path: [0],
-            decorations: node =>
+            decorations: (node) =>
               'bold' in node
                 ? [
                     {

@@ -1,7 +1,7 @@
-import { Editor } from '../interfaces/editor'
-import { Transforms } from '../interfaces/transforms'
+import type { Editor } from '../interfaces/editor'
 import { Range } from '../interfaces/range'
-import { WithEditorFirstArg } from '../utils/types'
+import { Transforms } from '../interfaces/transforms'
+import type { WithEditorFirstArg } from '../utils/types'
 
 export const deleteForward: WithEditorFirstArg<Editor['deleteForward']> = (
   editor,

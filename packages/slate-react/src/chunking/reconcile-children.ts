@@ -1,7 +1,10 @@
-import { Editor, Descendant } from 'slate'
-import { ChunkTree, ChunkLeaf } from './types'
-import { ChunkTreeHelper, ChunkTreeHelperOptions } from './chunk-tree-helper'
+import type { Descendant, Editor } from 'slate'
 import { ChildrenHelper } from './children-helper'
+import {
+  ChunkTreeHelper,
+  type ChunkTreeHelperOptions,
+} from './chunk-tree-helper'
+import type { ChunkLeaf, ChunkTree } from './types'
 
 export interface ReconcileOptions extends ChunkTreeHelperOptions {
   chunkTree: ChunkTree

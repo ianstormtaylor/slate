@@ -101,7 +101,7 @@ const sampleStrings = {
 
 const dirs = ['ltr', 'rtl']
 
-dirs.forEach(dir => {
+dirs.forEach((dir) => {
   const isRTL = dir === 'rtl'
 
   describe(`getCharacterDistance - ${dir}`, () => {
@@ -119,13 +119,13 @@ dirs.forEach(dir => {
       })
     })
 
-    regionalIndicatorSequences.forEach(str => {
+    regionalIndicatorSequences.forEach((str) => {
       it(str, () => {
         assert.strictEqual(getCharacterDistance(str + str, isRTL), 4)
       })
     })
 
-    keycapSequences.forEach(str => {
+    keycapSequences.forEach((str) => {
       it(str, () => {
         assert.strictEqual(getCharacterDistance(str + str, isRTL), 3)
       })
@@ -194,7 +194,7 @@ const cases = [
 ]
 
 describe('codepointsIteratorRTL', () => {
-  cases.forEach(str => {
+  cases.forEach((str) => {
     it(str, () => {
       const arr1 = [...codepointsIteratorRTL(str)]
       const arr2 = Array.from(str).reverse()

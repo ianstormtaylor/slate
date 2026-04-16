@@ -1,23 +1,23 @@
 import {
-  BaseEditor,
+  type BaseEditor,
   Editor,
   Node,
-  Path,
-  Point,
+  type Path,
+  type Point,
   Range,
   Scrubber,
   Transforms,
 } from 'slate'
-import { TextDiff } from '../utils/diff-text'
+import type { TextDiff } from '../utils/diff-text'
 import {
   closestShadowAware,
   containsShadowAware,
-  DOMElement,
-  DOMNode,
-  DOMPoint,
-  DOMRange,
-  DOMSelection,
-  DOMStaticRange,
+  type DOMElement,
+  type DOMNode,
+  type DOMPoint,
+  type DOMRange,
+  type DOMSelection,
+  type DOMStaticRange,
   DOMText,
   getSelection,
   hasShadowRoot,
@@ -270,13 +270,13 @@ export interface DOMEditorInterface {
 
 // eslint-disable-next-line no-redeclare
 export const DOMEditor: DOMEditorInterface = {
-  androidPendingDiffs: editor => EDITOR_TO_PENDING_DIFFS.get(editor),
+  androidPendingDiffs: (editor) => EDITOR_TO_PENDING_DIFFS.get(editor),
 
-  androidScheduleFlush: editor => {
+  androidScheduleFlush: (editor) => {
     EDITOR_TO_SCHEDULE_FLUSH.get(editor)?.()
   },
 
-  blur: editor => {
+  blur: (editor) => {
     const el = DOMEditor.toDOMNode(editor, editor)
     const root = DOMEditor.findDocumentOrShadowRoot(editor)
     IS_FOCUSED.set(editor, false)
@@ -286,7 +286,7 @@ export const DOMEditor: DOMEditorInterface = {
     }
   },
 
-  deselect: editor => {
+  deselect: (editor) => {
     const { selection } = editor
     const root = DOMEditor.findDocumentOrShadowRoot(editor)
     const domSelection = getSelection(root)
@@ -300,7 +300,7 @@ export const DOMEditor: DOMEditorInterface = {
     }
   },
 
-  findDocumentOrShadowRoot: editor => {
+  findDocumentOrShadowRoot: (editor) => {
     const el = DOMEditor.toDOMNode(editor, editor)
     const root = el.getRootNode()
 
@@ -397,9 +397,8 @@ export const DOMEditor: DOMEditorInterface = {
       if (parent == null) {
         if (child === editor) {
           return path
-        } else {
-          break
         }
+        break
       }
 
       const i = NODE_TO_INDEX.get(child)
@@ -465,7 +464,7 @@ export const DOMEditor: DOMEditorInterface = {
     }
   },
 
-  getWindow: editor => {
+  getWindow: (editor) => {
     const window = EDITOR_TO_WINDOW.get(editor)
     if (!window) {
       throw new Error('Unable to find a host window element for this editor')
@@ -500,7 +499,7 @@ export const DOMEditor: DOMEditorInterface = {
     }
 
     return (
-      closestShadowAware(targetEl, `[data-slate-editor]`) === editorEl &&
+      closestShadowAware(targetEl, '[data-slate-editor]') === editorEl &&
       (!editable || targetEl.isContentEditable
         ? true
         : (typeof targetEl.isContentEditable === 'boolean' && // isContentEditable exists only on HTMLElement, and on other nodes it will be undefined
@@ -537,13 +536,13 @@ export const DOMEditor: DOMEditorInterface = {
 
   insertTextData: (editor, data) => editor.insertTextData(data),
 
-  isComposing: editor => {
+  isComposing: (editor) => {
     return !!IS_COMPOSING.get(editor)
   },
 
-  isFocused: editor => !!IS_FOCUSED.get(editor),
+  isFocused: (editor) => !!IS_FOCUSED.get(editor),
 
-  isReadOnly: editor => !!IS_READ_ONLY.get(editor),
+  isReadOnly: (editor) => !!IS_READ_ONLY.get(editor),
 
   isTargetInsideNonReadonlyVoid: (editor, target) => {
     if (IS_READ_ONLY.get(editor)) return false
@@ -587,7 +586,7 @@ export const DOMEditor: DOMEditorInterface = {
     // For each leaf, we need to isolate its content, which means filtering
     // to its direct text and zero-width spans. (We have to filter out any
     // other siblings that may have been rendered alongside them.)
-    const selector = `[data-slate-string], [data-slate-zero-width]`
+    const selector = '[data-slate-string], [data-slate-zero-width]'
     const texts = Array.from(el.querySelectorAll(selector))
     let start = 0
 
@@ -601,7 +600,7 @@ export const DOMEditor: DOMEditorInterface = {
 
       const { length } = domNode.textContent
       const attr = text.getAttribute('data-slate-length')
-      const trueLength = attr == null ? length : parseInt(attr, 10)
+      const trueLength = attr == null ? length : Number.parseInt(attr, 10)
       const end = start + trueLength
 
       // Prefer putting the selection inside the mark placeholder to ensure
@@ -679,7 +678,7 @@ export const DOMEditor: DOMEditorInterface = {
     let domEl = isDOMElement(domNode) ? domNode : domNode.parentElement
 
     if (domEl && !domEl.hasAttribute('data-slate-node')) {
-      domEl = domEl.closest(`[data-slate-node]`)
+      domEl = domEl.closest('[data-slate-node]')
     }
 
     const node = domEl ? ELEMENT_TO_NODE.get(domEl as HTMLElement) : null
@@ -752,7 +751,7 @@ export const DOMEditor: DOMEditorInterface = {
             ),
           ]
 
-          removals.forEach(el => {
+          removals.forEach((el) => {
             // COMPAT: While composing at the start of a text node, some keyboards put
             // the text content inside the zero width space.
             if (
@@ -794,15 +793,15 @@ export const DOMEditor: DOMEditorInterface = {
         }
 
         // COMPAT: In read-only editors the leaf is not rendered.
-        if (!leafNode) {
-          offset = 1
-        } else {
+        if (leafNode) {
           textNode = leafNode.closest('[data-slate-node="text"]')!
           domNode = leafNode
           offset = domNode.textContent!.length
-          domNode.querySelectorAll('[data-slate-zero-width]').forEach(el => {
+          domNode.querySelectorAll('[data-slate-zero-width]').forEach((el) => {
             offset -= el.textContent!.length
           })
+        } else {
+          offset = 1
         }
       } else if (nonEditableNode) {
         // Find the edge of the nearest leaf in `searchDirection`
@@ -824,7 +823,8 @@ export const DOMEditor: DOMEditorInterface = {
           ]
 
           leafNode =
-            leafNodes.findLast(leaf => isBefore(nonEditableNode, leaf)) ?? null
+            leafNodes.findLast((leaf) => isBefore(nonEditableNode, leaf)) ??
+            null
 
           if (leafNode) {
             searchDirection = 'backward'
@@ -838,7 +838,7 @@ export const DOMEditor: DOMEditorInterface = {
           ]
 
           leafNode =
-            leafNodes.find(leaf => isAfter(nonEditableNode, leaf)) ?? null
+            leafNodes.find((leaf) => isAfter(nonEditableNode, leaf)) ?? null
 
           if (leafNode) {
             searchDirection = 'forward'
@@ -852,9 +852,11 @@ export const DOMEditor: DOMEditorInterface = {
             offset = 0
           } else {
             offset = domNode.textContent!.length
-            domNode.querySelectorAll('[data-slate-zero-width]').forEach(el => {
-              offset -= el.textContent!.length
-            })
+            domNode
+              .querySelectorAll('[data-slate-zero-width]')
+              .forEach((el) => {
+                offset -= el.textContent!.length
+              })
           }
         }
       }
@@ -970,9 +972,8 @@ export const DOMEditor: DOMEditorInterface = {
             function getLastChildren(element: HTMLElement): HTMLElement {
               if (element.childElementCount > 0) {
                 return getLastChildren(<HTMLElement>element.children[0])
-              } else {
-                return element
               }
+              return element
             }
 
             const firstNodeRow = <HTMLTableRowElement>firstRange.startContainer

@@ -1,11 +1,11 @@
 import {
-  Ancestor,
-  Descendant,
-  Element,
+  type Ancestor,
+  type Descendant,
+  type Element,
   Node,
-  Path,
+  type Path,
   Scrubber,
-  Text,
+  type Text,
 } from '../interfaces'
 
 export const insertChildren = <T>(
@@ -64,7 +64,7 @@ export const modifyChildren = (
   if (path.length === 0) {
     root.children = f(root.children)
   } else {
-    modifyDescendant<Element>(root, path, node => {
+    modifyDescendant<Element>(root, path, (node) => {
       if (Node.isText(node)) {
         throw new Error(
           `Cannot get the element at path [${path}] because it refers to a leaf node: ${Scrubber.stringify(
@@ -86,7 +86,7 @@ export const modifyLeaf = (
   path: Path,
   f: (leaf: Text) => Text
 ) =>
-  modifyDescendant(root, path, node => {
+  modifyDescendant(root, path, (node) => {
     if (!Node.isText(node)) {
       throw new Error(
         `Cannot get the leaf node at path [${path}] because it refers to a non-leaf node: ${Scrubber.stringify(

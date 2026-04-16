@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 
 test.describe('markdown preview', () => {
   const slateEditor = 'div[data-slate-editor="true"]'

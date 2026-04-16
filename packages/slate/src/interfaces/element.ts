@@ -1,11 +1,10 @@
 import {
-  Ancestor,
-  Descendant,
-  Editor,
-  ExtendedType,
-  Node,
-  Path,
+  type Ancestor,
+  type Descendant,
+  type ExtendedType,
   isObject,
+  Node,
+  type Path,
 } from '..'
 
 /**
@@ -107,7 +106,7 @@ export const Element: ElementInterface = {
   ): value is Element[] {
     return (
       Array.isArray(value) &&
-      value.every(val => Element.isElement(val, { deep }))
+      value.every((val) => Element.isElement(val, { deep }))
     )
   },
 
@@ -118,7 +117,7 @@ export const Element: ElementInterface = {
   isElementType: <T extends Element>(
     value: any,
     elementVal: string,
-    elementKey: string = 'type'
+    elementKey = 'type'
   ): value is T => {
     return (
       isElement(value) && value[<keyof Descendant>elementKey] === elementVal

@@ -1,5 +1,5 @@
-import { NodeTransforms } from '../interfaces/transforms/node'
 import { Transforms } from '../interfaces/transforms'
+import type { NodeTransforms } from '../interfaces/transforms/node'
 
 export const unsetNodes: NodeTransforms['unsetNodes'] = (
   editor,

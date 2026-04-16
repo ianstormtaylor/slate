@@ -1,4 +1,4 @@
-import { Element, createEditor as makeEditor, isObject } from 'slate'
+import { type Element, isObject, createEditor as makeEditor } from 'slate'
 import {
   createAnchor,
   createCursor,
@@ -90,7 +90,7 @@ const createFactory = <T extends HyperscriptCreators>(creators: T) => {
       attributes = {}
     }
 
-    children = children.filter(child => Boolean(child)).flat()
+    children = children.filter((child) => Boolean(child)).flat()
     const ret = creator(tagName, attributes, children)
     return ret
   }
@@ -126,4 +126,8 @@ const normalizeElements = (elements: HyperscriptShorthands) => {
   return creators
 }
 
-export { createHyperscript, HyperscriptCreators, HyperscriptShorthands }
+export {
+  createHyperscript,
+  type HyperscriptCreators,
+  type HyperscriptShorthands,
+}

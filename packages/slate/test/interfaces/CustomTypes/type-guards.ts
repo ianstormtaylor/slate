@@ -1,5 +1,5 @@
-import { Element, Text, Operation } from 'slate'
-import { CustomText, CustomOperation, HeadingElement } from './custom-types'
+import { Element, Operation, Text } from 'slate'
+import { CustomOperation, CustomText, HeadingElement } from './custom-types'
 
 export const isBoldText = (text: Text): text is CustomText =>
   !!(text as CustomText).bold

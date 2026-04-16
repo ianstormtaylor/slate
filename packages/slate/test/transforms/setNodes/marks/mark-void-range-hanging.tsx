@@ -1,10 +1,9 @@
 /** @jsx jsx */
 // Apply a mark across a range containing text with other marks and some voids that support marks
 import { Editor } from 'slate'
-import { jsx } from '../../..'
 
-export const run = editor => {
-  editor.markableVoid = node => node.markable
+export const run = (editor) => {
+  editor.markableVoid = (node) => node.markable
   Editor.addMark(editor, 'bold', true)
 }
 export const input = (
@@ -13,11 +12,11 @@ export const input = (
       <text>
         <anchor />
       </text>
-      <inline void markable>
+      <inline markable void>
         <text />
       </inline>
       <text italic>italic words </text>
-      <inline void markable>
+      <inline markable void>
         <text />
       </inline>
       <text>
@@ -32,13 +31,13 @@ export const output = (
       <text bold>
         <anchor />
       </text>
-      <inline void markable>
+      <inline markable void>
         <text bold />
       </inline>
-      <text italic bold>
+      <text bold italic>
         italic words{' '}
       </text>
-      <inline void markable>
+      <inline markable void>
         <text bold />
       </inline>
       <text bold>

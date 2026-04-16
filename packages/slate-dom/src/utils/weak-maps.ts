@@ -1,4 +1,4 @@
-import {
+import type {
   Ancestor,
   Editor,
   Node,
@@ -8,8 +8,8 @@ import {
   RangeRef,
   Text,
 } from 'slate'
-import { TextDiff } from './diff-text'
-import { Key } from './key'
+import type { TextDiff } from './diff-text'
+import type { Key } from './key'
 
 export type Action = { at?: Point | Range; run: () => void }
 

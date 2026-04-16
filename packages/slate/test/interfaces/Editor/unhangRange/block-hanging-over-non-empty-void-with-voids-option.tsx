@@ -1,6 +1,5 @@
 /** @jsx jsx */
 import { Editor } from 'slate'
-import { jsx } from '../../..'
 
 export const input = (
   <editor>
@@ -19,7 +18,7 @@ export const input = (
   </editor>
 )
 
-export const test = editor => {
+export const test = (editor) => {
   return Editor.unhangRange(editor, editor.selection, { voids: true })
 }
 

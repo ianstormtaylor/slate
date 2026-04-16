@@ -1,6 +1,5 @@
 /** @jsx jsx  */
 import { Node } from 'slate'
-import { jsx } from 'slate-hyperscript'
 
 export const input = (
   <editor>
@@ -12,7 +11,7 @@ export const input = (
     </element>
   </editor>
 )
-export const test = value => {
+export const test = (value) => {
   return Array.from(
     Node.nodes(value, {
       from: [0, 1],

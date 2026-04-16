@@ -1,7 +1,7 @@
 import {
   addMark,
   deleteFragment,
-  Editor,
+  type Editor,
   getDirtyPaths,
   getFragment,
   insertBreak,
@@ -63,15 +63,6 @@ import {
   unhangRange,
   withoutNormalizing,
 } from './editor'
-import { deleteText } from './transforms-text'
-import {
-  collapse,
-  deselect,
-  move,
-  select,
-  setPoint,
-  setSelection,
-} from './transforms-selection'
 import {
   insertNodes,
   liftNodes,
@@ -84,6 +75,15 @@ import {
   unwrapNodes,
   wrapNodes,
 } from './transforms-node'
+import {
+  collapse,
+  deselect,
+  move,
+  select,
+  setPoint,
+  setSelection,
+} from './transforms-selection'
+import { deleteText } from './transforms-text'
 
 /**
  * Create a new Slate `Editor` object.

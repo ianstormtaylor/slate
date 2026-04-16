@@ -1,13 +1,12 @@
 /** @jsx jsx */
 import { Editor } from 'slate'
-import { jsx } from '../../../..'
 
 export const input = (
   <editor>
     <block>one</block>
   </editor>
 )
-export const test = editor => {
+export const test = (editor) => {
   return Array.from(Editor.positions(editor, { at: [], reverse: true }))
 }
 export const output = [

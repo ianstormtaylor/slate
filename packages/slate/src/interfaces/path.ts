@@ -1,4 +1,4 @@
-import {
+import type {
   InsertNodeOperation,
   MergeNodeOperation,
   MoveNodeOperation,
@@ -6,7 +6,7 @@ import {
   RemoveNodeOperation,
   SplitNodeOperation,
 } from '..'
-import { TextDirection } from '../types/types'
+import type { TextDirection } from '../types/types'
 
 /**
  * `Path` arrays are a list of indexes that describe a node's exact position in
@@ -292,7 +292,7 @@ export const Path: PathInterface = {
   },
 
   isPath(value: any): value is Path {
-    return Array.isArray(value) && value.every(n => typeof n === 'number')
+    return Array.isArray(value) && value.every((n) => typeof n === 'number')
   },
 
   isSibling(path: Path, another: Path): boolean {
@@ -425,7 +425,8 @@ export const Path: PathInterface = {
 
         if (Path.equals(op, p) || Path.isAncestor(op, p)) {
           return null
-        } else if (Path.endsBefore(op, p)) {
+        }
+        if (Path.endsBefore(op, p)) {
           p[op.length - 1] -= 1
         }
 
@@ -482,7 +483,8 @@ export const Path: PathInterface = {
           }
 
           return copy.concat(p.slice(op.length))
-        } else if (
+        }
+        if (
           Path.isSibling(op, onp) &&
           (Path.isAncestor(onp, p) || Path.equals(onp, p))
         ) {

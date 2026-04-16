@@ -1,4 +1,4 @@
-import { Operation, Path } from '..'
+import { type Operation, Path } from '..'
 
 /**
  * `PathRef` objects keep a specific path in a document synced over time as new

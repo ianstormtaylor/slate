@@ -1,12 +1,11 @@
 /** @jsx jsx */
 import { Editor } from 'slate'
-import { jsx } from '../../..'
 
 export const input = (
   <editor>
     <block>
       <text>word</text>
-      <inline void markable>
+      <inline markable void>
         <anchor />
         <text bold />
       </inline>
@@ -14,7 +13,7 @@ export const input = (
         <anchor />
         bold
       </text>
-      <inline void markable>
+      <inline markable void>
         <text bold italic />
       </inline>
       <text bold italic>
@@ -25,8 +24,8 @@ export const input = (
     </block>
   </editor>
 )
-export const test = editor => {
-  editor.markableVoid = node => node.markable
+export const test = (editor) => {
+  editor.markableVoid = (node) => node.markable
   return Editor.marks(editor)
 }
 export const output = { bold: true }

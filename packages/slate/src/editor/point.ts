@@ -1,7 +1,7 @@
-import { EditorInterface } from '../interfaces/editor'
+import { Location } from '../interfaces'
+import type { EditorInterface } from '../interfaces/editor'
 import { Node } from '../interfaces/node'
 import { Range } from '../interfaces/range'
-import { Location } from '../interfaces'
 
 export const point: EditorInterface['point'] = (editor, at, options = {}) => {
   const { edge = 'start' } = options

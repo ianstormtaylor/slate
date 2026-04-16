@@ -11,7 +11,7 @@ export const input = {
   },
   custom: 'value',
 }
-export const test = value => {
+export const test = (value) => {
   return Range.isRange(value)
 }
 export const output = true

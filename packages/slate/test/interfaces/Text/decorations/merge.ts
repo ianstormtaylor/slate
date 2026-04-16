@@ -32,7 +32,7 @@ export const input = [
     decoration: [4, 5, 6],
   },
 ]
-export const test = decorations => {
+export const test = (decorations) => {
   return Text.decorations({ text: 'abc', mark: 'mark' }, decorations)
 }
 export const output = [

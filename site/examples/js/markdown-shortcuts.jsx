@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import { createEditor, Editor, Node, Point, Range, Transforms } from 'slate'
 import { withHistory } from 'slate-history'
 import { Editable, ReactEditor, Slate, withReact } from 'slate-react'
@@ -16,13 +16,13 @@ const SHORTCUTS = {
   '######': 'heading-six',
 }
 const MarkdownShortcutsExample = () => {
-  const renderElement = useCallback(props => <Element {...props} />, [])
+  const renderElement = useCallback((props) => <Element {...props} />, [])
   const editor = useMemo(
     () => withShortcuts(withReact(withHistory(createEditor()))),
     []
   )
   const handleDOMBeforeInput = useCallback(
-    e => {
+    (e) => {
       queueMicrotask(() => {
         const pendingDiffs = ReactEditor.androidPendingDiffs(editor)
         const scheduleFlush = pendingDiffs?.some(({ diff, path }) => {
@@ -36,7 +36,7 @@ const MarkdownShortcutsExample = () => {
           }
           const blockEntry = Editor.above(editor, {
             at: path,
-            match: n => Node.isElement(n) && Editor.isBlock(editor, n),
+            match: (n) => Node.isElement(n) && Editor.isBlock(editor, n),
           })
           if (!blockEntry) {
             return false
@@ -54,23 +54,23 @@ const MarkdownShortcutsExample = () => {
   return (
     <Slate editor={editor} initialValue={initialValue}>
       <Editable
-        onDOMBeforeInput={handleDOMBeforeInput}
-        renderElement={renderElement}
-        placeholder="Write some markdown..."
-        spellCheck
         autoFocus
+        onDOMBeforeInput={handleDOMBeforeInput}
+        placeholder="Write some markdown..."
+        renderElement={renderElement}
+        spellCheck
       />
     </Slate>
   )
 }
-const withShortcuts = editor => {
+const withShortcuts = (editor) => {
   const { deleteBackward, insertText } = editor
-  editor.insertText = text => {
+  editor.insertText = (text) => {
     const { selection } = editor
     if (text.endsWith(' ') && selection && Range.isCollapsed(selection)) {
       const { anchor } = selection
       const block = Editor.above(editor, {
-        match: n => Node.isElement(n) && Editor.isBlock(editor, n),
+        match: (n) => Node.isElement(n) && Editor.isBlock(editor, n),
       })
       const path = block ? block[1] : []
       const start = Editor.start(editor, path)
@@ -86,7 +86,7 @@ const withShortcuts = editor => {
           type,
         }
         Transforms.setNodes(editor, newProperties, {
-          match: n => Node.isElement(n) && Editor.isBlock(editor, n),
+          match: (n) => Node.isElement(n) && Editor.isBlock(editor, n),
         })
         if (type === 'list-item') {
           const list = {
@@ -94,7 +94,7 @@ const withShortcuts = editor => {
             children: [],
           }
           Transforms.wrapNodes(editor, list, {
-            match: n => Node.isElement(n) && n.type === 'list-item',
+            match: (n) => Node.isElement(n) && n.type === 'list-item',
           })
         }
         return
@@ -106,7 +106,7 @@ const withShortcuts = editor => {
     const { selection } = editor
     if (selection && Range.isCollapsed(selection)) {
       const match = Editor.above(editor, {
-        match: n => Node.isElement(n) && Editor.isBlock(editor, n),
+        match: (n) => Node.isElement(n) && Editor.isBlock(editor, n),
       })
       if (match) {
         const [block, path] = match
@@ -122,7 +122,7 @@ const withShortcuts = editor => {
           Transforms.setNodes(editor, newProperties)
           if (block.type === 'list-item') {
             Transforms.unwrapNodes(editor, {
-              match: n => Node.isElement(n) && n.type === 'bulleted-list',
+              match: (n) => Node.isElement(n) && n.type === 'bulleted-list',
               split: true,
             })
           }

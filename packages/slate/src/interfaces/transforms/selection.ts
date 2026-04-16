@@ -1,5 +1,5 @@
-import { Editor, Location, Point, Range } from '../../index'
-import { MoveUnit, SelectionEdge } from '../../types/types'
+import type { Editor, Location, Point, Range } from '../../index'
+import type { MoveUnit, SelectionEdge } from '../../types/types'
 
 export interface SelectionCollapseOptions {
   edge?: SelectionEdge

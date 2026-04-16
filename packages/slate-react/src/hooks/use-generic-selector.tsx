@@ -23,7 +23,7 @@ export function useGenericSelector<T>(
   selector: () => T,
   equalityFn: (a: T | null, b: T) => boolean
 ): [state: T, update: () => void] {
-  const [, forceRender] = useReducer(s => s + 1, 0)
+  const [, forceRender] = useReducer((s) => s + 1, 0)
 
   const latestSubscriptionCallbackError = useRef<Error | undefined>()
   const latestSelector = useRef<() => T>(() => null as any)

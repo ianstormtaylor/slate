@@ -1,8 +1,8 @@
 import { useCallback } from 'react'
 import { Editor, Range } from 'slate'
+import { ReactEditor } from '../plugin/react-editor'
 import { useElementIf } from './use-element'
 import { useSlateSelector } from './use-slate-selector'
-import { ReactEditor } from '../plugin/react-editor'
 
 /**
  * Get the current `selected` state of an element.

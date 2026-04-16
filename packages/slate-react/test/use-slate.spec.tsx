@@ -1,9 +1,9 @@
 /* eslint-disable import/no-deprecated */
-import React from 'react'
-import { Transforms, createEditor } from 'slate'
-import { render, act } from '@testing-library/react'
+
+import { act, render } from '@testing-library/react'
+import { createEditor, Transforms } from 'slate'
 import '@testing-library/jest-dom'
-import { Slate, withReact, Editable, useSlateWithV } from '../src'
+import { Editable, Slate, useSlateWithV, withReact } from '../src'
 
 describe('useSlateWithV', () => {
   const ShowVersion = () => {

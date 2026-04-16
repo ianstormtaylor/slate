@@ -1,5 +1,5 @@
-import { Editor, Location, Node, Range, Transforms } from '../../index'
-import { TextUnit } from '../../types/types'
+import { Editor, Location, type Node, Range, Transforms } from '../../index'
+import type { TextUnit } from '../../types/types'
 import { getDefaultInsertLocation } from '../../utils'
 
 export interface TextDeleteOptions {

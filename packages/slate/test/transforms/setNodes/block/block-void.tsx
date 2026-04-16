@@ -1,12 +1,11 @@
 /** @jsx jsx */
-import { Editor, Transforms, Element } from 'slate'
-import { jsx } from '../../..'
+import { Editor, Element, Transforms } from 'slate'
 
-export const run = editor => {
+export const run = (editor) => {
   Transforms.setNodes(
     editor,
     { someKey: true },
-    { match: n => Element.isElement(n) && Editor.isBlock(editor, n) }
+    { match: (n) => Element.isElement(n) && Editor.isBlock(editor, n) }
   )
 }
 export const input = (
@@ -19,7 +18,7 @@ export const input = (
 )
 export const output = (
   <editor>
-    <block void someKey>
+    <block someKey void>
       <cursor />
       word
     </block>

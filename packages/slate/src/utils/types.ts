@@ -1,4 +1,4 @@
-import { Editor } from '../interfaces/editor'
+import type { Editor } from '../interfaces/editor'
 
 export type OmitFirstArg<F> = F extends (x: any, ...args: infer P) => infer R
   ? (...args: P) => R

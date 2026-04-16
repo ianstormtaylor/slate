@@ -1,6 +1,5 @@
 /** @jsx jsx  */
 import { Editor } from 'slate'
-import { jsx } from 'slate-hyperscript'
 
 export const input = (
   <editor>
@@ -9,7 +8,7 @@ export const input = (
     </element>
   </editor>
 )
-export const test = editor => {
+export const test = (editor) => {
   return Array.from(
     Editor.levels(editor, {
       at: [0, 0],

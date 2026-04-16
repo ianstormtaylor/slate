@@ -1,4 +1,4 @@
-import { Operation, Range, isObject } from 'slate'
+import { isObject, Operation, type Range } from 'slate'
 
 interface Batch {
   operations: Operation[]

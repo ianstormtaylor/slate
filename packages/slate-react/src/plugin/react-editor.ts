@@ -1,4 +1,4 @@
-import { Ancestor } from 'slate'
+import type { Ancestor } from 'slate'
 import { DOMEditor, type DOMEditorInterface } from 'slate-dom'
 
 /**

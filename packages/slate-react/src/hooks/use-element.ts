@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react'
-import { Element } from 'slate'
+import type { Element } from 'slate'
 
 export const ElementContext = createContext<Element | null>(null)
 

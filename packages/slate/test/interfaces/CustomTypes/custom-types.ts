@@ -1,8 +1,8 @@
 import {
   BaseEditor,
-  BaseSelection,
   BasePoint,
   BaseRange,
+  BaseSelection,
   Descendant,
   Operation,
 } from 'slate'

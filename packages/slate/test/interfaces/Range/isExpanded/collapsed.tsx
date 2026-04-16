@@ -10,7 +10,7 @@ export const input = {
     offset: 0,
   },
 }
-export const test = range => {
+export const test = (range) => {
   return Range.isExpanded(range)
 }
 export const output = false

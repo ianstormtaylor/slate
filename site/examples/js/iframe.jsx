@@ -1,7 +1,7 @@
 import isHotkey from 'is-hotkey'
-import React, { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { Editor, createEditor } from 'slate'
+import { createEditor, Editor } from 'slate'
 import { withHistory } from 'slate-history'
 import { Editable, ReactEditor, Slate, useSlate, withReact } from 'slate-react'
 import { Button, Icon, Toolbar } from './components'
@@ -17,7 +17,7 @@ const IFrameExample = () => {
     ({ attributes, children }) => <p {...attributes}>{children}</p>,
     []
   )
-  const renderLeaf = useCallback(props => <Leaf {...props} />, [])
+  const renderLeaf = useCallback((props) => <Leaf {...props} />, [])
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
   const handleBlur = useCallback(() => ReactEditor.deselect(editor), [editor])
   return (
@@ -30,12 +30,8 @@ const IFrameExample = () => {
       </Toolbar>
       <IFrame onBlur={handleBlur}>
         <Editable
-          renderElement={renderElement}
-          renderLeaf={renderLeaf}
-          placeholder="Enter some rich text…"
-          spellCheck
           autoFocus
-          onKeyDown={event => {
+          onKeyDown={(event) => {
             for (const hotkey in HOTKEYS) {
               if (isHotkey(hotkey, event)) {
                 event.preventDefault()
@@ -44,6 +40,10 @@ const IFrameExample = () => {
               }
             }
           }}
+          placeholder="Enter some rich text…"
+          renderElement={renderElement}
+          renderLeaf={renderLeaf}
+          spellCheck
         />
       </IFrame>
     </Slate>
@@ -81,7 +81,7 @@ const MarkButton = ({ format, icon }) => {
   return (
     <Button
       active={isMarkActive(editor, format)}
-      onMouseDown={event => {
+      onMouseDown={(event) => {
         event.preventDefault()
         toggleMark(editor, format)
       }}
@@ -92,13 +92,13 @@ const MarkButton = ({ format, icon }) => {
 }
 const IFrame = ({ children, ...props }) => {
   const [iframeBody, setIframeBody] = useState(null)
-  const handleLoad = e => {
+  const handleLoad = (e) => {
     const iframe = e.target
     if (!iframe.contentDocument) return
     setIframeBody(iframe.contentDocument.body)
   }
   return (
-    <iframe srcDoc={`<!DOCTYPE html>`} {...props} onLoad={handleLoad}>
+    <iframe srcDoc={'<!DOCTYPE html>'} {...props} onLoad={handleLoad}>
       {iframeBody && createPortal(children, iframeBody)}
     </iframe>
   )

@@ -1,6 +1,5 @@
 /** @jsx jsx */
 import { Transforms } from 'slate'
-import { jsx } from '../../..'
 
 const fragment = (
   <fragment>

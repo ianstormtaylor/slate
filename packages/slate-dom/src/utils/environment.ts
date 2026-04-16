@@ -68,7 +68,8 @@ export const IS_SAFARI_LEGACY =
   /Safari/.test(navigator.userAgent) &&
   /Version\/(\d+)/.test(navigator.userAgent) &&
   (navigator.userAgent.match(/Version\/(\d+)/)?.[1]
-    ? parseInt(navigator.userAgent.match(/Version\/(\d+)/)?.[1]!, 10) < 17
+    ? Number.parseInt(navigator.userAgent.match(/Version\/(\d+)/)?.[1]!, 10) <
+      17
     : false)
 
 // COMPAT: Firefox/Edge Legacy don't support the `beforeinput` event
@@ -79,5 +80,5 @@ export const HAS_BEFORE_INPUT_SUPPORT =
   // globalThis is undefined in older browsers
   typeof globalThis !== 'undefined' &&
   globalThis.InputEvent &&
-  // @ts-ignore The `getTargetRanges` property isn't recognized.
+  // @ts-expect-error The `getTargetRanges` property isn't recognized.
   typeof globalThis.InputEvent.prototype.getTargetRanges === 'function'

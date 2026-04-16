@@ -1,11 +1,11 @@
 import React, { useMemo } from 'react'
-import { Transforms, createEditor } from 'slate'
+import { createEditor, Transforms } from 'slate'
 import {
-  Slate,
   Editable,
-  withReact,
-  useSlateStatic,
   ReactEditor,
+  Slate,
+  useSlateStatic,
+  withReact,
 } from 'slate-react'
 
 const EmbedsExample = () => {
@@ -13,18 +13,19 @@ const EmbedsExample = () => {
   return (
     <Slate editor={editor} initialValue={initialValue}>
       <Editable
-        renderElement={props => <Element {...props} />}
         placeholder="Enter some text..."
+        renderElement={(props) => <Element {...props} />}
       />
     </Slate>
   )
 }
-const withEmbeds = editor => {
+const withEmbeds = (editor) => {
   const { isVoid } = editor
-  editor.isVoid = element => (element.type === 'video' ? true : isVoid(element))
+  editor.isVoid = (element) =>
+    element.type === 'video' ? true : isVoid(element)
   return editor
 }
-const Element = props => {
+const Element = (props) => {
   const { attributes, children, element } = props
   switch (element.type) {
     case 'video':
@@ -58,8 +59,8 @@ const VideoElement = ({ attributes, children, element }) => {
           }}
         >
           <iframe
-            src={`${safeUrl}?title=0&byline=0&portrait=0`}
             frameBorder="0"
+            src={`${safeUrl}?title=0&byline=0&portrait=0`}
             style={{
               position: 'absolute',
               top: '0',
@@ -70,8 +71,7 @@ const VideoElement = ({ attributes, children, element }) => {
           />
         </div>
         <UrlInput
-          url={url}
-          onChange={val => {
+          onChange={(val) => {
             const path = ReactEditor.findPath(editor, element)
             const newProperties = {
               url: val,
@@ -80,6 +80,7 @@ const VideoElement = ({ attributes, children, element }) => {
               at: path,
             })
           }}
+          url={url}
         />
       </div>
       {children}
@@ -90,18 +91,18 @@ const UrlInput = ({ url, onChange }) => {
   const [value, setValue] = React.useState(url)
   return (
     <input
-      type="text"
-      value={value}
-      onClick={e => e.stopPropagation()}
-      style={{
-        marginTop: '5px',
-        boxSizing: 'border-box',
-      }}
-      onChange={e => {
+      onChange={(e) => {
         const newUrl = e.target.value
         setValue(newUrl)
         onChange(newUrl)
       }}
+      onClick={(e) => e.stopPropagation()}
+      style={{
+        marginTop: '5px',
+        boxSizing: 'border-box',
+      }}
+      type="text"
+      value={value}
     />
   )
 }

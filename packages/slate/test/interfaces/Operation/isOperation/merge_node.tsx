@@ -6,7 +6,7 @@ export const input = {
   position: 0,
   properties: {},
 }
-export const test = value => {
+export const test = (value) => {
   return Operation.isOperation(value)
 }
 export const output = true

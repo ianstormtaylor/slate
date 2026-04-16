@@ -2,65 +2,34 @@ import getDirection from 'direction'
 import debounce from 'lodash/debounce'
 import throttle from 'lodash/throttle'
 import React, {
+  type ForwardedRef,
+  forwardRef,
   useCallback,
   useEffect,
   useMemo,
   useReducer,
   useRef,
   useState,
-  forwardRef,
-  ForwardedRef,
 } from 'react'
-import { JSX } from 'react'
 import scrollIntoView from 'scroll-into-view-if-needed'
 import {
+  type DecoratedRange,
   Editor,
-  Element,
+  type Element,
+  type LeafPosition,
   Node,
-  NodeEntry,
+  type NodeEntry,
   Path,
   Range,
   Text,
   Transforms,
-  DecoratedRange,
-  LeafPosition,
 } from 'slate'
-import { useAndroidInputManager } from '../hooks/android-input-manager/use-android-input-manager'
-import useChildren from '../hooks/use-children'
-import { DecorateContext, useDecorateContext } from '../hooks/use-decorations'
-import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
-import { ReadOnlyContext } from '../hooks/use-read-only'
-import { useSlate } from '../hooks/use-slate'
-import { useTrackUserInput } from '../hooks/use-track-user-input'
-import { ReactEditor } from '../plugin/react-editor'
-import { TRIPLE_CLICK } from 'slate-dom'
-import {
-  containsShadowAware,
-  DOMElement,
-  DOMRange,
-  DOMText,
-  getActiveElement,
-  getDefaultView,
-  getSelection,
-  isDOMElement,
-  isDOMNode,
-  isPlainTextOnlyPaste,
-} from 'slate-dom'
 import {
   CAN_USE_DOM,
-  HAS_BEFORE_INPUT_SUPPORT,
-  IS_ANDROID,
-  IS_CHROME,
-  IS_FIREFOX,
-  IS_FIREFOX_LEGACY,
-  IS_IOS,
-  IS_WEBKIT,
-  IS_UC_MOBILE,
-  IS_WECHATBROWSER,
-} from 'slate-dom'
-import { Hotkeys } from 'slate-dom'
-import {
-  IS_NODE_MAP_DIRTY,
+  containsShadowAware,
+  type DOMElement,
+  type DOMRange,
+  type DOMText,
   EDITOR_TO_ELEMENT,
   EDITOR_TO_FORCE_RENDER,
   EDITOR_TO_PENDING_INSERTION_MARKS,
@@ -68,17 +37,43 @@ import {
   EDITOR_TO_USER_SELECTION,
   EDITOR_TO_WINDOW,
   ELEMENT_TO_NODE,
+  getActiveElement,
+  getDefaultView,
+  getSelection,
+  HAS_BEFORE_INPUT_SUPPORT,
+  Hotkeys,
+  IS_ANDROID,
+  IS_CHROME,
   IS_COMPOSING,
+  IS_FIREFOX,
+  IS_FIREFOX_LEGACY,
   IS_FOCUSED,
+  IS_IOS,
+  IS_NODE_MAP_DIRTY,
   IS_READ_ONLY,
+  IS_UC_MOBILE,
+  IS_WEBKIT,
+  IS_WECHATBROWSER,
+  isDOMElement,
+  isDOMNode,
+  isPlainTextOnlyPaste,
   MARK_PLACEHOLDER_SYMBOL,
   NODE_TO_ELEMENT,
   PLACEHOLDER_SYMBOL,
+  TRIPLE_CLICK,
 } from 'slate-dom'
-import { RestoreDOM } from './restore-dom/restore-dom'
-import { AndroidInputManager } from '../hooks/android-input-manager/android-input-manager'
+import type { AndroidInputManager } from '../hooks/android-input-manager/android-input-manager'
+import { useAndroidInputManager } from '../hooks/android-input-manager/use-android-input-manager'
+import useChildren from '../hooks/use-children'
 import { ComposingContext } from '../hooks/use-composing'
+import { DecorateContext, useDecorateContext } from '../hooks/use-decorations'
+import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
+import { ReadOnlyContext } from '../hooks/use-read-only'
+import { useSlate } from '../hooks/use-slate'
 import { useFlushDeferredSelectorsOnRender } from '../hooks/use-slate-selector'
+import { useTrackUserInput } from '../hooks/use-track-user-input'
+import { ReactEditor } from '../plugin/react-editor'
+import { RestoreDOM } from './restore-dom/restore-dom'
 
 type DeferredOperation = () => void
 
@@ -207,7 +202,7 @@ export const Editable = forwardRef(
 
     const { onUserInput, receivedUserInput } = useTrackUserInput()
 
-    const [, forceRender] = useReducer(s => s + 1, 0)
+    const [, forceRender] = useReducer((s) => s + 1, 0)
     EDITOR_TO_FORCE_RENDER.set(editor, forceRender)
 
     // Update internal state on each render.
@@ -669,7 +664,7 @@ export const Editable = forwardRef(
               ) {
                 const block = Editor.above(editor, {
                   at: anchor.path,
-                  match: n => Node.isElement(n) && Editor.isBlock(editor, n),
+                  match: (n) => Node.isElement(n) && Editor.isBlock(editor, n),
                 })
 
                 if (block && Node.string(block[0]).includes('\t')) {
@@ -868,7 +863,7 @@ export const Editable = forwardRef(
           NODE_TO_ELEMENT.delete(editor)
 
           if (ref.current && HAS_BEFORE_INPUT_SUPPORT) {
-            // @ts-ignore The `beforeinput` event isn't recognized.
+            // @ts-expect-error The `beforeinput` event isn't recognized.
             ref.current.removeEventListener('beforeinput', onDOMBeforeInput)
           }
         } else {
@@ -877,7 +872,7 @@ export const Editable = forwardRef(
           // real `beforeinput` events sadly... (2019/11/04)
           // https://github.com/facebook/react/issues/11211
           if (HAS_BEFORE_INPUT_SUPPORT) {
-            // @ts-ignore The `beforeinput` event isn't recognized.
+            // @ts-expect-error The `beforeinput` event isn't recognized.
             node.addEventListener('beforeinput', onDOMBeforeInput)
           }
         }
@@ -986,7 +981,7 @@ export const Editable = forwardRef(
         state.hasMarkPlaceholder = true
 
         const unset = Object.fromEntries(
-          Object.keys(rest).map(mark => [mark, null])
+          Object.keys(rest).map((mark) => [mark, null])
         )
 
         decorations.push({
@@ -1029,58 +1024,24 @@ export const Editable = forwardRef(
           <DecorateContext.Provider value={decorateContext}>
             <RestoreDOM node={ref} receivedUserInput={receivedUserInput}>
               <Component
-                role={readOnly ? undefined : 'textbox'}
                 aria-multiline={readOnly ? undefined : true}
+                role={readOnly ? undefined : 'textbox'}
                 translate="no"
                 {...attributes}
-                // COMPAT: Certain browsers don't support the `beforeinput` event, so we'd
-                // have to use hacks to make these replacement-based features work.
-                // For SSR situations HAS_BEFORE_INPUT_SUPPORT is false and results in prop
-                // mismatch warning app moves to browser. Pass-through consumer props when
-                // not CAN_USE_DOM (SSR) and default to falsy value
-                spellCheck={
+                autoCapitalize={
                   HAS_BEFORE_INPUT_SUPPORT || !CAN_USE_DOM
-                    ? attributes.spellCheck
-                    : false
+                    ? attributes.autoCapitalize
+                    : 'false'
                 }
                 autoCorrect={
                   HAS_BEFORE_INPUT_SUPPORT || !CAN_USE_DOM
                     ? attributes.autoCorrect
                     : 'false'
                 }
-                autoCapitalize={
-                  HAS_BEFORE_INPUT_SUPPORT || !CAN_USE_DOM
-                    ? attributes.autoCapitalize
-                    : 'false'
-                }
-                data-slate-editor
-                data-slate-node="value"
                 // explicitly set this
                 contentEditable={!readOnly}
-                // in some cases, a decoration needs access to the range / selection to decorate a text node,
-                // then you will select the whole text node when you select part the of text
-                // this magic zIndex="-1" will fix it
-                zindex={-1}
-                suppressContentEditableWarning
-                ref={callbackRef}
-                style={{
-                  ...(disableDefaultStyles
-                    ? {}
-                    : {
-                        // Allow positioning relative to the editable element.
-                        position: 'relative',
-                        // Preserve adjacent whitespace and new lines.
-                        whiteSpace: 'pre-wrap',
-                        // Allow words to break if they are too long.
-                        wordWrap: 'break-word',
-                        // Make the minimum height that of the placeholder.
-                        ...(placeholderHeight
-                          ? { minHeight: placeholderHeight }
-                          : {}),
-                      }),
-                  // Allow for passed-in styles to override anything.
-                  ...userStyle,
-                }}
+                data-slate-editor
+                data-slate-node="value"
                 onBeforeInput={useCallback(
                   (event: React.FormEvent<HTMLDivElement>) => {
                     // COMPAT: Certain browsers don't support the `beforeinput` event, so we
@@ -1089,7 +1050,12 @@ export const Editable = forwardRef(
                     if (
                       !HAS_BEFORE_INPUT_SUPPORT &&
                       !readOnly &&
-                      !isEventHandled(event, attributes.onBeforeInput) &&
+                      !isEventHandled(
+                        event,
+                        attributes.onBeforeInput as
+                          | ((event: React.FormEvent<HTMLDivElement>) => boolean | void)
+                          | undefined
+                      ) &&
                       ReactEditor.hasSelectableTarget(editor, event.target)
                     ) {
                       event.preventDefault()
@@ -1100,39 +1066,6 @@ export const Editable = forwardRef(
                     }
                   },
                   [attributes.onBeforeInput, editor, readOnly]
-                )}
-                onInput={useCallback(
-                  (event: React.FormEvent<HTMLDivElement>) => {
-                    if (isEventHandled(event, attributes.onInput)) {
-                      return
-                    }
-
-                    if (androidInputManagerRef.current) {
-                      androidInputManagerRef.current.handleInput()
-                      return
-                    }
-
-                    // Flush native operations, as native events will have propogated
-                    // and we can correctly compare DOM text values in components
-                    // to stop rendering, so that browser functions like autocorrect
-                    // and spellcheck work as expected.
-                    for (const op of deferredOperations.current) {
-                      op()
-                    }
-                    deferredOperations.current = []
-
-                    // COMPAT: Since `beforeinput` doesn't fully `preventDefault`,
-                    // there's a chance that content might be placed in the browser's undo stack.
-                    // This means undo can be triggered even when the div is not focused,
-                    // and it only triggers the input event for the node. (2024/10/09)
-                    if (!ReactEditor.isFocused(editor)) {
-                      handleNativeHistoryEvents(
-                        editor,
-                        event.nativeEvent as InputEvent
-                      )
-                    }
-                  },
-                  [attributes.onInput, editor]
                 )}
                 onBlur={useCallback(
                   (event: React.FocusEvent<HTMLDivElement>) => {
@@ -1238,7 +1171,7 @@ export const Editable = forwardRef(
                           )
                         ) {
                           const block = Editor.above(editor, {
-                            match: n =>
+                            match: (n) =>
                               Node.isElement(n) && Editor.isBlock(editor, n),
                             at: path,
                           })
@@ -1330,21 +1263,6 @@ export const Editable = forwardRef(
                   },
                   [attributes.onCompositionEnd, editor]
                 )}
-                onCompositionUpdate={useCallback(
-                  (event: React.CompositionEvent<HTMLDivElement>) => {
-                    if (
-                      ReactEditor.hasSelectableTarget(editor, event.target) &&
-                      !isEventHandled(event, attributes.onCompositionUpdate) &&
-                      !isDOMEventTargetInput(event)
-                    ) {
-                      if (!ReactEditor.isComposing(editor)) {
-                        setIsComposing(true)
-                        IS_COMPOSING.set(editor, true)
-                      }
-                    }
-                  },
-                  [attributes.onCompositionUpdate, editor]
-                )}
                 onCompositionStart={useCallback(
                   (event: React.CompositionEvent<HTMLDivElement>) => {
                     if (isDOMEventTargetInput(event)) {
@@ -1372,6 +1290,20 @@ export const Editable = forwardRef(
                     }
                   },
                   [attributes.onCompositionStart, editor]
+                )}
+                onCompositionUpdate={useCallback(
+                  (event: React.CompositionEvent<HTMLDivElement>) => {
+                    if (
+                      ReactEditor.hasSelectableTarget(editor, event.target) &&
+                      !isEventHandled(event, attributes.onCompositionUpdate) &&
+                      !isDOMEventTargetInput(event) &&
+                      !ReactEditor.isComposing(editor)
+                    ) {
+                      setIsComposing(true)
+                      IS_COMPOSING.set(editor, true)
+                    }
+                  },
+                  [attributes.onCompositionUpdate, editor]
                 )}
                 onCopy={useCallback(
                   (event: React.ClipboardEvent<HTMLDivElement>) => {
@@ -1422,6 +1354,19 @@ export const Editable = forwardRef(
                     }
                   },
                   [readOnly, editor, attributes.onCut]
+                )}
+                onDragEnd={useCallback(
+                  (event: React.DragEvent<HTMLDivElement>) => {
+                    if (
+                      !readOnly &&
+                      state.isDraggingInternally &&
+                      attributes.onDragEnd &&
+                      ReactEditor.hasTarget(editor, event.target)
+                    ) {
+                      attributes.onDragEnd(event)
+                    }
+                  },
+                  [readOnly, state, attributes, editor]
                 )}
                 onDragOver={useCallback(
                   (event: React.DragEvent<HTMLDivElement>) => {
@@ -1490,16 +1435,15 @@ export const Editable = forwardRef(
 
                       Transforms.select(editor, range)
 
-                      if (state.isDraggingInternally) {
-                        if (
-                          draggedRange &&
-                          !Range.equals(draggedRange, range) &&
-                          !Editor.void(editor, { at: range, voids: true })
-                        ) {
-                          Transforms.delete(editor, {
-                            at: draggedRange,
-                          })
-                        }
+                      if (
+                        state.isDraggingInternally &&
+                        draggedRange &&
+                        !Range.equals(draggedRange, range) &&
+                        !Editor.void(editor, { at: range, voids: true })
+                      ) {
+                        Transforms.delete(editor, {
+                          at: draggedRange,
+                        })
                       }
 
                       ReactEditor.insertData(editor, data)
@@ -1512,19 +1456,6 @@ export const Editable = forwardRef(
                     }
                   },
                   [readOnly, editor, attributes.onDrop, state]
-                )}
-                onDragEnd={useCallback(
-                  (event: React.DragEvent<HTMLDivElement>) => {
-                    if (
-                      !readOnly &&
-                      state.isDraggingInternally &&
-                      attributes.onDragEnd &&
-                      ReactEditor.hasTarget(editor, event.target)
-                    ) {
-                      attributes.onDragEnd(event)
-                    }
-                  },
-                  [readOnly, state, attributes, editor]
                 )}
                 onFocus={useCallback(
                   (event: React.FocusEvent<HTMLDivElement>) => {
@@ -1550,6 +1481,39 @@ export const Editable = forwardRef(
                     }
                   },
                   [readOnly, state, editor, attributes.onFocus]
+                )}
+                onInput={useCallback(
+                  (event: React.FormEvent<HTMLDivElement>) => {
+                    if (isEventHandled(event, attributes.onInput)) {
+                      return
+                    }
+
+                    if (androidInputManagerRef.current) {
+                      androidInputManagerRef.current.handleInput()
+                      return
+                    }
+
+                    // Flush native operations, as native events will have propogated
+                    // and we can correctly compare DOM text values in components
+                    // to stop rendering, so that browser functions like autocorrect
+                    // and spellcheck work as expected.
+                    for (const op of deferredOperations.current) {
+                      op()
+                    }
+                    deferredOperations.current = []
+
+                    // COMPAT: Since `beforeinput` doesn't fully `preventDefault`,
+                    // there's a chance that content might be placed in the browser's undo stack.
+                    // This means undo can be triggered even when the div is not focused,
+                    // and it only triggers the input event for the node. (2024/10/09)
+                    if (!ReactEditor.isFocused(editor)) {
+                      handleNativeHistoryEvents(
+                        editor,
+                        event.nativeEvent as InputEvent
+                      )
+                    }
+                  },
+                  [attributes.onInput, editor]
                 )}
                 onKeyDown={useCallback(
                   (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -1582,7 +1546,7 @@ export const Editable = forwardRef(
                       const { selection } = editor
                       const element =
                         editor.children[
-                          selection !== null ? selection.focus.path[0] : 0
+                          selection === null ? 0 : selection.focus.path[0]
                         ]
                       const isRTL = getDirection(Node.string(element)) === 'rtl'
 
@@ -1708,7 +1672,35 @@ export const Editable = forwardRef(
                       // COMPAT: Certain browsers don't support the `beforeinput` event, so we
                       // fall back to guessing at the input intention for hotkeys.
                       // COMPAT: In iOS, some of these hotkeys are handled in the
-                      if (!HAS_BEFORE_INPUT_SUPPORT) {
+                      if (HAS_BEFORE_INPUT_SUPPORT) {
+                        if (IS_CHROME || IS_WEBKIT) {
+                          // COMPAT: Chrome and Safari support `beforeinput` event but do not fire
+                          // an event when deleting backwards in a selected void inline node
+                          if (
+                            selection &&
+                            (Hotkeys.isDeleteBackward(nativeEvent) ||
+                              Hotkeys.isDeleteForward(nativeEvent)) &&
+                            Range.isCollapsed(selection)
+                          ) {
+                            const currentNode = Node.parent(
+                              editor,
+                              selection.anchor.path
+                            )
+
+                            if (
+                              Node.isElement(currentNode) &&
+                              Editor.isVoid(editor, currentNode) &&
+                              (Editor.isInline(editor, currentNode) ||
+                                Editor.isBlock(editor, currentNode))
+                            ) {
+                              event.preventDefault()
+                              Editor.deleteBackward(editor, { unit: 'block' })
+
+                              return
+                            }
+                          }
+                        }
+                      } else {
                         // We don't have a core behavior for these, but they change the
                         // DOM if we don't prevent them, so we have to.
                         if (
@@ -1815,34 +1807,6 @@ export const Editable = forwardRef(
 
                           return
                         }
-                      } else {
-                        if (IS_CHROME || IS_WEBKIT) {
-                          // COMPAT: Chrome and Safari support `beforeinput` event but do not fire
-                          // an event when deleting backwards in a selected void inline node
-                          if (
-                            selection &&
-                            (Hotkeys.isDeleteBackward(nativeEvent) ||
-                              Hotkeys.isDeleteForward(nativeEvent)) &&
-                            Range.isCollapsed(selection)
-                          ) {
-                            const currentNode = Node.parent(
-                              editor,
-                              selection.anchor.path
-                            )
-
-                            if (
-                              Node.isElement(currentNode) &&
-                              Editor.isVoid(editor, currentNode) &&
-                              (Editor.isInline(editor, currentNode) ||
-                                Editor.isBlock(editor, currentNode))
-                            ) {
-                              event.preventDefault()
-                              Editor.deleteBackward(editor, { unit: 'block' })
-
-                              return
-                            }
-                          }
-                        }
                       }
                     }
                   },
@@ -1874,14 +1838,48 @@ export const Editable = forwardRef(
                   },
                   [readOnly, editor, attributes.onPaste]
                 )}
+                ref={callbackRef}
+                // COMPAT: Certain browsers don't support the `beforeinput` event, so we'd
+                // have to use hacks to make these replacement-based features work.
+                // For SSR situations HAS_BEFORE_INPUT_SUPPORT is false and results in prop
+                // mismatch warning app moves to browser. Pass-through consumer props when
+                // not CAN_USE_DOM (SSR) and default to falsy value
+                spellCheck={
+                  HAS_BEFORE_INPUT_SUPPORT || !CAN_USE_DOM
+                    ? attributes.spellCheck
+                    : false
+                }
+                style={{
+                  ...(disableDefaultStyles
+                    ? {}
+                    : {
+                        // Allow positioning relative to the editable element.
+                        position: 'relative',
+                        // Preserve adjacent whitespace and new lines.
+                        whiteSpace: 'pre-wrap',
+                        // Allow words to break if they are too long.
+                        wordWrap: 'break-word',
+                        // Make the minimum height that of the placeholder.
+                        ...(placeholderHeight
+                          ? { minHeight: placeholderHeight }
+                          : {}),
+                      }),
+                  // Allow for passed-in styles to override anything.
+                  ...userStyle,
+                }}
+                suppressContentEditableWarning
+                // in some cases, a decoration needs access to the range / selection to decorate a text node,
+                // then you will select the whole text node when you select part the of text
+                // this magic zIndex="-1" will fix it
+                zindex={-1}
               >
                 <Children
                   decorations={decorations}
                   node={editor}
-                  renderElement={renderElement}
                   renderChunk={renderChunk}
-                  renderPlaceholder={renderPlaceholder}
+                  renderElement={renderElement}
                   renderLeaf={renderLeaf}
+                  renderPlaceholder={renderPlaceholder}
                   renderText={renderText}
                 />
               </Component>

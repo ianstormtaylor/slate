@@ -1,7 +1,12 @@
-import React, { useMemo } from 'react'
-import { Descendant, createEditor } from 'slate'
+import { useMemo } from 'react'
+import { createEditor, type Descendant } from 'slate'
 import { withHistory } from 'slate-history'
-import { Editable, RenderPlaceholderProps, Slate, withReact } from 'slate-react'
+import {
+  Editable,
+  type RenderPlaceholderProps,
+  Slate,
+  withReact,
+} from 'slate-react'
 
 const initialValue: Descendant[] = [
   {

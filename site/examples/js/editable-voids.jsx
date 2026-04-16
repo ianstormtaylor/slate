@@ -1,5 +1,5 @@
 import { css } from '@emotion/css'
-import React, { useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { createEditor, Transforms } from 'slate'
 import { withHistory } from 'slate-history'
 import { Editable, Slate, useSlateStatic, withReact } from 'slate-react'
@@ -18,20 +18,20 @@ const EditableVoidsExample = () => {
       </Toolbar>
 
       <Editable
-        renderElement={props => <Element {...props} />}
         placeholder="Enter some text..."
+        renderElement={(props) => <Element {...props} />}
       />
     </Slate>
   )
 }
-const withEditableVoids = editor => {
+const withEditableVoids = (editor) => {
   const { isVoid } = editor
-  editor.isVoid = element => {
+  editor.isVoid = (element) => {
     return element.type === 'editable-void' ? true : isVoid(element)
   }
   return editor
 }
-const insertEditableVoid = editor => {
+const insertEditableVoid = (editor) => {
   const text = { text: '' }
   const voidNode = {
     type: 'editable-void',
@@ -39,7 +39,7 @@ const insertEditableVoid = editor => {
   }
   Transforms.insertNodes(editor, voidNode)
 }
-const Element = props => {
+const Element = (props) => {
   const { attributes, children, element } = props
   switch (element.type) {
     case 'editable-void':
@@ -67,25 +67,25 @@ const EditableVoid = ({ attributes, children, element }) => {
           className={css`
             margin: 8px 0;
           `}
-          type="text"
-          value={inputValue}
-          onChange={e => {
+          onChange={(e) => {
             setInputValue(e.target.value)
           }}
+          type="text"
+          value={inputValue}
         />
         <h4>Left or right handed:</h4>
         <input
           className={unsetWidthStyle}
-          type="radio"
           name="handedness"
+          type="radio"
           value="left"
         />{' '}
         Left
         <br />
         <input
           className={unsetWidthStyle}
-          type="radio"
           name="handedness"
+          type="radio"
           value="right"
         />{' '}
         Right
@@ -107,7 +107,7 @@ const InsertEditableVoidButton = () => {
   const editor = useSlateStatic()
   return (
     <Button
-      onMouseDown={event => {
+      onMouseDown={(event) => {
         event.preventDefault()
         insertEditableVoid(editor)
       }}

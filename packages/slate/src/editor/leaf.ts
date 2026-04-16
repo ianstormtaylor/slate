@@ -1,4 +1,4 @@
-import { Editor, EditorInterface } from '../interfaces/editor'
+import { Editor, type EditorInterface } from '../interfaces/editor'
 import { Node } from '../interfaces/node'
 
 export const leaf: EditorInterface['leaf'] = (editor, at, options = {}) => {

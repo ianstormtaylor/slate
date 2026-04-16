@@ -1,8 +1,7 @@
-import React from 'react'
-import { createEditor, Transforms } from 'slate'
 import { act, renderHook } from '@testing-library/react'
-import { Slate, withReact, Editable, useSlateSelector } from '../src'
 import _ from 'lodash'
+import { createEditor, Transforms } from 'slate'
+import { Editable, Slate, useSlateSelector, withReact } from '../src'
 
 describe('useSlateSelector', () => {
   test('should use equality function when selector changes', async () => {

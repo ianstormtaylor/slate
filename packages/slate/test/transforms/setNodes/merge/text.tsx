@@ -1,9 +1,9 @@
 /** @jsx jsx */
-import { Transforms, Text } from 'slate'
-import { jsx } from '../../..'
-import _ from 'lodash'
 
-export const run = editor => {
+import _ from 'lodash'
+import { Text, Transforms } from 'slate'
+
+export const run = (editor) => {
   Transforms.setNodes(
     editor,
     { a: { b: 2, c: 3 } },

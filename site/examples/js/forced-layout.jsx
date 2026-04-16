@@ -1,9 +1,9 @@
-import React, { useCallback, useMemo } from 'react'
-import { Editor, Node, Transforms, createEditor } from 'slate'
+import { useCallback, useMemo } from 'react'
+import { createEditor, Editor, Node, Transforms } from 'slate'
 import { withHistory } from 'slate-history'
 import { Editable, Slate, withReact } from 'slate-react'
 
-const withLayout = editor => {
+const withLayout = (editor) => {
   const { normalizeNode } = editor
   editor.normalizeNode = ([node, path]) => {
     if (path.length === 0) {
@@ -27,7 +27,7 @@ const withLayout = editor => {
       for (const [child, childPath] of Node.children(editor, path)) {
         let type
         const slateIndex = childPath[0]
-        const enforceType = type => {
+        const enforceType = (type) => {
           if (Node.isElement(child) && child.type !== type) {
             const newProperties = { type }
             Transforms.setNodes(editor, newProperties, {
@@ -53,7 +53,7 @@ const withLayout = editor => {
   return editor
 }
 const ForcedLayoutExample = () => {
-  const renderElement = useCallback(props => <Element {...props} />, [])
+  const renderElement = useCallback((props) => <Element {...props} />, [])
   const editor = useMemo(
     () => withLayout(withHistory(withReact(createEditor()))),
     []
@@ -61,10 +61,10 @@ const ForcedLayoutExample = () => {
   return (
     <Slate editor={editor} initialValue={initialValue}>
       <Editable
-        renderElement={renderElement}
-        placeholder="Enter a title…"
-        spellCheck
         autoFocus
+        placeholder="Enter a title…"
+        renderElement={renderElement}
+        spellCheck
       />
     </Slate>
   )

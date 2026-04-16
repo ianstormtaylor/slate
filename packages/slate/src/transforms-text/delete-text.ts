@@ -1,11 +1,11 @@
-import { TextTransforms } from '../interfaces/transforms/text'
-import { Editor } from '../interfaces/editor'
-import { Range } from '../interfaces/range'
-import { Point } from '../interfaces/point'
-import { Path } from '../interfaces/path'
-import { Transforms } from '../interfaces/transforms'
-import { Node, NodeEntry } from '../interfaces/node'
 import { Location } from '../interfaces'
+import { Editor } from '../interfaces/editor'
+import { Node, type NodeEntry } from '../interfaces/node'
+import { Path } from '../interfaces/path'
+import { Point } from '../interfaces/point'
+import { Range } from '../interfaces/range'
+import { Transforms } from '../interfaces/transforms'
+import type { TextTransforms } from '../interfaces/transforms/text'
 
 export const deleteText: TextTransforms['delete'] = (editor, options = {}) => {
   Editor.withoutNormalizing(editor, () => {
@@ -63,12 +63,12 @@ export const deleteText: TextTransforms['delete'] = (editor, options = {}) => {
 
     let [start, end] = Range.edges(at)
     const startBlock = Editor.above(editor, {
-      match: n => Node.isElement(n) && Editor.isBlock(editor, n),
+      match: (n) => Node.isElement(n) && Editor.isBlock(editor, n),
       at: start,
       voids,
     })
     const endBlock = Editor.above(editor, {
-      match: n => Node.isElement(n) && Editor.isBlock(editor, n),
+      match: (n) => Node.isElement(n) && Editor.isBlock(editor, n),
       at: end,
       voids,
     })
@@ -77,12 +77,12 @@ export const deleteText: TextTransforms['delete'] = (editor, options = {}) => {
     const isSingleText = Path.equals(start.path, end.path)
     const startNonEditable = voids
       ? null
-      : Editor.void(editor, { at: start, mode: 'highest' }) ??
-        Editor.elementReadOnly(editor, { at: start, mode: 'highest' })
+      : (Editor.void(editor, { at: start, mode: 'highest' }) ??
+        Editor.elementReadOnly(editor, { at: start, mode: 'highest' }))
     const endNonEditable = voids
       ? null
-      : Editor.void(editor, { at: end, mode: 'highest' }) ??
-        Editor.elementReadOnly(editor, { at: end, mode: 'highest' })
+      : (Editor.void(editor, { at: end, mode: 'highest' }) ??
+        Editor.elementReadOnly(editor, { at: end, mode: 'highest' }))
 
     // If the start or end points are inside an inline void, nudge them out.
     if (startNonEditable) {
@@ -145,9 +145,9 @@ export const deleteText: TextTransforms['delete'] = (editor, options = {}) => {
 
     pathRefs
       .reverse()
-      .map(r => r.unref())
+      .map((r) => r.unref())
       .filter((r): r is Path => r !== null)
-      .forEach(p => Transforms.removeNodes(editor, { at: p, voids }))
+      .forEach((p) => Transforms.removeNodes(editor, { at: p, voids }))
 
     if (!endNonEditable) {
       const point = endRef.current!

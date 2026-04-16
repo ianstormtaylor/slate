@@ -1,7 +1,8 @@
-import React, {
+import type React from 'react'
+import {
   Fragment,
-  KeyboardEvent,
-  MouseEvent,
+  type KeyboardEvent,
+  type MouseEvent,
   useCallback,
   useEffect,
   useMemo,
@@ -9,19 +10,19 @@ import React, {
   useState,
 } from 'react'
 import {
-  Editor,
-  Transforms,
-  Range,
   createEditor,
-  Descendant,
-  Element as SlateElement,
+  type Descendant,
+  Editor,
+  Range,
+  type Element as SlateElement,
+  Transforms,
 } from 'slate'
 import { withHistory } from 'slate-history'
 import {
   Editable,
   ReactEditor,
-  RenderElementProps,
-  RenderLeafProps,
+  type RenderElementProps,
+  type RenderLeafProps,
   Slate,
   useFocused,
   useSelected,
@@ -29,7 +30,7 @@ import {
 } from 'slate-react'
 
 import { Portal } from './components'
-import {
+import type {
   CustomEditor,
   MentionElement,
   RenderElementPropsFor,
@@ -54,7 +55,7 @@ const MentionExample = () => {
     []
   )
 
-  const chars = CHARACTERS.filter(c =>
+  const chars = CHARACTERS.filter((c) =>
     c.toLowerCase().startsWith(search.toLowerCase())
   ).slice(0, 10)
 
@@ -62,16 +63,18 @@ const MentionExample = () => {
     (event: KeyboardEvent<HTMLDivElement>) => {
       if (target && chars.length > 0) {
         switch (event.key) {
-          case 'ArrowDown':
+          case 'ArrowDown': {
             event.preventDefault()
             const prevIndex = index >= chars.length - 1 ? 0 : index + 1
             setIndex(prevIndex)
             break
-          case 'ArrowUp':
+          }
+          case 'ArrowUp': {
             event.preventDefault()
             const nextIndex = index <= 0 ? chars.length - 1 : index - 1
             setIndex(nextIndex)
             break
+          }
           case 'Tab':
           case 'Enter':
             event.preventDefault()
@@ -130,14 +133,15 @@ const MentionExample = () => {
       }}
     >
       <Editable
-        renderElement={renderElement}
-        renderLeaf={renderLeaf}
         onKeyDown={onKeyDown}
         placeholder="Enter some text..."
+        renderElement={renderElement}
+        renderLeaf={renderLeaf}
       />
       {target && chars.length > 0 && (
         <Portal>
           <div
+            data-cy="mentions-portal"
             ref={ref}
             style={{
               top: '-9999px',
@@ -149,7 +153,6 @@ const MentionExample = () => {
               borderRadius: '4px',
               boxShadow: '0 1px 5px rgba(0,0,0,.2)',
             }}
-            data-cy="mentions-portal"
           >
             {chars.map((char, i) => (
               <div

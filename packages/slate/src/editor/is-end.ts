@@ -1,4 +1,4 @@
-import { Editor, EditorInterface } from '../interfaces/editor'
+import { Editor, type EditorInterface } from '../interfaces/editor'
 import { Point } from '../interfaces/point'
 
 export const isEnd: EditorInterface['isEnd'] = (editor, point, at) => {

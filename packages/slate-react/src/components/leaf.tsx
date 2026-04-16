@@ -1,18 +1,21 @@
-import React, {
-  useRef,
-  useCallback,
-  MutableRefObject,
-  useState,
-  useEffect,
-} from 'react'
-import { JSX } from 'react'
-import { Element, LeafPosition, Text } from 'slate'
 import { ResizeObserver as ResizeObserverPolyfill } from '@juggle/resize-observer'
-import String from './string'
-import { PLACEHOLDER_SYMBOL, EDITOR_TO_PLACEHOLDER_ELEMENT } from 'slate-dom'
-import { RenderLeafProps, RenderPlaceholderProps } from './editable'
+import React, {
+  type MutableRefObject,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
+import { type Element, type LeafPosition, Text } from 'slate'
+import {
+  EDITOR_TO_PLACEHOLDER_ELEMENT,
+  IS_ANDROID,
+  IS_WEBKIT,
+  PLACEHOLDER_SYMBOL,
+} from 'slate-dom'
 import { useSlateStatic } from '../hooks/use-slate-static'
-import { IS_WEBKIT, IS_ANDROID } from 'slate-dom'
+import type { RenderLeafProps, RenderPlaceholderProps } from './editable'
+import String from './string'
 
 // Delay the placeholder on Android to prevent the keyboard from closing.
 // (https://github.com/ianstormtaylor/slate/pull/5368)

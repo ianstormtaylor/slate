@@ -1,4 +1,4 @@
-import { EditorInterface, Editor, Node } from '../interfaces'
+import { Editor, type EditorInterface, Node } from '../interfaces'
 
 export const shouldMergeNodesRemovePrevNode: EditorInterface['shouldMergeNodesRemovePrevNode'] =
   (editor, [prevNode, prevPath], [curNode, curNodePath]) => {

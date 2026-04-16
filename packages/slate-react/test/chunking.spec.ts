@@ -1,4 +1,4 @@
-import { Descendant, Element, Node, Transforms, createEditor } from 'slate'
+import { createEditor, Descendant, Element, Node, Transforms } from 'slate'
 import { Key } from 'slate-dom'
 import { ReactEditor, withReact } from '../src'
 import {
@@ -8,8 +8,8 @@ import {
   ChunkLeaf,
   ChunkNode,
   ChunkTree,
-  KEY_TO_CHUNK_TREE,
   getChunkTreeForNode,
+  KEY_TO_CHUNK_TREE,
 } from '../src/chunking'
 import { ReconcileOptions } from '../src/chunking/reconcile-children'
 
@@ -63,7 +63,7 @@ const getChildrenAndTreeForShape = (
         children: [],
       }
 
-      chunk.children = ts.map(child => shapeToNode(child, chunk))
+      chunk.children = ts.map((child) => shapeToNode(child, chunk))
 
       return chunk
     }
@@ -87,13 +87,13 @@ const getChildrenAndTreeForShape = (
     children: [],
   }
 
-  chunkTree.children = treeShape.map(child => shapeToNode(child, chunkTree))
+  chunkTree.children = treeShape.map((child) => shapeToNode(child, chunkTree))
 
   return { children, chunkTree }
 }
 
 const withChunking = (editor: ReactEditor) => {
-  editor.getChunkSize = node => (node === editor ? 3 : null)
+  editor.getChunkSize = (node) => (node === editor ? 3 : null)
   return editor
 }
 
@@ -108,16 +108,16 @@ const createEditorWithShape = (treeShape: TreeShape[]) => {
 
 // https://stackoverflow.com/a/29450606
 const createPRNG = (seed: number) => {
-  const mask = 0xffffffff
-  let m_w = (123456789 + seed) & mask
-  let m_z = (987654321 - seed) & mask
+  const mask = 0xff_ff_ff_ff
+  let m_w = (123_456_789 + seed) & mask
+  let m_z = (987_654_321 - seed) & mask
 
   return () => {
-    m_z = (36969 * (m_z & 65535) + (m_z >>> 16)) & mask
-    m_w = (18000 * (m_w & 65535) + (m_w >>> 16)) & mask
+    m_z = (36_969 * (m_z & 65_535) + (m_z >>> 16)) & mask
+    m_w = (18_000 * (m_w & 65_535) + (m_w >>> 16)) & mask
 
-    let result = ((m_z << 16) + (m_w & 65535)) >>> 0
-    result /= 4294967296
+    let result = ((m_z << 16) + (m_w & 65_535)) >>> 0
+    result /= 4_294_967_296
     return result
   }
 }
@@ -229,7 +229,7 @@ describe('getChunkTreeForNode', () => {
 
       const chunkTree = reconcileEditor(editor)
       const chunks = chunkTree.children as Chunk[]
-      const leaves = chunks.map(chunk => chunk.children)
+      const leaves = chunks.map((chunk) => chunk.children)
 
       expect(leaves).toMatchObject([
         [{ index: 0 }, { index: 1 }, { index: 2 }],
@@ -333,7 +333,7 @@ describe('getChunkTreeForNode', () => {
 
         blocks(31)
           .reverse()
-          .forEach(node => {
+          .forEach((node) => {
             Transforms.insertNodes(editor, node, { at: [0] })
             chunkTree = reconcileEditor(editor)
           })
@@ -878,7 +878,7 @@ describe('getChunkTreeForNode', () => {
   describe('random testing', () => {
     it('remains correct after random operations', () => {
       // Hard code a value here to reproduce a test failure
-      const seed = Math.floor(10000000 * Math.random())
+      const seed = Math.floor(10_000_000 * Math.random())
       const random = createPRNG(seed)
 
       const duration = 250
@@ -910,12 +910,10 @@ describe('getChunkTreeForNode', () => {
               if (editor.children.length > 0) {
                 Transforms.removeNodes(editor, { at: [randomPosition(false)] })
               }
-            } else {
-              if (editor.children.length > 0) {
-                Transforms.setNodes(editor, { updated: i } as any, {
-                  at: [randomPosition(false)],
-                })
-              }
+            } else if (editor.children.length > 0) {
+              Transforms.setNodes(editor, { updated: i } as any, {
+                at: [randomPosition(false)],
+              })
             }
           }
 

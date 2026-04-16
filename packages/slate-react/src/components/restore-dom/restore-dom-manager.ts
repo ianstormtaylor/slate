@@ -1,6 +1,6 @@
-import { RefObject } from 'react'
-import { ReactEditor } from '../../plugin/react-editor'
+import type { RefObject } from 'react'
 import { isTrackedMutation } from 'slate-dom'
+import type { ReactEditor } from '../../plugin/react-editor'
 
 export type RestoreDOMManager = {
   registerMutations: (mutations: MutationRecord[]) => void
@@ -23,7 +23,7 @@ export const createRestoreDomManager = (
       return
     }
 
-    const trackedMutations = mutations.filter(mutation =>
+    const trackedMutations = mutations.filter((mutation) =>
       isTrackedMutation(editor, mutation, mutations)
     )
 
@@ -32,18 +32,18 @@ export const createRestoreDomManager = (
 
   function restoreDOM() {
     if (bufferedMutations.length > 0) {
-      bufferedMutations.reverse().forEach(mutation => {
+      bufferedMutations.reverse().forEach((mutation) => {
         if (mutation.type === 'characterData') {
           // We don't want to restore the DOM for characterData mutations
           // because this interrupts the composition.
           return
         }
 
-        mutation.removedNodes.forEach(node => {
+        mutation.removedNodes.forEach((node) => {
           mutation.target.insertBefore(node, mutation.nextSibling)
         })
 
-        mutation.addedNodes.forEach(node => {
+        mutation.addedNodes.forEach((node) => {
           mutation.target.removeChild(node)
         })
       })

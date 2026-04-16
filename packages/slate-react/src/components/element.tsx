@@ -1,27 +1,30 @@
 import getDirection from 'direction'
 import React, { useCallback } from 'react'
-import { JSX } from 'react'
-import { Editor, Element as SlateElement, Node, DecoratedRange } from 'slate'
-import { ReactEditor, useReadOnly, useSlateStatic } from '..'
-import useChildren from '../hooks/use-children'
-import { isElementDecorationsEqual } from 'slate-dom'
+import {
+  type DecoratedRange,
+  Editor,
+  Node,
+  type Element as SlateElement,
+} from 'slate'
 import {
   EDITOR_TO_KEY_TO_ELEMENT,
   ELEMENT_TO_NODE,
+  isElementDecorationsEqual,
   NODE_TO_ELEMENT,
   NODE_TO_INDEX,
   NODE_TO_PARENT,
 } from 'slate-dom'
-import {
+import { ReactEditor, useReadOnly, useSlateStatic } from '..'
+import useChildren from '../hooks/use-children'
+import { useDecorations } from '../hooks/use-decorations'
+import type {
   RenderChunkProps,
   RenderElementProps,
   RenderLeafProps,
   RenderPlaceholderProps,
   RenderTextProps,
 } from './editable'
-
 import Text from './text'
-import { useDecorations } from '../hooks/use-decorations'
 
 const defaultRenderElement = (props: RenderElementProps) => (
   <DefaultElement {...props} />
@@ -130,10 +133,10 @@ const Element = (props: {
         }}
       >
         <Text
-          renderPlaceholder={renderPlaceholder}
           decorations={[]}
           isLast={false}
           parent={element}
+          renderPlaceholder={renderPlaceholder}
           text={text}
         />
       </Tag>

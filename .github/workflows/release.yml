@@ -29,14 +29,16 @@ jobs:
           fetch-depth: 0
 
       - name: Setup node
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+
+      - name: Setup node
         uses: actions/setup-node@v4
         with:
           node-version: 22.17
-          cache: yarn
+          cache: pnpm
           # IMPORTANT: do NOT set registry-url here (avoid auth/.npmrc side effects)
-
-      - name: Enable Corepack (Yarn)
-        run: corepack enable
 
       - name: Upgrade npm (OIDC fixes ship in npm releases)
         run: npm i -g npm@latest
@@ -56,28 +58,31 @@ jobs:
           npm config list -l | grep -iE 'auth|token|always-auth' || true
 
       - name: Install dependencies
-        run: yarn install
+        run: pnpm install --frozen-lockfile
 
       - name: Prepare release
-        run: yarn prerelease
+        run: pnpm prerelease
 
       # Version PR when changesets exist; when none remain, publish runs here and
-      # changesets/action pushes tags + creates GitHub Releases (unlike plain `yarn changeset publish`).
+      # changesets/action pushes tags + creates GitHub Releases (unlike plain `pnpm changeset publish`).
       - name: Create or update release PR / publish
         if: matrix.channel == 'latest'
         id: changesets
         uses: changesets/action@v1
         with:
-          version: yarn changesetversion
-          publish: yarn changeset publish
+          version: pnpm changesetversion
+          publish: pnpm release:publish:latest
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          YARN_ENABLE_IMMUTABLE_INSTALLS: false
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Release to @dev channel
         if: matrix.channel == 'dev'
         run: |
-          yarn changeset version --snapshot
-          yarn changeset publish --tag dev
+          pnpm changeset version --snapshot
+          pnpm changeset publish --tag dev
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

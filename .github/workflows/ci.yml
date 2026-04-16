@@ -9,34 +9,45 @@ permissions:
 
 jobs:
   ci:
-    name: ${{ matrix.command }}
+    name: check
     # Pin the version to avoid dependency installation issues
     runs-on: ubuntu-22.04
-    strategy:
-      matrix:
-        command:
-          - 'test'
-          - 'test:integration'
-          - 'lint:eslint'
-          - 'lint:prettier'
-          - 'lint:typescript'
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
 
       - name: Setup node
         uses: actions/setup-node@v4
         with:
           node-version: 22.17
-          cache: yarn
+          cache: pnpm
 
-      - name: Run ${{ matrix.command }}
-        run: yarn && yarn build && yarn ${{ matrix.command }}
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Restore workspace cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ github.workspace }}/.turbo
+            ${{ github.workspace }}/packages/*/tsconfig.tsbuildinfo
+            ${{ github.workspace }}/packages/*/lib/tsconfig.tsbuildinfo
+            ${{ github.workspace }}/site/tsconfig.tsbuildinfo
+            ${{ github.workspace }}/site/.next/cache
+          key: slate-workspace-cache-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'turbo.json', 'packages/*/tsconfig*.json', 'site/tsconfig.json') }}
+
+      - name: Run check
+        run: pnpm check:ci
         env:
           CI: true
 
       - name: Upload Playwright test results
-        if: ${{ !cancelled() && matrix.command == 'test:integration' }}
+        if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
           name: test-results

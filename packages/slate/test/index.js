@@ -1,8 +1,8 @@
 import assert from 'assert'
 import { cloneDeep } from 'lodash'
-import { fixtures } from '../../../support/fixtures'
-import { Editor, createEditor } from 'slate'
+import { createEditor, Editor } from 'slate'
 import { createHyperscript } from 'slate-hyperscript'
+import { fixtures } from '../../../support/fixtures'
 
 describe('slate', () => {
   fixtures(__dirname, 'interfaces', ({ module }) => {
@@ -78,18 +78,18 @@ describe('slate', () => {
     testBatchDirty({ module })
   })
 })
-const withTest = editor => {
+const withTest = (editor) => {
   const { isInline, isVoid, isElementReadOnly, isSelectable } = editor
-  editor.isInline = element => {
+  editor.isInline = (element) => {
     return element.inline === true ? true : isInline(element)
   }
-  editor.isVoid = element => {
+  editor.isVoid = (element) => {
     return element.void === true ? true : isVoid(element)
   }
-  editor.isElementReadOnly = element => {
+  editor.isElementReadOnly = (element) => {
     return element.readOnly === true ? true : isElementReadOnly(element)
   }
-  editor.isSelectable = element => {
+  editor.isSelectable = (element) => {
     return element.nonSelectable === true ? false : isSelectable(element)
   }
   return editor

@@ -10,8 +10,8 @@ import 'prismjs/components/prism-python'
 import 'prismjs/components/prism-sql'
 import 'prismjs/components/prism-tsx'
 import 'prismjs/components/prism-typescript'
-import React, { useCallback, useState } from 'react'
-import { Editor, Node, Transforms, createEditor } from 'slate'
+import { useCallback, useState } from 'react'
+import { createEditor, Editor, Node, Transforms } from 'slate'
 import { withHistory } from 'slate-history'
 import {
   Editable,
@@ -35,19 +35,19 @@ const CodeHighlightingExample = () => {
       <ExampleToolbar />
       <Editable
         decorate={decorate}
+        onKeyDown={onKeyDown}
         renderElement={ElementWrapper}
         renderLeaf={renderLeaf}
-        onKeyDown={onKeyDown}
       />
       <style>{prismThemeCss}</style>
     </Slate>
   )
 }
-const ElementWrapper = props => {
+const ElementWrapper = (props) => {
   const { attributes, children, element } = props
   const editor = useSlateStatic()
   if (element.type === CodeBlockType) {
-    const setLanguage = language => {
+    const setLanguage = (language) => {
       const path = ReactEditor.findPath(editor, element)
       Transforms.setNodes(editor, { language }, { at: path })
     }
@@ -62,12 +62,12 @@ const ElementWrapper = props => {
         background: rgba(0, 20, 60, .03);
         padding: 5px 13px;
       `)}
-        style={{ position: 'relative' }}
         spellCheck={false}
+        style={{ position: 'relative' }}
       >
         <LanguageSelect
+          onChange={(e) => setLanguage(e.target.value)}
           value={element.language}
-          onChange={e => setLanguage(e.target.value)}
         />
         {children}
       </div>
@@ -101,30 +101,30 @@ const CodeBlockButton = () => {
       editor,
       { type: CodeBlockType, language: 'html', children: [] },
       {
-        match: n => Node.isElement(n) && n.type === ParagraphType,
+        match: (n) => Node.isElement(n) && n.type === ParagraphType,
         split: true,
       }
     )
     Transforms.setNodes(
       editor,
       { type: CodeLineType },
-      { match: n => Node.isElement(n) && n.type === ParagraphType }
+      { match: (n) => Node.isElement(n) && n.type === ParagraphType }
     )
   }
   return (
     <Button
-      data-test-id="code-block-button"
       active
-      onPointerDown={event => {
+      data-test-id="code-block-button"
+      onClick={handleClick}
+      onPointerDown={(event) => {
         event.preventDefault()
       }}
-      onClick={handleClick}
     >
       <Icon>code</Icon>
     </Button>
   )
 }
-const renderLeaf = props => {
+const renderLeaf = (props) => {
   const { attributes, children, leaf } = props
   const { text, ...rest } = leaf
   return (
@@ -142,7 +142,7 @@ const useDecorate = () => {
   }, [])
 }
 const decorateCodeBlock = ([block, blockPath]) => {
-  const text = block.children.map(line => Node.string(line)).join('\n')
+  const text = block.children.map((line) => Node.string(line)).join('\n')
   const tokens = Prism.tokenize(text, Prism.languages[block.language])
   const normalizedTokens = normalizeTokens(tokens) // make tokens flat and grouped by line
   const decorations = []
@@ -160,16 +160,16 @@ const decorateCodeBlock = ([block, blockPath]) => {
         anchor: { path, offset: start },
         focus: { path, offset: end },
         token: true,
-        ...Object.fromEntries(token.types.map(type => [type, true])),
+        ...Object.fromEntries(token.types.map((type) => [type, true])),
       })
       start = end
     }
   }
   return decorations
 }
-const useOnKeydown = editor => {
+const useOnKeydown = (editor) => {
   const onKeyDown = useCallback(
-    e => {
+    (e) => {
       if (isHotkey('tab', e)) {
         // handle tab key, insert spaces
         e.preventDefault()
@@ -180,17 +180,17 @@ const useOnKeydown = editor => {
   )
   return onKeyDown
 }
-const LanguageSelect = props => {
+const LanguageSelect = (props) => {
   return (
     <select
-      data-test-id="language-select"
-      contentEditable={false}
       className={css`
         position: absolute;
         right: 5px;
         top: 5px;
         z-index: 1;
       `}
+      contentEditable={false}
+      data-test-id="language-select"
       {...props}
     >
       <option value="css">CSS</option>
@@ -207,11 +207,11 @@ const LanguageSelect = props => {
     </select>
   )
 }
-const toChildren = content => [{ text: content }]
-const toCodeLines = content =>
+const toChildren = (content) => [{ text: content }]
+const toCodeLines = (content) =>
   content
     .split('\n')
-    .map(line => ({ type: CodeLineType, children: toChildren(line) }))
+    .map((line) => ({ type: CodeLineType, children: toChildren(line) }))
 const initialValue = [
   {
     type: ParagraphType,

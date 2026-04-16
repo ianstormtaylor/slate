@@ -1,13 +1,12 @@
-import { RefObject, useState } from 'react'
-import { useSlateStatic } from '../use-slate-static'
-import { IS_ANDROID } from 'slate-dom'
-import { EDITOR_TO_SCHEDULE_FLUSH } from 'slate-dom'
-import {
-  createAndroidInputManager,
-  CreateAndroidInputManagerOptions,
-} from './android-input-manager'
+import { type RefObject, useState } from 'react'
+import { EDITOR_TO_SCHEDULE_FLUSH, IS_ANDROID } from 'slate-dom'
 import { useIsMounted } from '../use-is-mounted'
 import { useMutationObserver } from '../use-mutation-observer'
+import { useSlateStatic } from '../use-slate-static'
+import {
+  type CreateAndroidInputManagerOptions,
+  createAndroidInputManager,
+} from './android-input-manager'
 
 type UseAndroidInputManagerOptions = {
   node: RefObject<HTMLElement>
@@ -22,9 +21,8 @@ const MUTATION_OBSERVER_CONFIG: MutationObserverInit = {
   characterData: true,
 }
 
-export const useAndroidInputManager = !IS_ANDROID
-  ? () => null
-  : ({ node, ...options }: UseAndroidInputManagerOptions) => {
+export const useAndroidInputManager = IS_ANDROID
+  ? ({ node, ...options }: UseAndroidInputManagerOptions) => {
       if (!IS_ANDROID) {
         return null
       }
@@ -52,3 +50,4 @@ export const useAndroidInputManager = !IS_ANDROID
 
       return inputManager
     }
+  : () => null

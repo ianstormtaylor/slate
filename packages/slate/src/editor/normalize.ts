@@ -1,7 +1,7 @@
-import { Editor, EditorInterface } from '../interfaces/editor'
-import { DIRTY_PATH_KEYS, DIRTY_PATHS } from '../utils/weak-maps'
-import { Path } from '../interfaces/path'
+import { Editor, type EditorInterface } from '../interfaces/editor'
 import { Node } from '../interfaces/node'
+import type { Path } from '../interfaces/path'
+import { DIRTY_PATH_KEYS, DIRTY_PATHS } from '../utils/weak-maps'
 
 export const normalize: EditorInterface['normalize'] = (
   editor,
@@ -29,7 +29,7 @@ export const normalize: EditorInterface['normalize'] = (
 
   if (force) {
     const allPaths = Array.from(Node.nodes(editor), ([, p]) => p)
-    const allPathKeys = new Set(allPaths.map(p => p.join(',')))
+    const allPathKeys = new Set(allPaths.map((p) => p.join(',')))
     DIRTY_PATHS.set(editor, allPaths)
     DIRTY_PATH_KEYS.set(editor, allPathKeys)
   }

@@ -1,6 +1,5 @@
 /** @jsx jsx */
 import { Editor } from 'slate'
-import { jsx } from '../../..'
 
 /**
  * Similar to firefox-double-click.tsx, when the selection is at the end of
@@ -29,7 +28,7 @@ export const input = (
   </editor>
 )
 
-export const test = editor => {
+export const test = (editor) => {
   return Editor.marks(editor)
 }
 

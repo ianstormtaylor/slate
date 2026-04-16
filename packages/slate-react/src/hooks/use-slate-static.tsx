@@ -1,6 +1,6 @@
 import { createContext, useContext } from 'react'
-import { Editor } from 'slate'
-import { ReactEditor } from '../plugin/react-editor'
+import type { Editor } from 'slate'
+import type { ReactEditor } from '../plugin/react-editor'
 
 /**
  * A React context for sharing the editor object.

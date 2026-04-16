@@ -6,27 +6,22 @@ export const Button = React.forwardRef(
   ({ className, active, reversed, ...props }, ref) => (
     <span
       {...props}
-      ref={ref}
       className={cx(
         className,
         css`
           cursor: pointer;
-          color: ${reversed
-            ? active
-              ? 'white'
-              : '#aaa'
-            : active
-            ? 'black'
-            : '#ccc'};
+          color: ${
+            reversed ? (active ? 'white' : '#aaa') : active ? 'black' : '#ccc'
+          };
         `
       )}
+      ref={ref}
     />
   )
 )
 export const Icon = React.forwardRef(({ className, ...props }, ref) => (
   <span
     {...props}
-    ref={ref}
     className={cx(
       'material-icons',
       className,
@@ -35,12 +30,12 @@ export const Icon = React.forwardRef(({ className, ...props }, ref) => (
         vertical-align: text-bottom;
       `
     )}
+    ref={ref}
   />
 ))
 export const Instruction = React.forwardRef(({ className, ...props }, ref) => (
   <div
     {...props}
-    ref={ref}
     className={cx(
       className,
       css`
@@ -51,13 +46,12 @@ export const Instruction = React.forwardRef(({ className, ...props }, ref) => (
         background: #f8f8e8;
       `
     )}
+    ref={ref}
   />
 ))
 export const Menu = React.forwardRef(({ className, ...props }, ref) => (
   <div
     {...props}
-    data-test-id="menu"
-    ref={ref}
     className={cx(
       className,
       css`
@@ -70,6 +64,8 @@ export const Menu = React.forwardRef(({ className, ...props }, ref) => (
         }
       `
     )}
+    data-test-id="menu"
+    ref={ref}
   />
 ))
 export const Portal = ({ children }) => {
@@ -80,7 +76,6 @@ export const Portal = ({ children }) => {
 export const Toolbar = React.forwardRef(({ className, ...props }, ref) => (
   <Menu
     {...props}
-    ref={ref}
     className={cx(
       className,
       css`
@@ -91,5 +86,6 @@ export const Toolbar = React.forwardRef(({ className, ...props }, ref) => (
         margin-bottom: 20px;
       `
     )}
+    ref={ref}
   />
 ))

@@ -1,8 +1,8 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { Descendant, createEditor } from 'slate'
-import { withHistory } from 'slate-history'
-import { Editable, RenderLeafProps, Slate, withReact } from 'slate-react'
 import { css } from '@emotion/css'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { createEditor, type Descendant } from 'slate'
+import { withHistory } from 'slate-history'
+import { Editable, type RenderLeafProps, Slate, withReact } from 'slate-react'
 
 interface AndroidTestCase {
   id: string
@@ -212,7 +212,7 @@ const AndroidTestsExample = () => {
     <>
       <label>
         Test case:{' '}
-        <select value={testId} onChange={e => setTestId(e.target.value)}>
+        <select onChange={(e) => setTestId(e.target.value)} value={testId}>
           {TEST_CASES.map(({ name, id }) => (
             <option key={id} value={id}>
               {name}
@@ -247,8 +247,8 @@ const TestCase = ({ value }: AndroidTestCase) => {
   return (
     <Slate editor={editor} initialValue={value}>
       <Editable
-        renderLeaf={renderLeaf}
         placeholder="Enter some text…"
+        renderLeaf={renderLeaf}
         spellCheck
       />
     </Slate>

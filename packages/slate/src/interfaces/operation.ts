@@ -1,4 +1,4 @@
-import { ExtendedType, Node, Path, Range, isObject } from '..'
+import { type ExtendedType, isObject, Node, Path, Range } from '..'
 
 export type BaseInsertNodeOperation = {
   type: 'insert_node'
@@ -231,7 +231,7 @@ export const Operation: OperationInterface = {
 
   isOperationList(value: any): value is Operation[] {
     return (
-      Array.isArray(value) && value.every(val => Operation.isOperation(val))
+      Array.isArray(value) && value.every((val) => Operation.isOperation(val))
     )
   },
 
@@ -304,15 +304,15 @@ export const Operation: OperationInterface = {
             properties: newProperties as Range,
             newProperties: null,
           }
-        } else if (newProperties == null) {
+        }
+        if (newProperties == null) {
           return {
             ...op,
             properties: null,
             newProperties: properties as Range,
           }
-        } else {
-          return { ...op, properties: newProperties, newProperties: properties }
         }
+        return { ...op, properties: newProperties, newProperties: properties }
       }
 
       case 'split_node': {

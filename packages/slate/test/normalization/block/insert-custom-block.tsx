@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import { jsx } from '../..'
+
 import { Editor, Element, Transforms } from 'slate'
 
 export const input = (
@@ -12,7 +12,7 @@ export const input = (
 // this test also verifies the new node itself is also normalized, because it's inserting a non-normalized node
 const editor = input as unknown as Editor
 const defaultNormalize = editor.normalizeNode
-editor.normalizeNode = entry => {
+editor.normalizeNode = (entry) => {
   const [node, path] = entry
   if (
     Element.isElement(node) &&

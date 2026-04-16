@@ -1,7 +1,7 @@
 html,
 input,
 textarea {
-  font-family: 'Roboto', sans-serif;
+  font-family: "Roboto", sans-serif;
   line-height: 1.4;
   background: #eee;
 }
@@ -44,7 +44,7 @@ blockquote {
   font-style: italic;
 }
 
-blockquote[dir='rtl'] {
+blockquote[dir="rtl"] {
   border-left: none;
   padding-left: 0;
   padding-right: 10px;
@@ -60,8 +60,8 @@ td {
   border: 2px solid #ddd;
 }
 
-input[type='text'],
-input[type='search'] {
+input[type="text"],
+input[type="search"] {
   box-sizing: border-box;
   font-size: 0.85em;
   width: 100%;
@@ -70,8 +70,8 @@ input[type='search'] {
   background: #fafafa;
 }
 
-input[type='text']:focus,
-input[type='search']:focus {
+input[type="text"]:focus,
+input[type="search"]:focus {
   outline: 0;
   border-color: blue;
 }

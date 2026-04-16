@@ -12,16 +12,17 @@ import DOMText = globalThis.Text
 import DOMRange = globalThis.Range
 import DOMSelection = globalThis.Selection
 import DOMStaticRange = globalThis.StaticRange
+
 import { DOMEditor } from '../plugin/dom-editor'
 
 export {
-  DOMNode,
   DOMComment,
   DOMElement,
-  DOMText,
+  DOMNode,
   DOMRange,
   DOMSelection,
   DOMStaticRange,
+  DOMText,
 }
 
 declare global {
@@ -268,7 +269,7 @@ export const getClipboardData = (
     const fragment = getSlateFragmentAttribute(dataTransfer)
     if (fragment) {
       const clipboardData = new DataTransfer()
-      dataTransfer.types.forEach(type => {
+      dataTransfer.types.forEach((type) => {
         clipboardData.setData(type, dataTransfer.getData(type))
       })
       clipboardData.setData(`application/${clipboardFormatKey}`, fragment)

@@ -6,7 +6,7 @@ export const input = {
   properties: {},
   newProperties: {},
 }
-export const test = value => {
+export const test = (value) => {
   return Operation.isOperationList(value)
 }
 export const output = false

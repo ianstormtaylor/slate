@@ -1,6 +1,3 @@
-/** @jsx jsx */
-import { jsx } from '../..'
-
 export const input = (
   <editor>
     <element>

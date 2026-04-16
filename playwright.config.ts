@@ -1,5 +1,4 @@
-import { PlaywrightTestConfig } from '@playwright/test'
-import { devices } from '@playwright/test'
+import { devices, type PlaywrightTestConfig } from '@playwright/test'
 import * as os from 'os'
 
 const projects = [
@@ -43,8 +42,8 @@ if (os.type() === 'Darwin') {
 const retries = process.env.PLAYWRIGHT_RETRIES
   ? +process.env.PLAYWRIGHT_RETRIES
   : process.env.CI
-  ? 5
-  : 2
+    ? 5
+    : 2
 
 /**
  * See https://playwright.dev/docs/test-configuration.

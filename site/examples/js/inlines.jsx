@@ -1,11 +1,11 @@
 import { css } from '@emotion/css'
 import { isKeyHotkey } from 'is-hotkey'
 import isUrl from 'is-url'
-import React, { useMemo } from 'react'
+import { useMemo } from 'react'
 import { createEditor, Editor, Node, Range, Transforms } from 'slate'
 import { withHistory } from 'slate-history'
-import { Editable, useSelected, useSlate, withReact } from 'slate-react'
 import * as SlateReact from 'slate-react'
+import { Editable, useSelected, useSlate, withReact } from 'slate-react'
 import { Button, Icon, Toolbar } from './components'
 
 const initialValue = [
@@ -61,7 +61,7 @@ const InlinesExample = () => {
     () => withInlines(withHistory(withReact(createEditor()))),
     []
   )
-  const onKeyDown = event => {
+  const onKeyDown = (event) => {
     const { selection } = editor
     // Default left/right behavior is unit:'character'.
     // This fails to distinguish between two cursor positions, such as
@@ -91,31 +91,31 @@ const InlinesExample = () => {
         <ToggleEditableButtonButton />
       </Toolbar>
       <Editable
-        renderElement={props => <Element {...props} />}
-        renderLeaf={props => <Text {...props} />}
-        placeholder="Enter some text..."
         onKeyDown={onKeyDown}
+        placeholder="Enter some text..."
+        renderElement={(props) => <Element {...props} />}
+        renderLeaf={(props) => <Text {...props} />}
       />
     </SlateReact.Slate>
   )
 }
-const withInlines = editor => {
+const withInlines = (editor) => {
   const { insertData, insertText, isInline, isElementReadOnly, isSelectable } =
     editor
-  editor.isInline = element =>
+  editor.isInline = (element) =>
     ['link', 'button', 'badge'].includes(element.type) || isInline(element)
-  editor.isElementReadOnly = element =>
+  editor.isElementReadOnly = (element) =>
     element.type === 'badge' || isElementReadOnly(element)
-  editor.isSelectable = element =>
+  editor.isSelectable = (element) =>
     element.type !== 'badge' && isSelectable(element)
-  editor.insertText = text => {
+  editor.insertText = (text) => {
     if (text && isUrl(text)) {
       wrapLink(editor, text)
     } else {
       insertText(text)
     }
   }
-  editor.insertData = data => {
+  editor.insertData = (data) => {
     const text = data.getData('text/plain')
     if (text && isUrl(text)) {
       wrapLink(editor, text)
@@ -130,31 +130,31 @@ const insertLink = (editor, url) => {
     wrapLink(editor, url)
   }
 }
-const insertButton = editor => {
+const insertButton = (editor) => {
   if (editor.selection) {
     wrapButton(editor)
   }
 }
-const isLinkActive = editor => {
+const isLinkActive = (editor) => {
   const [link] = Editor.nodes(editor, {
-    match: n => Node.isElement(n) && n.type === 'link',
+    match: (n) => Node.isElement(n) && n.type === 'link',
   })
   return !!link
 }
-const isButtonActive = editor => {
+const isButtonActive = (editor) => {
   const [button] = Editor.nodes(editor, {
-    match: n => Node.isElement(n) && n.type === 'button',
+    match: (n) => Node.isElement(n) && n.type === 'button',
   })
   return !!button
 }
-const unwrapLink = editor => {
+const unwrapLink = (editor) => {
   Transforms.unwrapNodes(editor, {
-    match: n => Node.isElement(n) && n.type === 'link',
+    match: (n) => Node.isElement(n) && n.type === 'link',
   })
 }
-const unwrapButton = editor => {
+const unwrapButton = (editor) => {
   Transforms.unwrapNodes(editor, {
-    match: n => Node.isElement(n) && n.type === 'button',
+    match: (n) => Node.isElement(n) && n.type === 'button',
   })
 }
 const wrapLink = (editor, url) => {
@@ -175,7 +175,7 @@ const wrapLink = (editor, url) => {
     Transforms.collapse(editor, { edge: 'end' })
   }
 }
-const wrapButton = editor => {
+const wrapButton = (editor) => {
   if (isButtonActive(editor)) {
     unwrapButton(editor)
   }
@@ -196,10 +196,10 @@ const wrapButton = editor => {
 // https://bugs.chromium.org/p/chromium/issues/detail?id=1249405
 const InlineChromiumBugfix = () => (
   <span
-    contentEditable={false}
     className={css`
       font-size: 0;
     `}
+    contentEditable={false}
   >
     {String.fromCodePoint(160) /* Non-breaking space */}
   </span>
@@ -221,7 +221,6 @@ const LinkComponent = ({ attributes, children, element }) => {
   return (
     <a
       {...attributes}
-      href={safeUrl}
       className={
         selected
           ? css`
@@ -229,6 +228,7 @@ const LinkComponent = ({ attributes, children, element }) => {
             `
           : ''
       }
+      href={safeUrl}
     >
       <InlineChromiumBugfix />
       {children}
@@ -249,7 +249,6 @@ const EditableButtonComponent = ({ attributes, children }) => {
     */
     <span
       {...attributes}
-      onClick={ev => ev.preventDefault()}
       // Margin is necessary to clearly show the cursor adjacent to the button
       className={css`
         margin: 0 0.1em;
@@ -260,6 +259,7 @@ const EditableButtonComponent = ({ attributes, children }) => {
         border-radius: 2px;
         font-size: 0.9em;
       `}
+      onClick={(ev) => ev.preventDefault()}
     >
       <InlineChromiumBugfix />
       {children}
@@ -272,7 +272,6 @@ const BadgeComponent = ({ attributes, children, element }) => {
   return (
     <span
       {...attributes}
-      contentEditable={false}
       className={css`
         background-color: green;
         color: white;
@@ -281,6 +280,7 @@ const BadgeComponent = ({ attributes, children, element }) => {
         font-size: 0.9em;
         ${selected && 'box-shadow: 0 0 0 3px #ddd;'}
       `}
+      contentEditable={false}
       data-playwright-selected={selected}
     >
       <InlineChromiumBugfix />
@@ -289,7 +289,7 @@ const BadgeComponent = ({ attributes, children, element }) => {
     </span>
   )
 }
-const Element = props => {
+const Element = (props) => {
   const { attributes, children, element } = props
   switch (element.type) {
     case 'link':
@@ -302,7 +302,7 @@ const Element = props => {
       return <p {...attributes}>{children}</p>
   }
 }
-const Text = props => {
+const Text = (props) => {
   const { attributes, children, leaf } = props
   return (
     <span
@@ -329,12 +329,12 @@ const AddLinkButton = () => {
   return (
     <Button
       active={isLinkActive(editor)}
-      onPointerDown={event => event.preventDefault()}
       onClick={() => {
         const url = window.prompt('Enter the URL of the link:')
         if (!url) return
         insertLink(editor, url)
       }}
+      onPointerDown={(event) => event.preventDefault()}
     >
       <Icon>link</Icon>
     </Button>
@@ -345,12 +345,12 @@ const RemoveLinkButton = () => {
   return (
     <Button
       active={isLinkActive(editor)}
-      onPointerDown={event => event.preventDefault()}
       onClick={() => {
         if (isLinkActive(editor)) {
           unwrapLink(editor)
         }
       }}
+      onPointerDown={(event) => event.preventDefault()}
     >
       <Icon>link_off</Icon>
     </Button>
@@ -361,7 +361,6 @@ const ToggleEditableButtonButton = () => {
   return (
     <Button
       active
-      onPointerDown={event => event.preventDefault()}
       onClick={() => {
         if (isButtonActive(editor)) {
           unwrapButton(editor)
@@ -369,6 +368,7 @@ const ToggleEditableButtonButton = () => {
           insertButton(editor)
         }
       }}
+      onPointerDown={(event) => event.preventDefault()}
     >
       <Icon>smart_button</Icon>
     </Button>

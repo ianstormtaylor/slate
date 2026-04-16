@@ -5,7 +5,7 @@ export const input = {
   offset: 0,
 }
 
-export const test = value => {
+export const test = (value) => {
   return Point.transform(
     value,
     {

@@ -48,13 +48,13 @@ Please include tests and docs with every pull request!
 
 ## Repository Setup
 
-The Slate repository is a monorepo that is managed with [lerna](https://github.com/lerna/lerna). Unlike more traditional repositories, this means that the repository must be built in order for tests, linting, or other common development activities to function as expected.
+The Slate repository is a pnpm workspace orchestrated with [Turbo](https://turbo.build/). Unlike more traditional repositories, this means that the repository must be built in order for tests, linting, or other common development activities to function as expected.
 
-To run the build, you need to have the Slate repository cloned to your computer. After that, you need to `cd` into the directory where you cloned it, and install the dependencies with `yarn` and build the monorepo:
+To run the build, you need to have the Slate repository cloned to your computer. After that, you need to `cd` into the directory where you cloned it, and install the dependencies with `pnpm` and build the monorepo:
 
 ```text
-yarn install
-yarn build
+pnpm install
+pnpm build
 ```
 
 ## Running Examples
@@ -64,40 +64,47 @@ To run the examples, start by building the monorepo as described in the [Reposit
 Then you can start the examples server with:
 
 ```text
-yarn start
+pnpm dev
 ```
 
 ## Running Tests
 
 To run the tests, start by building the monorepo as described in the [Repository Setup](contributing.md#repository-setup) section.
 
-Then you can rerun the tests with:
+The canonical repository gate is:
 
 ```text
-yarn test
+pnpm check
 ```
 
-If you need to debug something, you can add a `debugger` line to the source, and then run `yarn test:inspect`.
-
-If you only want to run a specific test or tests, you can run `yarn run test:mocha --fgrep="slate-react rendering"` flag which will filter the tests being run by grepping for the string in each test. \(This is a Mocha flag that gets passed through.\)
-
-In addition to tests you should also run the linter:
+It runs the full local gate: lint, typecheck, tests, and integration coverage.
+Package typechecking pulls the package build prerequisites through Turbo
+instead of front-loading a full root build. For purely mechanical formatting
+fixes, run:
 
 ```text
-yarn lint
+pnpm lint:fix
 ```
 
-This will catch TypeScript, Prettier, and Eslint errors.
+If you only want to rerun the tests, use:
 
 ```text
-yarn fix
+pnpm test
 ```
 
-This will fix Prettier and Eslint errors.
+If you need to debug something, you can add a `debugger` line to the source, and then run `pnpm test:inspect`.
+
+If you only want to run a specific test or tests, you can run `pnpm run test:mocha --fgrep="slate-react rendering"` flag which will filter the tests being run by grepping for the string in each test. \(This is a Mocha flag that gets passed through.\)
+
+If you only want the lint gate, use:
+
+```text
+pnpm lint
+```
 
 ## Running integration tests
 
-To run integrations with [Playwright](https://playwright.dev/), first run `yarn start` to run the examples website, then run `yarn playwright` in a separate session to open the Playwright test suite. Or alternatively, run just `yarn test:integration-local`.
+To run integrations with [Playwright](https://playwright.dev/), first run `pnpm dev` to run the examples website, then run `pnpm playwright` in a separate session to open the Playwright test suite. Or alternatively, run just `pnpm test:integration-local`.
 
 ### Running integration tests in Docker
 
@@ -106,7 +113,7 @@ If tests fail on CI but pass locally (often due to OS differences), you can run 
 **Prerequisites:** The project must be built first (same as running tests locally).
 
 ```text
-yarn test:integration-docker
+pnpm test:integration-docker
 ```
 
 The script will automatically:
@@ -118,19 +125,19 @@ The script will automatically:
 You can also pass additional arguments to the test runner. For example, to run a specific test file:
 
 ```text
-yarn test:integration-docker playwright/integration/slate-react/selection.test.ts
+pnpm test:integration-docker playwright/integration/slate-react/selection.test.ts
 ```
 
 Or run a specific browser project:
 
 ```text
-yarn test:integration-docker --project=chromium
+pnpm test:integration-docker --project=chromium
 ```
 
 You can combine arguments as well:
 
 ```text
-yarn test:integration-docker playwright/integration/examples/check-lists.test.ts --project chromium
+pnpm test:integration-docker playwright/integration/examples/richtext.test.ts --project chromium
 ```
 
 ## Testing Input Methods
@@ -139,40 +146,37 @@ yarn test:integration-docker playwright/integration/examples/check-lists.test.ts
 
 ## Android tests
 
-When making changes that might affect Android compatibility, you can perform the manual Android tests at [/examples/android-tests](https://slatejs.org/examples/android-tests).
+When making changes that affect Android or IME behavior, test against
+`/examples/android-tests`.
+
+That page links to the `placeholder`, `inline-edge`, and `void-edge` examples.
 
 ## Publishing Releases
 
-**Important**: When creating releases using Lerna with the instructions below, you will be given choices around how to increase version numbers. You should always use a `major`, `minor` or `patch` release and must never use a `prerelease`. If a prerelease is used, the root package will not link to the packages in the `packages` directory creating hard to diagnose issues.
-
 ### Publishing Normal `@latest` Release
 
-Since we use [Lerna](https://lerna.js.org) to manage the Slate packages this is fairly easy, just run:
+Slate uses Changesets for publishing, so run:
 
 ```text
-yarn release:latest
+pnpm release:latest
 ```
 
-And follow the prompts Lerna gives you.
-
-Note that this will automatically run the prelease script first that will build, test and lint before attempting to publish.
+This automatically runs the prerelease script first so the build, test, and lint gate is green before publishing.
 
 ### Publishing `@next` Release
 
 If we are unsure as to the stability of a release because there are significant changes and/or particularly complex changes, release with the `@next` tag.
 
 ```text
-yarn release:next
+pnpm release:next
 ```
-
-And follow the prompts Lerna gives you.
 
 ### Publishing `@experimental` Release
 
 If you need to create an experimental release to see how a published package will behave during an actual publish, release with the `@experimental` tag. End users should have no expectation that an `@experimental` release will be usable.
 
 ```text
-yarn release:experimental
+pnpm release:experimental
 ```
 
 ### Running Prerelease Script
@@ -180,7 +184,7 @@ yarn release:experimental
 If we want to make sure that Slate code follows the preparations for a release but without actually publishing, run:
 
 ```text
-yarn prerelease
+pnpm prerelease
 ```
 
 Which will build, test and lint Slate code.

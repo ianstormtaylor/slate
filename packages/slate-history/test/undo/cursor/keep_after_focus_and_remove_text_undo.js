@@ -1,10 +1,8 @@
 /** @jsx jsx */
 
-import assert from 'assert'
-import { Transforms, Editor } from 'slate'
-import { jsx } from '../..'
+import { Editor, Transforms } from 'slate'
 
-export const run = editor => {
+export const run = (editor) => {
   // focus at the end
   Transforms.select(editor, {
     anchor: { path: [0, 0], offset: 5 },

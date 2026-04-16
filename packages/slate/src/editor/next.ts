@@ -1,5 +1,5 @@
-import { Editor, EditorInterface } from '../interfaces/editor'
-import { Location, Span } from '../interfaces/location'
+import { Editor, type EditorInterface } from '../interfaces/editor'
+import { Location, type Span } from '../interfaces/location'
 
 export const next: EditorInterface['next'] = (editor, options = {}) => {
   const { mode = 'lowest', voids = false } = options
@@ -18,13 +18,13 @@ export const next: EditorInterface['next'] = (editor, options = {}) => {
   const span: Span = [pointAfterLocation.path, to]
 
   if (Location.isPath(at) && at.length === 0) {
-    throw new Error(`Cannot get the next node from the root node!`)
+    throw new Error('Cannot get the next node from the root node!')
   }
 
   if (match == null) {
     if (Location.isPath(at)) {
       const [parent] = Editor.parent(editor, at)
-      match = n => parent.children.includes(n)
+      match = (n) => parent.children.includes(n)
     } else {
       match = () => true
     }

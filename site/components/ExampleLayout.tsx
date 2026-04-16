@@ -1,7 +1,7 @@
-import React, { useState, ErrorInfo } from 'react'
 import Link from 'next/link'
-import { Icon } from '../examples/ts/components/index'
+import React, { type ErrorInfo, useState } from 'react'
 import { NON_HIDDEN_EXAMPLES } from '../constants/examples'
+import { Icon } from '../examples/ts/components/index'
 
 const Header = (props: React.HTMLAttributes<HTMLDivElement>) => (
   <div {...props} className="example-header" />
@@ -28,9 +28,9 @@ const TabList = ({
   ...props
 }: React.HTMLAttributes<HTMLDivElement> & { isVisible?: boolean }) => (
   <div
-    role="menu"
-    aria-label="Examples navigation"
     aria-hidden={!isVisible}
+    aria-label="Examples navigation"
+    role="menu"
     {...props}
     className={`example-tab-list ${isVisible ? 'visible' : 'hidden'}`}
   />
@@ -49,8 +49,8 @@ const TabListUnderlay = ({
 const TabButton = (props: React.HTMLAttributes<HTMLSpanElement>) => (
   <button
     {...props}
-    aria-label="Toggle examples menu"
     aria-haspopup="menu"
+    aria-label="Toggle examples menu"
     className="example-tab-button"
   />
 )
@@ -67,10 +67,10 @@ const Tab = React.forwardRef(
     ref: React.Ref<HTMLAnchorElement>
   ) => (
     <a
-      ref={ref}
-      href={href}
-      role="menuitem"
       aria-current={active ? 'page' : undefined}
+      href={href}
+      ref={ref}
+      role="menuitem"
       {...props}
       className={`example-tab ${active ? 'active' : ''}`}
     />
@@ -123,7 +123,8 @@ export function ExampleLayout({
       {exampleName && examplePath && (
         <ExampleHeader>
           <TabButton
-            onClick={e => {
+            aria-expanded={showTabs}
+            onClick={(e) => {
               e.stopPropagation()
               setShowTabs(!showTabs)
             }}
@@ -132,7 +133,6 @@ export function ExampleLayout({
                 setShowTabs(false)
               }
             }}
-            aria-expanded={showTabs}
           >
             <Icon>menu</Icon>
           </TabButton>
@@ -155,15 +155,15 @@ export function ExampleLayout({
       <TabList isVisible={showTabs}>
         {NON_HIDDEN_EXAMPLES.map(([n, p]) => (
           <Link
-            key={p as string}
-            href="/examples/[example]"
             as={`/examples/${p}`}
+            href="/examples/[example]"
+            key={p as string}
             legacyBehavior
             passHref
           >
             <Tab
-              onClick={() => setShowTabs(false)}
               active={p === examplePath}
+              onClick={() => setShowTabs(false)}
               onKeyDown={(e: React.KeyboardEvent) => {
                 if (e.key === 'Escape') {
                   setShowTabs(false)

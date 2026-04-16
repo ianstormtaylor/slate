@@ -1,4 +1,4 @@
-import { EditorInterface } from '../interfaces/editor'
+import type { EditorInterface } from '../interfaces/editor'
 import { Node } from '../interfaces/node'
 
 export const isEmpty: EditorInterface['isEmpty'] = (editor, element) => {

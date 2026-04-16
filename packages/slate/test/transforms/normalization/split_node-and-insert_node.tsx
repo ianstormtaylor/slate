@@ -1,6 +1,5 @@
 /** @jsx jsx */
-import { Editor, Transforms } from 'slate'
-import { jsx } from '../..'
+import { Editor } from 'slate'
 
 export const input = (
   <editor>
@@ -16,7 +15,7 @@ export const input = (
     </block>
   </editor>
 )
-export const run = editor => {
+export const run = (editor) => {
   Editor.withoutNormalizing(editor, () => {
     const operations = [
       {

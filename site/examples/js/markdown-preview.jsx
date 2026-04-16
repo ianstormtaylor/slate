@@ -1,27 +1,27 @@
 import { css } from '@emotion/css'
 import Prism from 'prismjs'
 import 'prismjs/components/prism-markdown'
-import React, { useCallback, useMemo } from 'react'
-import { Node, createEditor } from 'slate'
+import { useCallback, useMemo } from 'react'
+import { createEditor, Node } from 'slate'
 import { withHistory } from 'slate-history'
 import { Editable, Slate, withReact } from 'slate-react'
 
 const MarkdownPreviewExample = () => {
-  const renderLeaf = useCallback(props => <Leaf {...props} />, [])
+  const renderLeaf = useCallback((props) => <Leaf {...props} />, [])
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
   const decorate = useCallback(([node, path]) => {
     const ranges = []
     if (!Node.isText(node)) {
       return ranges
     }
-    const getLength = token => {
+    const getLength = (token) => {
       if (typeof token === 'string') {
         return token.length
-      } else if (typeof token.content === 'string') {
-        return token.content.length
-      } else {
-        return token.content.reduce((l, t) => l + getLength(t), 0)
       }
+      if (typeof token.content === 'string') {
+        return token.content.length
+      }
+      return token.content.reduce((l, t) => l + getLength(t), 0)
     }
     const tokens = Prism.tokenize(node.text, Prism.languages.markdown)
     let start = 0
@@ -43,8 +43,8 @@ const MarkdownPreviewExample = () => {
     <Slate editor={editor} initialValue={initialValue}>
       <Editable
         decorate={decorate}
-        renderLeaf={renderLeaf}
         placeholder="Write some markdown..."
+        renderLeaf={renderLeaf}
       />
     </Slate>
   )
@@ -57,39 +57,49 @@ const Leaf = ({ attributes, children, leaf }) => {
         font-weight: ${leaf.bold && 'bold'};
         font-style: ${leaf.italic && 'italic'};
         text-decoration: ${leaf.underlined && 'underline'};
-        ${leaf.title &&
-        css`
+        ${
+          leaf.title &&
+          css`
           display: inline-block;
           font-weight: bold;
           font-size: 20px;
           margin: 20px 0 10px 0;
-        `}
-        ${leaf.list &&
-        css`
+        `
+        }
+        ${
+          leaf.list &&
+          css`
           padding-left: 10px;
           font-size: 20px;
           line-height: 10px;
-        `}
-        ${leaf.hr &&
-        css`
+        `
+        }
+        ${
+          leaf.hr &&
+          css`
           display: block;
           text-align: center;
           border-bottom: 2px solid #ddd;
-        `}
-        ${leaf.blockquote &&
-        css`
+        `
+        }
+        ${
+          leaf.blockquote &&
+          css`
           display: inline-block;
           border-left: 2px solid #ddd;
           padding-left: 10px;
           color: #aaa;
           font-style: italic;
-        `}
-        ${leaf.code &&
-        css`
+        `
+        }
+        ${
+          leaf.code &&
+          css`
           font-family: monospace;
           background-color: #eee;
           padding: 3px;
-        `}
+        `
+        }
       `}
     >
       {children}

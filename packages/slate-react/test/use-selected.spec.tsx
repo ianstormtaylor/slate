@@ -1,20 +1,19 @@
-import React from 'react'
+import { act, render } from '@testing-library/react'
 import { createEditor, Transforms } from 'slate'
-import { render, act } from '@testing-library/react'
 import {
-  Slate,
-  withReact,
   Editable,
-  useSelected,
-  RenderElementProps,
   ReactEditor,
+  RenderElementProps,
+  Slate,
+  useSelected,
+  withReact,
 } from '../src'
 
 let editor: ReactEditor
 let elementSelectedRenders: Record<string, boolean[] | undefined>
 
 const clearRenders = () =>
-  Object.values(elementSelectedRenders).forEach(selectedRenders => {
+  Object.values(elementSelectedRenders).forEach((selectedRenders) => {
     if (selectedRenders) {
       selectedRenders.length = 0
     }

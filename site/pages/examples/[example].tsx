@@ -1,14 +1,13 @@
-import React from 'react'
-import Head from 'next/head'
 import dynamic from 'next/dynamic'
-
-// node
-import { getAllExamples } from '../api'
+import Head from 'next/head'
+import type React from 'react'
 import {
   ComponentLoader,
   HugeDocumentLoader,
 } from '../../components/ComponentLoader'
 import { EXAMPLE_NAMES_AND_PATHS } from '../../constants/examples'
+// node
+import { getAllExamples } from '../api'
 
 type ExampleTuple = [name: string, component: React.ComponentType, path: string]
 
@@ -25,14 +24,14 @@ const EXAMPLES: ExampleTuple[] = EXAMPLE_NAMES_AND_PATHS.map(([name, path]) => [
 ])
 
 const ExamplePage = ({ example }: { example: string }) => {
-  const EXAMPLE = EXAMPLES.find(e => e[2] === example)
+  const EXAMPLE = EXAMPLES.find((e) => e[2] === example)
   const [name, Component, path] = EXAMPLE!
 
   return (
     <>
       <Head>
         <title>Slate Examples - {name}</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta content="width=device-width, initial-scale=1" name="viewport" />
       </Head>
       <Component />
     </>
@@ -49,7 +48,7 @@ export async function getStaticPaths() {
   const paths = getAllExamples()
 
   return {
-    paths: paths.map(path => ({
+    paths: paths.map((path) => ({
       params: {
         example: path,
       },
@@ -63,7 +62,7 @@ export async function getStaticProps({
 }: {
   params: { example: string }
 }) {
-  const EXAMPLE = EXAMPLES.find(e => e[2] === params.example)
+  const EXAMPLE = EXAMPLES.find((e) => e[2] === params.example)
   const [name, , path] = EXAMPLE || [params.example, null, params.example]
   return {
     props: {

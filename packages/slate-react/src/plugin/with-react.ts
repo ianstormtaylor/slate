@@ -1,9 +1,9 @@
 import ReactDOM from 'react-dom'
-import { BaseEditor, Node } from 'slate'
-import { withDOM, IS_ANDROID, EDITOR_TO_PENDING_SELECTION } from 'slate-dom'
-import { ReactEditor } from './react-editor'
-import { REACT_MAJOR_VERSION } from '../utils/environment'
+import { type BaseEditor, Node } from 'slate'
+import { EDITOR_TO_PENDING_SELECTION, IS_ANDROID, withDOM } from 'slate-dom'
 import { getChunkTreeForNode } from '../chunking'
+import { REACT_MAJOR_VERSION } from '../utils/environment'
+import { ReactEditor } from './react-editor'
 
 /**
  * `withReact` adds React and DOM specific behaviors to the editor.
@@ -39,7 +39,7 @@ export const withReact = <T extends BaseEditor>(
     }
   }
 
-  e.onChange = options => {
+  e.onChange = (options) => {
     // COMPAT: React < 18 doesn't batch `setState` hook calls, which means
     // that the children and selection can get out of sync for one render
     // pass. So we have to use this unstable API to ensure it batches them.
@@ -58,7 +58,7 @@ export const withReact = <T extends BaseEditor>(
   // On move_node, if the chunking optimization is enabled for the parent of the
   // node being moved, add the moved node to the movedNodeKeys set of the
   // parent's chunk tree.
-  e.apply = operation => {
+  e.apply = (operation) => {
     if (operation.type === 'move_node') {
       const parent = Node.parent(e, operation.path)
       const chunking = !!e.getChunkSize(parent)

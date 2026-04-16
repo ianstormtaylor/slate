@@ -1,29 +1,29 @@
 import { css } from '@emotion/css'
 import { isKeyHotkey } from 'is-hotkey'
 import isUrl from 'is-url'
-import React, { PointerEvent, useMemo } from 'react'
+import type React from 'react'
+import { type PointerEvent, useMemo } from 'react'
 import {
   createEditor,
-  Descendant,
+  type Descendant,
   Editor,
   Node,
   Range,
   Transforms,
 } from 'slate'
 import { withHistory } from 'slate-history'
+import * as SlateReact from 'slate-react'
 import {
   Editable,
-  RenderElementProps,
-  RenderLeafProps,
+  type RenderElementProps,
+  type RenderLeafProps,
   useSelected,
   useSlate,
   withReact,
 } from 'slate-react'
-import * as SlateReact from 'slate-react'
 
 import { Button, Icon, Toolbar } from './components'
-import {
-  BadgeElement,
+import type {
   ButtonElement,
   CustomEditor,
   CustomElement,
@@ -85,7 +85,7 @@ const InlinesExample = () => {
     []
   )
 
-  const onKeyDown: React.KeyboardEventHandler<HTMLInputElement> = event => {
+  const onKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (event) => {
     const { selection } = editor
 
     // Default left/right behavior is unit:'character'.
@@ -117,10 +117,10 @@ const InlinesExample = () => {
         <ToggleEditableButtonButton />
       </Toolbar>
       <Editable
-        renderElement={props => <Element {...props} />}
-        renderLeaf={props => <Text {...props} />}
-        placeholder="Enter some text..."
         onKeyDown={onKeyDown}
+        placeholder="Enter some text..."
+        renderElement={(props) => <Element {...props} />}
+        renderLeaf={(props) => <Text {...props} />}
       />
     </SlateReact.Slate>
   )
@@ -139,7 +139,7 @@ const withInlines = (editor: CustomEditor) => {
   editor.isSelectable = (element: CustomElement) =>
     element.type !== 'badge' && isSelectable(element)
 
-  editor.insertText = text => {
+  editor.insertText = (text) => {
     if (text && isUrl(text)) {
       wrapLink(editor, text)
     } else {
@@ -147,7 +147,7 @@ const withInlines = (editor: CustomEditor) => {
     }
   }
 
-  editor.insertData = data => {
+  editor.insertData = (data) => {
     const text = data.getData('text/plain')
 
     if (text && isUrl(text)) {
@@ -174,27 +174,27 @@ const insertButton = (editor: CustomEditor) => {
 
 const isLinkActive = (editor: CustomEditor): boolean => {
   const [link] = Editor.nodes(editor, {
-    match: n => Node.isElement(n) && n.type === 'link',
+    match: (n) => Node.isElement(n) && n.type === 'link',
   })
   return !!link
 }
 
 const isButtonActive = (editor: CustomEditor): boolean => {
   const [button] = Editor.nodes(editor, {
-    match: n => Node.isElement(n) && n.type === 'button',
+    match: (n) => Node.isElement(n) && n.type === 'button',
   })
   return !!button
 }
 
 const unwrapLink = (editor: CustomEditor) => {
   Transforms.unwrapNodes(editor, {
-    match: n => Node.isElement(n) && n.type === 'link',
+    match: (n) => Node.isElement(n) && n.type === 'link',
   })
 }
 
 const unwrapButton = (editor: CustomEditor) => {
   Transforms.unwrapNodes(editor, {
-    match: n => Node.isElement(n) && n.type === 'button',
+    match: (n) => Node.isElement(n) && n.type === 'button',
   })
 }
 
@@ -243,10 +243,10 @@ const wrapButton = (editor: CustomEditor) => {
 // https://bugs.chromium.org/p/chromium/issues/detail?id=1249405
 const InlineChromiumBugfix = () => (
   <span
-    contentEditable={false}
     className={css`
       font-size: 0;
     `}
+    contentEditable={false}
   >
     {String.fromCodePoint(160) /* Non-breaking space */}
   </span>
@@ -275,7 +275,6 @@ const LinkComponent = ({
   return (
     <a
       {...attributes}
-      href={safeUrl}
       className={
         selected
           ? css`
@@ -283,6 +282,7 @@ const LinkComponent = ({
             `
           : ''
       }
+      href={safeUrl}
     >
       <InlineChromiumBugfix />
       {children}
@@ -307,7 +307,6 @@ const EditableButtonComponent = ({
     */
     <span
       {...attributes}
-      onClick={ev => ev.preventDefault()}
       // Margin is necessary to clearly show the cursor adjacent to the button
       className={css`
         margin: 0 0.1em;
@@ -318,6 +317,7 @@ const EditableButtonComponent = ({
         border-radius: 2px;
         font-size: 0.9em;
       `}
+      onClick={(ev) => ev.preventDefault()}
     >
       <InlineChromiumBugfix />
       {children}
@@ -336,7 +336,6 @@ const BadgeComponent = ({
   return (
     <span
       {...attributes}
-      contentEditable={false}
       className={css`
         background-color: green;
         color: white;
@@ -345,6 +344,7 @@ const BadgeComponent = ({
         font-size: 0.9em;
         ${selected && 'box-shadow: 0 0 0 3px #ddd;'}
       `}
+      contentEditable={false}
       data-playwright-selected={selected}
     >
       <InlineChromiumBugfix />
@@ -396,14 +396,14 @@ const AddLinkButton = () => {
   return (
     <Button
       active={isLinkActive(editor)}
-      onPointerDown={(event: PointerEvent<HTMLButtonElement>) =>
-        event.preventDefault()
-      }
       onClick={() => {
         const url = window.prompt('Enter the URL of the link:')
         if (!url) return
         insertLink(editor, url)
       }}
+      onPointerDown={(event: PointerEvent<HTMLButtonElement>) =>
+        event.preventDefault()
+      }
     >
       <Icon>link</Icon>
     </Button>
@@ -416,14 +416,14 @@ const RemoveLinkButton = () => {
   return (
     <Button
       active={isLinkActive(editor)}
-      onPointerDown={(event: PointerEvent<HTMLButtonElement>) =>
-        event.preventDefault()
-      }
       onClick={() => {
         if (isLinkActive(editor)) {
           unwrapLink(editor)
         }
       }}
+      onPointerDown={(event: PointerEvent<HTMLButtonElement>) =>
+        event.preventDefault()
+      }
     >
       <Icon>link_off</Icon>
     </Button>
@@ -435,9 +435,6 @@ const ToggleEditableButtonButton = () => {
   return (
     <Button
       active
-      onPointerDown={(event: PointerEvent<HTMLButtonElement>) =>
-        event.preventDefault()
-      }
       onClick={() => {
         if (isButtonActive(editor)) {
           unwrapButton(editor)
@@ -445,6 +442,9 @@ const ToggleEditableButtonButton = () => {
           insertButton(editor)
         }
       }}
+      onPointerDown={(event: PointerEvent<HTMLButtonElement>) =>
+        event.preventDefault()
+      }
     >
       <Icon>smart_button</Icon>
     </Button>

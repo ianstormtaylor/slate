@@ -1,11 +1,11 @@
 import { Path } from 'slate'
 import { Key } from 'slate-dom'
-import {
+import type {
   Chunk,
-  ChunkTree,
-  ChunkLeaf,
-  ChunkDescendant,
   ChunkAncestor,
+  ChunkDescendant,
+  ChunkLeaf,
+  ChunkTree,
 } from './types'
 
 type SavedPointer =
@@ -109,12 +109,12 @@ export class ChunkTreeHelper {
         this.pointerIndex++
         this.cachedPointerNode = undefined
         break
-      } else if (this.pointerChunk.type === 'root') {
+      }
+      if (this.pointerChunk.type === 'root') {
         this.reachedEnd = true
         return null
-      } else {
-        this.exitChunk()
       }
+      this.exitChunk()
     }
 
     this.validateState()
@@ -143,12 +143,12 @@ export class ChunkTreeHelper {
         this.pointerIndex--
         this.cachedPointerNode = undefined
         break
-      } else if (this.pointerChunk.type === 'root') {
+      }
+      if (this.pointerChunk.type === 'root') {
         this.pointerIndex = -1
         return
-      } else {
-        this.exitChunk()
       }
+      this.exitChunk()
     }
 
     this.validateState()
@@ -513,7 +513,7 @@ export class ChunkTreeHelper {
 
     // A depth of 0 means no chunking
     const depth = Math.max(depthForTotal, minDepth)
-    const perTopLevelChunk = Math.pow(this.chunkSize, depth)
+    const perTopLevelChunk = this.chunkSize ** depth
 
     const chunks = groupIntoChunks(leaves, this.pointerChunk, perTopLevelChunk)
     this.pointerSiblings.splice(this.pointerIndex + 1, 0, ...chunks)

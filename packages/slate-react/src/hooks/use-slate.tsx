@@ -1,8 +1,8 @@
-import { MutableRefObject, useContext, useMemo, useReducer } from 'react'
-import { Editor } from 'slate'
+import { type MutableRefObject, useContext, useMemo, useReducer } from 'react'
+import type { Editor } from 'slate'
+import { useIsomorphicLayoutEffect } from './use-isomorphic-layout-effect'
 import { SlateSelectorContext } from './use-slate-selector'
 import { useSlateStatic } from './use-slate-static'
-import { useIsomorphicLayoutEffect } from './use-isomorphic-layout-effect'
 
 /**
  * Get the current editor object and re-render whenever it changes.
@@ -10,7 +10,7 @@ import { useIsomorphicLayoutEffect } from './use-isomorphic-layout-effect'
 
 export const useSlate = (): Editor => {
   const { addEventListener } = useContext(SlateSelectorContext)
-  const [, forceRender] = useReducer(s => s + 1, 0)
+  const [, forceRender] = useReducer((s) => s + 1, 0)
 
   if (!addEventListener) {
     throw new Error(
@@ -41,7 +41,7 @@ const getEditorVersionRef = (editor: Editor): MutableRefObject<number> => {
   // Register the `onChange` handler exactly once per editor
   const { onChange } = editor
 
-  editor.onChange = options => {
+  editor.onChange = (options) => {
     v!.current++
     onChange(options)
   }

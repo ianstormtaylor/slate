@@ -1,8 +1,7 @@
 /** @jsx jsx */
-import { Transforms, Text } from 'slate'
-import { jsx } from '../../..'
+import { Text, Transforms } from 'slate'
 
-export const run = editor => {
+export const run = (editor) => {
   Transforms.setNodes(editor, { someKey: true }, { match: Text.isText })
 }
 export const input = (

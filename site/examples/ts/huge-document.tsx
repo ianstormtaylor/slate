@@ -1,23 +1,27 @@
 import { faker } from '@faker-js/faker'
 import React, {
-  CSSProperties,
-  Dispatch,
+  type CSSProperties,
+  type Dispatch,
   StrictMode,
   useCallback,
   useEffect,
   useState,
 } from 'react'
-import { createEditor as slateCreateEditor, Descendant, Editor } from 'slate'
+import {
+  type Descendant,
+  type Editor,
+  createEditor as slateCreateEditor,
+} from 'slate'
 import {
   Editable,
-  RenderElementProps,
-  RenderChunkProps,
+  type RenderChunkProps,
+  type RenderElementProps,
   Slate,
-  withReact,
   useSelected,
+  withReact,
 } from 'slate-react'
 
-import { HeadingElement, ParagraphElement } from './custom-types.d'
+import type { HeadingElement, ParagraphElement } from './custom-types.d'
 
 const SUPPORTS_EVENT_TIMING =
   typeof window !== 'undefined' && 'PerformanceEventTiming' in window
@@ -38,8 +42,8 @@ interface Config {
 }
 
 const blocksOptions = [
-  2, 1000, 2500, 5000, 7500, 10000, 15000, 20000, 25000, 30000, 40000, 50000,
-  100000, 200000,
+  2, 1000, 2500, 5000, 7500, 10_000, 15_000, 20_000, 25_000, 30_000, 40_000,
+  50_000, 100_000, 200_000,
 ]
 
 const chunkSizeOptions = [3, 10, 100, 1000]
@@ -50,7 +54,7 @@ const searchParams =
     : new URLSearchParams(document.location.search)
 
 const parseNumber = (key: string, defaultValue: number) =>
-  parseInt(searchParams?.get(key) ?? '', 10) || defaultValue
+  Number.parseInt(searchParams?.get(key) ?? '', 10) || defaultValue
 
 const parseBoolean = (key: string, defaultValue: boolean) => {
   const value = searchParams?.get(key)
@@ -69,7 +73,7 @@ const parseEnum = <T extends string>(
 }
 
 const initialConfig: Config = {
-  blocks: parseNumber('blocks', 10000),
+  blocks: parseNumber('blocks', 10_000),
   chunking: parseBoolean('chunking', true),
   chunkSize: parseNumber('chunk_size', 1000),
   chunkDivs: parseBoolean('chunk_divs', true),
@@ -134,7 +138,7 @@ const initialInitialValue =
 const createEditor = (config: Config) => {
   const editor = withReact(slateCreateEditor())
 
-  editor.getChunkSize = node =>
+  editor.getChunkSize = (node) =>
     config.chunking && node === editor ? config.chunkSize : null
 
   return editor
@@ -159,7 +163,7 @@ const HugeDocumentExample = () => {
         setRendering(false)
         setInitialValue(getInitialValue(newConfig.blocks))
         setEditor(createEditor(newConfig))
-        setEditorVersion(n => n + 1)
+        setEditorVersion((n) => n + 1)
       })
     },
     [config]
@@ -190,13 +194,13 @@ const HugeDocumentExample = () => {
   const editable = rendering ? (
     <div>Rendering&hellip;</div>
   ) : (
-    <Slate key={editorVersion} editor={editor} initialValue={initialValue}>
+    <Slate editor={editor} initialValue={initialValue} key={editorVersion}>
       <Editable
-        placeholder="Enter some text…"
-        renderElement={renderElement}
-        renderChunk={config.chunkDivs ? renderChunk : undefined}
-        spellCheck
         autoFocus
+        placeholder="Enter some text…"
+        renderChunk={config.chunkDivs ? renderChunk : undefined}
+        renderElement={renderElement}
+        spellCheck
       />
     </Slate>
   )
@@ -210,8 +214,8 @@ const HugeDocumentExample = () => {
   return (
     <>
       <PerformanceControls
-        editor={editor}
         config={config}
+        editor={editor}
         setConfig={setConfig}
       />
 
@@ -276,8 +280,8 @@ const Element = ({
       return (
         <Heading
           {...attributes}
-          style={style}
           showSelectedHeadings={showSelectedHeadings}
+          style={style}
         >
           {children}
         </Heading>
@@ -315,14 +319,14 @@ const PerformanceControls = ({
   useEffect(() => {
     if (!SUPPORTS_EVENT_TIMING) return
 
-    const observer = new PerformanceObserver(list => {
-      list.getEntries().forEach(entry => {
+    const observer = new PerformanceObserver((list) => {
+      list.getEntries().forEach((entry) => {
         if (entry.name === 'keypress') {
           const duration = Math.round(
-            // @ts-ignore Entry type is missing processingStart and processingEnd
+            // @ts-expect-error Entry type is missing processingStart and processingEnd
             entry.processingEnd - entry.processingStart
           )
-          setKeyPressDurations(durations => [
+          setKeyPressDurations((durations) => [
             duration,
             ...durations.slice(0, 9),
           ])
@@ -330,7 +334,7 @@ const PerformanceControls = ({
       })
     })
 
-    // @ts-ignore Options type is missing durationThreshold
+    // @ts-expect-error Options type is missing durationThreshold
     observer.observe({ type: 'event', durationThreshold: 16 })
 
     return () => observer.disconnect()
@@ -342,13 +346,13 @@ const PerformanceControls = ({
     const { apply } = editor
     let afterOperation = false
 
-    editor.apply = operation => {
+    editor.apply = (operation) => {
       apply(operation)
       afterOperation = true
     }
 
-    const observer = new PerformanceObserver(list => {
-      list.getEntries().forEach(entry => {
+    const observer = new PerformanceObserver((list) => {
+      list.getEntries().forEach((entry) => {
         if (afterOperation) {
           setLastLongAnimationFrameDuration(Math.round(entry.duration))
           afterOperation = false
@@ -368,14 +372,14 @@ const PerformanceControls = ({
         <label>
           Blocks:{' '}
           <select
-            value={config.blocks}
-            onChange={event =>
+            onChange={(event) =>
               setConfig({
-                blocks: parseInt(event.target.value, 10),
+                blocks: Number.parseInt(event.target.value, 10),
               })
             }
+            value={config.blocks}
           >
-            {blocksOptions.map(blocks => (
+            {blocksOptions.map((blocks) => (
               <option key={blocks} value={blocks}>
                 {blocks.toString().replace(/(\d{3})$/, ',$1')}
               </option>
@@ -385,21 +389,21 @@ const PerformanceControls = ({
       </p>
 
       <details
+        onToggle={(event) => setConfigurationOpen(event.currentTarget.open)}
         open={configurationOpen}
-        onToggle={event => setConfigurationOpen(event.currentTarget.open)}
       >
         <summary>Configuration</summary>
 
         <p>
           <label>
             <input
-              type="checkbox"
               checked={config.chunking}
-              onChange={event =>
+              onChange={(event) =>
                 setConfig({
                   chunking: event.target.checked,
                 })
               }
+              type="checkbox"
             />{' '}
             Chunking enabled
           </label>
@@ -410,13 +414,13 @@ const PerformanceControls = ({
             <p>
               <label>
                 <input
-                  type="checkbox"
                   checked={config.chunkDivs}
-                  onChange={event =>
+                  onChange={(event) =>
                     setConfig({
                       chunkDivs: event.target.checked,
                     })
                   }
+                  type="checkbox"
                 />{' '}
                 Render each chunk as a separate <code>&lt;div&gt;</code>
               </label>
@@ -426,13 +430,13 @@ const PerformanceControls = ({
               <p>
                 <label>
                   <input
-                    type="checkbox"
                     checked={config.chunkOutlines}
-                    onChange={event =>
+                    onChange={(event) =>
                       setConfig({
                         chunkOutlines: event.target.checked,
                       })
                     }
+                    type="checkbox"
                   />{' '}
                   Outline each chunk
                 </label>
@@ -443,14 +447,14 @@ const PerformanceControls = ({
               <label>
                 Chunk size:{' '}
                 <select
-                  value={config.chunkSize}
-                  onChange={event =>
+                  onChange={(event) =>
                     setConfig({
-                      chunkSize: parseInt(event.target.value, 10),
+                      chunkSize: Number.parseInt(event.target.value, 10),
                     })
                   }
+                  value={config.chunkSize}
                 >
-                  {chunkSizeOptions.map(chunkSize => (
+                  {chunkSizeOptions.map((chunkSize) => (
                     <option key={chunkSize} value={chunkSize}>
                       {chunkSize}
                     </option>
@@ -465,12 +469,12 @@ const PerformanceControls = ({
           <label>
             Set <code>content-visibility: auto</code> on:{' '}
             <select
-              value={config.contentVisibilityMode}
-              onChange={event =>
+              onChange={(event) =>
                 setConfig({
                   contentVisibilityMode: event.target.value as any,
                 })
               }
+              value={config.contentVisibilityMode}
             >
               <option value="none">None</option>
               <option value="element">Elements</option>
@@ -484,13 +488,13 @@ const PerformanceControls = ({
         <p>
           <label>
             <input
-              type="checkbox"
               checked={config.showSelectedHeadings}
-              onChange={event =>
+              onChange={(event) =>
                 setConfig({
                   showSelectedHeadings: event.target.checked,
                 })
               }
+              type="checkbox"
             />{' '}
             Call <code>useSelected</code> in each heading
           </label>
@@ -499,13 +503,13 @@ const PerformanceControls = ({
         <p>
           <label>
             <input
-              type="checkbox"
               checked={config.strictMode}
-              onChange={event =>
+              onChange={(event) =>
                 setConfig({
                   strictMode: event.target.checked,
                 })
               }
+              type="checkbox"
             />{' '}
             React strict mode (only works in localhost)
           </label>
@@ -518,21 +522,21 @@ const PerformanceControls = ({
         <p>
           Last keypress (ms):{' '}
           {SUPPORTS_EVENT_TIMING
-            ? lastKeyPressDuration ?? '-'
+            ? (lastKeyPressDuration ?? '-')
             : 'Not supported'}
         </p>
 
         <p>
           Average of last 10 keypresses (ms):{' '}
           {SUPPORTS_EVENT_TIMING
-            ? averageKeyPressDuration ?? '-'
+            ? (averageKeyPressDuration ?? '-')
             : 'Not supported'}
         </p>
 
         <p>
           Last long animation frame (ms):{' '}
           {SUPPORTS_LOAF_TIMING
-            ? lastLongAnimationFrameDuration ?? '-'
+            ? (lastLongAnimationFrameDuration ?? '-')
             : 'Not supported'}
         </p>
 

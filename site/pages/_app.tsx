@@ -1,7 +1,7 @@
-import React, { useState, ErrorInfo } from 'react'
-import { AppProps } from 'next/app'
-import { ErrorBoundary } from 'react-error-boundary'
+import type { AppProps } from 'next/app'
 import { Roboto } from 'next/font/google'
+import { type ErrorInfo, useState } from 'react'
+import { ErrorBoundary } from 'react-error-boundary'
 import { ExampleLayout, Warning } from '../components/ExampleLayout'
 
 const roboto = Roboto({
@@ -42,9 +42,9 @@ export default function App({ Component, pageProps }: AppProps) {
         }}
       >
         <ExampleLayout
+          error={error}
           exampleName={pageProps.exampleName}
           examplePath={pageProps.examplePath}
-          error={error}
           stackTrace={stackTrace}
         >
           <Component {...pageProps} />

@@ -1,4 +1,4 @@
-import { Editor, EditorInterface } from '../interfaces/editor'
+import { Editor, type EditorInterface } from '../interfaces/editor'
 
 export const withoutNormalizing: EditorInterface['withoutNormalizing'] = (
   editor,

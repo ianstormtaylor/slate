@@ -2,7 +2,7 @@ import { createEditor, Transforms } from 'slate'
 
 export const input = createEditor() as any
 
-export const run = editor => {
+export const run = (editor) => {
   const { isSelectable } = editor
 
   editor.isSelectable = (element: any) => {

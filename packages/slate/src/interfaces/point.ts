@@ -1,5 +1,5 @@
-import { ExtendedType, Operation, Path, isObject } from '..'
-import { TextDirection } from '../types/types'
+import { type ExtendedType, isObject, type Operation, Path } from '..'
+import type { TextDirection } from '../types/types'
 
 /**
  * `Point` objects refer to a specific location in a text node in a Slate
@@ -154,7 +154,8 @@ export const Point: PointInterface = {
         if (Path.equals(op.path, path)) {
           if (op.position === offset && affinity == null) {
             return null
-          } else if (
+          }
+          if (
             op.position < offset ||
             (op.position === offset && affinity === 'forward')
           ) {

@@ -5,7 +5,7 @@ export const input = {
   path: [0],
   newPath: [1],
 }
-export const test = value => {
+export const test = (value) => {
   return Operation.isOperation(value)
 }
 export const output = true

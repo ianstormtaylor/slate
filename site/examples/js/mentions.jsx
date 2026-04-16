@@ -1,4 +1,4 @@
-import React, {
+import {
   Fragment,
   useCallback,
   useEffect,
@@ -6,7 +6,7 @@ import React, {
   useRef,
   useState,
 } from 'react'
-import { Editor, Transforms, Range, createEditor } from 'slate'
+import { createEditor, Editor, Range, Transforms } from 'slate'
 import { withHistory } from 'slate-history'
 import {
   Editable,
@@ -24,29 +24,31 @@ const MentionExample = () => {
   const [target, setTarget] = useState(null)
   const [index, setIndex] = useState(0)
   const [search, setSearch] = useState('')
-  const renderElement = useCallback(props => <Element {...props} />, [])
-  const renderLeaf = useCallback(props => <Leaf {...props} />, [])
+  const renderElement = useCallback((props) => <Element {...props} />, [])
+  const renderLeaf = useCallback((props) => <Leaf {...props} />, [])
   const editor = useMemo(
     () => withMentions(withReact(withHistory(createEditor()))),
     []
   )
-  const chars = CHARACTERS.filter(c =>
+  const chars = CHARACTERS.filter((c) =>
     c.toLowerCase().startsWith(search.toLowerCase())
   ).slice(0, 10)
   const onKeyDown = useCallback(
-    event => {
+    (event) => {
       if (target && chars.length > 0) {
         switch (event.key) {
-          case 'ArrowDown':
+          case 'ArrowDown': {
             event.preventDefault()
             const prevIndex = index >= chars.length - 1 ? 0 : index + 1
             setIndex(prevIndex)
             break
-          case 'ArrowUp':
+          }
+          case 'ArrowUp': {
             event.preventDefault()
             const nextIndex = index <= 0 ? chars.length - 1 : index - 1
             setIndex(nextIndex)
             break
+          }
           case 'Tab':
           case 'Enter':
             event.preventDefault()
@@ -100,14 +102,15 @@ const MentionExample = () => {
       }}
     >
       <Editable
-        renderElement={renderElement}
-        renderLeaf={renderLeaf}
         onKeyDown={onKeyDown}
         placeholder="Enter some text..."
+        renderElement={renderElement}
+        renderLeaf={renderLeaf}
       />
       {target && chars.length > 0 && (
         <Portal>
           <div
+            data-cy="mentions-portal"
             ref={ref}
             style={{
               top: '-9999px',
@@ -119,12 +122,11 @@ const MentionExample = () => {
               borderRadius: '4px',
               boxShadow: '0 1px 5px rgba(0,0,0,.2)',
             }}
-            data-cy="mentions-portal"
           >
             {chars.map((char, i) => (
               <div
                 key={char}
-                onClick={e => {
+                onClick={(e) => {
                   Transforms.select(editor, target)
                   insertMention(editor, char)
                   setTarget(null)
@@ -145,15 +147,15 @@ const MentionExample = () => {
     </Slate>
   )
 }
-const withMentions = editor => {
+const withMentions = (editor) => {
   const { isInline, isVoid, markableVoid } = editor
-  editor.isInline = element => {
+  editor.isInline = (element) => {
     return element.type === 'mention' ? true : isInline(element)
   }
-  editor.isVoid = element => {
+  editor.isVoid = (element) => {
     return element.type === 'mention' ? true : isVoid(element)
   }
-  editor.markableVoid = element => {
+  editor.markableVoid = (element) => {
     return element.type === 'mention' || markableVoid(element)
   }
   return editor
@@ -184,7 +186,7 @@ const Leaf = ({ attributes, children, leaf }) => {
   }
   return <span {...attributes}>{children}</span>
 }
-const Element = props => {
+const Element = (props) => {
   const { attributes, children, element } = props
   switch (element.type) {
     case 'mention':

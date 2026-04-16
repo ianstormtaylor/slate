@@ -1,6 +1,6 @@
 import { css } from '@emotion/css'
-import React, { useCallback, useMemo } from 'react'
-import { Editor, Node, Point, Range, Transforms, createEditor } from 'slate'
+import { useCallback, useMemo } from 'react'
+import { createEditor, Editor, Node, Point, Range, Transforms } from 'slate'
 import { withHistory } from 'slate-history'
 import {
   Editable,
@@ -56,7 +56,7 @@ const initialValue = [
   },
 ]
 const CheckListsExample = () => {
-  const renderElement = useCallback(props => <Element {...props} />, [])
+  const renderElement = useCallback((props) => <Element {...props} />, [])
   const editor = useMemo(
     () => withChecklists(withHistory(withReact(createEditor()))),
     []
@@ -64,21 +64,21 @@ const CheckListsExample = () => {
   return (
     <Slate editor={editor} initialValue={initialValue}>
       <Editable
-        renderElement={renderElement}
-        placeholder="Get to work…"
-        spellCheck
         autoFocus
+        placeholder="Get to work…"
+        renderElement={renderElement}
+        spellCheck
       />
     </Slate>
   )
 }
-const withChecklists = editor => {
+const withChecklists = (editor) => {
   const { deleteBackward } = editor
   editor.deleteBackward = (...args) => {
     const { selection } = editor
     if (selection && Range.isCollapsed(selection)) {
       const [match] = Editor.nodes(editor, {
-        match: n => Node.isElement(n) && n.type === 'check-list-item',
+        match: (n) => Node.isElement(n) && n.type === 'check-list-item',
       })
       if (match) {
         const [, path] = match
@@ -88,7 +88,7 @@ const withChecklists = editor => {
             type: 'paragraph',
           }
           Transforms.setNodes(editor, newProperties, {
-            match: n => Node.isElement(n) && n.type === 'check-list-item',
+            match: (n) => Node.isElement(n) && n.type === 'check-list-item',
           })
           return
         }
@@ -98,7 +98,7 @@ const withChecklists = editor => {
   }
   return editor
 }
-const Element = props => {
+const Element = (props) => {
   const { attributes, children, element } = props
   switch (element.type) {
     case 'check-list-item':
@@ -125,35 +125,35 @@ const CheckListItemElement = ({ attributes, children, element }) => {
       `}
     >
       <span
-        contentEditable={false}
         className={css`
           margin-right: 0.75em;
         `}
+        contentEditable={false}
       >
         <input
-          type="checkbox"
           checked={checked}
-          onChange={event => {
+          onChange={(event) => {
             const path = ReactEditor.findPath(editor, element)
             const newProperties = {
               checked: event.target.checked,
             }
             Transforms.setNodes(editor, newProperties, { at: path })
           }}
+          type="checkbox"
         />
       </span>
       <span
-        contentEditable={!readOnly}
-        suppressContentEditableWarning
         className={css`
           flex: 1;
           opacity: ${checked ? 0.666 : 1};
-          text-decoration: ${!checked ? 'none' : 'line-through'};
+          text-decoration: ${checked ? 'line-through' : 'none'};
 
           &:focus {
             outline: none;
           }
         `}
+        contentEditable={!readOnly}
+        suppressContentEditableWarning
       >
         {children}
       </span>

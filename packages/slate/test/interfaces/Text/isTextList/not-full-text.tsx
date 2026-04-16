@@ -11,7 +11,7 @@ export const input = [
     newProperties: {},
   },
 ]
-export const test = value => {
+export const test = (value) => {
   return Text.isTextList(value)
 }
 export const output = false

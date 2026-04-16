@@ -1,6 +1,6 @@
-import { Node, NodeEntry } from '../interfaces/node'
-import { Editor, EditorNodesOptions } from '../interfaces/editor'
+import { Editor, type EditorNodesOptions } from '../interfaces/editor'
 import { Location } from '../interfaces/location'
+import { Node, type NodeEntry } from '../interfaces/node'
 import { Path } from '../interfaces/path'
 
 export function* nodes<T extends Node>(
@@ -72,9 +72,8 @@ export function* nodes<T extends Node>(
       // means the match is not universal.
       if (universal && !isLower && Node.isText(node)) {
         return
-      } else {
-        continue
       }
+      continue
     }
 
     // If there's a match and it's lower than the last, update the hit.

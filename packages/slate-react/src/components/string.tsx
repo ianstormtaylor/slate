@@ -1,10 +1,8 @@
-import React, { forwardRef, memo, useRef, useState } from 'react'
-import { Editor, Text, Path, Element, Node } from 'slate'
-
+import { forwardRef, memo, useRef, useState } from 'react'
+import { Editor, type Element, Node, Path, type Text } from 'slate'
+import { IS_ANDROID, MARK_PLACEHOLDER_SYMBOL } from 'slate-dom'
 import { ReactEditor, useSlateStatic } from '..'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
-import { IS_ANDROID } from 'slate-dom'
-import { MARK_PLACEHOLDER_SYMBOL } from 'slate-dom'
 
 /**
  * Leaf content strings.

@@ -1,5 +1,5 @@
-import { Editor, EditorInterface } from '../interfaces/editor'
 import { Location } from '../interfaces'
+import { Editor, type EditorInterface } from '../interfaces/editor'
 import { Path } from '../interfaces/path'
 
 export const above: EditorInterface['above'] = (editor, options = {}) => {

@@ -1,27 +1,35 @@
-import React, { useCallback, useRef } from 'react'
-import { Ancestor, Editor, Element, DecoratedRange, Text, Node } from 'slate'
-import { Key, isElementDecorationsEqual } from 'slate-dom'
+import type React from 'react'
+import { useCallback, useRef } from 'react'
 import {
+  type Ancestor,
+  type DecoratedRange,
+  Editor,
+  type Element,
+  Node,
+  type Text,
+} from 'slate'
+import {
+  IS_NODE_MAP_DIRTY,
+  isElementDecorationsEqual,
+  type Key,
+  NODE_TO_INDEX,
+  NODE_TO_PARENT,
+  splitDecorationsByChild,
+} from 'slate-dom'
+import { getChunkTreeForNode } from '../chunking'
+import ChunkTree from '../components/chunk-tree'
+import type {
   RenderChunkProps,
   RenderElementProps,
   RenderLeafProps,
   RenderPlaceholderProps,
   RenderTextProps,
 } from '../components/editable'
-
 import ElementComponent from '../components/element'
 import TextComponent from '../components/text'
 import { ReactEditor } from '../plugin/react-editor'
-import {
-  IS_NODE_MAP_DIRTY,
-  NODE_TO_INDEX,
-  NODE_TO_PARENT,
-  splitDecorationsByChild,
-} from 'slate-dom'
-import { useSlateStatic } from './use-slate-static'
-import { getChunkTreeForNode } from '../chunking'
-import ChunkTree from '../components/chunk-tree'
 import { ElementContext } from './use-element'
+import { useSlateStatic } from './use-slate-static'
 
 /**
  * Children.
@@ -79,10 +87,10 @@ const useChildren = (props: {
             decorations={decorationsByChild[i]}
             element={n}
             key={key.id}
-            renderElement={renderElement}
             renderChunk={renderChunk}
-            renderPlaceholder={renderPlaceholder}
+            renderElement={renderElement}
             renderLeaf={renderLeaf}
+            renderPlaceholder={renderPlaceholder}
             renderText={renderText}
           />
         </ElementContext.Provider>
@@ -105,11 +113,11 @@ const useChildren = (props: {
     return (
       <TextComponent
         decorations={decorationsByChild[i]}
-        key={key.id}
         isLast={i === node.children.length - 1}
+        key={key.id}
         parent={node}
-        renderPlaceholder={renderPlaceholder}
         renderLeaf={renderLeaf}
+        renderPlaceholder={renderPlaceholder}
         renderText={renderText}
         text={n}
       />
@@ -142,10 +150,10 @@ const useChildren = (props: {
 
   return (
     <ChunkTree
-      root={chunkTree}
       ancestor={chunkTree}
-      renderElement={renderElementComponent}
       renderChunk={renderChunk}
+      renderElement={renderElementComponent}
+      root={chunkTree}
     />
   )
 }

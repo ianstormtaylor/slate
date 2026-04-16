@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 
 test.describe('shadow-dom example', () => {
   test.beforeEach(
@@ -38,14 +38,14 @@ test.describe('shadow-dom example', () => {
     page,
   }) => {
     const consoleErrors: string[] = []
-    page.on('console', msg => {
+    page.on('console', (msg) => {
       if (msg.type() === 'error') {
         consoleErrors.push(msg.text())
       }
     })
 
     const pageErrors: Error[] = []
-    page.on('pageerror', error => {
+    page.on('pageerror', (error) => {
       pageErrors.push(error)
     })
 

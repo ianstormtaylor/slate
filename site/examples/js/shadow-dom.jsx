@@ -1,8 +1,8 @@
-import React, { useMemo, useRef, useEffect } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { createRoot } from 'react-dom/client'
 import { createEditor } from 'slate'
-import { Slate, Editable, withReact } from 'slate-react'
 import { withHistory } from 'slate-history'
+import { Editable, Slate, withReact } from 'slate-react'
 
 const ShadowDOM = () => {
   const container = useRef(null)
@@ -20,7 +20,7 @@ const ShadowDOM = () => {
     const root = createRoot(reactRoot)
     root.render(<ShadowEditor />)
   })
-  return <div ref={container} data-cy="outer-shadow-root" />
+  return <div data-cy="outer-shadow-root" ref={container} />
 }
 const ShadowEditor = () => {
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
