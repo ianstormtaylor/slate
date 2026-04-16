@@ -1,4 +1,4 @@
-import assert from 'assert'
+import assert from 'node:assert/strict'
 import { cloneDeep } from 'lodash'
 import { createEditor, Editor } from 'slate'
 import { createHyperscript } from 'slate-hyperscript'

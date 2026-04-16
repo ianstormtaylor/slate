@@ -55,8 +55,8 @@ export const getDirtyPaths: WithEditorFirstArg<Editor['getDirtyPaths']> = (
         newAncestors.push(p!)
       }
 
-      const newParent = newAncestors[newAncestors.length - 1]
-      const newIndex = newPath[newPath.length - 1]
+      const newParent = newAncestors.at(-1)!
+      const newIndex = newPath.at(-1)!
       const resultPath = newParent.concat(newIndex)
 
       return [...oldAncestors, ...newAncestors, resultPath]

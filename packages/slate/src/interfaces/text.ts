@@ -131,7 +131,7 @@ export const Text: TextInterface = {
     for (const dec of decorations) {
       const { anchor, focus, merge: mergeDecoration, ...rest } = dec
       const [start, end] = Range.edges(dec)
-      const next = []
+      const next: Array<{ leaf: Text; position?: LeafPosition }> = []
       let leafEnd = 0
       const decorationStart = start.offset
       const decorationEnd = end.offset
@@ -165,8 +165,8 @@ export const Text: TextInterface = {
         // and add the range to the middle intersecting section. Do the end
         // split first since we don't need to update the offset that way.
         let middle = leaf
-        let before
-        let after
+        let before: { leaf: Text } | undefined
+        let after: { leaf: Text } | undefined
 
         if (decorationEnd < leafEnd) {
           const off = decorationEnd - leafStart

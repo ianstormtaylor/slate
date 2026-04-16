@@ -3,23 +3,28 @@ import React, { type PropsWithChildren, type ReactNode, type Ref } from 'react'
 import ReactDOM from 'react-dom'
 
 interface BaseProps {
-  className: string
-  [key: string]: unknown
+  className?: string
 }
 
-export const Button = React.forwardRef(
+type ButtonProps = PropsWithChildren<
+  React.ButtonHTMLAttributes<HTMLButtonElement> &
+    BaseProps & {
+      active?: boolean
+      reversed?: boolean
+    }
+>
+
+type SpanProps = PropsWithChildren<
+  React.HTMLAttributes<HTMLSpanElement> & BaseProps
+>
+
+type DivProps = PropsWithChildren<
+  React.HTMLAttributes<HTMLDivElement> & BaseProps
+>
+
+export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   (
-    {
-      className,
-      active,
-      reversed,
-      ...props
-    }: PropsWithChildren<
-      {
-        active: boolean
-        reversed: boolean
-      } & BaseProps
-    >,
+    { className, active, reversed, ...props }: ButtonProps,
     ref: Ref<HTMLButtonElement>
   ) => (
     <button
@@ -41,11 +46,8 @@ export const Button = React.forwardRef(
   )
 )
 
-export const Icon = React.forwardRef(
-  (
-    { className, ...props }: PropsWithChildren<BaseProps>,
-    ref: Ref<HTMLSpanElement>
-  ) => (
+export const Icon = React.forwardRef<HTMLSpanElement, SpanProps>(
+  ({ className, ...props }: SpanProps, ref: Ref<HTMLSpanElement>) => (
     <span
       {...props}
       className={cx(
@@ -61,11 +63,8 @@ export const Icon = React.forwardRef(
   )
 )
 
-export const Instruction = React.forwardRef(
-  (
-    { className, ...props }: PropsWithChildren<BaseProps>,
-    ref: Ref<HTMLDivElement>
-  ) => (
+export const Instruction = React.forwardRef<HTMLDivElement, DivProps>(
+  ({ className, ...props }: DivProps, ref: Ref<HTMLDivElement>) => (
     <div
       {...props}
       className={cx(
@@ -83,11 +82,8 @@ export const Instruction = React.forwardRef(
   )
 )
 
-export const Menu = React.forwardRef(
-  (
-    { className, ...props }: PropsWithChildren<BaseProps>,
-    ref: Ref<HTMLDivElement>
-  ) => (
+export const Menu = React.forwardRef<HTMLDivElement, DivProps>(
+  ({ className, ...props }: DivProps, ref: Ref<HTMLDivElement>) => (
     <div
       {...props}
       className={cx(
@@ -114,11 +110,8 @@ export const Portal = ({ children }: { children?: ReactNode }) => {
     : null
 }
 
-export const Toolbar = React.forwardRef(
-  (
-    { className, ...props }: PropsWithChildren<BaseProps>,
-    ref: Ref<HTMLDivElement>
-  ) => (
+export const Toolbar = React.forwardRef<HTMLDivElement, DivProps>(
+  ({ className, ...props }: DivProps, ref: Ref<HTMLDivElement>) => (
     <Menu
       {...props}
       className={cx(

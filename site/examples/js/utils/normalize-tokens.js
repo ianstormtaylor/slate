@@ -1,7 +1,7 @@
 /**
  * Copied from prism-react-renderer repo
  * https://github.com/FormidableLabs/prism-react-renderer/blob/master/src/utils/normalizeTokens.js
- * */
+ */
 const newlineRe = /\r\n|\r|\n/
 // Empty lines need to contain a single empty token, denoted with { empty: true }
 const normalizeEmptyLines = (line) => {

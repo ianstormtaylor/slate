@@ -5,14 +5,6 @@ const SITE_ROOT = __dirname
 const REPO_ROOT = path.resolve(SITE_ROOT, '..')
 const PACKAGES_ROOT = path.join(REPO_ROOT, 'packages')
 
-const toSiteImportPath = (targetPath) => {
-  const relativePath = path
-    .relative(SITE_ROOT, targetPath)
-    .replaceAll('\\', '/')
-
-  return relativePath.startsWith('.') ? relativePath : `./${relativePath}`
-}
-
 const getIndexEntry = (dir) => {
   const tsEntry = path.join(dir, 'index.ts')
   const tsxEntry = path.join(dir, 'index.tsx')
@@ -42,16 +34,14 @@ const buildWorkspaceSourceAliases = (mapper) => {
 /**
  * @type {import('next').NextConfig}
  */
-const turbopackSourceAliases = buildWorkspaceSourceAliases(toSiteImportPath)
 const webpackSourceAliases = buildWorkspaceSourceAliases(
   (targetPath) => targetPath
 )
 
 const nextConfig = {
   output: 'export',
-  turbopack: {
-    root: path.join(__dirname, '..'),
-    resolveAlias: turbopackSourceAliases,
+  eslint: {
+    ignoreDuringBuilds: true,
   },
   webpack: (config, { webpack }) => {
     config.resolve.alias = {

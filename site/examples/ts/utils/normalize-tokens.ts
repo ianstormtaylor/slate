@@ -1,7 +1,7 @@
 /**
  * Copied from prism-react-renderer repo
  * https://github.com/FormidableLabs/prism-react-renderer/blob/master/src/utils/normalizeTokens.js
- * */
+ */
 
 import type Prism from 'prismjs'
 

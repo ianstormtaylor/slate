@@ -181,7 +181,7 @@ export function* positions(
         leafTextOffset = reverse
           ? leafTextOffset - distance
           : leafTextOffset + distance
-        leafTextRemaining = leafTextRemaining - distance
+        leafTextRemaining -= distance
 
         // If `leafText` is exhausted, break to get a new leaf node
         // and set distance to the overflow amount, so we'll (maybe)

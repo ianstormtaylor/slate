@@ -32,7 +32,7 @@ const MarkdownShortcutsExample = () => {
           const { text } = Node.leaf(editor, path)
           const beforeText = text.slice(0, diff.start) + diff.text.slice(0, -1)
           if (!(beforeText in SHORTCUTS)) {
-            return
+            return false
           }
           const blockEntry = Editor.above(editor, {
             at: path,

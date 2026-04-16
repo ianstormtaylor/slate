@@ -53,13 +53,13 @@ const create = (key: string) => {
   const generic = HOTKEYS[<keyof typeof HOTKEYS>key]
   const apple = APPLE_HOTKEYS[<keyof typeof APPLE_HOTKEYS>key]
   const windows = WINDOWS_HOTKEYS[<keyof typeof WINDOWS_HOTKEYS>key]
-  const isGeneric = generic && isHotkey(generic)
-  const isApple = apple && isHotkey(apple)
-  const isWindows = windows && isHotkey(windows)
+  const isGeneric = generic ? isHotkey(generic) : undefined
+  const isApple = apple ? isHotkey(apple) : undefined
+  const isWindows = windows ? isHotkey(windows) : undefined
 
   return (event: KeyboardEvent) => {
-    if (isGeneric && isGeneric(event)) return true
-    if (IS_APPLE && isApple && isApple(event)) return true
+    if (isGeneric?.(event)) return true
+    if (IS_APPLE && isApple?.(event)) return true
     if (!IS_APPLE && isWindows && isWindows(event)) return true
     return false
   }

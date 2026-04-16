@@ -7,6 +7,9 @@ import { Range } from '../interfaces/range'
 import { Transforms } from '../interfaces/transforms'
 import type { TextTransforms } from '../interfaces/transforms/text'
 
+const COMPLEX_SCRIPT_RE =
+  /[\u0980-\u09FF\u0E00-\u0E7F\u1000-\u109F\u0900-\u097F\u1780-\u17FF\u0D00-\u0D7F\u0B00-\u0B7F\u0A00-\u0A7F\u0B80-\u0BFF\u0C00-\u0C7F]+/
+
 export const deleteText: TextTransforms['delete'] = (editor, options = {}) => {
   Editor.withoutNormalizing(editor, () => {
     const {
@@ -147,7 +150,9 @@ export const deleteText: TextTransforms['delete'] = (editor, options = {}) => {
       .reverse()
       .map((r) => r.unref())
       .filter((r): r is Path => r !== null)
-      .forEach((p) => Transforms.removeNodes(editor, { at: p, voids }))
+      .forEach((p) => {
+        Transforms.removeNodes(editor, { at: p, voids })
+      })
 
     if (!endNonEditable) {
       const point = endRef.current!
@@ -187,9 +192,7 @@ export const deleteText: TextTransforms['delete'] = (editor, options = {}) => {
       reverse &&
       unit === 'character' &&
       removedText.length > 1 &&
-      removedText.match(
-        /[\u0980-\u09FF\u0E00-\u0E7F\u1000-\u109F\u0900-\u097F\u1780-\u17FF\u0D00-\u0D7F\u0B00-\u0B7F\u0A00-\u0A7F\u0B80-\u0BFF\u0C00-\u0C7F]+/
-      )
+      removedText.match(COMPLEX_SCRIPT_RE)
     ) {
       Transforms.insertText(
         editor,

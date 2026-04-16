@@ -1,5 +1,3 @@
-import { createEditor, createText } from './creators'
-import type { HyperscriptCreators, HyperscriptShorthands } from './hyperscript'
 import { createHyperscript } from './hyperscript'
 
 /**
@@ -8,5 +6,7 @@ import { createHyperscript } from './hyperscript'
 
 const jsx = createHyperscript()
 
-export type { HyperscriptCreators, HyperscriptShorthands }
-export { createEditor, createHyperscript, createText, jsx }
+export { createEditor, createText } from './creators'
+export type { HyperscriptCreators, HyperscriptShorthands } from './hyperscript'
+export { createHyperscript } from './hyperscript'
+export { jsx }

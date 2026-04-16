@@ -63,7 +63,9 @@ export const useDecorateContext = (
 
   useIsomorphicLayoutEffect(() => {
     latestDecorate.current = decorateProp
-    eventListeners.current.forEach((listener) => listener())
+    eventListeners.current.forEach((listener) => {
+      listener()
+    })
   }, [decorateProp])
 
   const decorate = useCallback(

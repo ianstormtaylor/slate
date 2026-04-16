@@ -158,7 +158,6 @@ describe('slate-react', () => {
       await act(async () =>
         Transforms.setNodes(
           editor,
-          // @ts-expect-error
           { bold: true },
           {
             at: { path: [0, 0], offset: 2 },

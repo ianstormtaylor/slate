@@ -10,8 +10,6 @@ export const shouldMergeNodesRemovePrevNode: EditorInterface['shouldMergeNodesRe
 
     return (
       (Node.isElement(prevNode) && Editor.isEmpty(editor, prevNode)) ||
-      (Node.isText(prevNode) &&
-        prevNode.text === '' &&
-        prevPath[prevPath.length - 1] !== 0)
+      (Node.isText(prevNode) && prevNode.text === '' && prevPath.at(-1)! !== 0)
     )
   }

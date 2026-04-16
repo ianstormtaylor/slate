@@ -85,11 +85,15 @@ export function useSelectorContext() {
   const deferredEventListeners = useRef(new Set<Callback>())
 
   const onChange = useCallback(() => {
-    eventListeners.current.forEach((listener) => listener())
+    eventListeners.current.forEach((listener) => {
+      listener()
+    })
   }, [])
 
   const flushDeferred = useCallback(() => {
-    deferredEventListeners.current.forEach((listener) => listener())
+    deferredEventListeners.current.forEach((listener) => {
+      listener()
+    })
     deferredEventListeners.current.clear()
   }, [])
 

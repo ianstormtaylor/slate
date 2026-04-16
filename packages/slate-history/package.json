@@ -4,15 +4,29 @@
   "version": "0.115.0",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
-  "main": "dist/index.js",
+  "type": "module",
+  "main": "dist/index.cjs",
   "module": "dist/index.es.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.es.js",
+      "require": "./dist/index.cjs"
+    }
+  },
   "umd": "dist/slate-history.js",
   "umdMin": "dist/slate-history.min.js",
   "sideEffects": false,
   "files": [
     "dist/"
   ],
+  "scripts": {
+    "build": "ROLLUP_PACKAGES=slate-history pnpm --dir ../.. build:rollup",
+    "clean": "rimraf dist lib",
+    "test": "node ../../scripts/run-from-root.mjs pnpm exec mocha --require ./config/babel/register.cjs ./packages/slate-history/test/**/*.ts",
+    "typecheck": "pnpm exec tsc --project tsconfig.build.json --noEmit --pretty false"
+  },
   "devDependencies": {
     "@babel/runtime": "^7.23.2",
     "lodash": "^4.17.21",

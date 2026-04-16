@@ -26,13 +26,15 @@ import {
   normalizeRange,
   normalizeStringDiff,
   type StringDiff,
-  type TextDiff,
   targetRange,
   verifyDiffState,
 } from 'slate-dom'
 import { ReactEditor } from '../../plugin/react-editor'
 
 export type Action = { at?: Point | Range; run: () => void }
+
+const DOUBLE_NEWLINE_AT_END_RE = /.*\n.*\n$/
+const NON_WHITESPACE_OR_END_RE = /\S|$/
 
 // https://github.com/facebook/draft-js/blob/main/src/component/handlers/composition/DraftEditorCompositionHandler.js#L41
 // When using keyboard English association function, conpositionEnd triggered too fast, resulting in after `insertText` still maintain association state.
@@ -168,8 +170,9 @@ export function createAndroidInputManager({
 
     let scheduleSelectionChange = hasPendingDiffs()
 
-    let diff: TextDiff | undefined
-    while ((diff = EDITOR_TO_PENDING_DIFFS.get(editor)?.[0])) {
+    while (true) {
+      const diff = EDITOR_TO_PENDING_DIFFS.get(editor)?.[0]
+      if (!diff) break
       const pendingMarks = EDITOR_TO_PENDING_INSERTION_MARKS.get(editor)
 
       if (pendingMarks !== undefined) {
@@ -198,8 +201,8 @@ export function createAndroidInputManager({
       EDITOR_TO_PENDING_DIFFS.set(
         editor,
         EDITOR_TO_PENDING_DIFFS.get(editor)?.filter(
-          ({ id }) => id !== diff!.id
-        )!
+          ({ id }) => id !== diff.id
+        ) ?? []
       )
 
       if (!verifyDiffState(editor, diff)) {
@@ -463,17 +466,18 @@ export function createAndroidInputManager({
           const range = Editor.range(editor, point, point)
           handleUserSelect(range)
 
-          return storeDiff(targetRange.anchor.path, {
+          storeDiff(targetRange.anchor.path, {
             text: '',
             end: end.offset,
             start: start.offset,
           })
+          return
         }
 
-        return scheduleAction(
-          () => Editor.deleteFragment(editor, { direction }),
-          { at: targetRange }
-        )
+        scheduleAction(() => Editor.deleteFragment(editor, { direction }), {
+          at: targetRange,
+        })
+        return
       }
     }
 
@@ -481,9 +485,10 @@ export function createAndroidInputManager({
       case 'deleteByComposition':
       case 'deleteByCut':
       case 'deleteByDrag': {
-        return scheduleAction(() => Editor.deleteFragment(editor), {
+        scheduleAction(() => Editor.deleteFragment(editor), {
           at: targetRange,
         })
+        return
       }
 
       case 'deleteContent':
@@ -493,17 +498,19 @@ export function createAndroidInputManager({
           const targetNode = Node.leaf(editor, anchor.path)
 
           if (anchor.offset < targetNode.text.length) {
-            return storeDiff(anchor.path, {
+            storeDiff(anchor.path, {
               text: '',
               start: anchor.offset,
               end: anchor.offset + 1,
             })
+            return
           }
         }
 
-        return scheduleAction(() => Editor.deleteForward(editor), {
+        scheduleAction(() => Editor.deleteForward(editor), {
           at: targetRange,
         })
+        return
       }
 
       case 'deleteContentBackward': {
@@ -522,80 +529,85 @@ export function createAndroidInputManager({
           Range.isCollapsed(targetRange) &&
           anchor.offset > 0
         ) {
-          return storeDiff(anchor.path, {
+          storeDiff(anchor.path, {
             text: '',
             start: anchor.offset - 1,
             end: anchor.offset,
           })
+          return
         }
 
-        return scheduleAction(() => Editor.deleteBackward(editor), {
+        scheduleAction(() => Editor.deleteBackward(editor), {
           at: targetRange,
         })
+        return
       }
 
       case 'deleteEntireSoftLine': {
-        return scheduleAction(
+        scheduleAction(
           () => {
             Editor.deleteBackward(editor, { unit: 'line' })
             Editor.deleteForward(editor, { unit: 'line' })
           },
           { at: targetRange }
         )
+        return
       }
 
       case 'deleteHardLineBackward': {
-        return scheduleAction(
-          () => Editor.deleteBackward(editor, { unit: 'block' }),
-          { at: targetRange }
-        )
+        scheduleAction(() => Editor.deleteBackward(editor, { unit: 'block' }), {
+          at: targetRange,
+        })
+        return
       }
 
       case 'deleteSoftLineBackward': {
-        return scheduleAction(
-          () => Editor.deleteBackward(editor, { unit: 'line' }),
-          { at: targetRange }
-        )
+        scheduleAction(() => Editor.deleteBackward(editor, { unit: 'line' }), {
+          at: targetRange,
+        })
+        return
       }
 
       case 'deleteHardLineForward': {
-        return scheduleAction(
-          () => Editor.deleteForward(editor, { unit: 'block' }),
-          { at: targetRange }
-        )
+        scheduleAction(() => Editor.deleteForward(editor, { unit: 'block' }), {
+          at: targetRange,
+        })
+        return
       }
 
       case 'deleteSoftLineForward': {
-        return scheduleAction(
-          () => Editor.deleteForward(editor, { unit: 'line' }),
-          { at: targetRange }
-        )
+        scheduleAction(() => Editor.deleteForward(editor, { unit: 'line' }), {
+          at: targetRange,
+        })
+        return
       }
 
       case 'deleteWordBackward': {
-        return scheduleAction(
-          () => Editor.deleteBackward(editor, { unit: 'word' }),
-          { at: targetRange }
-        )
+        scheduleAction(() => Editor.deleteBackward(editor, { unit: 'word' }), {
+          at: targetRange,
+        })
+        return
       }
 
       case 'deleteWordForward': {
-        return scheduleAction(
-          () => Editor.deleteForward(editor, { unit: 'word' }),
-          { at: targetRange }
-        )
+        scheduleAction(() => Editor.deleteForward(editor, { unit: 'word' }), {
+          at: targetRange,
+        })
+        return
       }
 
       case 'insertLineBreak': {
-        return scheduleAction(() => Editor.insertSoftBreak(editor), {
+        scheduleAction(() => Editor.insertSoftBreak(editor), {
           at: targetRange,
         })
+        return
       }
 
       case 'insertParagraph': {
-        return scheduleAction(() => Editor.insertBreak(editor), {
+        scheduleAction(() => Editor.insertBreak(editor), {
           at: targetRange,
         })
+        return
       }
       case 'insertCompositionText':
       case 'deleteCompositionText':
@@ -606,9 +618,10 @@ export function createAndroidInputManager({
       case 'insertReplacementText':
       case 'insertText': {
         if (isDataTransfer(data)) {
-          return scheduleAction(() => ReactEditor.insertData(editor, data), {
+          scheduleAction(() => ReactEditor.insertData(editor, data), {
             at: targetRange,
           })
+          return
         }
 
         let text = data ?? ''
@@ -622,14 +635,14 @@ export function createAndroidInputManager({
         // Pastes from the Android clipboard will generate `insertText` events.
         // If the copied text contains any newlines, Android will append an
         // extra newline to the end of the copied text.
-        if (type === 'insertText' && /.*\n.*\n$/.test(text)) {
+        if (type === 'insertText' && DOUBLE_NEWLINE_AT_END_RE.test(text)) {
           text = text.slice(0, -1)
         }
 
         // If the text includes a newline, split it at newlines and paste each component
         // string, with soft breaks in between each.
         if (text.includes('\n')) {
-          return scheduleAction(
+          scheduleAction(
             () => {
               const parts = text.split('\n')
               parts.forEach((line, i) => {
@@ -645,6 +658,7 @@ export function createAndroidInputManager({
               at: targetRange,
             }
           )
+          return
         }
 
         if (Path.equals(targetRange.anchor.path, targetRange.focus.path)) {
@@ -664,8 +678,10 @@ export function createAndroidInputManager({
           // swiftkey insert causing the issue.
           if (text && insertPositionHint && type === 'insertCompositionText') {
             const hintPosition =
-              insertPositionHint.start + insertPositionHint.text.search(/\S|$/)
-            const diffPosition = diff.start + diff.text.search(/\S|$/)
+              insertPositionHint.start +
+              insertPositionHint.text.search(NON_WHITESPACE_OR_END_RE)
+            const diffPosition =
+              diff.start + diff.text.search(NON_WHITESPACE_OR_END_RE)
 
             if (
               diffPosition === hintPosition + 1 &&
@@ -723,9 +739,10 @@ export function createAndroidInputManager({
           }
         }
 
-        return scheduleAction(() => Editor.insertText(editor, text), {
+        scheduleAction(() => Editor.insertText(editor, text), {
           at: targetRange,
         })
+        return
       }
     }
   }

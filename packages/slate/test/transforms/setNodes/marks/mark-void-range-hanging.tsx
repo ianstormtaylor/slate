@@ -1,4 +1,9 @@
 /** @jsx jsx */
+
+import { jsx } from '../../..'
+
+jsx
+
 // Apply a mark across a range containing text with other marks and some voids that support marks
 import { Editor } from 'slate'
 

@@ -123,7 +123,7 @@ export const splitNodes: NodeTransforms['splitNodes'] = (
           })
         }
 
-        position = path[path.length - 1] + (split || isEnd ? 1 : 0)
+        position = path.at(-1)! + (split || isEnd ? 1 : 0)
       }
 
       if (options.at == null) {

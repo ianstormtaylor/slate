@@ -389,7 +389,7 @@ export const Node: NodeInterface = {
 
     for (const [, path] of nodeEntries) {
       if (!Range.includes(range, path)) {
-        const index = path[path.length - 1]
+        const index = path.at(-1)!
 
         modifyChildren(newRoot, Path.parent(path), (children) =>
           removeChildren(children, index, 1)
@@ -429,9 +429,7 @@ export const Node: NodeInterface = {
   getIf(root: Node, path: Path): Node | undefined {
     let node = root
 
-    for (let i = 0; i < path.length; i++) {
-      const p = path[i]
-
+    for (const p of path) {
       if (typeof p !== 'number') {
         throw new Error('Got non-numeric path index')
       }
@@ -449,9 +447,7 @@ export const Node: NodeInterface = {
   has(root: Node, path: Path): boolean {
     let node = root
 
-    for (let i = 0; i < path.length; i++) {
-      const p = path[i]
-
+    for (const p of path) {
       if (typeof p !== 'number') {
         throw new Error('Got non-numeric path index')
       }
@@ -609,7 +605,7 @@ export const Node: NodeInterface = {
       }
 
       // If we're going backward...
-      if (reverse && p[p.length - 1] !== 0) {
+      if (reverse && p.at(-1)! !== 0) {
         const newPath = Path.previous(p)
         p = newPath
         n = Node.get(root, p)

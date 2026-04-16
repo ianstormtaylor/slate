@@ -1,5 +1,9 @@
 /** @jsx jsx */
 
+import { jsx } from '../../..'
+
+jsx
+
 import { Transforms } from 'slate'
 
 export const run = (editor) => {

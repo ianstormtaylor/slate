@@ -51,6 +51,7 @@
         }
       },
       "suspicious": {
+        "noAlert": "off",
         "noConsole": "off",
         "noExplicitAny": "off",
         "noArrayIndexKey": "off",
@@ -66,6 +67,7 @@
         "useFilenamingConvention": "off",
         "noNestedTernary": "off",
         "noNonNullAssertion": "off",
+        "noEnum": "off",
         "useDefaultSwitchClause": "off",
         "useBlockStatements": "off",
         "useConsistentTypeDefinitions": "off"
@@ -220,6 +222,18 @@
         "rules": {
           "a11y": "off",
           "performance": "off"
+        }
+      }
+    },
+    {
+      "includes": [
+        "packages/slate-react/src/components/restore-dom/restore-dom.tsx"
+      ],
+      "linter": {
+        "rules": {
+          "style": {
+            "useReactFunctionComponents": "off"
+          }
         }
       }
     },

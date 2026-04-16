@@ -8,8 +8,8 @@ import type { ChunkLeaf } from './types'
  * children array with a chunk tree
  */
 export class ChildrenHelper {
-  private editor: Editor
-  private children: Descendant[]
+  private readonly editor: Editor
+  private readonly children: Descendant[]
 
   /**
    * Sparse array of Slate node keys, each index corresponding to an index in
@@ -17,12 +17,12 @@ export class ChildrenHelper {
    *
    * Fetching the key for a Slate node is expensive, so we cache them here.
    */
-  private cachedKeys: Array<Key | undefined>
+  private readonly cachedKeys: Array<Key | undefined>
 
   /**
    * The index of the next node to be read in the children array
    */
-  public pointerIndex: number
+  pointerIndex: number
 
   constructor(editor: Editor, children: Descendant[]) {
     this.editor = editor
@@ -34,7 +34,7 @@ export class ChildrenHelper {
   /**
    * Read a given number of nodes, advancing the pointer by that amount
    */
-  public read(n: number): Descendant[] {
+  read(n: number): Descendant[] {
     // PERF: If only one child was requested (the most common case), use array
     // indexing instead of slice
     if (n === 1) {
@@ -52,7 +52,7 @@ export class ChildrenHelper {
    *
    * @param [maxChildren] Limit the number of children returned.
    */
-  public remaining(maxChildren?: number): Descendant[] {
+  remaining(maxChildren?: number): Descendant[] {
     if (maxChildren === undefined) {
       return this.children.slice(this.pointerIndex)
     }
@@ -66,7 +66,7 @@ export class ChildrenHelper {
   /**
    * Whether all children have been read
    */
-  public get reachedEnd() {
+  get reachedEnd() {
     return this.pointerIndex >= this.children.length
   }
 
@@ -83,7 +83,7 @@ export class ChildrenHelper {
    * search fails to return a value, fetch the keys of each remaining child one
    * by one and compare it to the known key.
    */
-  public lookAhead(node: Descendant, key: Key) {
+  lookAhead(node: Descendant, key: Key) {
     const elementResult = this.children.indexOf(node, this.pointerIndex)
     if (elementResult > -1) return elementResult - this.pointerIndex
 
@@ -100,7 +100,7 @@ export class ChildrenHelper {
    * Convert an array of Slate nodes to an array of chunk leaves, each
    * containing the node and its key
    */
-  public toChunkLeaves(nodes: Descendant[], startIndex: number): ChunkLeaf[] {
+  toChunkLeaves(nodes: Descendant[], startIndex: number): ChunkLeaf[] {
     return nodes.map((node, i) => ({
       type: 'leaf',
       node,

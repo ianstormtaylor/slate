@@ -48,11 +48,7 @@ export const findCurrentLineRange = (
   }
 
   if (positions.length < 2) {
-    return Editor.range(
-      editor,
-      positions[positions.length - 1],
-      parentRangeBoundary
-    )
+    return Editor.range(editor, positions.at(-1)!, parentRangeBoundary)
   }
 
   while (middle !== positions.length && middle !== left) {

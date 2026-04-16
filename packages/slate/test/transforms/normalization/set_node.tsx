@@ -1,5 +1,9 @@
 /** @jsx jsx */
 
+import { jsx } from '../..'
+
+jsx
+
 import _ from 'lodash'
 import { Editor, Element, Transforms } from 'slate'
 

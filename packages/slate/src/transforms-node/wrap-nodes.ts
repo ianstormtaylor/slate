@@ -94,7 +94,7 @@ export const wrapNodes: NodeTransforms['wrapNodes'] = (
 
       if (matches.length > 0) {
         const [first] = matches
-        const last = matches[matches.length - 1]
+        const last = matches.at(-1)!
         const [, firstPath] = first
         const [, lastPath] = last
 

@@ -244,7 +244,7 @@ export const insertFragment: TextTransforms['insertFragment'] = (
     })
 
     if (!options.at) {
-      let path
+      let path: Path | undefined
 
       if (ends.length > 0 && endRef.current) {
         path = Path.previous(endRef.current)

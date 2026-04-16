@@ -38,7 +38,7 @@ export const liftNodes: NodeTransforms['liftNodes'] = (
 
       const parentNodeEntry = Editor.node(editor, Path.parent(path))
       const [parent, parentPath] = parentNodeEntry as NodeEntry<Ancestor>
-      const index = path[path.length - 1]
+      const index = path.at(-1)!
       const { length } = parent.children
 
       if (length === 1) {

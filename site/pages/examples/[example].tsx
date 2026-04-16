@@ -25,7 +25,7 @@ const EXAMPLES: ExampleTuple[] = EXAMPLE_NAMES_AND_PATHS.map(([name, path]) => [
 
 const ExamplePage = ({ example }: { example: string }) => {
   const EXAMPLE = EXAMPLES.find((e) => e[2] === example)
-  const [name, Component, path] = EXAMPLE!
+  const [name, Component] = EXAMPLE!
 
   return (
     <>

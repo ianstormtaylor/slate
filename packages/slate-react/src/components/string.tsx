@@ -8,7 +8,7 @@ import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect
  * Leaf content strings.
  */
 
-const String = (props: {
+const LeafString = (props: {
   isLast: boolean
   leaf: Text
   parent: Element
@@ -31,7 +31,7 @@ const String = (props: {
   // to support expected plain text.
   if (
     leaf.text === '' &&
-    parent.children[parent.children.length - 1] === text &&
+    parent.children.at(-1) === text &&
     !editor.isInline(parent) &&
     Editor.string(editor, parentPath) === ''
   ) {
@@ -141,4 +141,4 @@ export const ZeroWidthString = (props: {
   )
 }
 
-export default String
+export default LeafString

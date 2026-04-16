@@ -77,8 +77,10 @@ import { RestoreDOM } from './restore-dom/restore-dom'
 
 type DeferredOperation = () => void
 
+const NATIVE_CHAR_RE = /[a-z ]/i
+
 const Children = (props: Parameters<typeof useChildren>[0]) => (
-  <React.Fragment>{useChildren(props)}</React.Fragment>
+  <>{useChildren(props)}</>
 )
 
 /**
@@ -344,9 +346,9 @@ export const Editable = forwardRef(
 
     useIsomorphicLayoutEffect(() => {
       // Update element-related weak maps with the DOM element ref.
-      let window
-      if (ref.current && (window = getDefaultView(ref.current))) {
-        EDITOR_TO_WINDOW.set(editor, window)
+      const editorWindow = ref.current ? getDefaultView(ref.current) : null
+      if (ref.current && editorWindow) {
+        EDITOR_TO_WINDOW.set(editor, editorWindow)
         EDITOR_TO_ELEMENT.set(editor, ref.current)
         NODE_TO_ELEMENT.set(editor, ref.current)
         ELEMENT_TO_NODE.set(ref.current, editor)
@@ -377,7 +379,7 @@ export const Editable = forwardRef(
 
         // Get anchorNode and focusNode
         const focusNode = domSelection.focusNode
-        let anchorNode
+        let anchorNode: globalThis.Node | null = null
 
         // COMPAT: In firefox the normal selection way does not work
         // (https://github.com/ianstormtaylor/slate/pull/5486#issue-1820720223)
@@ -456,7 +458,7 @@ export const Editable = forwardRef(
 
         try {
           newDomRange = selection && ReactEditor.toDOMRange(editor, selection)
-        } catch (e) {
+        } catch (_e) {
           // Ignore, dom and state might be out of sync
         }
 
@@ -510,7 +512,7 @@ export const Editable = forwardRef(
               el.focus()
 
               setDomSelection(forceChange)
-            } catch (e) {
+            } catch (_e) {
               // Ignore, dom and state might be out of sync
             }
           }
@@ -611,7 +613,7 @@ export const Editable = forwardRef(
             // causes duplicate inserts.
             event.data &&
             event.data.length === 1 &&
-            /[a-z ]/i.test(event.data) &&
+            NATIVE_CHAR_RE.test(event.data) &&
             // Chrome has issues correctly editing the start of nodes: https://bugs.chromium.org/p/chromium/issues/detail?id=1249405
             // When there is an inline element, e.g. a link, and you select
             // right after it (the start of the next node).
@@ -798,16 +800,17 @@ export const Editable = forwardRef(
             case 'insertFromYank':
             case 'insertReplacementText':
             case 'insertText': {
-              if (type === 'insertFromComposition') {
+              if (
+                type === 'insertFromComposition' &&
+                ReactEditor.isComposing(editor)
+              ) {
                 // COMPAT: in Safari, `compositionend` is dispatched after the
                 // `beforeinput` for "insertFromComposition". But if we wait for it
                 // then we will abort because we're still composing and the selection
                 // won't be updated properly.
                 // https://www.w3.org/TR/input-events-2/
-                if (ReactEditor.isComposing(editor)) {
-                  setIsComposing(false)
-                  IS_COMPOSING.set(editor, false)
-                }
+                setIsComposing(false)
+                IS_COMPOSING.set(editor, false)
               }
 
               // use a weak comparison instead of 'instanceof' to allow
@@ -863,18 +866,18 @@ export const Editable = forwardRef(
           NODE_TO_ELEMENT.delete(editor)
 
           if (ref.current && HAS_BEFORE_INPUT_SUPPORT) {
-            // @ts-expect-error The `beforeinput` event isn't recognized.
+            // `beforeinput` is attached directly because React's polyfill does
+            // not expose the real event on this path.
             ref.current.removeEventListener('beforeinput', onDOMBeforeInput)
           }
-        } else {
+        } else if (HAS_BEFORE_INPUT_SUPPORT) {
           // Attach a native DOM event handler for `beforeinput` events, because React's
           // built-in `onBeforeInput` is actually a leaky polyfill that doesn't expose
           // real `beforeinput` events sadly... (2019/11/04)
           // https://github.com/facebook/react/issues/11211
-          if (HAS_BEFORE_INPUT_SUPPORT) {
-            // @ts-expect-error The `beforeinput` event isn't recognized.
-            node.addEventListener('beforeinput', onDOMBeforeInput)
-          }
+          // `beforeinput` is attached directly because React's polyfill does
+          // not expose the real event on this path.
+          node.addEventListener('beforeinput', onDOMBeforeInput)
         }
 
         ref.current = node
@@ -1678,28 +1681,26 @@ export const Editable = forwardRef(
                         if (IS_CHROME || IS_WEBKIT) {
                           // COMPAT: Chrome and Safari support `beforeinput` event but do not fire
                           // an event when deleting backwards in a selected void inline node
+                          const currentNode =
+                            selection && Range.isCollapsed(selection)
+                              ? Node.parent(editor, selection.anchor.path)
+                              : null
+
                           if (
                             selection &&
                             (Hotkeys.isDeleteBackward(nativeEvent) ||
                               Hotkeys.isDeleteForward(nativeEvent)) &&
-                            Range.isCollapsed(selection)
+                            Range.isCollapsed(selection) &&
+                            currentNode &&
+                            Node.isElement(currentNode) &&
+                            Editor.isVoid(editor, currentNode) &&
+                            (Editor.isInline(editor, currentNode) ||
+                              Editor.isBlock(editor, currentNode))
                           ) {
-                            const currentNode = Node.parent(
-                              editor,
-                              selection.anchor.path
-                            )
+                            event.preventDefault()
+                            Editor.deleteBackward(editor, { unit: 'block' })
 
-                            if (
-                              Node.isElement(currentNode) &&
-                              Editor.isVoid(editor, currentNode) &&
-                              (Editor.isInline(editor, currentNode) ||
-                                Editor.isBlock(editor, currentNode))
-                            ) {
-                              event.preventDefault()
-                              Editor.deleteBackward(editor, { unit: 'block' })
-
-                              return
-                            }
+                            return
                           }
                         }
                       } else {
@@ -1819,7 +1820,10 @@ export const Editable = forwardRef(
                     if (
                       !readOnly &&
                       ReactEditor.hasEditableTarget(editor, event.target) &&
-                      !isEventHandled(event, attributes.onPaste)
+                      !isEventHandled(event, attributes.onPaste) &&
+                      (!HAS_BEFORE_INPUT_SUPPORT ||
+                        isPlainTextOnlyPaste(event.nativeEvent) ||
+                        IS_WEBKIT)
                     ) {
                       // COMPAT: Certain browsers don't support the `beforeinput` event, so we
                       // fall back to React's `onPaste` here instead.
@@ -1828,14 +1832,8 @@ export const Editable = forwardRef(
                       // COMPAT: Safari InputEvents generated by pasting won't include
                       // application/x-slate-fragment items, so use the
                       // ClipboardEvent here. (2023/03/15)
-                      if (
-                        !HAS_BEFORE_INPUT_SUPPORT ||
-                        isPlainTextOnlyPaste(event.nativeEvent) ||
-                        IS_WEBKIT
-                      ) {
-                        event.preventDefault()
-                        ReactEditor.insertData(editor, event.clipboardData)
-                      }
+                      event.preventDefault()
+                      ReactEditor.insertData(editor, event.clipboardData)
                     }
                   },
                   [readOnly, editor, attributes.onPaste]
@@ -1971,7 +1969,7 @@ export const defaultScrollSelectionIntoView = (
     })
 
     // @ts-expect-error an unorthodox delete D:
-    delete leafEl.getBoundingClientRect
+    leafEl.getBoundingClientRect = undefined
   }
 }
 

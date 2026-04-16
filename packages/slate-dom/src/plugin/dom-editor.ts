@@ -312,11 +312,9 @@ export const DOMEditor: DOMEditorInterface = {
   },
 
   findEventRange: (editor, event) => {
-    if ('nativeEvent' in event) {
-      event = event.nativeEvent
-    }
+    const resolvedEvent = 'nativeEvent' in event ? event.nativeEvent : event
 
-    const { clientX: x, clientY: y, target } = event
+    const { clientX: x, clientY: y, target } = resolvedEvent
 
     if (x == null || y == null) {
       throw new Error(`Cannot resolve a Slate range from a DOM event: ${event}`)
@@ -348,7 +346,7 @@ export const DOMEditor: DOMEditorInterface = {
     }
 
     // Else resolve a range from the caret position where the drop occured.
-    let domRange
+    let domRange: globalThis.Range | null = null
     const { document } = DOMEditor.getWindow(editor)
 
     // COMPAT: In Firefox, `caretRangeFromPoint` doesn't exist. (2016/07/25)
@@ -475,7 +473,7 @@ export const DOMEditor: DOMEditorInterface = {
   hasDOMNode: (editor, target, options = {}) => {
     const { editable = false } = options
     const editorEl = DOMEditor.toDOMNode(editor, editor)
-    let targetEl
+    let targetEl: HTMLElement | null | undefined
 
     // COMPAT: In Firefox, reading `target.nodeType` will throw an error if
     // target is originating from an internal "restricted" element (e.g. a
@@ -573,15 +571,12 @@ export const DOMEditor: DOMEditorInterface = {
   },
 
   toDOMPoint: (editor, point) => {
-    const [node] = Editor.node(editor, point.path)
+    const resolvedPoint = Editor.void(editor, { at: point })
+      ? { path: point.path, offset: 0 }
+      : point
+    const [node] = Editor.node(editor, resolvedPoint.path)
     const el = DOMEditor.toDOMNode(editor, node)
     let domPoint: DOMPoint | undefined
-
-    // If we're inside a void node, force the offset to 0, otherwise the zero
-    // width spacing character will result in an incorrect offset of 1
-    if (Editor.void(editor, { at: point })) {
-      point = { path: point.path, offset: 0 }
-    }
 
     // For each leaf, we need to isolate its content, which means filtering
     // to its direct text and zero-width spans. (We have to filter out any
@@ -607,7 +602,7 @@ export const DOMEditor: DOMEditorInterface = {
       // composed text is displayed with the correct marks.
       const nextText = texts[i + 1]
       if (
-        point.offset === end &&
+        resolvedPoint.offset === end &&
         nextText?.hasAttribute('data-slate-mark-placeholder')
       ) {
         const domText = nextText.childNodes[0]
@@ -624,8 +619,11 @@ export const DOMEditor: DOMEditorInterface = {
         break
       }
 
-      if (point.offset <= end) {
-        const offset = Math.min(length, Math.max(0, point.offset - start))
+      if (resolvedPoint.offset <= end) {
+        const offset = Math.min(
+          length,
+          Math.max(0, resolvedPoint.offset - start)
+        )
         domPoint = [domNode, offset]
         break
       }
@@ -636,7 +634,7 @@ export const DOMEditor: DOMEditorInterface = {
     if (!domPoint) {
       throw new Error(
         `Cannot resolve a DOM point from Slate point: ${Scrubber.stringify(
-          point
+          resolvedPoint
         )}`
       )
     }
@@ -784,8 +782,7 @@ export const DOMEditor: DOMEditorInterface = {
         // ancestor, so find it by going down from the nearest void parent and taking the
         // first one that isn't inside a nested editor.
         const leafNodes = voidNode.querySelectorAll('[data-slate-leaf]')
-        for (let index = 0; index < leafNodes.length; index++) {
-          const current = leafNodes[index]
+        for (const current of leafNodes) {
           if (DOMEditor.hasDOMNode(editor, current)) {
             leafNode = current
             break
@@ -891,7 +888,7 @@ export const DOMEditor: DOMEditorInterface = {
 
       if (node && DOMEditor.hasDOMNode(editor, node, { editable: true })) {
         const slateNode = DOMEditor.toSlateNode(editor, node)
-        let nodePath
+        let nodePath: Path
         try {
           nodePath = DOMEditor.findPath(editor, slateNode)
         } catch (e) {
@@ -923,7 +920,7 @@ export const DOMEditor: DOMEditorInterface = {
     // the select event fires twice, once for the old editor's `element`
     // first, and then afterwards for the correct `element`. (2017/03/03)
     const slateNode = DOMEditor.toSlateNode(editor, textNode!)
-    let path
+    let path: Path
     try {
       path = DOMEditor.findPath(editor, slateNode)
     } catch (e) {
@@ -947,11 +944,11 @@ export const DOMEditor: DOMEditorInterface = {
     const el = isDOMSelection(domRange)
       ? domRange.anchorNode
       : domRange.startContainer
-    let anchorNode
-    let anchorOffset
-    let focusNode
-    let focusOffset
-    let isCollapsed
+    let anchorNode: globalThis.Node | null = null
+    let anchorOffset = 0
+    let focusNode: globalThis.Node | null = null
+    let focusOffset = 0
+    let isCollapsed = false
 
     if (el) {
       if (isDOMSelection(domRange)) {
@@ -1008,19 +1005,17 @@ export const DOMEditor: DOMEditorInterface = {
               // Fallback option
               anchorOffset = 0
             }
-          } else {
+          } else if (firstRange.startContainer === focusNode) {
             // This is the read only mode of a firefox table
             // Right to left
-            if (firstRange.startContainer === focusNode) {
-              anchorNode = lastRange.endContainer
-              anchorOffset = lastRange.endOffset
-              focusOffset = firstRange.startOffset
-            } else {
-              // Left to right
-              anchorNode = firstRange.startContainer
-              anchorOffset = firstRange.endOffset
-              focusOffset = lastRange.startOffset
-            }
+            anchorNode = lastRange.endContainer
+            anchorOffset = lastRange.endOffset
+            focusOffset = firstRange.startOffset
+          } else {
+            // Left to right
+            anchorNode = firstRange.startContainer
+            anchorOffset = firstRange.endOffset
+            focusOffset = lastRange.startOffset
           }
         } else {
           anchorNode = domRange.anchorNode

@@ -13,13 +13,20 @@ export const setNodes: NodeTransforms['setNodes'] = (
   options = {}
 ) => {
   Editor.withoutNormalizing(editor, () => {
-    let { match, at = editor.selection, compare, merge } = options
     const {
+      at: optionAt = editor.selection,
+      compare: optionCompare,
       hanging = false,
+      match: optionMatch,
+      merge: optionMerge,
       mode = 'lowest',
       split = false,
       voids = false,
     } = options
+    let match = optionMatch
+    let at = optionAt
+    let compare = optionCompare
+    const merge = optionMerge
 
     if (!at) {
       return

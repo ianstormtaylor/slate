@@ -81,17 +81,18 @@ const createFactory = <T extends HyperscriptCreators>(creators: T) => {
       throw new Error(`No hyperscript creator found for tag: <${tagName}>`)
     }
 
-    if (attributes == null) {
-      attributes = {}
+    let normalizedAttributes = attributes ?? {}
+    let normalizedChildren = children
+
+    if (!isObject(normalizedAttributes)) {
+      normalizedChildren = [normalizedAttributes].concat(normalizedChildren)
+      normalizedAttributes = {}
     }
 
-    if (!isObject(attributes)) {
-      children = [attributes].concat(children)
-      attributes = {}
-    }
-
-    children = children.filter((child) => Boolean(child)).flat()
-    const ret = creator(tagName, attributes, children)
+    normalizedChildren = normalizedChildren
+      .filter((child) => Boolean(child))
+      .flat()
+    const ret = creator(tagName, normalizedAttributes, normalizedChildren)
     return ret
   }
 
@@ -106,6 +107,7 @@ const normalizeElements = (elements: HyperscriptShorthands) => {
   const creators: HyperscriptCreators<Element> = {}
 
   for (const tagName in elements) {
+    if (!Object.hasOwn(elements, tagName)) continue
     const props = elements[tagName]
 
     if (typeof props !== 'object') {

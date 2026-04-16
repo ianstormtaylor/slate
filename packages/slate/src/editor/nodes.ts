@@ -25,8 +25,8 @@ export function* nodes<T extends Node>(
     return
   }
 
-  let from
-  let to
+  let from: Path
+  let to: Path
 
   if (Location.isSpan(at)) {
     from = at[0]
@@ -43,7 +43,7 @@ export function* nodes<T extends Node>(
     from,
     to,
     pass: ([node, path]) => {
-      if (pass && pass([node, path])) return true
+      if (pass?.([node, path])) return true
       if (!Node.isElement(node)) return false
       if (
         !voids &&

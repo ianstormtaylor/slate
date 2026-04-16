@@ -35,7 +35,7 @@ const SearchHighlightingExample = () => {
             index < texts.length &&
             start >= iterated + texts[index].length
           ) {
-            iterated = iterated + texts[index].length
+            iterated += texts[index].length
             index++
           }
           // Find the index of array and relative position
@@ -50,9 +50,9 @@ const SearchHighlightingExample = () => {
               focus: { path: currentPath, offset: offset + taken },
               highlight: true,
             })
-            remaining = remaining - taken
+            remaining -= taken
             if (remaining > 0) {
-              iterated = iterated + currentText.length
+              iterated += currentText.length
               // Next block will be indexed from 0
               offset = 0
               index++

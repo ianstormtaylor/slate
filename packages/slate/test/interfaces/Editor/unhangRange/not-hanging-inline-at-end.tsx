@@ -1,4 +1,9 @@
 /** @jsx jsx */
+
+import { jsx } from '../../..'
+
+jsx
+
 /* The starting selection range is not hanging, so should not be adjusted */
 import { Editor } from 'slate'
 

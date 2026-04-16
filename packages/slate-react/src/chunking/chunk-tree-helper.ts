@@ -27,12 +27,12 @@ export class ChunkTreeHelper {
   /**
    * The root of the chunk tree
    */
-  private root: ChunkTree
+  private readonly root: ChunkTree
 
   /**
    * The ideal size of a chunk
    */
-  private chunkSize: number
+  private readonly chunkSize: number
 
   /**
    * Whether debug mode is enabled
@@ -40,7 +40,7 @@ export class ChunkTreeHelper {
    * If enabled, the pointer state will be checked for internal consistency
    * after each mutating operation.
    */
-  private debug: boolean
+  private readonly debug: boolean
 
   /**
    * Whether the traversal has reached the end of the chunk tree
@@ -99,7 +99,7 @@ export class ChunkTreeHelper {
   /**
    * Move the pointer to the next leaf in the chunk tree
    */
-  public readLeaf(): ChunkLeaf | null {
+  readLeaf(): ChunkLeaf | null {
     // istanbul ignore next
     if (this.reachedEnd) return null
 
@@ -128,7 +128,7 @@ export class ChunkTreeHelper {
   /**
    * Move the pointer to the previous leaf in the chunk tree
    */
-  public returnToPreviousLeaf() {
+  returnToPreviousLeaf() {
     // If we were at the end of the tree, descend into the end of the last
     // chunk in the tree
     if (this.reachedEnd) {
@@ -160,7 +160,7 @@ export class ChunkTreeHelper {
   /**
    * Insert leaves before the current leaf, leaving the pointer unchanged
    */
-  public insertBefore(leaves: ChunkLeaf[]) {
+  insertBefore(leaves: ChunkLeaf[]) {
     this.returnToPreviousLeaf()
     this.insertAfter(leaves)
     this.readLeaf()
@@ -177,7 +177,7 @@ export class ChunkTreeHelper {
    * Any remaining leaves are passed to rawInsertAfter to be chunked and
    * inserted at the highest possible level.
    */
-  public insertAfter(leaves: ChunkLeaf[]) {
+  insertAfter(leaves: ChunkLeaf[]) {
     // istanbul ignore next
     if (leaves.length === 0) return
 
@@ -259,7 +259,7 @@ export class ChunkTreeHelper {
    * Remove the current node and decrement the pointer, deleting any ancestor
    * chunk that becomes empty as a result
    */
-  public remove() {
+  remove() {
     this.pointerSiblings.splice(this.pointerIndex--, 1)
     this.cachedPointerNode = undefined
 
@@ -280,7 +280,7 @@ export class ChunkTreeHelper {
    * Add the current chunk and all ancestor chunks to the list of modified
    * chunks
    */
-  public invalidateChunk() {
+  invalidateChunk() {
     for (let c = this.pointerChunk; c.type === 'chunk'; c = c.parent) {
       this.root.modifiedChunks.add(c)
     }

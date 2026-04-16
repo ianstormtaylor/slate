@@ -21,57 +21,58 @@ export const withHistory = <T extends Editor>(editor: T) => {
     const { history } = e
     const { redos } = history
 
-    if (redos.length > 0) {
-      const batch = redos[redos.length - 1]
-
-      if (batch.selectionBefore) {
-        Transforms.setSelection(e, batch.selectionBefore)
-      }
-
-      HistoryEditor.withoutSaving(e, () => {
-        Editor.withoutNormalizing(e, () => {
-          for (const op of batch.operations) {
-            e.apply(op)
-          }
-        })
-      })
-
-      history.redos.pop()
-      e.writeHistory('undos', batch)
+    const batch = redos.at(-1)
+    if (!batch) {
+      return
     }
+
+    if (batch.selectionBefore) {
+      Transforms.setSelection(e, batch.selectionBefore)
+    }
+
+    HistoryEditor.withoutSaving(e, () => {
+      Editor.withoutNormalizing(e, () => {
+        for (const op of batch.operations) {
+          e.apply(op)
+        }
+      })
+    })
+
+    history.redos.pop()
+    e.writeHistory('undos', batch)
   }
 
   e.undo = () => {
     const { history } = e
     const { undos } = history
 
-    if (undos.length > 0) {
-      const batch = undos[undos.length - 1]
-
-      HistoryEditor.withoutSaving(e, () => {
-        Editor.withoutNormalizing(e, () => {
-          const inverseOps = batch.operations.map(Operation.inverse).reverse()
-
-          for (const op of inverseOps) {
-            e.apply(op)
-          }
-          if (batch.selectionBefore) {
-            Transforms.setSelection(e, batch.selectionBefore)
-          }
-        })
-      })
-
-      e.writeHistory('redos', batch)
-      history.undos.pop()
+    const batch = undos.at(-1)
+    if (!batch) {
+      return
     }
+
+    HistoryEditor.withoutSaving(e, () => {
+      Editor.withoutNormalizing(e, () => {
+        const inverseOps = batch.operations.map(Operation.inverse).reverse()
+
+        for (const op of inverseOps) {
+          e.apply(op)
+        }
+        if (batch.selectionBefore) {
+          Transforms.setSelection(e, batch.selectionBefore)
+        }
+      })
+    })
+
+    e.writeHistory('redos', batch)
+    history.undos.pop()
   }
 
   e.apply = (op: Operation) => {
     const { operations, history } = e
     const { undos } = history
-    const lastBatch = undos[undos.length - 1]
-    const lastOp =
-      lastBatch && lastBatch.operations[lastBatch.operations.length - 1]
+    const lastBatch = undos.at(-1)
+    const lastOp = lastBatch?.operations.at(-1)
     let save = HistoryEditor.isSaving(e)
     let merge = HistoryEditor.isMerging(e)
 
@@ -83,7 +84,7 @@ export const withHistory = <T extends Editor>(editor: T) => {
       if (merge == null) {
         if (lastBatch == null) {
           merge = false
-        } else if (operations.includes(lastOp)) {
+        } else if (lastOp && operations.includes(lastOp)) {
           merge = true
         } else {
           merge = shouldMerge(op, lastOp)

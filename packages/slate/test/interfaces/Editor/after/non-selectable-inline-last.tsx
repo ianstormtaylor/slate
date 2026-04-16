@@ -1,5 +1,9 @@
 /** @jsx jsx */
 
+import { jsx } from '../../..'
+
+jsx
+
 import { Editor } from 'slate'
 
 // This is invalid due to the lack of a text node after the inline, but this

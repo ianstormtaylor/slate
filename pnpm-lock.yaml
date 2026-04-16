@@ -236,6 +236,9 @@ importers:
       lodash:
         specifier: ^4.17.21
         version: 4.18.1
+      slate-hyperscript:
+        specifier: ^0.115.0
+        version: 0.115.0(slate@0.124.1)
       source-map-loader:
         specifier: ^4.0.1
         version: 4.0.2
@@ -306,9 +309,18 @@ importers:
       '@babel/runtime':
         specifier: ^7.23.2
         version: 7.29.2
+      lodash:
+        specifier: ^4.17.21
+        version: 4.18.1
       slate:
-        specifier: workspace:*
-        version: link:../slate
+        specifier: ^0.124.0
+        version: 0.124.1
+      slate-hyperscript:
+        specifier: ^0.115.0
+        version: 0.115.0(slate@0.124.1)
+      source-map-loader:
+        specifier: ^4.0.1
+        version: 4.0.2
 
   packages/slate-hyperscript:
     devDependencies:
@@ -4644,6 +4656,14 @@ packages:
   slash@3.0.0:
     resolution: {integrity: sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==}
     engines: {node: '>=8'}
+
+  slate-hyperscript@0.115.0:
+    resolution: {integrity: sha512-aaQ1XSfUhw0Lf4cwVLeNFYnnPsC9iX9aEmKvT5PAaGTNVe1LaBCAXB+CFuqp7YPExPj9hYuS5CsIu8dAh9JX2w==}
+    peerDependencies:
+      slate: '>=0.114.3'
+
+  slate@0.124.1:
+    resolution: {integrity: sha512-ii7DwezgvbLAyKtHBIunjTR1kzbNfYLCUKLMzJELlbTZkvHzX4DzN7HKIwcakf6dPxO6AoeT/P7kHOcyTym/hA==}
 
   source-map-js@1.2.1:
     resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
@@ -10337,6 +10357,12 @@ snapshots:
   slash@2.0.0: {}
 
   slash@3.0.0: {}
+
+  slate-hyperscript@0.115.0(slate@0.124.1):
+    dependencies:
+      slate: 0.124.1
+
+  slate@0.124.1: {}
 
   source-map-js@1.2.1: {}
 

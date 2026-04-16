@@ -1,5 +1,10 @@
 /** @jsx jsx */
-import assert from 'assert'
+
+import { jsx } from '../../..'
+
+jsx
+
+import assert from 'node:assert/strict'
 import { Editor, Operation, Transforms } from 'slate'
 
 export const run = (editor: Editor) => {

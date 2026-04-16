@@ -43,7 +43,9 @@ export const reconcileChildren = (
   // node. Each leaf from the tree is compared to the current node in the
   // children array to determine whether nodes have been inserted, removed or
   // updated.
-  while ((treeLeaf = chunkTreeHelper.readLeaf())) {
+  while (true) {
+    treeLeaf = chunkTreeHelper.readLeaf()
+    if (!treeLeaf) break
     // Check where the tree node appears in the children array. In the most
     // common case (where no insertions or removals have occurred), this will be
     // 0. If the node has been removed, this will be -1. If new nodes have been

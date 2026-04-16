@@ -256,7 +256,7 @@ export const Path: PathInterface = {
   },
 
   hasPrevious(path: Path): boolean {
-    return path[path.length - 1] > 0
+    return path.at(-1)! > 0
   },
 
   isAfter(path: Path, another: Path): boolean {
@@ -302,8 +302,8 @@ export const Path: PathInterface = {
 
     const as = path.slice(0, -1)
     const bs = another.slice(0, -1)
-    const al = path[path.length - 1]
-    const bl = another[another.length - 1]
+    const al = path.at(-1)!
+    const bl = another.at(-1)!
     return al !== bl && Path.equals(as, bs)
   },
 
@@ -329,7 +329,7 @@ export const Path: PathInterface = {
       )
     }
 
-    const last = path[path.length - 1]
+    const last = path.at(-1)!
     return path.slice(0, -1).concat(last + 1)
   },
 
@@ -368,7 +368,7 @@ export const Path: PathInterface = {
       )
     }
 
-    const last = path[path.length - 1]
+    const last = path.at(-1)!
 
     if (last <= 0) {
       throw new Error(
@@ -451,7 +451,7 @@ export const Path: PathInterface = {
 
         if (Path.equals(op, p)) {
           if (affinity === 'forward') {
-            p[p.length - 1] += 1
+            p[p.length - 1]! += 1
           } else if (affinity === 'backward') {
             // Nothing, because it still refers to the right path.
           } else {

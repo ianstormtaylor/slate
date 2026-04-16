@@ -37,6 +37,8 @@ import {
 } from '../utils/weak-maps'
 import { DOMEditor } from './dom-editor'
 
+const NEWLINE_SPLIT_RE = /\r\n|\r|\n/
+
 /**
  * `withDOM` adds DOM specific behaviors to the editor.
  *
@@ -347,7 +349,7 @@ export const withDOM = <T extends BaseEditor>(
     const text = data.getData('text/plain')
 
     if (text) {
-      const lines = text.split(/\r\n|\r|\n/)
+      const lines = text.split(NEWLINE_SPLIT_RE)
       let split = false
 
       for (const line of lines) {

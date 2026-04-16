@@ -13,7 +13,7 @@ export const addMark: EditorInterface['addMark'] = (editor, key, value) => {
       if (!Node.isText(node)) {
         return false // marks can only be applied to text
       }
-      const [parentNode, parentPath] = Editor.parent(editor, path)
+      const [parentNode] = Editor.parent(editor, path)
       return !editor.isVoid(parentNode) || editor.markableVoid(parentNode)
     }
     const expandedSelection = Range.isExpanded(selection)

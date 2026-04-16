@@ -1,11 +1,4 @@
-import {
-  Fragment,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createEditor, Editor, Range, Transforms } from 'slate'
 import { withHistory } from 'slate-history'
 import {
@@ -86,7 +79,7 @@ const MentionExample = () => {
           const before = wordBefore && Editor.before(editor, wordBefore)
           const beforeRange = before && Editor.range(editor, before, start)
           const beforeText = beforeRange && Editor.string(editor, beforeRange)
-          const beforeMatch = beforeText && beforeText.match(/^@(\w+)$/)
+          const beforeMatch = beforeText?.match(/^@(\w+)$/)
           const after = Editor.after(editor, start)
           const afterRange = Editor.range(editor, start, after)
           const afterText = Editor.string(editor, afterRange)
@@ -227,15 +220,15 @@ const Mention = ({ attributes, children, element }) => {
       <div contentEditable={false}>
         {IS_MAC ? (
           // Mac OS IME https://github.com/ianstormtaylor/slate/issues/3490
-          <Fragment>
+          <>
             {children}@{element.character}
-          </Fragment>
+          </>
         ) : (
           // Others like Android https://github.com/ianstormtaylor/slate/pull/5360
-          <Fragment>
+          <>
             @{element.character}
             {children}
-          </Fragment>
+          </>
         )}
       </div>
     </span>

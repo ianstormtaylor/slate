@@ -99,8 +99,8 @@ export const mergeNodes: NodeTransforms['mergeNodes'] = (
     })
 
     const emptyRef = emptyAncestor && Editor.pathRef(editor, emptyAncestor[1])
-    let properties
-    let position
+    let properties: Partial<Text> | Partial<Element>
+    let position: number
 
     // Ensure that the nodes are equivalent, and figure out what the position
     // and extra properties of the merge will be.

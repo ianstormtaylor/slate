@@ -24,16 +24,17 @@ const resolveDescendants = (children: any[]): Descendant[] => {
       return
     }
 
-    const prev = nodes[nodes.length - 1]
+    let normalizedChild = child
+    const prev = nodes.at(-1)
 
-    if (typeof child === 'string') {
-      const text = { text: child }
+    if (typeof normalizedChild === 'string') {
+      const text = { text: normalizedChild }
       STRINGS.add(text)
-      child = text
+      normalizedChild = text
     }
 
-    if (Text.isText(child)) {
-      const c = child // HACK: fix typescript complaining
+    if (Text.isText(normalizedChild)) {
+      const c = normalizedChild // HACK: fix typescript complaining
 
       if (
         Text.isText(prev) &&
@@ -45,23 +46,23 @@ const resolveDescendants = (children: any[]): Descendant[] => {
       } else {
         nodes.push(c)
       }
-    } else if (Element.isElement(child)) {
-      nodes.push(child)
-    } else if (child instanceof Token) {
-      let n = nodes[nodes.length - 1]
+    } else if (Element.isElement(normalizedChild)) {
+      nodes.push(normalizedChild)
+    } else if (normalizedChild instanceof Token) {
+      let n = nodes.at(-1)
 
       if (!Text.isText(n)) {
         addChild('')
-        n = nodes[nodes.length - 1] as Text
+        n = nodes.at(-1) as Text
       }
 
-      if (child instanceof AnchorToken) {
-        addAnchorToken(n, child)
-      } else if (child instanceof FocusToken) {
-        addFocusToken(n, child)
+      if (normalizedChild instanceof AnchorToken) {
+        addAnchorToken(n, normalizedChild)
+      } else if (normalizedChild instanceof FocusToken) {
+        addFocusToken(n, normalizedChild)
       }
     } else {
-      throw new Error(`Unexpected hyperscript child object: ${child}`)
+      throw new Error(`Unexpected hyperscript child object: ${normalizedChild}`)
     }
   }
 

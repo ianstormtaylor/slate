@@ -71,9 +71,7 @@ function longestCommonSuffixLength(
   const length = Math.min(str.length, another.length, max)
 
   for (let i = 0; i < length; i++) {
-    if (
-      str.charAt(str.length - i - 1) !== another.charAt(another.length - i - 1)
-    ) {
+    if (str.at(i + 1) !== another.at(i + 1)) {
       return i
     }
   }

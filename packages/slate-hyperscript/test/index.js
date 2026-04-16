@@ -11,6 +11,7 @@ describe('slate-hyperscript', () => {
       actual = input
     } else {
       for (const key in output) {
+        if (!Object.hasOwn(output, key)) continue
         actual[key] = input[key]
       }
     }

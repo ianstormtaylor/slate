@@ -40,9 +40,7 @@ export type DOMPoint = [Node, number]
  */
 
 export const getDefaultView = (value: any): Window | null => {
-  return (
-    (value && value.ownerDocument && value.ownerDocument.defaultView) || null
-  )
+  return value?.ownerDocument?.defaultView || null
 }
 
 /**
@@ -75,7 +73,7 @@ export const isDOMNode = (value: any): value is DOMNode => {
  */
 
 export const isDOMSelection = (value: any): value is DOMSelection => {
-  const window = value && value.anchorNode && getDefaultView(value.anchorNode)
+  const window = value?.anchorNode && getDefaultView(value.anchorNode)
   return !!window && value instanceof window.Selection
 }
 
@@ -139,7 +137,7 @@ export const normalizeDOMPoint = (domPoint: DOMPoint): DOMPoint => {
  */
 
 export const hasShadowRoot = (node: Node | null) => {
-  let parent = node && node.parentNode
+  let parent = node?.parentNode
   while (parent) {
     if (parent.toString() === '[object ShadowRoot]') {
       return true
@@ -164,8 +162,10 @@ export const getEditableChildAndIndex = (
   }
 
   const { childNodes } = parent
-  let child = childNodes[index]
-  let i = index
+  let resolvedIndex = index
+  let resolvedDirection = direction
+  let child = childNodes[resolvedIndex]
+  let i = resolvedIndex
   let triedForward = false
   let triedBackward = false
 
@@ -182,24 +182,24 @@ export const getEditableChildAndIndex = (
 
     if (i >= childNodes.length) {
       triedForward = true
-      i = index - 1
-      direction = 'backward'
+      i = resolvedIndex - 1
+      resolvedDirection = 'backward'
       continue
     }
 
     if (i < 0) {
       triedBackward = true
-      i = index + 1
-      direction = 'forward'
+      i = resolvedIndex + 1
+      resolvedDirection = 'forward'
       continue
     }
 
     child = childNodes[i]
-    index = i
-    i += direction === 'forward' ? 1 : -1
+    resolvedIndex = i
+    i += resolvedDirection === 'forward' ? 1 : -1
   }
 
-  return [child, index]
+  return [child, resolvedIndex]
 }
 
 /**
@@ -320,6 +320,8 @@ export const isTrackedMutation = (
         return true
       }
     }
+
+    return false
   })
 
   if (!parentMutation || parentMutation === mutation) {
@@ -336,7 +338,7 @@ export const isTrackedMutation = (
 export const getActiveElement = () => {
   let activeElement = document.activeElement
 
-  while (activeElement?.shadowRoot && activeElement.shadowRoot?.activeElement) {
+  while (activeElement?.shadowRoot?.activeElement) {
     activeElement = activeElement?.shadowRoot?.activeElement
   }
 
@@ -376,7 +378,7 @@ export const closestShadowAware = (
   let current: DOMElement | null = element
 
   while (current) {
-    if (current.matches && current.matches(selector)) {
+    if (current.matches?.(selector)) {
       return current
     }
 

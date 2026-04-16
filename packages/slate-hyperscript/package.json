@@ -13,9 +13,15 @@
   "files": [
     "dist/"
   ],
+  "scripts": {
+    "build": "ROLLUP_PACKAGES=slate-hyperscript pnpm --dir ../.. build:rollup",
+    "clean": "rimraf dist lib",
+    "test": "node ../../scripts/run-from-root.mjs pnpm exec mocha --require ./config/babel/register.cjs ./packages/slate-hyperscript/test/index.js",
+    "typecheck": "pnpm exec tsc --project tsconfig.json --noEmit --pretty false"
+  },
   "devDependencies": {
     "@babel/runtime": "^7.23.2",
-    "slate": "^0.124.0",
+    "slate": "workspace:*",
     "source-map-loader": "^4.0.1"
   },
   "peerDependencies": {

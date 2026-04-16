@@ -15,7 +15,7 @@ import {
 } from 'slate-dom'
 import { useSlateStatic } from '../hooks/use-slate-static'
 import type { RenderLeafProps, RenderPlaceholderProps } from './editable'
-import String from './string'
+import LeafString from './string'
 
 // Delay the placeholder on Android to prevent the keyboard from closing.
 // (https://github.com/ianstormtaylor/slate/pull/5368)
@@ -100,7 +100,7 @@ const Leaf = (props: {
   )
 
   let children = (
-    <String isLast={isLast} leaf={leaf} parent={parent} text={text} />
+    <LeafString isLast={isLast} leaf={leaf} parent={parent} text={text} />
   )
 
   const leafIsPlaceholder = Boolean(leaf[PLACEHOLDER_SYMBOL])
@@ -144,10 +144,10 @@ const Leaf = (props: {
     }
 
     children = (
-      <React.Fragment>
+      <>
         {children}
         {renderPlaceholder(placeholderProps)}
-      </React.Fragment>
+      </>
     )
   }
 

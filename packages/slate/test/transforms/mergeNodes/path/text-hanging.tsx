@@ -1,4 +1,9 @@
 /** @jsx jsx */
+
+import { jsx } from '../../..'
+
+jsx
+
 import { Text, Transforms } from 'slate'
 
 export const input = (

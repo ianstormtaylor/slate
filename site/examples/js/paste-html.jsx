@@ -112,8 +112,6 @@ const withHtml = (editor) => {
 const Element = (props) => {
   const { attributes, children, element } = props
   switch (element.type) {
-    default:
-      return <p {...attributes}>{children}</p>
     case 'block-quote':
       return <blockquote {...attributes}>{children}</blockquote>
     case 'code-block':
@@ -148,6 +146,8 @@ const Element = (props) => {
       )
     case 'image':
       return <ImageElement {...props} />
+    default:
+      return <p {...attributes}>{children}</p>
   }
 }
 const allowedSchemes = ['http:', 'https:', 'mailto:', 'tel:']

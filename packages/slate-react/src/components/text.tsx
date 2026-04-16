@@ -45,7 +45,7 @@ const Text = (props: {
   const decorations = useDecorations(text, parentDecorations)
   const decoratedLeaves = SlateText.decorations(text, decorations)
   const key = ReactEditor.findKey(editor, text)
-  const children = []
+  const children: React.ReactNode[] = []
 
   for (let i = 0; i < decoratedLeaves.length; i++) {
     const { leaf, position } = decoratedLeaves[i]

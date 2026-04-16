@@ -37,6 +37,8 @@ export const IS_ANDROID_CHROME_LEGACY =
   typeof navigator !== 'undefined' &&
   /Chrome?\/(?:[0-5]?\d)(?:\.)/i.test(navigator.userAgent)
 
+const SAFARI_VERSION = navigator.userAgent.match(/Version\/(\d+)/)?.[1]
+
 // Firefox did not support `beforeInput` until `v87`.
 export const IS_FIREFOX_LEGACY =
   typeof navigator !== 'undefined' &&
@@ -67,10 +69,7 @@ export const IS_SAFARI_LEGACY =
   typeof navigator !== 'undefined' &&
   /Safari/.test(navigator.userAgent) &&
   /Version\/(\d+)/.test(navigator.userAgent) &&
-  (navigator.userAgent.match(/Version\/(\d+)/)?.[1]
-    ? Number.parseInt(navigator.userAgent.match(/Version\/(\d+)/)?.[1]!, 10) <
-      17
-    : false)
+  (SAFARI_VERSION ? Number.parseInt(SAFARI_VERSION, 10) < 17 : false)
 
 // COMPAT: Firefox/Edge Legacy don't support the `beforeinput` event
 // Chrome Legacy doesn't support `beforeinput` correctly
@@ -80,5 +79,8 @@ export const HAS_BEFORE_INPUT_SUPPORT =
   // globalThis is undefined in older browsers
   typeof globalThis !== 'undefined' &&
   globalThis.InputEvent &&
-  // @ts-expect-error The `getTargetRanges` property isn't recognized.
-  typeof globalThis.InputEvent.prototype.getTargetRanges === 'function'
+  typeof (
+    globalThis.InputEvent.prototype as InputEvent & {
+      getTargetRanges?: unknown
+    }
+  ).getTargetRanges === 'function'

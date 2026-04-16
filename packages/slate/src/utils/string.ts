@@ -35,9 +35,9 @@ export const getCharacterDistance = (str: string, isRTL = false): number => {
       intersects(right, CodepointType.ExtPict)
     ) {
       if (isLTR) {
-        gb11 = endsWithEmojiZWJ(str.substring(0, distance))
+        gb11 = endsWithEmojiZWJ(str.slice(0, distance))
       } else {
-        gb11 = endsWithEmojiZWJ(str.substring(0, str.length - distance))
+        gb11 = endsWithEmojiZWJ(str.slice(0, str.length - distance))
       }
       if (!gb11) break
     }
@@ -50,9 +50,7 @@ export const getCharacterDistance = (str: string, isRTL = false): number => {
         if (isLTR) {
           gb12Or13 = true
         } else {
-          gb12Or13 = endsWithOddNumberOfRIs(
-            str.substring(0, str.length - distance)
-          )
+          gb12Or13 = endsWithOddNumberOfRIs(str.slice(0, str.length - distance))
         }
       } else {
         gb12Or13 = !gb12Or13
@@ -84,12 +82,17 @@ const CHAMELEON = /['\u2018\u2019]/
  */
 
 export const getWordDistance = (text: string, isRTL = false): number => {
+  let remainingText = text
   let dist = 0
   let started = false
 
-  while (text.length > 0) {
-    const charDist = getCharacterDistance(text, isRTL)
-    const [char, remaining] = splitByCharacterDistance(text, charDist, isRTL)
+  while (remainingText.length > 0) {
+    const charDist = getCharacterDistance(remainingText, isRTL)
+    const [char, remaining] = splitByCharacterDistance(
+      remainingText,
+      charDist,
+      isRTL
+    )
 
     if (isWordCharacter(char, remaining, isRTL)) {
       started = true
@@ -100,7 +103,7 @@ export const getWordDistance = (text: string, isRTL = false): number => {
       dist += charDist
     }
 
-    text = remaining
+    remainingText = remaining
   }
 
   return dist

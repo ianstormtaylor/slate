@@ -5,7 +5,7 @@ const config = {
     '^.+\\.(ts|tsx)$': [
       'ts-jest',
       {
-        tsconfig: '<rootDir>/packages/slate-react/tsconfig.json',
+        tsconfig: '<rootDir>/packages/slate-react/tsconfig.test.json',
       },
     ],
   },

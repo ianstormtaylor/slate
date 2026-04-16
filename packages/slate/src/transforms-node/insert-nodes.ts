@@ -22,16 +22,13 @@ export const insertNodes: NodeTransforms['insertNodes'] = (
       batchDirty = true,
     } = options
     let { at, match, select } = options
+    const targetNodes = Node.isNode(nodes) ? [nodes] : nodes
 
-    if (Node.isNode(nodes)) {
-      nodes = [nodes]
-    }
-
-    if (nodes.length === 0) {
+    if (targetNodes.length === 0) {
       return
     }
 
-    const [node] = nodes
+    const [node] = targetNodes
 
     if (!at) {
       at = getDefaultInsertLocation(editor)
@@ -90,7 +87,7 @@ export const insertNodes: NodeTransforms['insertNodes'] = (
     }
 
     const parentPath = Path.parent(at)
-    let index = at[at.length - 1]
+    let index = at.at(-1)!
 
     if (!voids && Editor.void(editor, { at: parentPath })) {
       return
@@ -104,7 +101,7 @@ export const insertNodes: NodeTransforms['insertNodes'] = (
       batchDirtyPaths(
         editor,
         () => {
-          for (const node of nodes as Node[]) {
+          for (const node of targetNodes as Node[]) {
             const path = parentPath.concat(index)
             index++
 
@@ -142,7 +139,7 @@ export const insertNodes: NodeTransforms['insertNodes'] = (
         }
       )
     } else {
-      for (const node of nodes as Node[]) {
+      for (const node of targetNodes as Node[]) {
         const path = parentPath.concat(index)
         index++
 

@@ -8,34 +8,35 @@ import {
 
 export const path: EditorInterface['path'] = (editor, at, options = {}) => {
   const { depth, edge } = options
+  let resolvedAt = at
 
-  if (Location.isPath(at)) {
+  if (Location.isPath(resolvedAt)) {
     if (edge === 'start') {
-      const [, firstPath] = Node.first(editor, at)
-      at = firstPath
+      const [, firstPath] = Node.first(editor, resolvedAt)
+      resolvedAt = firstPath
     } else if (edge === 'end') {
-      const [, lastPath] = Node.last(editor, at)
-      at = lastPath
+      const [, lastPath] = Node.last(editor, resolvedAt)
+      resolvedAt = lastPath
     }
   }
 
-  if (Location.isRange(at)) {
+  if (Location.isRange(resolvedAt)) {
     if (edge === 'start') {
-      at = Range.start(at)
+      resolvedAt = Range.start(resolvedAt)
     } else if (edge === 'end') {
-      at = Range.end(at)
+      resolvedAt = Range.end(resolvedAt)
     } else {
-      at = Path.common(at.anchor.path, at.focus.path)
+      resolvedAt = Path.common(resolvedAt.anchor.path, resolvedAt.focus.path)
     }
   }
 
-  if (Location.isPoint(at)) {
-    at = at.path
+  if (Location.isPoint(resolvedAt)) {
+    resolvedAt = resolvedAt.path
   }
 
   if (depth != null) {
-    at = at.slice(0, depth)
+    resolvedAt = resolvedAt.slice(0, depth)
   }
 
-  return at
+  return resolvedAt
 }

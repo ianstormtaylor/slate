@@ -162,8 +162,6 @@ const Element = (props: RenderElementProps) => {
   const { attributes, children, element } = props
 
   switch (element.type) {
-    default:
-      return <p {...attributes}>{children}</p>
     case 'block-quote':
       return <blockquote {...attributes}>{children}</blockquote>
     case 'code-block':
@@ -198,6 +196,8 @@ const Element = (props: RenderElementProps) => {
       )
     case 'image':
       return <ImageElement {...props} />
+    default:
+      return <p {...attributes}>{children}</p>
   }
 }
 
