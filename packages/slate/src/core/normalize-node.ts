@@ -10,6 +10,7 @@ import {
   Path,
   Ancestor,
 } from '../interfaces'
+import { isObservingBatchNormalize } from './batch'
 
 const isDirectChildPath = (parentPath: Path, childPath: Path) =>
   childPath.length === parentPath.length + 1 &&
@@ -26,28 +27,71 @@ const getBlockOnlyChildIndexesToValidate = (
   switch (operation.type) {
     case 'set_node':
     case 'insert_node': {
-      return isDirectChildPath(path, operation.path)
-        ? [operation.path[path.length]]
-        : null
+      if (
+        Path.equals(path, operation.path) ||
+        Path.isAncestor(path, operation.path)
+      ) {
+        return isDirectChildPath(path, operation.path)
+          ? [operation.path[path.length]]
+          : []
+      }
+
+      if (operation.type === 'insert_node') {
+        const parentPath = Path.parent(operation.path)
+
+        if (
+          Path.equals(path, parentPath) ||
+          Path.isAncestor(path, parentPath)
+        ) {
+          return isDirectChildPath(path, operation.path)
+            ? [operation.path[path.length]]
+            : []
+        }
+      }
+
+      return null
+    }
+
+    case 'insert_text':
+    case 'remove_text': {
+      return []
+    }
+
+    case 'split_node':
+    case 'merge_node': {
+      return Path.isAncestor(path, operation.path) ? [] : null
+    }
+
+    case 'set_selection': {
+      return []
     }
 
     case 'remove_node': {
-      return isDirectChildPath(path, operation.path) ? [] : null
+      if (
+        Path.equals(path, operation.path) ||
+        Path.isAncestor(path, operation.path)
+      ) {
+        return []
+      }
+
+      return null
     }
 
     case 'move_node': {
-      const removesFromParent = isDirectChildPath(path, operation.path)
-      const insertsIntoParent = isDirectChildPath(path, operation.newPath)
+      const removesFromParent = Path.isAncestor(path, operation.path)
+      const insertsIntoParent = Path.isAncestor(path, operation.newPath)
 
       if (!removesFromParent && !insertsIntoParent) {
         return null
       }
 
-      if (removesFromParent && insertsIntoParent) {
-        return []
-      }
-
-      return insertsIntoParent ? [operation.newPath[path.length]] : []
+      return isDirectChildPath(path, operation.path)
+        ? insertsIntoParent && isDirectChildPath(path, operation.newPath)
+          ? [operation.newPath[path.length]]
+          : []
+        : insertsIntoParent && isDirectChildPath(path, operation.newPath)
+        ? [operation.newPath[path.length]]
+        : []
     }
 
     default: {
@@ -183,7 +227,8 @@ export const normalizeNode: WithEditorFirstArg<Editor['normalizeNode']> = (
     }
 
     const childIndexesToValidate =
-      force || editor.operations.length !== 1
+      force ||
+      (isObservingBatchNormalize(editor) && editor.operations.length !== 1)
         ? null
         : getBlockOnlyChildIndexesToValidate(path, operation)
 

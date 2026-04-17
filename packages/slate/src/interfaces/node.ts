@@ -1,6 +1,11 @@
 import { Editor, Path, Range, Scrubber, Text } from '..'
 import { Element, ElementEntry } from './element'
 import { modifyChildren, modifyLeaf, removeChildren } from '../utils/modify'
+import {
+  BATCH_DEPTH,
+  BATCH_OBSERVE_NORMALIZE_DEPTH,
+  CHILDREN,
+} from '../utils/weak-maps'
 
 /**
  * The `Node` union type represents all of the different types of nodes that
@@ -238,6 +243,15 @@ export interface NodeInterface {
   ) => Generator<NodeEntry<Text>, void, undefined>
 }
 
+const getNodeChildren = (node: Ancestor): Descendant[] =>
+  typeof (node as Editor).apply === 'function' &&
+  typeof (node as Editor).getChildren === 'function'
+    ? (BATCH_DEPTH.get(node as Editor) ?? 0) === 0 &&
+      (BATCH_OBSERVE_NORMALIZE_DEPTH.get(node as Editor) ?? 0) === 0
+      ? CHILDREN.get(node as Editor) ?? []
+      : (node as Editor).getChildren()
+    : node.children
+
 // eslint-disable-next-line no-redeclare
 export const Node: NodeInterface = {
   ancestor(root: Node, path: Path): Ancestor {
@@ -277,7 +291,7 @@ export const Node: NodeInterface = {
       throw new Error('Expected index to be a number')
     }
 
-    const c = root.children[index] as Descendant
+    const c = getNodeChildren(root)[index] as Descendant
 
     if (c == null) {
       throw new Error(
@@ -297,7 +311,7 @@ export const Node: NodeInterface = {
   ): Generator<NodeEntry<Descendant>, void, undefined> {
     const { reverse = false } = options
     const ancestor = Node.ancestor(root, path)
-    const { children } = ancestor
+    const children = getNodeChildren(ancestor)
     let index = reverse ? children.length - 1 : 0
 
     while (reverse ? index >= 0 : index < children.length) {
@@ -369,10 +383,10 @@ export const Node: NodeInterface = {
     let n = Node.get(root, p)
 
     while (n) {
-      if (Node.isText(n) || n.children.length === 0) {
+      if (Node.isText(n) || getNodeChildren(n).length === 0) {
         break
       } else {
-        n = n.children[0]
+        n = getNodeChildren(n)[0]
         p.push(0)
       }
     }
@@ -381,7 +395,13 @@ export const Node: NodeInterface = {
   },
 
   fragment<T extends Ancestor = Editor>(root: T, range: Range): T['children'] {
-    const newRoot = { children: root.children }
+    const newRoot = {
+      children:
+        typeof (root as Editor).apply === 'function' &&
+        typeof (root as Editor).getChildren === 'function'
+          ? (root as Editor).getChildren()
+          : root.children,
+    }
 
     const [start, end] = Range.edges(range)
     const nodeEntries = Node.nodes(newRoot, {
@@ -438,11 +458,17 @@ export const Node: NodeInterface = {
         throw new Error('Got non-numeric path index')
       }
 
-      if (Node.isText(node) || !node.children[p]) {
+      if (Node.isText(node)) {
         return
       }
 
-      node = node.children[p]
+      const children = getNodeChildren(node)
+
+      if (!children[p]) {
+        return
+      }
+
+      node = children[p]
     }
 
     return node
@@ -458,11 +484,17 @@ export const Node: NodeInterface = {
         throw new Error('Got non-numeric path index')
       }
 
-      if (Node.isText(node) || !node.children[p]) {
+      if (Node.isText(node)) {
         return false
       }
 
-      node = node.children[p]
+      const children = getNodeChildren(node)
+
+      if (!children[p]) {
+        return false
+      }
+
+      node = children[p]
     }
 
     return true
@@ -509,11 +541,12 @@ export const Node: NodeInterface = {
     let n = Node.get(root, p)
 
     while (n) {
-      if (Node.isText(n) || n.children.length === 0) {
+      if (Node.isText(n) || getNodeChildren(n).length === 0) {
         break
       } else {
-        const i = n.children.length - 1
-        n = n.children[i]
+        const children = getNodeChildren(n)
+        const i = children.length - 1
+        n = children[i]
         p.push(i)
       }
     }
@@ -580,11 +613,12 @@ export const Node: NodeInterface = {
       if (
         !visited.has(n) &&
         !Node.isText(n) &&
-        n.children.length !== 0 &&
+        getNodeChildren(n).length !== 0 &&
         (pass == null || pass([n, p]) === false)
       ) {
         visited.add(n)
-        let nextIndex = reverse ? n.children.length - 1 : 0
+        const children = getNodeChildren(n)
+        let nextIndex = reverse ? children.length - 1 : 0
 
         if (Path.isAncestor(p, from)) {
           nextIndex = from[p.length]
@@ -644,7 +678,7 @@ export const Node: NodeInterface = {
     if (Node.isText(node)) {
       return node.text
     } else {
-      return node.children.map(Node.string).join('')
+      return getNodeChildren(node).map(Node.string).join('')
     }
   },
 

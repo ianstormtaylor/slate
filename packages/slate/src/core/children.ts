@@ -148,6 +148,8 @@ const getObservedChildren = (editor: Editor): Descendant[] => {
 export const getChildren = (editor: Editor): Descendant[] =>
   isReadingBatchInternals(editor) || isObservingBatchNormalize(editor)
     ? getCurrentChildren(editor)
+    : !isBatching(editor)
+    ? getCommittedChildren(editor)
     : getObservedChildren(editor)
 
 export const getCommittedChildren = (editor: Editor): Descendant[] =>
@@ -658,11 +660,23 @@ export const clearExactSetNodeDraft = (editor: Editor) => {
   BATCH_EXACT_SET_NODE_SNAPSHOT_OPS.delete(editor)
 }
 
-export const defineChildrenAccessor = (editor: ChildrenAccessEditor) => {
+export const defineChildrenAccessor = (
+  editor: ChildrenAccessEditor,
+  defaultGetChildren: ChildrenAccessEditor['getChildren']
+) => {
   Object.defineProperty(editor, 'children', {
     configurable: true,
     enumerable: true,
     get() {
+      if (
+        editor.getChildren === defaultGetChildren &&
+        !isBatching(editor) &&
+        !isReadingBatchInternals(editor) &&
+        !isObservingBatchNormalize(editor)
+      ) {
+        return getCommittedChildren(editor)
+      }
+
       return editor.getChildren()
     },
     set(children: Descendant[]) {

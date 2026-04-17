@@ -193,7 +193,8 @@ export const createEditor = (): Editor => {
       shouldMergeNodesRemovePrevNode(editor, ...args),
   }
 
-  defineChildrenAccessor(editor)
+  const defaultGetChildren = editor.getChildren
+  defineChildrenAccessor(editor, defaultGetChildren)
   editor.children = []
 
   return editor
