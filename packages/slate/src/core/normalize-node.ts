@@ -1,6 +1,7 @@
 import { WithEditorFirstArg } from '../utils/types'
 import {
   Editor,
+  EditorNormalizeOptions,
   Element,
   Descendant,
   Text,
@@ -9,12 +10,102 @@ import {
   Path,
   Ancestor,
 } from '../interfaces'
+import { isObservingBatchNormalize } from './batch'
+
+const isDirectChildPath = (parentPath: Path, childPath: Path) =>
+  childPath.length === parentPath.length + 1 &&
+  Path.equals(Path.parent(childPath), parentPath)
+
+const getBlockOnlyChildIndexesToValidate = (
+  path: Path,
+  operation?: EditorNormalizeOptions['operation']
+) => {
+  if (!operation) {
+    return null
+  }
+
+  switch (operation.type) {
+    case 'set_node':
+    case 'insert_node': {
+      if (
+        Path.equals(path, operation.path) ||
+        Path.isAncestor(path, operation.path)
+      ) {
+        return isDirectChildPath(path, operation.path)
+          ? [operation.path[path.length]]
+          : []
+      }
+
+      if (operation.type === 'insert_node') {
+        const parentPath = Path.parent(operation.path)
+
+        if (
+          Path.equals(path, parentPath) ||
+          Path.isAncestor(path, parentPath)
+        ) {
+          return isDirectChildPath(path, operation.path)
+            ? [operation.path[path.length]]
+            : []
+        }
+      }
+
+      return null
+    }
+
+    case 'insert_text':
+    case 'remove_text': {
+      return []
+    }
+
+    case 'split_node':
+    case 'merge_node': {
+      return Path.isAncestor(path, operation.path) ? [] : null
+    }
+
+    case 'set_selection': {
+      return []
+    }
+
+    case 'remove_node': {
+      if (
+        Path.equals(path, operation.path) ||
+        Path.isAncestor(path, operation.path)
+      ) {
+        return []
+      }
+
+      return null
+    }
+
+    case 'move_node': {
+      const removesFromParent = Path.isAncestor(path, operation.path)
+      const insertsIntoParent = Path.isAncestor(path, operation.newPath)
+
+      if (!removesFromParent && !insertsIntoParent) {
+        return null
+      }
+
+      return isDirectChildPath(path, operation.path)
+        ? insertsIntoParent && isDirectChildPath(path, operation.newPath)
+          ? [operation.newPath[path.length]]
+          : []
+        : insertsIntoParent && isDirectChildPath(path, operation.newPath)
+        ? [operation.newPath[path.length]]
+        : []
+    }
+
+    default: {
+      return null
+    }
+  }
+}
 
 export const normalizeNode: WithEditorFirstArg<Editor['normalizeNode']> = (
   editor,
   entry,
   options
 ) => {
+  const { force = false, operation } = options ?? {}
   const [node, path] = entry as [{}, Path] // node is not yet normalized, treat as hostile
 
   // There are no core normalizations for text nodes.
@@ -113,21 +204,50 @@ export const normalizeNode: WithEditorFirstArg<Editor['normalizeNode']> = (
       }
     }
   } else {
+    const isInlineChild = (child: Descendant) =>
+      Element.isElement(child) && editor.isInline(child)
+
+    const normalizeBlockChild = (index: number) => {
+      const child = element.children[index]
+
+      if (!child || (!Node.isText(child) && !isInlineChild(child))) {
+        return
+      }
+
+      if (options?.fallbackElement) {
+        Transforms.wrapNodes(editor, options.fallbackElement(), {
+          at: path.concat(index),
+          voids: true,
+        })
+      } else {
+        Transforms.removeNodes(editor, { at: path.concat(index), voids: true })
+      }
+
+      element = Node.get(editor, path) as Ancestor
+    }
+
+    const childIndexesToValidate =
+      force ||
+      (isObservingBatchNormalize(editor) && editor.operations.length !== 1)
+        ? null
+        : getBlockOnlyChildIndexesToValidate(path, operation)
+
+    if (Array.isArray(childIndexesToValidate)) {
+      for (const index of childIndexesToValidate) {
+        normalizeBlockChild(index)
+      }
+
+      return
+    }
+
     // Since we'll be applying operations while iterating, we also modify `n` when adding/removing nodes
     for (let n = 0; n < element.children.length; n++) {
-      const child = element.children[n]
-
       // Allow only block nodes in the top-level children and parent blocks that only contain block nodes
-      if (Node.isText(child) || editor.isInline(child)) {
-        if (options?.fallbackElement) {
-          Transforms.wrapNodes(editor, options.fallbackElement(), {
-            at: path.concat(n),
-            voids: true,
-          })
-        } else {
-          Transforms.removeNodes(editor, { at: path.concat(n), voids: true })
-        }
-        element = Node.get(editor, path) as Ancestor
+      if (
+        Node.isText(element.children[n]) ||
+        isInlineChild(element.children[n])
+      ) {
+        normalizeBlockChild(n)
         n--
       }
     }

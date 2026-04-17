@@ -1,10 +1,7 @@
 import { test, expect } from '@playwright/test'
 
 test.describe('On richtext example', () => {
-  test.beforeEach(
-    async ({ page }) =>
-      await page.goto('http://localhost:3000/examples/richtext')
-  )
+  test.beforeEach(async ({ page }) => await page.goto('/examples/richtext'))
 
   test('renders rich text', async ({ page }) => {
     expect(await page.locator('strong').nth(0).textContent()).toContain('rich')

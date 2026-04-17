@@ -1,10 +1,7 @@
 import { test, expect } from '@playwright/test'
 
 test.describe('mentions example', () => {
-  test.beforeEach(
-    async ({ page }) =>
-      await page.goto('http://localhost:3000/examples/mentions')
-  )
+  test.beforeEach(async ({ page }) => await page.goto('/examples/mentions'))
 
   test('renders mention element', async ({ page }) => {
     await expect(page.locator('[data-cy="mention-R2-D2"]')).toHaveCount(1)

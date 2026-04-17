@@ -28,6 +28,7 @@ import {
 } from '../types/types'
 import { OmitFirstArg } from '../utils/types'
 import { isEditor } from '../editor/is-editor'
+import { withBatch as withBatchEditor } from '../editor/with-batch'
 import {
   TextInsertFragmentOptions,
   TextInsertTextOptions,
@@ -49,6 +50,7 @@ export interface BaseEditor {
   // Overrideable core methods.
 
   apply: (operation: Operation) => void
+  getChildren: () => Descendant[]
   getDirtyPaths: (operation: Operation) => Path[]
   getFragment: () => Descendant[]
   isElementReadOnly: (element: Element) => boolean
@@ -65,6 +67,7 @@ export interface BaseEditor {
   onChange: (options?: { operation?: Operation }) => void
   shouldNormalize: ({
     iteration,
+    initialDirtyPathsLength,
     dirtyPaths,
     operation,
   }: {
@@ -97,6 +100,7 @@ export interface BaseEditor {
   removeMark: OmitFirstArg<typeof Editor.removeMark>
   removeNodes: OmitFirstArg<typeof Transforms.removeNodes>
   select: OmitFirstArg<typeof Transforms.select>
+  setChildren: (children: Descendant[]) => void
   setNodes: <T extends Node>(
     props: Partial<T>,
     options?: {
@@ -719,6 +723,11 @@ export interface EditorInterface {
   ) => NodeEntry<Element> | undefined
 
   /**
+   * Call a function, deferring normalization and flush until it completes.
+   */
+  withBatch: (editor: Editor, fn: () => void) => void
+
+  /**
    * Call a function, deferring normalization until after it completes.
    */
   withoutNormalizing: (editor: Editor, fn: () => void) => void
@@ -968,6 +977,10 @@ export const Editor: EditorInterface = {
 
   void(editor, options) {
     return editor.void(options)
+  },
+
+  withBatch(editor, fn: () => void) {
+    withBatchEditor(editor, fn)
   },
 
   withoutNormalizing(editor, fn: () => void) {

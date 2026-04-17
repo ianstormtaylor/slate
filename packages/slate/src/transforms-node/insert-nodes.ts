@@ -5,7 +5,7 @@ import { Range } from '../interfaces/range'
 import { Transforms } from '../interfaces/transforms'
 import { Path } from '../interfaces/path'
 import { getDefaultInsertLocation } from '../utils'
-import { batchDirtyPaths } from '../core/batch-dirty-paths'
+import { batchDirtyPaths } from '../core/batching/dirty-paths'
 import { BaseInsertNodeOperation, Location } from '../interfaces'
 import { updateDirtyPaths } from '../core/update-dirty-paths'
 

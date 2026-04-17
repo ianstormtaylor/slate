@@ -1,6 +1,14 @@
-import { Editor, Operation, Path, Transforms } from 'slate'
+import {
+  Editor,
+  isWritingBatchInternals,
+  Operation,
+  Path,
+  Transforms,
+  wrapApply,
+} from 'slate'
 
 import { HistoryEditor } from './history-editor'
+import { Batch } from './history'
 
 /**
  * The `withHistory` plugin keeps track of the operation history of a Slate
@@ -14,76 +22,91 @@ import { HistoryEditor } from './history-editor'
 
 export const withHistory = <T extends Editor>(editor: T) => {
   const e = editor as T & HistoryEditor
-  const { apply } = e
+  const { setChildren } = e
   e.history = { undos: [], redos: [] }
+  const applyOperationStack: number[] = []
 
   e.redo = () => {
     const { history } = e
     const { redos } = history
+    const batch = redos[redos.length - 1]
 
-    if (redos.length > 0) {
-      const batch = redos[redos.length - 1]
-
-      if (batch.selectionBefore) {
-        Transforms.setSelection(e, batch.selectionBefore)
-      }
-
-      HistoryEditor.withoutSaving(e, () => {
-        Editor.withoutNormalizing(e, () => {
-          for (const op of batch.operations) {
-            e.apply(op)
-          }
-        })
-      })
-
-      history.redos.pop()
-      e.writeHistory('undos', batch)
+    if (!batch) {
+      return
     }
+
+    if (batch.selectionBefore) {
+      Transforms.setSelection(e, batch.selectionBefore)
+    }
+
+    HistoryEditor.withoutSaving(e, () => {
+      Editor.withoutNormalizing(e, () => {
+        for (const op of batch.operations) {
+          e.apply(op)
+        }
+
+        if (batch.selectionAfter !== undefined) {
+          restoreSelection(e, batch.selectionAfter)
+        }
+      })
+    })
+
+    history.redos.pop()
+    e.writeHistory('undos', batch)
   }
 
   e.undo = () => {
     const { history } = e
     const { undos } = history
+    const batch = undos[undos.length - 1]
 
-    if (undos.length > 0) {
-      const batch = undos[undos.length - 1]
-
-      HistoryEditor.withoutSaving(e, () => {
-        Editor.withoutNormalizing(e, () => {
-          const inverseOps = batch.operations.map(Operation.inverse).reverse()
-
-          for (const op of inverseOps) {
-            e.apply(op)
-          }
-          if (batch.selectionBefore) {
-            Transforms.setSelection(e, batch.selectionBefore)
-          }
-        })
-      })
-
-      e.writeHistory('redos', batch)
-      history.undos.pop()
+    if (!batch) {
+      return
     }
+
+    HistoryEditor.withoutSaving(e, () => {
+      Editor.withoutNormalizing(e, () => {
+        const inverseOps = batch.operations.map(Operation.inverse).reverse()
+
+        for (const op of inverseOps) {
+          e.apply(op)
+        }
+
+        restoreSelection(e, batch.selectionBefore)
+      })
+    })
+
+    e.writeHistory('redos', batch)
+    history.undos.pop()
   }
 
-  e.apply = (op: Operation) => {
+  wrapApply(e, apply => (op: Operation) => {
     const { operations, history } = e
     const { undos } = history
     const lastBatch = undos[undos.length - 1]
     const lastOp =
       lastBatch && lastBatch.operations[lastBatch.operations.length - 1]
+    const hasPendingSavedOperations = operations.some(operation =>
+      shouldSave(operation)
+    )
     let save = HistoryEditor.isSaving(e)
     let merge = HistoryEditor.isMerging(e)
+    let trackedBatch: Batch | null = null
 
     if (save == null) {
-      save = shouldSave(op, lastOp)
+      save = shouldSave(op)
     }
 
     if (save) {
       if (merge == null) {
         if (lastBatch == null) {
           merge = false
-        } else if (operations.includes(lastOp)) {
+        } else if (
+          lastBatch.operations.length === 0 &&
+          operations.length !== 0
+        ) {
+          merge = true
+        } else if (hasPendingSavedOperations) {
           merge = true
         } else {
           merge = shouldMerge(op, lastOp)
@@ -97,12 +120,14 @@ export const withHistory = <T extends Editor>(editor: T) => {
 
       if (lastBatch && merge) {
         lastBatch.operations.push(op)
+        trackedBatch = lastBatch
       } else {
-        const batch = {
+        const batch: Batch = {
           operations: [op],
           selectionBefore: e.selection,
         }
         e.writeHistory('undos', batch)
+        trackedBatch = batch
       }
 
       while (undos.length > 100) {
@@ -112,10 +137,47 @@ export const withHistory = <T extends Editor>(editor: T) => {
       history.redos = []
     }
 
-    apply(op)
+    applyOperationStack.push(e.operations.length)
+
+    try {
+      apply(op)
+    } finally {
+      applyOperationStack.pop()
+    }
+
+    if (trackedBatch) {
+      setSelectionAfter(trackedBatch, e.selection)
+    } else if (
+      HistoryEditor.isSaving(e) !== false &&
+      op.type === 'set_selection' &&
+      lastBatch
+    ) {
+      setSelectionAfter(lastBatch, e.selection)
+      history.redos = []
+    }
+  })
+
+  e.setChildren = children => {
+    setChildren(children)
+
+    const operationsLengthBeforeApply =
+      applyOperationStack[applyOperationStack.length - 1]
+
+    if (
+      isWritingBatchInternals(e) ||
+      (operationsLengthBeforeApply !== undefined &&
+        e.operations.length === operationsLengthBeforeApply)
+    ) {
+      return
+    }
+
+    // Direct tree replacement invalidates both history stacks because the
+    // saved batches no longer describe the current document.
+    e.history.undos = []
+    e.history.redos = []
   }
 
-  e.writeHistory = (stack: 'undos' | 'redos', batch: any) => {
+  e.writeHistory = (stack: 'undos' | 'redos', batch: Batch) => {
     e.history[stack].push(batch)
   }
 
@@ -154,10 +216,26 @@ const shouldMerge = (op: Operation, prev: Operation | undefined): boolean => {
  * Check whether an operation needs to be saved to the history.
  */
 
-const shouldSave = (op: Operation, prev: Operation | undefined): boolean => {
-  if (op.type === 'set_selection') {
-    return false
+const shouldSave = (op: Operation): boolean => op.type !== 'set_selection'
+
+const restoreSelection = (
+  editor: Editor,
+  selection: Editor['selection']
+): void => {
+  if (selection == null) {
+    if (editor.selection != null) {
+      Transforms.deselect(editor)
+    }
+
+    return
   }
 
-  return true
+  Transforms.select(editor, selection)
+}
+
+const setSelectionAfter = (
+  batch: Batch,
+  selection: Editor['selection']
+): void => {
+  batch.selectionAfter = selection
 }

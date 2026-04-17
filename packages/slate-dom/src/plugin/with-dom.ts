@@ -1,6 +1,7 @@
 import {
   BaseEditor,
   Editor,
+  isWritingBatchInternals,
   Location,
   Node,
   Operation,
@@ -51,7 +52,8 @@ export const withDOM = <T extends BaseEditor>(
   clipboardFormatKey = 'x-slate-fragment'
 ): T & DOMEditor => {
   const e = editor as T & DOMEditor
-  const { apply, onChange, deleteBackward, addMark, removeMark } = e
+  const { apply, onChange, deleteBackward, addMark, removeMark, setChildren } =
+    e
 
   // The WeakMap which maps a key to a specific HTMLElement must be scoped to the editor instance to
   // avoid collisions between editors in the DOM that share the same value.
@@ -204,6 +206,10 @@ export const withDOM = <T extends BaseEditor>(
 
     apply(op)
 
+    if (op.type === 'insert_text' || op.type === 'remove_text') {
+      EDITOR_TO_PENDING_DIFFS.delete(e)
+    }
+
     switch (op.type) {
       case 'insert_node':
       case 'remove_node':
@@ -232,6 +238,25 @@ export const withDOM = <T extends BaseEditor>(
 
       pathRef.unref()
     }
+  }
+
+  e.setChildren = children => {
+    setChildren(children)
+
+    if (isWritingBatchInternals(e)) {
+      return
+    }
+
+    // Direct children replacement invalidates every DOM cache derived from
+    // the previous tree. Internal batch writes stay inside the same batch.
+    EDITOR_TO_PENDING_DIFFS.delete(e)
+    EDITOR_TO_PENDING_SELECTION.delete(e)
+    EDITOR_TO_PENDING_ACTION.delete(e)
+    EDITOR_TO_PENDING_INSERTION_MARKS.delete(e)
+    EDITOR_TO_USER_MARKS.delete(e)
+    EDITOR_TO_USER_SELECTION.get(e)?.unref()
+    EDITOR_TO_USER_SELECTION.delete(e)
+    IS_NODE_MAP_DIRTY.set(e, true)
   }
 
   e.setFragmentData = (data: Pick<DataTransfer, 'getData' | 'setData'>) => {

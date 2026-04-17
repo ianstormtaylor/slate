@@ -21,7 +21,7 @@ export const withReact = <T extends BaseEditor>(
 
   e = withDOM(e, clipboardFormatKey)
 
-  const { onChange, apply, insertText } = e
+  const { apply, onChange, insertText } = e
 
   e.getChunkSize = () => null
 

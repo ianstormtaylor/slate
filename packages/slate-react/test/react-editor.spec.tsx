@@ -39,6 +39,8 @@ describe('slate-react', () => {
           )
           expect(windowSelection?.focusOffset).toBe(testSelection.focus.offset)
         })
+
+        expect(ReactEditor.isFocused(editor)).toBe(true)
       })
 
       test('should be able to call .focus without getting toDOMNode errors', async () => {

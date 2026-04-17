@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test'
 
 test.describe('Inlines example', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('http://localhost:3000/examples/inlines')
+    await page.goto('/examples/inlines')
   })
 
   test('contains link', async ({ page }) => {

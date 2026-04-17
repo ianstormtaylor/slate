@@ -1,3 +1,8 @@
+import {
+  isBatching,
+  isObservingBatchNormalize,
+  queueBatchNormalize,
+} from '../core/batch'
 import { Editor, EditorInterface } from '../interfaces/editor'
 import { DIRTY_PATH_KEYS, DIRTY_PATHS } from '../utils/weak-maps'
 import { Path } from '../interfaces/path'
@@ -21,6 +26,11 @@ export const normalize: EditorInterface['normalize'] = (
     const key = path.join(',')
     getDirtyPathKeys(editor).delete(key)
     return path
+  }
+
+  if (isBatching(editor) && !isObservingBatchNormalize(editor)) {
+    queueBatchNormalize(editor, options)
+    return
   }
 
   if (!Editor.isNormalizing(editor)) {

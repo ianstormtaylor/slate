@@ -1,4 +1,5 @@
 export * from './apply'
+export { isWritingBatchInternals, wrapApply } from './batch'
 export * from './get-dirty-paths'
 export * from './get-fragment'
 export * from './normalize-node'

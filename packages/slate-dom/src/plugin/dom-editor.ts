@@ -429,6 +429,14 @@ export const DOMEditor: DOMEditorInterface = {
       return
     }
 
+    let createdSelection = false
+
+    // Create a new selection in the top of the document if missing.
+    if (!editor.selection) {
+      Transforms.select(editor, Editor.start(editor, []))
+      createdSelection = true
+    }
+
     // Retry setting focus if the editor has pending operations.
     // The DOM (selection) is unstable while changes are applied.
     // Retry until retries are exhausted or editor is focused.
@@ -437,7 +445,7 @@ export const DOMEditor: DOMEditorInterface = {
         'Could not set focus, editor seems stuck with pending operations'
       )
     }
-    if (editor.operations.length > 0) {
+    if (editor.operations.length > 0 && !createdSelection) {
       setTimeout(() => {
         DOMEditor.focus(editor, { retries: options.retries - 1 })
       }, 10)
@@ -446,22 +454,20 @@ export const DOMEditor: DOMEditorInterface = {
 
     const el = DOMEditor.toDOMNode(editor, editor)
     const root = DOMEditor.findDocumentOrShadowRoot(editor)
+
     if (root.activeElement !== el) {
-      // Ensure that the DOM selection state is set to the editor's selection
-      if (editor.selection && root instanceof Document) {
-        const domSelection = getSelection(root)
-        const domRange = DOMEditor.toDOMRange(editor, editor.selection)
-        domSelection?.removeAllRanges()
-        domSelection?.addRange(domRange)
-      }
-      // Create a new selection in the top of the document if missing
-      if (!editor.selection) {
-        Transforms.select(editor, Editor.start(editor, []))
-      }
       // IS_FOCUSED should be set before calling el.focus() to ensure that
       // FocusedContext is updated to the correct value
       IS_FOCUSED.set(editor, true)
       el.focus({ preventScroll: true })
+    }
+
+    // Ensure that the DOM selection state is set to the editor's selection.
+    if (editor.selection && root instanceof Document) {
+      const domSelection = getSelection(root)
+      const domRange = DOMEditor.toDOMRange(editor, editor.selection)
+      domSelection?.removeAllRanges()
+      domSelection?.addRange(domRange)
     }
   },
 

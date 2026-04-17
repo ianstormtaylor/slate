@@ -1,8 +1,9 @@
 import { Operation, Range, isObject } from 'slate'
 
-interface Batch {
+export interface Batch {
   operations: Operation[]
   selectionBefore: Range | null
+  selectionAfter?: Range | null
 }
 
 /**

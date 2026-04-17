@@ -29,6 +29,7 @@ export const isEditor: EditorInterface['isEditor'] = (
     typeof value.end === 'function' &&
     typeof value.first === 'function' &&
     typeof value.fragment === 'function' &&
+    typeof value.getChildren === 'function' &&
     typeof value.getDirtyPaths === 'function' &&
     typeof value.getFragment === 'function' &&
     typeof value.getMarks === 'function' &&
@@ -81,6 +82,7 @@ export const isEditor: EditorInterface['isEditor'] = (
     typeof value.removeMark === 'function' &&
     typeof value.removeNodes === 'function' &&
     typeof value.select === 'function' &&
+    typeof value.setChildren === 'function' &&
     typeof value.setNodes === 'function' &&
     typeof value.setNormalizing === 'function' &&
     typeof value.setPoint === 'function' &&

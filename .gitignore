@@ -12,6 +12,7 @@ tmp/
 test-results/
 coverage
 .DS_Store
+.omx/
 
 # Recommendation from https://yarnpkg.com/getting-started/qa#which-files-should-be-gitignored (not using Zero-installs)
 .yarn/*

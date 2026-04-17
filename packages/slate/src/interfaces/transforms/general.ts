@@ -12,6 +12,7 @@ import {
   Selection,
   Text,
 } from '../../index'
+import { applyOperationBatch } from '../../core/batching/apply-operation-batch'
 import {
   insertChildren,
   modifyChildren,
@@ -20,25 +21,17 @@ import {
   removeChildren,
   replaceChildren,
 } from '../../utils/modify'
-
-/**
- * The set of properties that cannot be set using set_node.
- */
-export const NON_SETTABLE_NODE_PROPERTIES = [
-  'children',
-  'text',
-  // Do not allow overriding any property on the Object prototype
-  ...Object.getOwnPropertyNames(Object.prototype),
-]
-
-/**
- * The set of properties that cannot be set using set_selection.
- */
-export const NON_SETTABLE_SELECTION_PROPERTIES = Object.getOwnPropertyNames(
-  Object.prototype
-)
+import {
+  NON_SETTABLE_NODE_PROPERTIES,
+  NON_SETTABLE_SELECTION_PROPERTIES,
+} from '../../utils/non-settable-properties'
 
 export interface GeneralTransforms {
+  /**
+   * Apply many operations as one logical batch.
+   */
+  applyBatch: (editor: Editor, ops: Operation[]) => void
+
   /**
    * Transform the editor by an operation.
    */
@@ -47,6 +40,10 @@ export interface GeneralTransforms {
 
 // eslint-disable-next-line no-redeclare
 export const GeneralTransforms: GeneralTransforms = {
+  applyBatch(editor: Editor, ops: Operation[]): void {
+    applyOperationBatch(editor, ops)
+  },
+
   transform(editor: Editor, op: Operation): void {
     let transformSelection = false
 
@@ -140,6 +137,25 @@ export const GeneralTransforms: GeneralTransforms = {
 
         const node = Node.get(editor, path)
 
+        const truePath = Path.transform(path, op)!
+
+        if (Path.equals(Path.parent(path), Path.parent(truePath))) {
+          const parentPath = Path.parent(path)
+          const newIndex = truePath[truePath.length - 1]
+
+          modifyChildren(editor, parentPath, children => {
+            // PERF: Same-parent moves can rewrite one cloned child array
+            // instead of paying separate remove/insert tree updates.
+            const nextChildren = children.slice()
+            nextChildren.splice(index, 1)
+            nextChildren.splice(newIndex, 0, node)
+            return nextChildren
+          })
+
+          transformSelection = true
+          break
+        }
+
         modifyChildren(editor, Path.parent(path), children =>
           removeChildren(children, index, 1)
         )
@@ -150,7 +166,6 @@ export const GeneralTransforms: GeneralTransforms = {
         // of date. So instead of using the `op.newPath` directly, we
         // transform `op.path` to ascertain what the `newPath` would be after
         // the operation was applied.
-        const truePath = Path.transform(path, op)!
         const newIndex = truePath[truePath.length - 1]
 
         modifyChildren(editor, Path.parent(truePath), children =>
@@ -386,6 +401,8 @@ export const GeneralTransforms: GeneralTransforms = {
             }
           }
 
+          const mutableNextNode = nextNode as unknown as Record<string, unknown>
+
           for (const key in properties) {
             if (NON_SETTABLE_NODE_PROPERTIES.includes(key)) {
               throw new Error(`Cannot set the "${key}" property of nodes!`)
@@ -404,7 +421,7 @@ export const GeneralTransforms: GeneralTransforms = {
             }
 
             if (value != null) {
-              nextNode[<keyof Node>key] = value
+              mutableNextNode[key] = value
             }
           }
 

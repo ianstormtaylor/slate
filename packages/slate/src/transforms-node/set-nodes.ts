@@ -5,7 +5,7 @@ import { Range } from '../interfaces/range'
 import { Transforms } from '../interfaces/transforms'
 import { Node } from '../interfaces/node'
 import { Location } from '../interfaces'
-import { NON_SETTABLE_NODE_PROPERTIES } from '../interfaces/transforms/general'
+import { NON_SETTABLE_NODE_PROPERTIES } from '../utils/non-settable-properties'
 
 export const setNodes: NodeTransforms['setNodes'] = (
   editor,

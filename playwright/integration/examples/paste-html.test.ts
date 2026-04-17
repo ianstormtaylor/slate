@@ -1,10 +1,7 @@
 import { test, expect, Page } from '@playwright/test'
 
 test.describe('paste html example', () => {
-  test.beforeEach(
-    async ({ page }) =>
-      await page.goto('http://localhost:3000/examples/paste-html')
-  )
+  test.beforeEach(async ({ page }) => await page.goto('/examples/paste-html'))
 
   const pasteHtml = async (page: Page, htmlContent: string) => {
     await page.getByRole('textbox').click()

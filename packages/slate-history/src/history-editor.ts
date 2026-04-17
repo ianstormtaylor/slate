@@ -1,5 +1,5 @@
 import { BaseEditor, Editor } from 'slate'
-import { History } from './history'
+import { Batch, History } from './history'
 
 /**
  * Weakmaps for attaching state to the editor.
@@ -18,7 +18,7 @@ export interface HistoryEditor extends BaseEditor {
   history: History
   undo: () => void
   redo: () => void
-  writeHistory: (stack: 'undos' | 'redos', batch: any) => void
+  writeHistory: (stack: 'undos' | 'redos', batch: Batch) => void
 }
 
 // eslint-disable-next-line no-redeclare

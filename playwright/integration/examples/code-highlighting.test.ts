@@ -4,7 +4,7 @@ test.setTimeout(60 * 1000)
 
 test.describe('code highlighting', () => {
   test.beforeEach(async ({ page }) => {
-    page.goto('http://localhost:3000/examples/code-highlighting')
+    page.goto('/examples/code-highlighting')
   })
 
   for (const testCase of getTestCases()) {
@@ -13,9 +13,13 @@ test.describe('code highlighting', () => {
     test(`code highlighting ${language}`, async ({ page }) => {
       await setText(page, content, language)
 
-      const tokens = await page
-        .locator('[data-slate-editor] [data-slate-string]')
-        .all()
+      const tokenLocator = page.locator(
+        '[data-slate-editor] [data-slate-string]'
+      )
+
+      await expect(tokenLocator).toHaveCount(highlights.length)
+
+      const tokens = await tokenLocator.all()
 
       for (const [index, token] of tokens.entries()) {
         const highlight = highlights[index]
@@ -30,15 +34,17 @@ test.describe('code highlighting', () => {
 
 // it also tests if select and code block button works the right way
 async function setText(page: Page, text: string, language: string) {
-  await page.locator('[data-slate-editor]').selectText()
-  await page.keyboard.press('Backspace') // clear editor
-  await page.getByTestId('code-block-button').click() // convert the first paragraph to a code block
+  const editor = page.getByRole('textbox')
+
+  await editor.selectText()
+  await editor.press('Backspace') // clear editor
+  await page.getByTestId('code-block-button').click() // convert first and the only one paragraph to code block
   await page
     .locator('[data-slate-editor] [data-test-id="language-select"]')
     .first()
-    .selectOption({ value: language }) // select the language option for the code block we just created
+    .selectOption({ value: language }) // select the language option on the active code block
 
-  await page.keyboard.type(text) // type text
+  await editor.pressSequentially(text) // type text
 }
 
 function getTestCases() {

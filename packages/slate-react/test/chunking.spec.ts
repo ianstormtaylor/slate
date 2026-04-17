@@ -1,4 +1,11 @@
-import { Descendant, Element, Node, Transforms, createEditor } from 'slate'
+import {
+  Descendant,
+  Editor,
+  Element,
+  Node,
+  Transforms,
+  createEditor,
+} from 'slate'
 import { Key } from 'slate-dom'
 import { ReactEditor, withReact } from '../src'
 import {
@@ -104,6 +111,23 @@ const createEditorWithShape = (treeShape: TreeShape[]) => {
   const key = ReactEditor.findKey(editor, editor)
   KEY_TO_CHUNK_TREE.set(key, chunkTree)
   return editor
+}
+
+const runMoveBatch = (
+  editor: ReactEditor,
+  batchEntry: 'applyBatch' | 'manualWithBatch',
+  ops: Array<{ type: 'move_node'; path: number[]; newPath: number[] }>
+) => {
+  if (batchEntry === 'applyBatch') {
+    Transforms.applyBatch(editor, ops)
+    return
+  }
+
+  Editor.withBatch(editor, () => {
+    ops.forEach(op => {
+      editor.apply(op)
+    })
+  })
 }
 
 // https://stackoverflow.com/a/29450606
@@ -851,6 +875,60 @@ describe('getChunkTreeForNode', () => {
 
       expect(chunkTree.movedNodeKeys.size).toBe(0)
     })
+
+    for (const batchEntry of ['applyBatch', 'manualWithBatch'] as const) {
+      it(`reconciles batched move_node operations like replay | batchEntry=${batchEntry}`, () => {
+        const ops: Array<{
+          type: 'move_node'
+          path: number[]
+          newPath: number[]
+        }> = [
+          { type: 'move_node', path: [3], newPath: [1] },
+          { type: 'move_node', path: [4], newPath: [2] },
+        ]
+        const batchEditor = createEditorWithShape([
+          ['0'],
+          ['1'],
+          ['2'],
+          ['3'],
+          ['4'],
+        ])
+        const replayEditor = createEditorWithShape([
+          ['0'],
+          ['1'],
+          ['2'],
+          ['3'],
+          ['4'],
+        ])
+
+        runMoveBatch(batchEditor, batchEntry, ops)
+        ops.forEach(op => {
+          replayEditor.apply(op)
+        })
+
+        const batchOnInsert = jest.fn()
+        const batchOnIndexChange = jest.fn()
+        const replayOnInsert = jest.fn()
+        const replayOnIndexChange = jest.fn()
+        const batchChunkTree = reconcileEditor(batchEditor, {
+          onInsert: batchOnInsert,
+          onIndexChange: batchOnIndexChange,
+        })
+        const replayChunkTree = reconcileEditor(replayEditor, {
+          onInsert: replayOnInsert,
+          onIndexChange: replayOnIndexChange,
+        })
+
+        expect(getTreeShape(batchChunkTree)).toEqual(
+          getTreeShape(replayChunkTree)
+        )
+        expect(batchOnInsert.mock.calls).toEqual(replayOnInsert.mock.calls)
+        expect(batchOnIndexChange.mock.calls).toEqual(
+          replayOnIndexChange.mock.calls
+        )
+        expect(batchChunkTree.movedNodeKeys.size).toBe(0)
+      })
+    }
   })
 
   describe('manual rerendering', () => {
