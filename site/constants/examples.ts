@@ -18,6 +18,7 @@ export const EXAMPLE_NAMES_AND_PATHS = [
   ['Read-only', 'read-only'],
   ['Rendering in iframes', 'iframe'],
   ['Rich Text', 'richtext'],
+  ['Scroll Into View', 'scroll-into-view'],
   ['Search Highlighting', 'search-highlighting'],
   ['Shadow DOM', 'shadow-dom'],
   ['Styling', 'styling'],

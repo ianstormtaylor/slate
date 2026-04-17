@@ -13,12 +13,28 @@ export const withoutNormalizing: EditorInterface['withoutNormalizing'] = (
     Editor.setNormalizing(editor, value)
   }
 
-  const operations = editor.operations.slice(initialOperationsLength)
-  const operation =
-    operations.length > 0 &&
-    operations.every(candidate => candidate.type === operations[0].type)
-      ? operations[operations.length - 1]
-      : undefined
+  let operation
+  const nextOperationsLength = editor.operations.length
+
+  if (nextOperationsLength > initialOperationsLength) {
+    const firstOperation = editor.operations[initialOperationsLength]
+    let hasSingleType = true
+
+    for (
+      let index = initialOperationsLength + 1;
+      index < nextOperationsLength;
+      index++
+    ) {
+      if (editor.operations[index].type !== firstOperation.type) {
+        hasSingleType = false
+        break
+      }
+    }
+
+    if (hasSingleType) {
+      operation = editor.operations[nextOperationsLength - 1]
+    }
+  }
 
   Editor.normalize(editor, operation ? { operation } : undefined)
 }

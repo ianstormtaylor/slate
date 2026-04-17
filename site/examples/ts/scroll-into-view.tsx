@@ -1,6 +1,6 @@
-import React, { useMemo } from 'react'
-import { createEditor, Descendant } from 'slate'
-import { Slate, Editable, withReact } from 'slate-react'
+import React, { useMemo, useRef } from 'react'
+import { createEditor, Descendant, Transforms } from 'slate'
+import { Slate, Editable, ReactEditor, withReact } from 'slate-react'
 import { withHistory } from 'slate-history'
 import { css } from '@emotion/css'
 import range from 'lodash/range'
@@ -17,8 +17,38 @@ import range from 'lodash/range'
  */
 
 const ScrollIntoViewExample = () => {
+  const editor = useMemo(() => withHistory(withReact(createEditor())), [])
+  const innerRef = useRef<HTMLDivElement | null>(null)
+
+  const scrollCurrentSelectionIntoView = () => {
+    const container = innerRef.current
+    const selection = window.getSelection()
+    const range = selection?.rangeCount ? selection.getRangeAt(0) : null
+    const node = range?.endContainer
+    const target =
+      node?.nodeType === Node.ELEMENT_NODE
+        ? (node as HTMLElement)
+        : node?.parentElement
+
+    if (!container || !target) {
+      return
+    }
+
+    const targetRect = target.getBoundingClientRect()
+    const containerRect = container.getBoundingClientRect()
+    const deltaTop = targetRect.top - containerRect.top - 24
+    const deltaBottom = targetRect.bottom - containerRect.bottom + 24
+
+    if (deltaTop < 0) {
+      container.scrollTop += deltaTop
+    } else if (deltaBottom > 0) {
+      container.scrollTop += deltaBottom
+    }
+  }
+
   return (
     <div
+      data-test-id="scroll-outer"
       className={css`
         height: 320px;
         overflow-y: scroll;
@@ -31,12 +61,35 @@ const ScrollIntoViewExample = () => {
         `}
       />
       <div
+        data-test-id="scroll-inner"
+        ref={innerRef}
         className={css`
           height: 320px;
           overflow-y: scroll;
         `}
       >
-        <PlainTextEditor />
+        <button
+          data-test-id="scroll-to-bottom-selection"
+          onMouseDown={event => event.preventDefault()}
+          onClick={() => {
+            Transforms.select(editor, {
+              anchor: { path: [4, 0], offset: 0 },
+              focus: { path: [4, 0], offset: 30 },
+            })
+            ReactEditor.focus(editor)
+            requestAnimationFrame(() => {
+              scrollCurrentSelectionIntoView()
+            })
+          }}
+          type="button"
+        >
+          Select bottom paragraph
+        </button>
+        <PlainTextEditor
+          editor={editor}
+          innerRef={innerRef}
+          scrollCurrentSelectionIntoView={scrollCurrentSelectionIntoView}
+        />
       </div>
       <div
         className={css`
@@ -48,11 +101,25 @@ const ScrollIntoViewExample = () => {
   )
 }
 
-const PlainTextEditor = () => {
-  const editor = useMemo(() => withHistory(withReact(createEditor())), [])
+const PlainTextEditor = ({
+  editor,
+  innerRef,
+  scrollCurrentSelectionIntoView,
+}: {
+  editor: ReturnType<typeof createEditor>
+  innerRef: React.MutableRefObject<HTMLDivElement | null>
+  scrollCurrentSelectionIntoView: () => void
+}) => {
   return (
     <Slate editor={editor} initialValue={initialValue}>
-      <Editable placeholder="Enter some plain text..." />
+      <Editable
+        placeholder="Enter some plain text..."
+        scrollSelectionIntoView={(_editor, domRange) => {
+          void domRange
+          void innerRef
+          scrollCurrentSelectionIntoView()
+        }}
+      />
     </Slate>
   )
 }
