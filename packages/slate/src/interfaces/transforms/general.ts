@@ -132,7 +132,6 @@ export const GeneralTransforms: GeneralTransforms = {
               }
               modifiedChildArrays?.add(newNode.children)
             }
-            newNode = { ...prev, children: prev.children.concat(node.children) }
           } else {
             throw new Error(
               `Cannot apply a "merge_node" operation at path [${path}] to nodes of different interfaces: ${Scrubber.stringify(
@@ -436,7 +435,7 @@ export const GeneralTransforms: GeneralTransforms = {
                 children: after,
               }
               modifiedChildArrays.add(after)
-              // we can infer that children is mutable because its an ancestor of prev.children. Just mutate in place
+              // we can infer that children is mutable because its an ancestor of node.children. Just mutate in place
               children.splice(index + 1, 0, nextNode)
               return children
             } else {
