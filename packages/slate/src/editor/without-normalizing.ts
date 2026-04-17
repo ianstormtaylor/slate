@@ -13,10 +13,11 @@ export const withoutNormalizing: EditorInterface['withoutNormalizing'] = (
     Editor.setNormalizing(editor, value)
   }
 
-  const nextOperationsLength = editor.operations.length
+  const operations = editor.operations.slice(initialOperationsLength)
   const operation =
-    nextOperationsLength - initialOperationsLength === 1
-      ? editor.operations[nextOperationsLength - 1]
+    operations.length > 0 &&
+    operations.every(candidate => candidate.type === operations[0].type)
+      ? operations[operations.length - 1]
       : undefined
 
   Editor.normalize(editor, operation ? { operation } : undefined)
