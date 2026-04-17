@@ -1,27 +1,53 @@
 import { afterEach, mock as bunMock, expect, mock, spyOn } from 'bun:test'
+import { dirname, relative } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { TextEncoder } from 'node:util'
 import { GlobalRegistrator } from '@happy-dom/global-registrator'
 import * as matchers from '@testing-library/jest-dom/matchers'
 import { cleanup } from '@testing-library/react'
+import React from 'react'
 
-const slateHyperscriptSpecTranspiler = new Bun.Transpiler({
+const legacyClassicJsxTranspiler = new Bun.Transpiler({
   loader: 'tsx',
   tsconfig: {
     compilerOptions: {
+      jsxFactory: 'jsx',
       jsx: 'react',
     },
   },
 })
-const slateHyperscriptSpecRe =
-  /[/\\]packages[/\\]slate-hyperscript[/\\]test[/\\]hyperscript\.spec\.tsx$/
+const legacyClassicJsxFixtureRe =
+  /[/\\]packages[/\\](slate|slate-history|slate-hyperscript)[/\\]test[/\\](?!bun[/\\])(?!.*\.spec\.).+\.(js|jsx|ts|tsx)$/
+
+const hasLocalJsxFactoryRe =
+  /\b(?:const|let|var|function)\s+jsx\b|\bimport\s*\{\s*jsx\s*\}\s*from\b/
+const slateTestJsxRuntimePath = fileURLToPath(
+  new URL('./slate-test-jsx.js', import.meta.url)
+)
+const getInjectedJsxImport = (path: string) => {
+  const relativePath = relative(
+    dirname(path),
+    slateTestJsxRuntimePath
+  ).replaceAll('\\', '/')
+  const specifier = relativePath.startsWith('.')
+    ? relativePath
+    : `./${relativePath}`
+
+  return `import { jsx } from '${specifier}'\n`
+}
+const importWorkspaceModule = (specifier: string) => import(specifier)
 
 Bun.plugin({
-  name: 'slate-hyperscript-spec',
+  name: 'legacy-hsx-fixtures',
   setup(build) {
-    build.onLoad({ filter: slateHyperscriptSpecRe }, async (args) => {
+    build.onLoad({ filter: legacyClassicJsxFixtureRe }, async (args) => {
+      const source = await Bun.file(args.path).text()
+
       return {
-        contents: slateHyperscriptSpecTranspiler.transformSync(
-          await Bun.file(args.path).text()
+        contents: legacyClassicJsxTranspiler.transformSync(
+          hasLocalJsxFactoryRe.test(source)
+            ? source
+            : `${getInjectedJsxImport(args.path)}${source}`
         ),
         loader: 'js',
       }
@@ -29,17 +55,21 @@ Bun.plugin({
   },
 })
 
-bunMock.module('slate', () => import('../packages/slate/src/index'))
-bunMock.module('slate-dom', () => import('../packages/slate-dom/src/index'))
-bunMock.module(
-  'slate-history',
-  () => import('../packages/slate-history/src/index')
+bunMock.module('slate', () =>
+  importWorkspaceModule('../packages/slate/src/index')
 )
-bunMock.module(
-  'slate-hyperscript',
-  () => import('../packages/slate-hyperscript/src/index')
+bunMock.module('slate-dom', () =>
+  importWorkspaceModule('../packages/slate-dom/src/index')
 )
-bunMock.module('slate-react', () => import('../packages/slate-react/src/index'))
+bunMock.module('slate-history', () =>
+  importWorkspaceModule('../packages/slate-history/src/index')
+)
+bunMock.module('slate-hyperscript', () =>
+  importWorkspaceModule('../packages/slate-hyperscript/src/index')
+)
+bunMock.module('slate-react', () =>
+  importWorkspaceModule('../packages/slate-react/src/index')
+)
 
 GlobalRegistrator.register({
   settings: {
@@ -108,6 +138,12 @@ if (typeof window !== 'undefined' && window.HTMLElement) {
 
 expect.extend(matchers)
 
+Object.defineProperty(globalThis, 'React', {
+  configurable: true,
+  value: React,
+  writable: true,
+})
+
 globalThis.jest = {
   fn: mock,
   spyOn,
@@ -137,4 +173,4 @@ globalThis.MessageChannel = class MessageChannel {
     removeEventListener: () => {},
     start: () => {},
   }
-} as typeof globalThis.MessageChannel
+} as unknown as typeof globalThis.MessageChannel

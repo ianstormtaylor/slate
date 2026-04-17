@@ -2,9 +2,10 @@
   "extends": "../tsconfig.json",
   "include": ["./**/*", "../src/**/*"],
   "compilerOptions": {
+    "jsx": "preserve",
     "noEmit": true,
     "rootDir": "..",
-    "types": ["node", "mocha"],
+    "types": ["bun-types", "bun-types/test-globals", "node"],
     "composite": false,
     "skipLibCheck": true,
     "noImplicitAny": false

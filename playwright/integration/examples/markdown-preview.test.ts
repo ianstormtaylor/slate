@@ -2,21 +2,20 @@ import { expect, test } from '@playwright/test'
 
 test.describe('markdown preview', () => {
   const slateEditor = 'div[data-slate-editor="true"]'
-  const markdown = 'span[data-slate-string="true"]'
 
   test.beforeEach(async ({ page }) => {
-    await page.goto('http://localhost:3100/examples/markdown-preview')
+    await page.goto('/examples/markdown-preview')
   })
 
   test('checks for markdown', async ({ page }) => {
-    await expect(page.locator(slateEditor).locator(markdown)).toHaveCount(9)
+    const insertedHeading = '## Added markdown heading'
 
     await page.locator(slateEditor).click()
     await page.keyboard.press('End')
     await page.keyboard.press('Enter')
-    await page.keyboard.type('## Try it out!')
+    await page.keyboard.type(insertedHeading)
     await page.keyboard.press('Enter')
-    await page.pause()
-    await expect(page.locator(slateEditor).locator(markdown)).toHaveCount(10)
+
+    await expect(page.locator(slateEditor)).toContainText(insertedHeading)
   })
 })

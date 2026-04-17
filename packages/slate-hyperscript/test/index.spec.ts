@@ -1,5 +1,5 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
-import { basename, dirname, extname, resolve } from 'node:path'
+import { basename, dirname, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 
 type FixtureModule = {
@@ -17,6 +17,10 @@ const isFixtureFile = (file: string) =>
   !file.startsWith('.') &&
   file !== 'index.js'
 
+const fixtureNameRe = /\.hsx\.tsx$|\.tsx$|\.ts$|\.js$/u
+
+const getFixtureName = (file: string) => file.replace(fixtureNameRe, '')
+
 const runFixtures = (path: string) => {
   describe(basename(path), () => {
     for (const file of readdirSync(path).sort()) {
@@ -30,7 +34,7 @@ const runFixtures = (path: string) => {
 
       if (!stat.isFile() || !isFixtureFile(file)) continue
 
-      const name = basename(file, extname(file))
+      const name = getFixtureName(file)
       const source = readFileSync(fixturePath, 'utf8')
       const testFn = /\bexport const skip\s*=\s*true\b/.test(source)
         ? it.skip

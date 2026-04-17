@@ -18,15 +18,12 @@
   "scripts": {
     "build": "pnpm exec tsdown --config ../../config/tsdown.config.mts --log-level warn",
     "clean": "rimraf dist lib",
-    "test": "node ../../scripts/run-from-root.mjs pnpm exec mocha --require ./config/babel/register.cjs ./packages/slate-history/test/**/*.ts",
-    "typecheck": "pnpm exec tsc --project tsconfig.build.json --noEmit --pretty false"
+    "typecheck": "pnpm exec tsc --project tsconfig.build.json --noEmit"
   },
   "devDependencies": {
-    "@babel/runtime": "^7.23.2",
     "lodash": "^4.17.21",
     "slate": "^0.124.0",
-    "slate-hyperscript": "^0.115.0",
-    "source-map-loader": "^4.0.1"
+    "slate-hyperscript": "^0.115.0"
   },
   "peerDependencies": {
     "slate": ">=0.114.3"

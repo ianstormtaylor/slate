@@ -4,7 +4,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "jsx": "react-jsx",
-    "types": ["node", "react", "react-dom", "jest"],
+    "types": ["node", "react", "react-dom"],
     "paths": {
       "slate-dom": ["../slate-dom/src/index.ts"],
       "slate": ["../slate/src/index.ts"]

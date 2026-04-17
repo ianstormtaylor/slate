@@ -1,9 +1,3 @@
-/** @jsx jsx */
-
-import { jsx } from '../../..'
-
-jsx
-
 import { Editor, Element } from 'slate'
 
 export const input = (

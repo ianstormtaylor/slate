@@ -1,0 +1,14 @@
+{
+  "extends": "../tsconfig.json",
+  "files": [
+    "./interfaces/CustomTypes/custom-types.ts",
+    "./interfaces/CustomTypes/type-guards.ts"
+  ],
+  "compilerOptions": {
+    "composite": false,
+    "noEmit": true,
+    "rootDir": "..",
+    "skipLibCheck": true,
+    "types": ["bun-types", "bun-types/test-globals", "node"]
+  }
+}

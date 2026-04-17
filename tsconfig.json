@@ -1,5 +1,17 @@
 {
-  "files": [],
+  "extends": "./config/typescript/tsconfig.json",
+  "include": ["./**/*.ts", "./**/*.tsx", "./**/*.mts", "./**/*.cts"],
+  "exclude": ["./node_modules", "./packages", "./site"],
+  "compilerOptions": {
+    "baseUrl": ".",
+    "composite": false,
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "rootDir": ".",
+    "skipLibCheck": true,
+    "types": ["bun-types", "bun-types/test-globals", "node"]
+  },
   "references": [
     { "path": "./packages/slate" },
     { "path": "./packages/slate-dom" },

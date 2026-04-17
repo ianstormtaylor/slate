@@ -18,12 +18,10 @@
   "scripts": {
     "build": "pnpm exec tsdown --config ../../config/tsdown.config.mts --log-level warn",
     "clean": "rimraf dist lib",
-    "typecheck": "pnpm exec tsc --project tsconfig.json --noEmit --pretty false"
+    "typecheck": "pnpm exec tsc --project tsconfig.json --noEmit"
   },
   "devDependencies": {
-    "@babel/runtime": "^7.23.2",
-    "slate": "workspace:*",
-    "source-map-loader": "^4.0.1"
+    "slate": "workspace:*"
   },
   "peerDependencies": {
     "slate": ">=0.114.3"

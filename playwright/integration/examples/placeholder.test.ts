@@ -2,8 +2,7 @@ import { expect, test } from '@playwright/test'
 
 test.describe('placeholder example', () => {
   test.beforeEach(
-    async ({ page }) =>
-      await page.goto('http://localhost:3100/examples/custom-placeholder')
+    async ({ page }) => await page.goto('/examples/custom-placeholder')
   )
 
   test('renders custom placeholder', async ({ page }) => {

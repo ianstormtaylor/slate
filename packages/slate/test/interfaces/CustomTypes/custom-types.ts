@@ -1,10 +1,10 @@
-import {
+import type {
   BaseEditor,
+  BaseOperation,
   BasePoint,
   BaseRange,
   BaseSelection,
   Descendant,
-  Operation,
 } from 'slate'
 
 export type HeadingElement = {
@@ -31,7 +31,7 @@ export type CustomOperation = {
   value: string
 }
 
-export type ExtendedOperation = Operation | CustomOperation
+export type ExtendedOperation = BaseOperation | CustomOperation
 
 export type CustomElement = HeadingElement | ListItemElement
 

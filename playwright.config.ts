@@ -45,6 +45,8 @@ const retries = process.env.PLAYWRIGHT_RETRIES
     ? 5
     : 2
 
+const baseURL = process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3101'
+
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
@@ -80,7 +82,7 @@ const config: PlaywrightTestConfig = {
     actionTimeout: 0,
     /* Base URL to use in actions like `await page.goto('/')`. */
     // Can be overridden with PLAYWRIGHT_BASE_URL env var (used by Docker tests)
-    baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3100',
+    baseURL,
 
     /* Collect trace if the first attempt fails. See https://playwright.dev/docs/trace-viewer */
     trace: 'retain-on-first-failure',
@@ -91,6 +93,15 @@ const config: PlaywrightTestConfig = {
 
   /* Configure projects for major browsers */
   projects,
+
+  webServer: process.env.PLAYWRIGHT_BASE_URL
+    ? undefined
+    : {
+        command: 'pnpm build:next && pnpm serve:playwright',
+        reuseExistingServer: !process.env.CI,
+        timeout: 300 * 1000,
+        url: baseURL,
+      },
 
   /* Folder for test artifacts such as screenshots, videos, traces, etc. */
   // outputDir: 'test-results/',

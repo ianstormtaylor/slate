@@ -19,6 +19,10 @@ const tsconfig = fs.existsSync(path.join(packageRoot, 'tsconfig.build.json'))
   : 'tsconfig.json'
 
 const enableSourcemaps = !process.env.CI
+const dts = {
+  bundle: true,
+  sourcemap: enableSourcemaps,
+}
 
 export default defineConfig({
   entry: [input],
@@ -27,10 +31,7 @@ export default defineConfig({
   platform: 'neutral',
   tsconfig,
   sourcemap: enableSourcemaps,
-  dts: {
-    bundle: true,
-    sourcemap: enableSourcemaps,
-  },
+  dts,
   outExtensions: () => ({
     js: '.js',
   }),

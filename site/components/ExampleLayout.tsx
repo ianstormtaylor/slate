@@ -57,17 +57,16 @@ const TabButton = (props: React.ComponentProps<'button'>) => (
 
 const Tab = ({
   active,
-  href,
+  className,
   ...props
-}: React.ComponentProps<'a'> & {
+}: React.ComponentProps<typeof Link> & {
   active: boolean
 }) => (
-  <a
+  <Link
     aria-current={active ? 'page' : undefined}
-    href={href}
     role="menuitem"
     {...props}
-    className={`example-tab ${active ? 'active' : ''}`}
+    className={`example-tab ${active ? 'active' : ''} ${className ?? ''}`.trim()}
   />
 )
 
@@ -148,25 +147,20 @@ export function ExampleLayout({
 
       <TabList isVisible={showTabs}>
         {NON_HIDDEN_EXAMPLES.map(([n, p]) => (
-          <Link
+          <Tab
+            active={p === examplePath}
             as={`/examples/${p}`}
             href="/examples/[example]"
             key={p as string}
-            legacyBehavior
-            passHref
+            onClick={() => setShowTabs(false)}
+            onKeyDown={(e: React.KeyboardEvent) => {
+              if (e.key === 'Escape') {
+                setShowTabs(false)
+              }
+            }}
           >
-            <Tab
-              active={p === examplePath}
-              onClick={() => setShowTabs(false)}
-              onKeyDown={(e: React.KeyboardEvent) => {
-                if (e.key === 'Escape') {
-                  setShowTabs(false)
-                }
-              }}
-            >
-              {n}
-            </Tab>
-          </Link>
+            {n}
+          </Tab>
         ))}
       </TabList>
 

@@ -92,9 +92,36 @@ If you only want to rerun the tests, use:
 pnpm test
 ```
 
+That runs the full package test graph:
+
+- `pnpm test:bun` for Bun-owned lanes
+- `pnpm test:vitest` for the `slate-react` DOM lane
+
+If you only want the Bun-owned package tests, use:
+
+```text
+pnpm test:bun
+```
+
+If you only want the `slate-react` Vitest lane, use:
+
+```text
+pnpm test:vitest
+```
+
 If you need to debug something, you can add a `debugger` line to the source, and then run `pnpm test:inspect`.
 
-If you only want to run a specific test or tests, you can run `pnpm run test:mocha --fgrep="slate-react rendering"` flag which will filter the tests being run by grepping for the string in each test. \(This is a Mocha flag that gets passed through.\)
+If you only want to run a specific Bun-owned test or tests, use Bun's test-name filtering:
+
+```text
+bun test ./packages/slate/test/index.spec.ts --test-name-pattern "Editor\\.above"
+```
+
+If you only want to run a specific `slate-react` Vitest test or tests, run Vitest directly:
+
+```text
+pnpm --dir ./packages/slate-react exec vitest run --config ./vitest.config.mjs test/react-editor.vitest.tsx -t "should not trigger onValueChange"
+```
 
 If you only want the lint gate, use:
 
@@ -104,7 +131,13 @@ pnpm lint
 
 ## Running integration tests
 
-To run integrations with [Playwright](https://playwright.dev/), first run `pnpm dev` to run the examples website, then run `pnpm playwright` in a separate session to open the Playwright test suite. Or alternatively, run just `pnpm test:integration-local`.
+To run integrations with [Playwright](https://playwright.dev/), either:
+
+- run `pnpm dev` and then `pnpm playwright` in a separate session
+- or run `pnpm test:integration-local`
+
+The local integration command manages its own exported-site server, so it does
+not need the normal dev server to already be running.
 
 ### Running integration tests in Docker
 

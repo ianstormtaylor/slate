@@ -26,34 +26,28 @@
   "scripts": {
     "build": "pnpm exec tsdown --config ../../config/tsdown.config.mts --log-level warn",
     "clean": "rimraf dist lib",
-    "test": "pnpm run test:bun && node ../../scripts/run-from-root.mjs pnpm exec jest --config jest.config.js",
-    "test:bun": "pnpm --dir ../.. exec bun test ./packages/slate-react/test/bun",
-    "typecheck": "pnpm exec tsc --project tsconfig.build.json --noEmit --pretty false"
+    "test": "pnpm run test:vitest",
+    "test:vitest": "pnpm exec vitest run --config ./vitest.config.mjs",
+    "typecheck": "pnpm exec tsc --project tsconfig.build.json --noEmit"
   },
   "devDependencies": {
-    "@babel/runtime": "^7.23.2",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@types/is-hotkey": "^0.1.8",
-    "@types/jest": "29.5.6",
-    "@types/jsdom": "^21.1.4",
     "@types/lodash": "^4.14.200",
     "@types/node": "^20.8.7",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@types/resize-observer-browser": "^0.1.8",
-    "direction": "^1.0.4",
-    "jsdom": "^26.1.0",
+    "jsdom": "20.0.3",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
-    "scroll-into-view-if-needed": "^3.1.0",
     "slate": "workspace:*",
     "slate-dom": "workspace:*",
     "slate-history": "workspace:*",
     "slate-hyperscript": "workspace:*",
-    "source-map-loader": "^4.0.1",
-    "tsx": "^4.21.0"
+    "vitest": "^4.1.0"
   },
   "peerDependencies": {
     "react": ">=19.2.0",

@@ -1,8 +1,25 @@
-import { expect, test } from '@playwright/test'
+import { expect, type Locator, test } from '@playwright/test'
+
+const focusTextboxStart = async (textbox: Locator) => {
+  await textbox.evaluate((element: Element) => {
+    const editable = element as HTMLElement
+    const selection = window.getSelection()
+    const range = editable.ownerDocument.createRange()
+
+    editable.focus()
+    range.selectNodeContents(editable)
+    range.collapse(true)
+    selection?.removeAllRanges()
+    selection?.addRange(range)
+  })
+}
 
 test.describe('On markdown-shortcuts example', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('http://localhost:3100/examples/markdown-shortcuts')
+    await page.goto('/examples/markdown-shortcuts')
+    await expect(page.getByRole('textbox').locator('blockquote')).toContainText(
+      'A wise quote.'
+    )
   })
 
   test('contains quote', async ({ page }) => {
@@ -11,19 +28,19 @@ test.describe('On markdown-shortcuts example', () => {
     ).toContain('A wise quote.')
   })
 
-  test('can add list items', async ({ page }, testInfo) => {
-    await expect(page.getByRole('textbox').locator('ul')).toHaveCount(0)
+  test('can add list items', async ({ page }) => {
+    const textbox = page.getByRole('textbox')
 
-    await page.getByRole('textbox').click()
-    await page
-      .getByRole('textbox')
-      .press(testInfo.project.name === 'webkit' ? 'Meta+ArrowLeft' : 'Home')
-    await page.getByRole('textbox').pressSequentially('* ')
-    await page.getByRole('textbox').pressSequentially('1st Item')
+    await expect(textbox.locator('ul')).toHaveCount(0)
+
+    await textbox.click()
+    await focusTextboxStart(textbox)
+    await textbox.pressSequentially('* ')
+    await textbox.pressSequentially('1st Item')
     await page.keyboard.press('Enter')
-    await page.getByRole('textbox').pressSequentially('2nd Item')
+    await textbox.pressSequentially('2nd Item')
     await page.keyboard.press('Enter')
-    await page.getByRole('textbox').pressSequentially('3rd Item')
+    await textbox.pressSequentially('3rd Item')
     await page.keyboard.press('Enter')
     await page.keyboard.press('Backspace')
 

@@ -1,0 +1,12 @@
+{
+  "extends": "../tsconfig.json",
+  "include": ["./**/*", "../src/**/*"],
+  "compilerOptions": {
+    "composite": false,
+    "jsx": "preserve",
+    "noEmit": true,
+    "rootDir": "..",
+    "skipLibCheck": true,
+    "types": ["bun-types", "bun-types/test-globals", "node"]
+  }
+}

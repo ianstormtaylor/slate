@@ -4,7 +4,8 @@ test.setTimeout(60 * 1000)
 
 test.describe('code highlighting', () => {
   test.beforeEach(async ({ page }) => {
-    page.goto('http://localhost:3100/examples/code-highlighting')
+    await page.goto('/examples/code-highlighting')
+    await expect(page.getByTestId('code-block-button')).toBeVisible()
   })
 
   for (const testCase of getTestCases()) {
