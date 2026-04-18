@@ -3,7 +3,6 @@
   "include": ["./**/*.ts", "./**/*.tsx", "./**/*.mts", "./**/*.cts"],
   "exclude": ["./node_modules", "./packages", "./site"],
   "compilerOptions": {
-    "baseUrl": ".",
     "composite": false,
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "moduleResolution": "bundler",
@@ -14,6 +13,7 @@
   },
   "references": [
     { "path": "./packages/slate" },
+    { "path": "./packages/slate-browser" },
     { "path": "./packages/slate-dom" },
     { "path": "./packages/slate-history" },
     { "path": "./packages/slate-hyperscript" },

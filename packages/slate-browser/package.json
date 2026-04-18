@@ -1,0 +1,69 @@
+{
+  "name": "slate-browser",
+  "description": "Browser proof harness for Slate editors.",
+  "version": "0.0.0-private",
+  "private": true,
+  "license": "MIT",
+  "repository": "git://github.com/ianstormtaylor/slate.git",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./core": {
+      "types": "./dist/core/index.d.ts",
+      "default": "./dist/core/index.js"
+    },
+    "./browser": {
+      "types": "./dist/browser/index.d.ts",
+      "default": "./dist/browser/index.js"
+    },
+    "./playwright": {
+      "types": "./dist/playwright/index.d.ts",
+      "default": "./dist/playwright/index.js"
+    },
+    "./transports": {
+      "types": "./dist/transports/index.d.ts",
+      "default": "./dist/transports/index.js"
+    }
+  },
+  "sideEffects": false,
+  "files": [
+    "dist/"
+  ],
+  "scripts": {
+    "build": "tsdown --config ./tsdown.config.mts --log-level warn",
+    "clean": "rimraf dist lib",
+    "test": "bun run test:core && bun run test:dom && bun run test:selection",
+    "test:core": "bun test test/core",
+    "test:dom": "vitest run --config ./vitest.config.ts --project browser",
+    "test:selection": "vitest run --config ./vitest.config.ts --project browser test/browser/selection.browser.test.ts",
+    "typecheck": "tsc --project ./tsconfig.test.json --noEmit"
+  },
+  "peerDependencies": {
+    "@playwright/test": ">=1.52.0"
+  },
+  "peerDependenciesMeta": {
+    "@playwright/test": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.52.0",
+    "@types/node": "^20.8.7",
+    "@vitest/browser-playwright": "^4.1.0",
+    "playwright": "^1.58.2",
+    "vite": "^7.1.12",
+    "vitest": "^4.1.0"
+  },
+  "subpaths": [
+    "core",
+    "browser",
+    "playwright",
+    "transports"
+  ]
+}

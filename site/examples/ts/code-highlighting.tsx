@@ -23,6 +23,7 @@ import {
   Editor,
   Node,
   type NodeEntry,
+  type Element as SlateElement,
   Transforms,
 } from 'slate'
 import { withHistory } from 'slate-history'
@@ -137,7 +138,7 @@ const CodeBlockButton = () => {
         split: true,
       }
     )
-    Transforms.setNodes(
+    Transforms.setNodes<SlateElement>(
       editor,
       { type: CodeLineType },
       { match: (n) => Node.isElement(n) && n.type === ParagraphType }

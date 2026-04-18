@@ -2,7 +2,6 @@
   "extends": "../../config/typescript/tsconfig.json",
   "include": ["src/**/*"],
   "compilerOptions": {
-    "baseUrl": ".",
     "jsx": "react-jsx",
     "types": ["node", "react", "react-dom"],
     "paths": {

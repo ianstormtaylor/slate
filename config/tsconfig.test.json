@@ -1,7 +1,6 @@
 {
   "extends": "./typescript/tsconfig.json",
   "compilerOptions": {
-    "baseUrl": "..",
     "jsx": "react-jsx",
     "types": [
       "bun-types",

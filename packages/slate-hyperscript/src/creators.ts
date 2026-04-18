@@ -142,8 +142,8 @@ export function createSelection(
   attributes: { [key: string]: any },
   children: any[]
 ): Range {
-  const anchor: AnchorToken = children.find((c) => c instanceof AnchorToken)
-  const focus: FocusToken = children.find((c) => c instanceof FocusToken)
+  const anchor = children.find((c) => c instanceof AnchorToken)
+  const focus = children.find((c) => c instanceof FocusToken)
 
   if (!anchor || anchor.offset == null || anchor.path == null) {
     throw new Error(

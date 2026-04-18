@@ -1,0 +1,27 @@
+export {
+  type BrowserMobileScenarioId,
+  type DebugPlaceholderShape,
+  type DebugSnapshot,
+  evaluateImeInput,
+  evaluateImeInput as evaluateImeInputProof,
+  evaluatePlaceholderInput,
+  evaluatePlaceholderInput as evaluatePlaceholderInputProof,
+  extractAgentBrowserDebugSnapshot,
+  extractAgentBrowserDebugSnapshot as extractAgentBrowserDebugSnapshotProof,
+  extractAppiumDebugSnapshot,
+  extractAppiumDebugSnapshot as extractAppiumDebugSnapshotProof,
+  type PlaceholderInputEvaluation,
+  type ProofEvidenceClass,
+  parseAgentBrowserBatch,
+  parseAgentBrowserBatch as parseAgentBrowserBatchProof,
+  parseDebugSnapshot,
+  parseDebugSnapshot as parseDebugSnapshotProof,
+} from './proof'
+export {
+  isCollapsed,
+  type Path,
+  type Point,
+  type Range,
+  serializePoint,
+  serializeRange,
+} from './selection'

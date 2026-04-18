@@ -1,0 +1,10 @@
+{
+  "extends": "../../config/typescript/tsconfig.json",
+  "include": ["src/**/*"],
+  "compilerOptions": {
+    "types": ["node"],
+    "rootDir": ".",
+    "outDir": "./lib",
+    "composite": true
+  }
+}
