@@ -94,13 +94,13 @@ bun run test
 
 That runs the full package test graph:
 
-- `bun test:bun` for Bun-owned lanes
+- `bun test` for Bun-owned lanes
 - `bun test:vitest` for the `slate-react` DOM lane
 
 If you only want the Bun-owned package tests, use:
 
 ```text
-bun test:bun
+bun test
 ```
 
 If you only want the `slate-react` Vitest lane, use:
@@ -120,7 +120,7 @@ bun test ./packages/slate/test/index.spec.ts --test-name-pattern "Editor\\.above
 If you only want to run a specific `slate-react` Vitest test or tests, run Vitest directly:
 
 ```text
-cd ./packages/slate-react && bun test:vitest -- test/react-editor.vitest.tsx -t "should not trigger onValueChange"
+cd ./packages/slate-react && bun test:vitest -- test/react-editor.test.tsx -t "should not trigger onValueChange"
 ```
 
 If you only want the lint gate, use:

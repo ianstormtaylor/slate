@@ -1,4 +1,6 @@
 [test]
 preload = ["./config/bun-test-setup.ts"]
+root = "./packages"
+pathIgnorePatterns = ["**/*.test.*"]
 tsconfig = "./config/tsconfig.test.json"
 onlyFailures = true

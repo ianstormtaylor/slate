@@ -32,8 +32,7 @@
     "release:publish:next": "changeset publish --tag next",
     "serve": "cd ./site && next dev -p 3100",
     "serve:playwright": "node ./scripts/serve-playwright.mjs",
-    "test": "bun test:bun && bun test:vitest",
-    "test:bun": "bun test ./packages/slate-hyperscript/test/index.spec.ts ./packages/slate-react/test/bun ./packages/slate/test/index.spec.ts ./packages/slate/test/utils/string.ts ./packages/slate-history/test/index.spec.ts",
+    "test": "bun test && bun test:vitest",
     "test:inspect": "bun test --inspect-brk",
     "test:integration": "playwright install --with-deps && playwright test",
     "test:integration-docker": "./playwright/docker/run-tests.sh",
@@ -46,7 +45,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.11",
-    "bun-types": "1.3.10",
+    "bun-types": "1.3.12",
     "@changesets/changelog-github": "^0.4.8",
     "@changesets/cli": "^2.26.2",
     "@emotion/css": "^11.11.2",
@@ -86,5 +85,5 @@
     "typescript": "5.2.2",
     "ultracite": "7.4.4"
   },
-  "packageManager": "bun@1.3.10"
+  "packageManager": "bun@1.3.12"
 }
