@@ -18,28 +18,24 @@
   "dependencies": {
     "@juggle/resize-observer": "^3.4.0",
     "direction": "^1.0.4",
-    "is-hotkey": "^0.2.0",
     "lodash": "^4.17.21",
-    "scroll-into-view-if-needed": "^3.1.0",
-    "tiny-invariant": "1.3.1"
+    "scroll-into-view-if-needed": "^3.1.0"
   },
   "scripts": {
-    "build": "pnpm exec tsdown --config ../../config/tsdown.config.mts --log-level warn",
+    "build": "tsdown --config ../../config/tsdown.config.mts --log-level warn",
     "clean": "rimraf dist lib",
-    "test": "pnpm run test:vitest",
-    "test:vitest": "pnpm exec vitest run --config ./vitest.config.mjs",
-    "typecheck": "pnpm exec tsc --project tsconfig.build.json --noEmit"
+    "test": "bun test:vitest",
+    "test:vitest": "vitest run --config ./vitest.config.mjs",
+    "typecheck": "tsc --project tsconfig.build.json --noEmit"
   },
   "devDependencies": {
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
-    "@types/is-hotkey": "^0.1.8",
     "@types/lodash": "^4.14.200",
     "@types/node": "^20.8.7",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "@types/resize-observer-browser": "^0.1.8",
     "jsdom": "20.0.3",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",

@@ -50,30 +50,29 @@ jobs:
           fetch-depth: 0
           ref: refs/pull/${{ github.event.issue.number }}/head
 
-      - name: Setup node
-        uses: pnpm/action-setup@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          version: 9.15.0
+          bun-version: 1.3.10
 
       - name: Setup node
         uses: actions/setup-node@v4
         with:
           node-version: 22.17
-          cache: pnpm
           registry-url: https://registry.npmjs.org
           key: node22
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: bun install --frozen-lockfile
 
       - name: Prepare release
-        run: pnpm prerelease
+        run: bun run prerelease
 
       # https://github.com/atlassian/changesets/blob/master/docs/snapshot-releases.md
       - name: Release to @pr channel
         run: |
-          pnpm changeset version --snapshot
-          pnpm changeset publish --tag pr
+          bunx changeset version --snapshot
+          bunx changeset publish --tag pr
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -95,7 +94,7 @@ jobs:
 
           const lines = files.map((file) => {
             const pkg = JSON.parse(readFileSync(file, 'utf8'));
-            return `- \`pnpm add ${pkg.name}@${pkg.version}\``;
+            return `- \`bun add ${pkg.name}@${pkg.version}\``;
           });
 
           console.log("body<<'BODY'");

@@ -97,7 +97,7 @@ const config: PlaywrightTestConfig = {
   webServer: process.env.PLAYWRIGHT_BASE_URL
     ? undefined
     : {
-        command: 'pnpm build:next && pnpm serve:playwright',
+        command: 'bun build:next && bun serve:playwright',
         reuseExistingServer: !process.env.CI,
         timeout: 300 * 1000,
         url: baseURL,

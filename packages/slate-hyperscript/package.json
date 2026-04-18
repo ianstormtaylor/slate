@@ -16,9 +16,9 @@
     "dist/"
   ],
   "scripts": {
-    "build": "pnpm exec tsdown --config ../../config/tsdown.config.mts --log-level warn",
+    "build": "tsdown --config ../../config/tsdown.config.mts --log-level warn",
     "clean": "rimraf dist lib",
-    "typecheck": "pnpm exec tsc --project tsconfig.json --noEmit"
+    "typecheck": "tsc --project tsconfig.json --noEmit"
   },
   "devDependencies": {
     "slate": "workspace:*"

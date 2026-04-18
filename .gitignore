@@ -1,5 +1,4 @@
 *.log
-.pnpm-store/
 .turbo/
 .next/
 .idea/

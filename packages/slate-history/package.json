@@ -16,14 +16,13 @@
     "dist/"
   ],
   "scripts": {
-    "build": "pnpm exec tsdown --config ../../config/tsdown.config.mts --log-level warn",
+    "build": "tsdown --config ../../config/tsdown.config.mts --log-level warn",
     "clean": "rimraf dist lib",
-    "typecheck": "pnpm exec tsc --project tsconfig.build.json --noEmit"
+    "typecheck": "tsc --project tsconfig.build.json --noEmit"
   },
   "devDependencies": {
     "lodash": "^4.17.21",
-    "slate": "^0.124.0",
-    "slate-hyperscript": "^0.115.0"
+    "slate": "^0.124.0"
   },
   "peerDependencies": {
     "slate": ">=0.114.3"

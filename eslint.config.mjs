@@ -6,7 +6,6 @@ export default defineConfig([
   {
     ignores: [
       '**/node_modules/**',
-      '**/.pnpm-store/**',
       '**/.turbo/**',
       '**/.next/**',
       '**/dist/**',

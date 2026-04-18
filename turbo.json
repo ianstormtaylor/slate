@@ -13,7 +13,6 @@
   ],
   "tasks": {
     "build": {
-      "dependsOn": ["^build"],
       "outputs": ["dist/**", "lib/**"],
       "cache": true
     },

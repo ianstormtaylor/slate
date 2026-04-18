@@ -28,16 +28,15 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup node
-        uses: pnpm/action-setup@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          version: 9.15.0
+          bun-version: 1.3.10
 
       - name: Setup node
         uses: actions/setup-node@v4
         with:
           node-version: 22.17
-          cache: pnpm
           # IMPORTANT: do NOT set registry-url here (avoid auth/.npmrc side effects)
 
       - name: Upgrade npm (OIDC fixes ship in npm releases)
@@ -58,20 +57,20 @@ jobs:
           npm config list -l | grep -iE 'auth|token|always-auth' || true
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: bun install --frozen-lockfile
 
       - name: Prepare release
-        run: pnpm prerelease
+        run: bun run prerelease
 
       # Version PR when changesets exist; when none remain, publish runs here and
-      # changesets/action pushes tags + creates GitHub Releases (unlike plain `pnpm changeset publish`).
+      # changesets/action pushes tags + creates GitHub Releases (unlike plain `bun changeset publish`).
       - name: Create or update release PR / publish
         if: matrix.channel == 'latest'
         id: changesets
         uses: changesets/action@v1
         with:
-          version: pnpm changesetversion
-          publish: pnpm release:publish:latest
+          version: bun changesetversion
+          publish: bun release:publish:latest
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -80,8 +79,8 @@ jobs:
       - name: Release to @dev channel
         if: matrix.channel == 'dev'
         run: |
-          pnpm changeset version --snapshot
-          pnpm changeset publish --tag dev
+          bunx changeset version --snapshot
+          bunx changeset publish --tag dev
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

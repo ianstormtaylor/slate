@@ -48,13 +48,13 @@ Please include tests and docs with every pull request!
 
 ## Repository Setup
 
-The Slate repository is a pnpm workspace orchestrated with [Turbo](https://turbo.build/). Unlike more traditional repositories, this means that the repository must be built in order for tests, linting, or other common development activities to function as expected.
+The Slate repository is a Bun workspace orchestrated with [Turbo](https://turbo.build/). Unlike more traditional repositories, this means that the repository must be built in order for tests, linting, or other common development activities to function as expected.
 
-To run the build, you need to have the Slate repository cloned to your computer. After that, you need to `cd` into the directory where you cloned it, and install the dependencies with `pnpm` and build the monorepo:
+To run the build, you need to have the Slate repository cloned to your computer. After that, you need to `cd` into the directory where you cloned it, and install the dependencies with Bun and build the monorepo:
 
 ```text
-pnpm install
-pnpm build
+bun install
+bun run build
 ```
 
 ## Running Examples
@@ -64,7 +64,7 @@ To run the examples, start by building the monorepo as described in the [Reposit
 Then you can start the examples server with:
 
 ```text
-pnpm dev
+bun dev
 ```
 
 ## Running Tests
@@ -74,7 +74,7 @@ To run the tests, start by building the monorepo as described in the [Repository
 The canonical repository gate is:
 
 ```text
-pnpm check
+bun check
 ```
 
 It runs the full local gate: lint, typecheck, tests, and integration coverage.
@@ -83,33 +83,33 @@ instead of front-loading a full root build. For purely mechanical formatting
 fixes, run:
 
 ```text
-pnpm lint:fix
+bun lint:fix
 ```
 
 If you only want to rerun the tests, use:
 
 ```text
-pnpm test
+bun run test
 ```
 
 That runs the full package test graph:
 
-- `pnpm test:bun` for Bun-owned lanes
-- `pnpm test:vitest` for the `slate-react` DOM lane
+- `bun test:bun` for Bun-owned lanes
+- `bun test:vitest` for the `slate-react` DOM lane
 
 If you only want the Bun-owned package tests, use:
 
 ```text
-pnpm test:bun
+bun test:bun
 ```
 
 If you only want the `slate-react` Vitest lane, use:
 
 ```text
-pnpm test:vitest
+bun test:vitest
 ```
 
-If you need to debug something, you can add a `debugger` line to the source, and then run `pnpm test:inspect`.
+If you need to debug something, you can add a `debugger` line to the source, and then run `bun test:inspect`.
 
 If you only want to run a specific Bun-owned test or tests, use Bun's test-name filtering:
 
@@ -120,21 +120,21 @@ bun test ./packages/slate/test/index.spec.ts --test-name-pattern "Editor\\.above
 If you only want to run a specific `slate-react` Vitest test or tests, run Vitest directly:
 
 ```text
-pnpm --dir ./packages/slate-react exec vitest run --config ./vitest.config.mjs test/react-editor.vitest.tsx -t "should not trigger onValueChange"
+cd ./packages/slate-react && bun test:vitest -- test/react-editor.vitest.tsx -t "should not trigger onValueChange"
 ```
 
 If you only want the lint gate, use:
 
 ```text
-pnpm lint
+bun lint
 ```
 
 ## Running integration tests
 
 To run integrations with [Playwright](https://playwright.dev/), either:
 
-- run `pnpm dev` and then `pnpm playwright` in a separate session
-- or run `pnpm test:integration-local`
+- run `bun dev` and then `bun playwright` in a separate session
+- or run `bun test:integration-local`
 
 The local integration command manages its own exported-site server, so it does
 not need the normal dev server to already be running.
@@ -146,7 +146,7 @@ If tests fail on CI but pass locally (often due to OS differences), you can run 
 **Prerequisites:** The project must be built first (same as running tests locally).
 
 ```text
-pnpm test:integration-docker
+bun test:integration-docker
 ```
 
 The script will automatically:
@@ -158,19 +158,19 @@ The script will automatically:
 You can also pass additional arguments to the test runner. For example, to run a specific test file:
 
 ```text
-pnpm test:integration-docker playwright/integration/slate-react/selection.test.ts
+bun test:integration-docker playwright/integration/slate-react/selection.test.ts
 ```
 
 Or run a specific browser project:
 
 ```text
-pnpm test:integration-docker --project=chromium
+bun test:integration-docker --project=chromium
 ```
 
 You can combine arguments as well:
 
 ```text
-pnpm test:integration-docker playwright/integration/examples/richtext.test.ts --project chromium
+bun test:integration-docker playwright/integration/examples/richtext.test.ts --project chromium
 ```
 
 ## Testing Input Methods
@@ -191,7 +191,7 @@ That page links to the `placeholder`, `inline-edge`, and `void-edge` examples.
 Slate uses Changesets for publishing, so run:
 
 ```text
-pnpm release:latest
+bun release:latest
 ```
 
 This automatically runs the prerelease script first so the build, test, and lint gate is green before publishing.
@@ -201,7 +201,7 @@ This automatically runs the prerelease script first so the build, test, and lint
 If we are unsure as to the stability of a release because there are significant changes and/or particularly complex changes, release with the `@next` tag.
 
 ```text
-pnpm release:next
+bun release:next
 ```
 
 ### Publishing `@experimental` Release
@@ -209,7 +209,7 @@ pnpm release:next
 If you need to create an experimental release to see how a published package will behave during an actual publish, release with the `@experimental` tag. End users should have no expectation that an `@experimental` release will be usable.
 
 ```text
-pnpm release:experimental
+bun release:experimental
 ```
 
 ### Running Prerelease Script
@@ -217,7 +217,7 @@ pnpm release:experimental
 If we want to make sure that Slate code follows the preparations for a release but without actually publishing, run:
 
 ```text
-pnpm prerelease
+bun prerelease
 ```
 
 Which will build, test and lint Slate code.
