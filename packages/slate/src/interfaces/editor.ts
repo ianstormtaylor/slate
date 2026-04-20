@@ -77,6 +77,7 @@ export interface BaseEditor {
   // Overrideable core transforms.
 
   addMark: OmitFirstArg<typeof Editor.addMark>
+  asMutationBatch: OmitFirstArg<typeof Editor.asMutationBatch>
   collapse: OmitFirstArg<typeof Transforms.collapse>
   delete: OmitFirstArg<typeof Transforms.delete>
   deleteBackward: (unit: TextUnit) => void
@@ -136,6 +137,7 @@ export interface BaseEditor {
   hasInlines: OmitFirstArg<typeof Editor.hasInlines>
   hasPath: OmitFirstArg<typeof Editor.hasPath>
   hasTexts: OmitFirstArg<typeof Editor.hasTexts>
+  isBatchingMutations: OmitFirstArg<typeof Editor.isBatchingMutations>
   isBlock: OmitFirstArg<typeof Editor.isBlock>
   isEdge: OmitFirstArg<typeof Editor.isEdge>
   isEmpty: OmitFirstArg<typeof Editor.isEmpty>
@@ -344,6 +346,20 @@ export interface EditorInterface {
   ) => Point | undefined
 
   /**
+   * Call a function, during this function all tree changes are grouped as one
+   * "mutation batch". During mutation batch new element references and
+   * children arrays are not treated as immutable until after the batch, saving
+   * memory and computation by altering nodes directly. Node snapshots from
+   * before the batch are never altered and after the batch new nodes are never
+   * altered again.
+   * 
+   * WARNING:
+   * During this function do not save any references to non-leaf nodes, as they
+   * may mutate later in the batch.
+   */
+  asMutationBatch: (editor: Editor, fn: () => void) => void
+
+  /**
    * Get the point before a location.
    */
   before: (
@@ -464,6 +480,11 @@ export interface EditorInterface {
     text: string,
     options?: TextInsertTextOptions
   ) => void
+
+  /**
+   * Check if the editor is batching tree mutations for operations.
+   */
+  isBatchingMutations: (editor: Editor) => boolean
 
   /**
    * Check if a value is a block `Element` object.
@@ -747,6 +768,10 @@ export const Editor: EditorInterface = {
     return editor.after(at, options)
   },
 
+  asMutationBatch(editor, fn: () => void) {
+    editor.asMutationBatch(fn)
+  },
+
   before(editor, at, options) {
     return editor.before(at, options)
   },
@@ -819,6 +844,10 @@ export const Editor: EditorInterface = {
 
   insertText(editor, text) {
     editor.insertText(text)
+  },
+
+  isBatchingMutations(editor) {
+    return editor.isBatchingMutations()
   },
 
   isBlock(editor, value) {
@@ -973,6 +1002,7 @@ export const Editor: EditorInterface = {
   withoutNormalizing(editor, fn: () => void) {
     editor.withoutNormalizing(fn)
   },
+
   shouldMergeNodesRemovePrevNode: (editor, prevNode, curNode) => {
     return editor.shouldMergeNodesRemovePrevNode(prevNode, curNode)
   },

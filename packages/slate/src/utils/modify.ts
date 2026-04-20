@@ -1,12 +1,14 @@
 import {
   Ancestor,
   Descendant,
+  Editor,
   Element,
   Node,
   Path,
   Scrubber,
   Text,
 } from '../interfaces'
+import { MUTATED_CHILD_ARRAYS_IN_BATCH } from './weak-maps'
 
 export const insertChildren = <T>(
   xs: T[],
@@ -23,6 +25,58 @@ export const replaceChildren = <T>(
 
 export const removeChildren = replaceChildren
 
+export const smartInsertChildren = <T extends Descendant>(
+  modifiedChildArrays: Set<Descendant[]> | undefined,
+  children: T[],
+  index: number,
+  ...newValues: T[]
+) => {
+  return smartReplaceChildren(
+    modifiedChildArrays,
+    children,
+    index,
+    0,
+    ...newValues
+  )
+}
+
+export const smartReplaceChildren = <T extends Descendant>(
+  modifiedChildArrays: Set<Descendant[]> | undefined,
+  children: T[],
+  index: number,
+  removeCount: number,
+  ...newValues: T[]
+) => {
+  let out
+  if (modifiedChildArrays?.has(children)) {
+    out = children
+  } else {
+    out = children.slice()
+    modifiedChildArrays?.add(out)
+  }
+  out.splice(index, removeCount, ...newValues)
+  return out
+}
+
+export const smartReplaceChild = <T extends Descendant>(
+  modifiedChildArrays: Set<Descendant[]> | undefined,
+  children: T[],
+  index: number,
+  newValue: T
+) => {
+  let out
+  if (modifiedChildArrays?.has(children)) {
+    out = children
+  } else {
+    out = children.slice()
+    modifiedChildArrays?.add(out)
+  }
+  out[index] = newValue
+  return out
+}
+
+export const smartRemoveChildren = smartReplaceChildren
+
 /**
  * Replace a descendant with a new node, replacing all ancestors
  */
@@ -36,21 +90,43 @@ export const modifyDescendant = <N extends Descendant>(
   }
 
   const node = Node.get(root, path) as N
-  const slicedPath = path.slice()
   let modifiedNode: Node = f(node)
+  if (modifiedNode === node) return
+
+  const modifiedChildArrays = MUTATED_CHILD_ARRAYS_IN_BATCH.get(root as Editor)
+
+  const slicedPath = path.slice()
 
   while (slicedPath.length > 1) {
     const index = slicedPath.pop()!
     const ancestorNode = Node.get(root, slicedPath) as Ancestor
 
+    const children = smartReplaceChild(
+      modifiedChildArrays,
+      ancestorNode.children,
+      index,
+      modifiedNode
+    )
+
+    if (children === ancestorNode.children) {
+      // we were able to directly mutate, no further replacements needed
+      return
+    }
+
     modifiedNode = {
       ...ancestorNode,
-      children: replaceChildren(ancestorNode.children, index, 1, modifiedNode),
+      children,
     }
   }
 
-  const index = slicedPath.pop()!
-  root.children = replaceChildren(root.children, index, 1, modifiedNode)
+  const index = slicedPath[0]
+
+  root.children = smartReplaceChild(
+    modifiedChildArrays,
+    root.children,
+    index,
+    modifiedNode
+  )
 }
 
 /**
@@ -73,7 +149,8 @@ export const modifyChildren = (
         )
       }
 
-      return { ...node, children: f(node.children) }
+      const children = f(node.children)
+      return children === node.children ? node : { ...node, children }
     })
   }
 }
