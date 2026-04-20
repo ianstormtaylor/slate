@@ -346,8 +346,16 @@ export interface EditorInterface {
   ) => Point | undefined
 
   /**
-   * Call a function, during which only the first operation on a node's descendant will immutably change it, all subsequent changes of its descendants in the batch will cause a mutable change.
-   * WARNING, during this function do not save any references to non-leaf nodes, as they may mutate later in the batch.
+   * Call a function, during this function all tree changes are grouped as one
+   * "mutation batch". During mutation batch new element references and
+   * children arrays are not treated as immutable until after the batch, saving
+   * memory and computation by altering nodes directly. Node snapshots from
+   * before the batch are never altered and after the batch new nodes are never
+   * altered again.
+   * 
+   * WARNING:
+   * During this function do not save any references to non-leaf nodes, as they
+   * may mutate later in the batch.
    */
   asMutationBatch: (editor: Editor, fn: () => void) => void
 
@@ -759,7 +767,7 @@ export const Editor: EditorInterface = {
   after(editor, at, options) {
     return editor.after(at, options)
   },
-  
+
   asMutationBatch(editor, fn: () => void) {
     editor.asMutationBatch(fn)
   },
@@ -837,7 +845,7 @@ export const Editor: EditorInterface = {
   insertText(editor, text) {
     editor.insertText(text)
   },
-  
+
   isBatchingMutations(editor) {
     return editor.isBatchingMutations()
   },
