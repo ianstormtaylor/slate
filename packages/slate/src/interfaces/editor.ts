@@ -77,6 +77,7 @@ export interface BaseEditor {
   // Overrideable core transforms.
 
   addMark: OmitFirstArg<typeof Editor.addMark>
+  asMutationBatch: OmitFirstArg<typeof Editor.asMutationBatch>
   collapse: OmitFirstArg<typeof Transforms.collapse>
   delete: OmitFirstArg<typeof Transforms.delete>
   deleteBackward: (unit: TextUnit) => void
@@ -116,7 +117,6 @@ export interface BaseEditor {
   splitNodes: OmitFirstArg<typeof Transforms.splitNodes>
   unsetNodes: OmitFirstArg<typeof Transforms.unsetNodes>
   unwrapNodes: OmitFirstArg<typeof Transforms.unwrapNodes>
-  whileMutablyBatching: OmitFirstArg<typeof Editor.withoutNormalizing>
   withoutNormalizing: OmitFirstArg<typeof Editor.withoutNormalizing>
   wrapNodes: OmitFirstArg<typeof Transforms.wrapNodes>
 
@@ -137,12 +137,12 @@ export interface BaseEditor {
   hasInlines: OmitFirstArg<typeof Editor.hasInlines>
   hasPath: OmitFirstArg<typeof Editor.hasPath>
   hasTexts: OmitFirstArg<typeof Editor.hasTexts>
+  isBatchingMutations: OmitFirstArg<typeof Editor.isBatchingMutations>
   isBlock: OmitFirstArg<typeof Editor.isBlock>
   isEdge: OmitFirstArg<typeof Editor.isEdge>
   isEmpty: OmitFirstArg<typeof Editor.isEmpty>
   isEnd: OmitFirstArg<typeof Editor.isEnd>
   isInline: OmitFirstArg<typeof Editor.isInline>
-  isMutablyBatching: OmitFirstArg<typeof Editor.isMutablyBatching>
   isNormalizing: OmitFirstArg<typeof Editor.isNormalizing>
   isStart: OmitFirstArg<typeof Editor.isStart>
   isVoid: OmitFirstArg<typeof Editor.isVoid>
@@ -346,6 +346,12 @@ export interface EditorInterface {
   ) => Point | undefined
 
   /**
+   * Call a function, during which only the first operation on a node's descendant will immutably change it, all subsequent changes of its descendants in the batch will cause a mutable change.
+   * WARNING, during this function do not save any references to non-leaf nodes, as they may mutate later in the batch.
+   */
+  asMutationBatch: (editor: Editor, fn: () => void) => void
+
+  /**
    * Get the point before a location.
    */
   before: (
@@ -468,6 +474,11 @@ export interface EditorInterface {
   ) => void
 
   /**
+   * Check if the editor is batching tree mutations for operations.
+   */
+  isBatchingMutations: (editor: Editor) => boolean
+
+  /**
    * Check if a value is a block `Element` object.
    */
   isBlock: (editor: Editor, value: Element) => boolean
@@ -501,11 +512,6 @@ export interface EditorInterface {
    * Check if a value is an inline `Element` object.
    */
   isInline: (editor: Editor, value: Element) => boolean
-
-  /**
-   * Check if the editor is batching tree mutations for operations.
-   */
-  isMutablyBatching: (editor: Editor) => boolean
 
   /**
    * Check if the editor is currently normalizing after each operation.
@@ -726,12 +732,6 @@ export interface EditorInterface {
   ) => NodeEntry<Element> | undefined
 
   /**
-   * Call a function, during which only the first operation on a node's descendant will immutably change it, all subsequent changes of its descendants in the batch will cause a mutable change.
-   * WARNING, during this function do not save any references to non-leaf nodes, as they may mutate later in the batch.
-   */
-  whileMutablyBatching: (editor: Editor, fn: () => void) => void
-
-  /**
    * Call a function, deferring normalization until after it completes.
    */
   withoutNormalizing: (editor: Editor, fn: () => void) => void
@@ -758,6 +758,10 @@ export const Editor: EditorInterface = {
 
   after(editor, at, options) {
     return editor.after(at, options)
+  },
+  
+  asMutationBatch(editor, fn: () => void) {
+    editor.asMutationBatch(fn)
   },
 
   before(editor, at, options) {
@@ -833,6 +837,10 @@ export const Editor: EditorInterface = {
   insertText(editor, text) {
     editor.insertText(text)
   },
+  
+  isBatchingMutations(editor) {
+    return editor.isBatchingMutations()
+  },
 
   isBlock(editor, value) {
     return editor.isBlock(value)
@@ -858,10 +866,6 @@ export const Editor: EditorInterface = {
 
   isInline(editor, value) {
     return editor.isInline(value)
-  },
-
-  isMutablyBatching(editor) {
-    return editor.isMutablyBatching()
   },
 
   isNormalizing(editor) {
@@ -985,10 +989,6 @@ export const Editor: EditorInterface = {
 
   void(editor, options) {
     return editor.void(options)
-  },
-
-  whileMutablyBatching(editor, fn: () => void) {
-    editor.whileMutablyBatching(fn)
   },
 
   withoutNormalizing(editor, fn: () => void) {

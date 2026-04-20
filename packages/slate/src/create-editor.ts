@@ -16,6 +16,7 @@ import {
 import { apply } from './core'
 import {
   above,
+  asMutationBatch,
   after,
   before,
   deleteBackward,
@@ -30,6 +31,7 @@ import {
   hasInlines,
   hasPath,
   hasTexts,
+  isBatchingMutations,
   isBlock,
   isEdge,
   isEmpty,
@@ -84,8 +86,6 @@ import {
   unwrapNodes,
   wrapNodes,
 } from './transforms-node'
-import { isMutablyBatching } from './editor/is-mutably-batching'
-import { whileMutablyBatching } from './editor/while-mutably-batching'
 
 /**
  * Create a new Slate `Editor` object.
@@ -144,7 +144,7 @@ export const createEditor = (): Editor => {
     isEdge: (...args) => isEdge(editor, ...args),
     isEmpty: (...args) => isEmpty(editor, ...args),
     isEnd: (...args) => isEnd(editor, ...args),
-    isMutablyBatching: (...args) => isMutablyBatching(editor, ...args),
+    isBatchingMutations: (...args) => isBatchingMutations(editor, ...args),
     isNormalizing: (...args) => isNormalizing(editor, ...args),
     isStart: (...args) => isStart(editor, ...args),
     last: (...args) => last(editor, ...args),
@@ -183,7 +183,7 @@ export const createEditor = (): Editor => {
     unsetNodes: (...args) => unsetNodes(editor, ...args),
     unwrapNodes: (...args) => unwrapNodes(editor, ...args),
     void: (...args) => getVoid(editor, ...args),
-    whileMutablyBatching: (...args) => whileMutablyBatching(editor, ...args),
+    asMutationBatch: (...args) => asMutationBatch(editor, ...args),
     withoutNormalizing: (...args) => withoutNormalizing(editor, ...args),
     wrapNodes: (...args) => wrapNodes(editor, ...args),
     shouldMergeNodesRemovePrevNode: (...args) =>

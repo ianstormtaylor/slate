@@ -347,7 +347,7 @@ export const withDOM = <T extends BaseEditor>(
     const text = data.getData('text/plain')
 
     if (text) {
-      editor.whileMutablyBatching(() => {
+      editor.asMutationBatch(() => {
         const lines = text.split(/\r\n|\r|\n/)
         let split = false
 
