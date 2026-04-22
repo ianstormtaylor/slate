@@ -3,6 +3,7 @@ export const EXAMPLE_NAMES_AND_PATHS = [
   ['Checklists', 'check-lists'],
   ['Code Highlighting', 'code-highlighting'],
   ['Custom Placeholder', 'custom-placeholder'],
+  ['Decorations Async', 'decorations-async'],
   ['Editable Voids', 'editable-voids'],
   ['Embeds', 'embeds'],
   ['Forced Layout', 'forced-layout'],
