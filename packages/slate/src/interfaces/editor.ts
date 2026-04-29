@@ -352,7 +352,7 @@ export interface EditorInterface {
    * memory and computation by altering nodes directly. Node snapshots from
    * before the batch are never altered and after the batch new nodes are never
    * altered again.
-   * 
+   *
    * WARNING:
    * During this function do not save any references to non-leaf nodes, as they
    * may mutate later in the batch.

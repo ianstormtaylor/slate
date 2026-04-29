@@ -12,5 +12,5 @@ export const RANGE_REFS: WeakMap<Editor, Set<RangeRef>> = new WeakMap()
 
 export const MUTATED_CHILD_ARRAYS_IN_BATCH: WeakMap<
   Editor,
-  Set<Descendant[]>
+  WeakSet<Descendant[]>
 > = new WeakMap()
