@@ -13,12 +13,12 @@ import {
   Text,
 } from '../../index'
 import {
-  insertChildren,
   modifyChildren,
   modifyDescendant,
   modifyLeaf,
-  removeChildren,
-  replaceChildren,
+  smartInsertChildren,
+  smartRemoveChildren,
+  smartReplaceChildren,
 } from '../../utils/modify'
 
 /**
@@ -54,17 +54,24 @@ export const GeneralTransforms: GeneralTransforms = {
       case 'insert_node': {
         const { path, node } = op
 
-        modifyChildren(editor, Path.parent(path), children => {
-          const index = path[path.length - 1]
-
-          if (index > children.length) {
-            throw new Error(
-              `Cannot apply an "insert_node" operation at path [${path}] because the destination is past the end of the node.`
+        modifyChildren(
+          editor,
+          Path.parent(path),
+          (children, mutatedChildArrays) => {
+            const index = path[path.length - 1]
+            if (index > children.length) {
+              throw new Error(
+                `Cannot apply an "insert_node" operation at path [${path}] because the destination is past the end of the node.`
+              )
+            }
+            return smartInsertChildren(
+              mutatedChildArrays,
+              children,
+              index,
+              node
             )
           }
-
-          return insertChildren(children, index, node)
-        })
+        )
 
         transformSelection = true
         break
@@ -77,11 +84,7 @@ export const GeneralTransforms: GeneralTransforms = {
         modifyLeaf(editor, path, node => {
           const before = node.text.slice(0, offset)
           const after = node.text.slice(offset)
-
-          return {
-            ...node,
-            text: before + text + after,
-          }
+          return { ...node, text: before + text + after }
         })
 
         transformSelection = true
@@ -90,39 +93,64 @@ export const GeneralTransforms: GeneralTransforms = {
 
       case 'merge_node': {
         const { path } = op
-        const index = path[path.length - 1]
-        const prevPath = Path.previous(path)
-        const prevIndex = prevPath[prevPath.length - 1]
-
         if (path.length === 0) {
           throw new Error(
             `Cannot apply a "merge_node" operation at path [${path}] because the root node cannot be merged.`
           )
         }
+        if (!Path.hasPrevious(path)) {
+          throw new Error(
+            `Cannot apply a "merge_node" operation at path [${path}] because it has no previous sibling.`
+          )
+        }
+        const index = path[path.length - 1]
+        const prevIndex = index - 1
 
         // Defend against malicious paths containing strings
         if (typeof index !== 'number' || typeof prevIndex !== 'number')
           throw new Error('Index must be number')
 
-        modifyChildren(editor, Path.parent(path), children => {
-          const node = children[index]
-          const prev = children[prevIndex]
-          let newNode: Descendant
+        modifyChildren(
+          editor,
+          Path.parent(path),
+          (children, mutatedChildArrays) => {
+            const node = children[index]
+            const prev = children[prevIndex]
+            let newNode: Descendant
 
-          if (Node.isText(node) && Node.isText(prev)) {
-            newNode = { ...prev, text: prev.text + node.text }
-          } else if (Node.isElement(node) && Node.isElement(prev)) {
-            newNode = { ...prev, children: prev.children.concat(node.children) }
-          } else {
-            throw new Error(
-              `Cannot apply a "merge_node" operation at path [${path}] to nodes of different interfaces: ${Scrubber.stringify(
-                node
-              )} ${Scrubber.stringify(prev)}`
+            if (Node.isText(node) && Node.isText(prev)) {
+              newNode = { ...prev, text: prev.text + node.text }
+            } else if (Node.isElement(node) && Node.isElement(prev)) {
+              if (mutatedChildArrays?.has(prev.children)) {
+                // modify child array in place
+                prev.children.push(...node.children)
+                // we can infer that children is mutable because its an ancestor of prev.children. Just mutate in place
+                children.splice(index, 1)
+                return children
+              } else {
+                newNode = {
+                  ...prev,
+                  children: prev.children.concat(node.children),
+                }
+                mutatedChildArrays?.add(newNode.children)
+              }
+            } else {
+              throw new Error(
+                `Cannot apply a "merge_node" operation at path [${path}] to nodes of different interfaces: ${Scrubber.stringify(
+                  node
+                )} ${Scrubber.stringify(prev)}`
+              )
+            }
+
+            return smartReplaceChildren(
+              mutatedChildArrays,
+              children,
+              prevIndex,
+              2,
+              newNode
             )
           }
-
-          return replaceChildren(children, prevIndex, 2, newNode)
-        })
+        )
 
         transformSelection = true
         break
@@ -140,8 +168,11 @@ export const GeneralTransforms: GeneralTransforms = {
 
         const node = Node.get(editor, path)
 
-        modifyChildren(editor, Path.parent(path), children =>
-          removeChildren(children, index, 1)
+        modifyChildren(
+          editor,
+          Path.parent(path),
+          (children, mutatedChildArrays) =>
+            smartRemoveChildren(mutatedChildArrays, children, index, 1)
         )
 
         // This is tricky, but since the `path` and `newPath` both refer to
@@ -153,8 +184,11 @@ export const GeneralTransforms: GeneralTransforms = {
         const truePath = Path.transform(path, op)!
         const newIndex = truePath[truePath.length - 1]
 
-        modifyChildren(editor, Path.parent(truePath), children =>
-          insertChildren(children, newIndex, node)
+        modifyChildren(
+          editor,
+          Path.parent(truePath),
+          (children, mutatedChildArrays) =>
+            smartInsertChildren(mutatedChildArrays, children, newIndex, node)
         )
 
         transformSelection = true
@@ -165,8 +199,11 @@ export const GeneralTransforms: GeneralTransforms = {
         const { path } = op
         const index = path[path.length - 1]
 
-        modifyChildren(editor, Path.parent(path), children =>
-          removeChildren(children, index, 1)
+        modifyChildren(
+          editor,
+          Path.parent(path),
+          (children, mutatedChildArrays) =>
+            smartRemoveChildren(mutatedChildArrays, children, index, 1)
         )
 
         // Transform all the points in the value, but if the point was in the
@@ -359,57 +396,87 @@ export const GeneralTransforms: GeneralTransforms = {
         // Defend against malicious paths containing strings
         if (typeof index !== 'number') throw new Error('Index must be number')
 
-        modifyChildren(editor, Path.parent(path), children => {
-          const node = children[index]
-          let newNode: Descendant
-          let nextNode: Descendant
-
-          if (Node.isText(node)) {
-            const before = node.text.slice(0, position)
-            const after = node.text.slice(position)
-            newNode = {
-              ...node,
-              text: before,
-            }
-            nextNode = {
-              text: after,
-            }
-          } else {
-            const before = node.children.slice(0, position)
-            const after = node.children.slice(position)
-            newNode = {
-              ...node,
-              children: before,
-            }
-            nextNode = {
-              children: after,
-            }
+        // defend against malicious properties
+        for (const key in properties) {
+          if (NON_SETTABLE_NODE_PROPERTIES.includes(key)) {
+            throw new Error(`Cannot set the "${key}" property of nodes!`)
           }
 
-          for (const key in properties) {
-            if (NON_SETTABLE_NODE_PROPERTIES.includes(key)) {
-              throw new Error(`Cannot set the "${key}" property of nodes!`)
-            }
+          const value = properties[<keyof Node>key]
 
-            const value = properties[<keyof Node>key]
-
-            // Make sure we're not setting `then` to a function, since this will
-            // cause the node to be treated as a Promise-like object, which can
-            // cause unexpected behaviour when returning the node from async
-            // functions.
-            if (key === 'then' && typeof value === 'function') {
-              throw new Error(
-                'Cannot set the "then" property of a node to a function'
-              )
-            }
-
-            if (value != null) {
-              nextNode[<keyof Node>key] = value
-            }
+          // Make sure we're not setting `then` to a function, since this will
+          // cause the node to be treated as a Promise-like object, which can
+          // cause unexpected behaviour when returning the node from async
+          // functions.
+          if (key === 'then' && typeof value === 'function') {
+            throw new Error(
+              'Cannot set the "then" property of a node to a function'
+            )
           }
+        }
+        if (Object.getOwnPropertySymbols(properties).length !== 0) {
+          throw new Error(`Cannot set symbol properties of nodes!`)
+        }
 
-          return replaceChildren(children, index, 1, newNode, nextNode)
-        })
+        modifyChildren(
+          editor,
+          Path.parent(path),
+          (children, mutatedChildArrays) => {
+            const node = children[index]
+            let newNode: Descendant
+            let nextNode: Descendant
+
+            if (Node.isText(node)) {
+              const before = node.text.slice(0, position)
+              const after = node.text.slice(position)
+              newNode = {
+                ...node,
+                text: before,
+              }
+              nextNode = {
+                ...(properties as Partial<Element>),
+                text: after,
+              }
+            } else {
+              if (mutatedChildArrays?.has(node.children)) {
+                // modify child array in place by splicing
+                const after = node.children.splice(position)
+                nextNode = {
+                  ...(properties as Partial<Element>),
+                  children: after,
+                }
+                mutatedChildArrays.add(after)
+                // we can infer that children is mutable because its an ancestor of node.children. Just mutate in place
+                children.splice(index + 1, 0, nextNode)
+                return children
+              } else {
+                const before = node.children.slice(0, position)
+                const after = node.children.slice(position)
+                newNode = {
+                  ...node,
+                  children: before,
+                }
+                nextNode = {
+                  ...(properties as Partial<Element>),
+                  children: after,
+                }
+                if (mutatedChildArrays) {
+                  mutatedChildArrays.add(before)
+                  mutatedChildArrays.add(after)
+                }
+              }
+            }
+
+            return smartReplaceChildren(
+              mutatedChildArrays,
+              children,
+              index,
+              1,
+              newNode,
+              nextNode
+            )
+          }
+        )
 
         transformSelection = true
         break
