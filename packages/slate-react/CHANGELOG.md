@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.124.2
+
+### Patch Changes
+
+- [#6054](https://github.com/ianstormtaylor/slate/pull/6054) [`31d8354f`](https://github.com/ianstormtaylor/slate/commit/31d8354ff7795c83ddb1554c3522c984b9e9bc8b) Thanks [@ckale-scorpio](https://github.com/ckale-scorpio)! - fix: add missing `RenderTextProps` export
+
 ## 0.124.0
 
 ### Patch Changes
