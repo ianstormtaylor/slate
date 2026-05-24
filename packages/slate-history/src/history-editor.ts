@@ -82,8 +82,11 @@ export const HistoryEditor = {
   withMerging(editor: HistoryEditor, fn: () => void): void {
     const prev = HistoryEditor.isMerging(editor)
     MERGING.set(editor, true)
-    fn()
-    MERGING.set(editor, prev)
+    try {
+      fn()
+    } finally {
+      MERGING.set(editor, prev)
+    }
   },
 
   /**
@@ -95,9 +98,12 @@ export const HistoryEditor = {
     const prev = HistoryEditor.isMerging(editor)
     MERGING.set(editor, true)
     SPLITTING_ONCE.set(editor, true)
-    fn()
-    MERGING.set(editor, prev)
-    SPLITTING_ONCE.delete(editor)
+    try {
+      fn()
+    } finally {
+      MERGING.set(editor, prev)
+      SPLITTING_ONCE.delete(editor)
+    }
   },
 
   /**
@@ -108,8 +114,11 @@ export const HistoryEditor = {
   withoutMerging(editor: HistoryEditor, fn: () => void): void {
     const prev = HistoryEditor.isMerging(editor)
     MERGING.set(editor, false)
-    fn()
-    MERGING.set(editor, prev)
+    try {
+      fn()
+    } finally {
+      MERGING.set(editor, prev)
+    }
   },
 
   /**
