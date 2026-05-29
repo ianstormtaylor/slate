@@ -36,7 +36,7 @@
     "react-dom": "^18.2.0",
     "slate": "^0.124.0",
     "slate-dom": "^0.124.0",
-    "slate-hyperscript": "^0.115.0",
+    "slate-hyperscript": "^0.125.0",
     "source-map-loader": "^4.0.1"
   },
   "peerDependencies": {

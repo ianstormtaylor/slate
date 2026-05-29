@@ -30,7 +30,7 @@
     "@types/lodash": "^4.14.200",
     "@types/resize-observer-browser": "^0.1.8",
     "slate": "^0.124.1",
-    "slate-hyperscript": "^0.115.0",
+    "slate-hyperscript": "^0.125.0",
     "source-map-loader": "^4.0.1"
   },
   "peerDependencies": {
