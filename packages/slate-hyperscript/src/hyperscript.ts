@@ -6,6 +6,7 @@ import {
   createElement,
   createFocus,
   createFragment,
+  createPoint,
   createSelection,
   createText,
 } from './creators'
@@ -21,6 +22,7 @@ const DEFAULT_CREATORS = {
   element: createElement,
   focus: createFocus,
   fragment: createFragment,
+  point: createPoint,
   selection: createSelection,
   text: createText,
 }
