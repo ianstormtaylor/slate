@@ -4,7 +4,7 @@ import { fixtures } from '../../../support/fixtures'
 
 describe('slate-hyperscript', () => {
   fixtures(resolve(__dirname, 'fixtures'), ({ module }) => {
-    const { input, output } = module
+    const { input, output, test } = module
     let actual = {}
 
     if (Array.isArray(output)) {
@@ -16,5 +16,6 @@ describe('slate-hyperscript', () => {
     }
 
     assert.deepEqual(actual, output)
+    test?.()
   })
 })
