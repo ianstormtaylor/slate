@@ -8,7 +8,6 @@ import { Path, Point, Range } from '..'
  * `Point` or `Range`. This eliminates the need for developers to manage
  * converting between the different interfaces in their own code base.
  */
-
 export type Location = Path | Point | Range
 
 export interface LocationInterface {
@@ -65,7 +64,6 @@ export const Location: LocationInterface = {
  * The `Span` interface is a low-level way to refer to locations in nodes
  * without using `Point` which requires leaf text nodes to be present.
  */
-
 export type Span = [Path, Path]
 
 export interface SpanInterface {

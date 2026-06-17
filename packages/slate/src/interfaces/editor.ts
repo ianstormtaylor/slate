@@ -21,18 +21,20 @@ import {
   LeafEdge,
   MaximizeMode,
   RangeDirection,
+  RangeMode,
   SelectionMode,
   TextDirection,
   TextUnit,
   TextUnitAdjustment,
 } from '../types/types'
-import { OmitFirstArg } from '../utils/types'
 import { isEditor } from '../editor/is-editor'
 import {
+  TextDeleteOptions,
   TextInsertFragmentOptions,
   TextInsertTextOptions,
 } from './transforms/text'
 import { NodeInsertNodesOptions } from './transforms/node'
+import { SelectionCollapseOptions, SelectionMoveOptions, SelectionSetPointOptions } from './transforms/selection'
 
 /**
  * The `Editor` interface stores all the state of a Slate editor. It is extended
@@ -40,7 +42,6 @@ import { NodeInsertNodesOptions } from './transforms/node'
  */
 export interface BaseEditor {
   // Core state.
-
   children: Descendant[]
   selection: Selection
   operations: Operation[]
@@ -48,12 +49,37 @@ export interface BaseEditor {
 
   // Overrideable core methods.
 
+  /** Apply an operation in the editor. */
   apply: (operation: Operation) => void
+
   getDirtyPaths: (operation: Operation) => Path[]
+
+  /** Returns the fragment at the current selection. Used when cutting or copying, as an example, to get the fragment at the current selection. */
   getFragment: () => Descendant[]
+
+  /**
+   * Check if a value is a read-only `Element` object.
+   * @see {@link EditorInterface.isElementReadOnly}
+   */
   isElementReadOnly: (element: Element) => boolean
+
+  /**
+   * Check if a value is a selectable `Element` object.
+   * @see {@link EditorInterface.isSelectable}
+   */
   isSelectable: (element: Element) => boolean
+
+  /**
+   * Tells which void nodes accept marks. Slate's default implementation
+   * returns `false`, but if some void elements support formatting, override
+   * this function to include them.
+   */
   markableVoid: (element: Element) => boolean
+
+  /**
+   * Normalize a node according to the schema.
+   * @see {@link EditorInterface.normalize}
+   */
   normalizeNode: (
     entry: NodeEntry,
     options?: {
@@ -62,7 +88,14 @@ export interface BaseEditor {
       force?: boolean
     }
   ) => void
+
+  /** Called when there is a change in the editor. */
   onChange: (options?: { operation?: Operation }) => void
+
+  /**
+   * Override this method to prevent normalizing the editor.
+   * @see {@link EditorInterface.isNormalizing}
+   */
   shouldNormalize: ({
     iteration,
     dirtyPaths,
@@ -76,27 +109,173 @@ export interface BaseEditor {
 
   // Overrideable core transforms.
 
-  addMark: OmitFirstArg<typeof Editor.addMark>
-  collapse: OmitFirstArg<typeof Transforms.collapse>
-  delete: OmitFirstArg<typeof Transforms.delete>
+  /**
+   * Add a custom property to the leaf text nodes within non-void nodes or void
+   * nodes that `editor.markableVoid()` allows in the current selection. If the
+   * selection is currently collapsed, the marks will be added to the
+   * `editor.marks` property instead, and applied when text is inserted next.
+   * @see {@link EditorInterface.addMark}
+   */
+  addMark: (key: string, value: any) => void
+
+  /**
+   * Collapse the selection.
+   * @see {@link Transforms.collapse}
+   */
+  collapse: (options?: SelectionCollapseOptions) => void
+
+  /**
+   * Delete content in the editor.
+   * @see {@link Transforms.delete}
+   */
+  delete: (options?: TextDeleteOptions) => void
+
+  /**
+   * Delete content in the editor backward from the current selection.
+   * @see {@link EditorInterface.deleteBackward}
+   */
   deleteBackward: (unit: TextUnit) => void
+
+  /**
+   * Delete content in the editor forward from the current selection.
+   * @see {@link EditorInterface.deleteForward}
+   */
   deleteForward: (unit: TextUnit) => void
-  deleteFragment: OmitFirstArg<typeof Editor.deleteFragment>
-  deselect: OmitFirstArg<typeof Transforms.deselect>
-  insertBreak: OmitFirstArg<typeof Editor.insertBreak>
-  insertFragment: OmitFirstArg<typeof Transforms.insertFragment>
-  insertNode: OmitFirstArg<typeof Editor.insertNode>
-  insertNodes: OmitFirstArg<typeof Transforms.insertNodes>
-  insertSoftBreak: OmitFirstArg<typeof Editor.insertSoftBreak>
-  insertText: OmitFirstArg<typeof Transforms.insertText>
-  liftNodes: OmitFirstArg<typeof Transforms.liftNodes>
-  mergeNodes: OmitFirstArg<typeof Transforms.mergeNodes>
-  move: OmitFirstArg<typeof Transforms.move>
-  moveNodes: OmitFirstArg<typeof Transforms.moveNodes>
-  normalize: OmitFirstArg<typeof Editor.normalize>
-  removeMark: OmitFirstArg<typeof Editor.removeMark>
-  removeNodes: OmitFirstArg<typeof Transforms.removeNodes>
-  select: OmitFirstArg<typeof Transforms.select>
+
+  /**
+   * Delete the content of the current selection.
+   * @see {@link EditorInterface.deleteFragment}
+   */
+  deleteFragment: (options?: EditorFragmentDeletionOptions) => void
+
+  /**
+   * Unset the selection.
+   * @see {@link Transforms.deselect}
+   */
+  deselect: () => void
+
+  /**
+   * Insert a block break at the current selection. If the selection is
+   * currently expanded, delete it first.
+   * @see {@link EditorInterface.insertBreak}
+   */
+  insertBreak: () => void
+
+  /**
+   * Insert a fragment at the current selection. If the selection is currently
+   * expanded, delete it first.
+   * @see {@link EditorInterface.insertFragment}
+   */
+  insertFragment: (fragment: Node[], options?: TextInsertFragmentOptions) => void
+
+  /**
+   * Insert a node at the current selection. If the selection is currently
+   * expanded, delete it first.
+   * @see {@link EditorInterface.insertNode}
+   */
+  insertNode: <T extends Node>(node: Node, options?: NodeInsertNodesOptions<T>) => void
+
+  /**
+   * Insert nodes in the editor at the specified location or (if not defined)
+   * the current selection or (if not defined) the end of the document.
+   * @see {@link Transforms.insertNodes}
+   */
+  insertNodes: <T extends Node>(nodes: Node | Node[], options?: NodeInsertNodesOptions<T>) => void
+
+  /**
+   * Insert a soft break at the current selection. If the selection is
+   * currently expanded, delete it first.
+   * @see {@link EditorInterface.insertSoftBreak}
+   */
+  insertSoftBreak: () => void
+
+  /**
+   * Insert text at the current selection. If the selection is currently
+   * expanded, delete it first.
+   * @see {@link EditorInterface.insertText}
+   */
+  insertText: (text: string, options?: TextInsertTextOptions) => void
+
+  /**
+   * Lift nodes at a specific location upwards in the document tree, splitting
+   * their parent in two if necessary.
+   * @see {@link Transforms.liftNodes}
+   */
+  liftNodes: <T extends Node>(options?: {
+    at?: Location
+    match?: NodeMatch<T>
+    mode?: MaximizeMode
+    voids?: boolean
+  }) => void
+
+  /**
+   * Merge a node at a location with the previous node of the same depth,
+   * removing any empty containing nodes after the merge if necessary.
+   * @see {@link Transforms.mergeNodes}
+   */
+  mergeNodes: <T extends Node>(options?: {
+    at?: Location
+    match?: NodeMatch<T>
+    mode?: RangeMode
+    hanging?: boolean
+    voids?: boolean
+  }) => void
+
+  /**
+   * Move the selection's point forward or backward.
+   * @see {@link Transforms.move}
+   */
+  move: (options?: SelectionMoveOptions) => void
+
+  /**
+   * Move the nodes at a location to a new location.
+   * @see {@link Transforms.moveNodes}
+   */
+  moveNodes: <T extends Node>(options: {
+    at?: Location
+    match?: NodeMatch<T>
+    mode?: MaximizeMode
+    to: Path
+    voids?: boolean
+  }) => void
+
+  /**
+   * Normalize any dirty objects in the editor.
+   * @see {@link EditorInterface.normalize}
+   */
+  normalize: (options?: EditorNormalizeOptions) => void
+
+  /**
+   * Remove a custom property from the leaf text nodes within non-void nodes
+   * or void nodes that `editor.markableVoid()` allows in the current
+   * selection. If the selection is currently collapsed, the removal will be
+   * stored on `editor.marks` and applied to the text inserted next.
+   * @see {@link EditorInterface.removeMark}
+   */
+  removeMark: (key: string) => void
+
+  /**
+   * Remove the nodes at a specific location in the document.
+   * @see {@link Transforms.removeNodes}
+   */
+  removeNodes: <T extends Node>(options?: {
+    at?: Location
+    match?: NodeMatch<T>
+    mode?: RangeMode
+    hanging?: boolean
+    voids?: boolean
+  }) => void
+
+  /**
+   * Set the selection to a new value.
+   * @see {@link Transforms.select}
+   */
+  select: (target: Location) => void
+
+  /**
+   * Set new properties on the nodes at a location.
+   * @see {@link Transforms.setNodes}
+   */
   setNodes: <T extends Node>(
     props: Partial<T>,
     options?: {
@@ -110,73 +289,364 @@ export interface BaseEditor {
       merge?: PropsMerge
     }
   ) => void
-  setNormalizing: OmitFirstArg<typeof Editor.setNormalizing>
-  setPoint: OmitFirstArg<typeof Transforms.setPoint>
-  setSelection: OmitFirstArg<typeof Transforms.setSelection>
-  splitNodes: OmitFirstArg<typeof Transforms.splitNodes>
-  unsetNodes: OmitFirstArg<typeof Transforms.unsetNodes>
-  unwrapNodes: OmitFirstArg<typeof Transforms.unwrapNodes>
-  withoutNormalizing: OmitFirstArg<typeof Editor.withoutNormalizing>
-  wrapNodes: OmitFirstArg<typeof Transforms.wrapNodes>
+
+  /**
+   * Manually set if the editor should currently be normalizing.
+   *
+   * Note: Using this incorrectly can leave the editor in an invalid state.
+   * @see {@link EditorInterface.setNormalizing}
+   */
+  setNormalizing: (isNormalizing: boolean) => void
+
+  /**
+   * Set new properties on one of the selection's points.
+   * @see {@link Transforms.setPoint}
+   */
+  setPoint: (props: Partial<Point>, options?: SelectionSetPointOptions) => void
+
+  /**
+   * Set new properties on the selection.
+   * @see {@link Transforms.setSelection}
+   */
+  setSelection: (props: Partial<Range>) => void
+
+  /**
+   * Split the nodes at a specific location.
+   * @see {@link Transforms.splitNodes}
+   */
+  splitNodes: <T extends Node>(options?: {
+    at?: Location
+    match?: NodeMatch<T>
+    mode?: RangeMode
+    always?: boolean
+    height?: number
+    voids?: boolean
+  }) => void
+
+  /**
+   * Unset properties on the nodes at a location.
+   * @see {@link Transforms.unsetNodes}
+   */
+  unsetNodes: <T extends Node>(
+    props: string | string[],
+    options?: {
+      at?: Location
+      match?: NodeMatch<T>
+      mode?: MaximizeMode
+      hanging?: boolean
+      split?: boolean
+      voids?: boolean
+    }
+  ) => void
+
+  /**
+   * Unwrap the nodes at a location from a parent node, splitting the parent
+   * if necessary to ensure that only the content in the range is unwrapped.
+   * @see {@link Transforms.unwrapNodes}
+   */
+  unwrapNodes: <T extends Node>(options?: {
+    at?: Location
+    match?: NodeMatch<T>
+    mode?: MaximizeMode
+    split?: boolean
+    voids?: boolean
+  }) => void
+
+  /**
+   * Call a function, deferring normalization until after it completes.
+   * @see {@link EditorInterface.withoutNormalizing}
+   */
+  withoutNormalizing: (fn: () => void) => void
+
+  /**
+   * Wrap the nodes at a location in a new container node, splitting the edges
+   * of the range first to ensure that only the content in the range is wrapped.
+   * @see {@link Transforms.wrapNodes}
+   */
+  wrapNodes: <T extends Node>(
+    element: Element,
+    options?: {
+      at?: Location
+      match?: NodeMatch<T>
+      mode?: MaximizeMode
+      split?: boolean
+      voids?: boolean
+    }
+  ) => void
 
   // Overrideable core queries.
 
-  above: <T extends Ancestor>(
-    options?: EditorAboveOptions<T>
-  ) => NodeEntry<T> | undefined
-  after: OmitFirstArg<typeof Editor.after>
-  before: OmitFirstArg<typeof Editor.before>
-  edges: OmitFirstArg<typeof Editor.edges>
-  elementReadOnly: OmitFirstArg<typeof Editor.elementReadOnly>
-  end: OmitFirstArg<typeof Editor.end>
-  first: OmitFirstArg<typeof Editor.first>
-  fragment: OmitFirstArg<typeof Editor.fragment>
-  getMarks: OmitFirstArg<typeof Editor.marks>
-  hasBlocks: OmitFirstArg<typeof Editor.hasBlocks>
-  hasInlines: OmitFirstArg<typeof Editor.hasInlines>
-  hasPath: OmitFirstArg<typeof Editor.hasPath>
-  hasTexts: OmitFirstArg<typeof Editor.hasTexts>
-  isBlock: OmitFirstArg<typeof Editor.isBlock>
-  isEdge: OmitFirstArg<typeof Editor.isEdge>
-  isEmpty: OmitFirstArg<typeof Editor.isEmpty>
-  isEnd: OmitFirstArg<typeof Editor.isEnd>
-  isInline: OmitFirstArg<typeof Editor.isInline>
-  isNormalizing: OmitFirstArg<typeof Editor.isNormalizing>
-  isStart: OmitFirstArg<typeof Editor.isStart>
-  isVoid: OmitFirstArg<typeof Editor.isVoid>
-  last: OmitFirstArg<typeof Editor.last>
-  leaf: OmitFirstArg<typeof Editor.leaf>
-  levels: <T extends Node>(
-    options?: EditorLevelsOptions<T>
-  ) => Generator<NodeEntry<T>, void, undefined>
-  next: <T extends Descendant>(
-    options?: EditorNextOptions<T>
-  ) => NodeEntry<T> | undefined
-  node: OmitFirstArg<typeof Editor.node>
-  nodes: <T extends Node>(
-    options?: EditorNodesOptions<T>
-  ) => Generator<NodeEntry<T>, void, undefined>
-  parent: OmitFirstArg<typeof Editor.parent>
-  path: OmitFirstArg<typeof Editor.path>
-  pathRef: OmitFirstArg<typeof Editor.pathRef>
-  pathRefs: OmitFirstArg<typeof Editor.pathRefs>
-  point: OmitFirstArg<typeof Editor.point>
-  pointRef: OmitFirstArg<typeof Editor.pointRef>
-  pointRefs: OmitFirstArg<typeof Editor.pointRefs>
-  positions: OmitFirstArg<typeof Editor.positions>
-  previous: <T extends Node>(
-    options?: EditorPreviousOptions<T>
-  ) => NodeEntry<T> | undefined
-  range: OmitFirstArg<typeof Editor.range>
-  rangeRef: OmitFirstArg<typeof Editor.rangeRef>
-  rangeRefs: OmitFirstArg<typeof Editor.rangeRefs>
-  start: OmitFirstArg<typeof Editor.start>
-  string: OmitFirstArg<typeof Editor.string>
-  unhangRange: OmitFirstArg<typeof Editor.unhangRange>
-  void: OmitFirstArg<typeof Editor.void>
-  shouldMergeNodesRemovePrevNode: OmitFirstArg<
-    typeof Editor.shouldMergeNodesRemovePrevNode
-  >
+  /**
+   * Get the ancestor above a location in the document.
+   * @see {@link EditorInterface.above}
+   */
+  above: <T extends Ancestor>(options?: EditorAboveOptions<T>) => NodeEntry<T> | undefined
+
+  /**
+   * Get the point after a location.
+   * @see {@link EditorInterface.after}
+   */
+  after: (at: Location, options?: EditorAfterOptions) => Point | undefined
+
+  /**
+   * Get the point before a location.
+   * @see {@link EditorInterface.before}
+   */
+  before: (at: Location, options?: EditorBeforeOptions) => Point | undefined
+
+  /**
+   * Get the start and end points of a location.
+   * @see {@link EditorInterface.edges}
+   */
+  edges: (at: Location) => [Point, Point]
+
+  /**
+   * Match a read-only element in the current branch of the editor.
+   * @see {@link EditorInterface.elementReadOnly}
+   */
+  elementReadOnly: (options?: EditorElementReadOnlyOptions) => NodeEntry<Element> | undefined
+
+  /**
+   * Get the end point of a location.
+   * @see {@link EditorInterface.end}
+   */
+  end: (at: Location) => Point
+
+  /**
+   * Get the first node at a location.
+   * @see {@link EditorInterface.first}
+   */
+  first: (at: Location) => NodeEntry
+
+  /**
+   * Get the fragment at a location.
+   * @see {@link EditorInterface.fragment}
+   */
+  fragment: (at: Location) => Descendant[]
+
+  /**
+   * Get the marks that would be added to text at the current selection.
+   * @see {@link EditorInterface.marks}
+   */
+  getMarks: () => Omit<Text, 'text'> | null
+
+  /**
+   * Check if a node has block children.
+   * @see {@link EditorInterface.hasBlocks}
+   */
+  hasBlocks: (element: Element) => boolean
+
+  /**
+   * Check if a node has inline and text children.
+   * @see {@link EditorInterface.hasInlines}
+   */
+  hasInlines: (element: Element) => boolean
+
+  /**
+   * @see {@link EditorInterface.hasPath}
+   */
+  hasPath: (path: Path) => boolean
+
+  /**
+   * Check if a node has text children.
+   * @see {@link EditorInterface.hasTexts}
+   */
+  hasTexts: (element: Element) => boolean
+
+  /**
+   * Check if a value is a block `Element` object.
+   * @see {@link EditorInterface.isBlock}
+   */
+  isBlock: (value: Element) => boolean
+
+  /**
+   * Check if a point is an edge of a location.
+   * @see {@link EditorInterface.isEdge}
+   */
+  isEdge: (point: Point, at: Location) => boolean
+
+  /**
+   * Check if an element is empty, accounting for void nodes.
+   * @see {@link EditorInterface.isEmpty}
+   */
+  isEmpty: (element: Element) => boolean
+
+  /**
+   * Check if a point is the end point of a location.
+   * @see {@link EditorInterface.isEnd}
+   */
+  isEnd: (point: Point, at: Location) => boolean
+
+  /**
+   * Check if a value is an inline `Element` object.
+   * @see {@link EditorInterface.isInline}
+   */
+  isInline: (value: Element) => boolean
+
+  /**
+   * Check if the editor is currently normalizing after each operation.
+   * @see {@link EditorInterface.isNormalizing}
+   */
+  isNormalizing: () => boolean
+
+  /**
+   * Check if a point is the start point of a location.
+   * @see {@link EditorInterface.isStart}
+   */
+  isStart: (point: Point, at: Location) => boolean
+
+  /**
+   * Check if a value is a void `Element` object.
+   * @see {@link EditorInterface.isVoid}
+   */
+  isVoid: (value: Element) => boolean
+
+  /**
+   * Get the last node at a location.
+   * @see {@link EditorInterface.last}
+   */
+  last: (at: Location) => NodeEntry
+
+  /**
+   * Get the leaf text node at a location.
+   * @see {@link EditorInterface.leaf}
+   */
+  leaf: (at: Location, options?: EditorLeafOptions) => NodeEntry<Text>
+
+  /**
+   * Iterate through all of the levels at a location.
+   * @see {@link EditorInterface.levels}
+   */
+  levels: <T extends Node>(options?: EditorLevelsOptions<T>) => Generator<NodeEntry<T>, void, undefined>
+
+  /**
+   * Get the matching node in the branch of the document after a location.
+   * @see {@link EditorInterface.next}
+   */
+  next: <T extends Descendant>(options?: EditorNextOptions<T>) => NodeEntry<T> | undefined
+
+  /**
+   * Get the node at a location.
+   * @see {@link EditorInterface.node}
+   */
+  node: (at: Location, options?: EditorNodeOptions) => NodeEntry
+
+  /**
+   * Iterate through all of the nodes in the Editor.
+   * @see {@link EditorInterface.nodes}
+   */
+  nodes: <T extends Node>(options?: EditorNodesOptions<T>) => Generator<NodeEntry<T>, void, undefined>
+
+  /**
+   * Get the parent node of a location.
+   * @see {@link EditorInterface.parent}
+   */
+  parent: (at: Location, options?: EditorParentOptions) => NodeEntry<Ancestor>
+
+  /**
+   * Get the path of a location.
+   * @see {@link EditorInterface.path}
+   */
+  path: (at: Location, options?: EditorPathOptions) => Path
+
+  /**
+   * Create a mutable ref for a `Path` object, which will stay in sync as new
+   * operations are applied to the editor.
+   * @see {@link EditorInterface.pathRef}
+   */
+  pathRef: (path: Path, options?: EditorPathRefOptions) => PathRef
+
+  /**
+   * Get the set of currently tracked path refs of the editor.
+   * @see {@link EditorInterface.pathRefs}
+   */
+  pathRefs: () => Set<PathRef>
+
+  /**
+   * Get the start or end point of a location.
+   * @see {@link EditorInterface.point}
+   */
+  point: (at: Location, options?: EditorPointOptions) => Point
+
+  /**
+   * Create a mutable ref for a `Point` object, which will stay in sync as new
+   * operations are applied to the editor.
+   * @see {@link EditorInterface.pointRef}
+   */
+  pointRef: (point: Point, options?: EditorPointRefOptions) => PointRef
+
+  /**
+   * Get the set of currently tracked point refs of the editor.
+   * @see {@link EditorInterface.pointRefs}
+   */
+  pointRefs: () => Set<PointRef>
+
+  /**
+   * Return all the positions in `at` range where a `Point` can be placed.
+   * @see {@link EditorInterface.positions}
+   */
+  positions: (options?: EditorPositionsOptions) => Generator<Point, void, undefined>
+
+  /**
+   * Get the matching node in the branch of the document before a location.
+   * @see {@link EditorInterface.previous}
+   */
+  previous: <T extends Node>(options?: EditorPreviousOptions<T>) => NodeEntry<T> | undefined
+
+  /**
+   * Get a range of a location.
+   * @see {@link EditorInterface.range}
+   */
+  range: (at: Location, to?: Location) => Range
+
+  /**
+   * Create a mutable ref for a `Range` object, which will stay in sync as new
+   * operations are applied to the editor.
+   * @see {@link EditorInterface.rangeRef}
+   */
+  rangeRef: (range: Range, options?: EditorRangeRefOptions) => RangeRef
+
+  /**
+   * Get the set of currently tracked range refs of the editor.
+   * @see {@link EditorInterface.rangeRefs}
+   */
+  rangeRefs: () => Set<RangeRef>
+
+  /**
+   * Get the start point of a location.
+   * @see {@link EditorInterface.start}
+   */
+  start: (at: Location) => Point
+
+  /**
+   * Get the text string content of a location.
+   *
+   * Note: by default the text of void nodes is considered to be an empty
+   * string, regardless of content, unless you pass in true for the voids option.
+   * @see {@link EditorInterface.string}
+   */
+  string: (at: Location, options?: EditorStringOptions) => string
+
+  /**
+   * Convert a range into a non-hanging one.
+   * @see {@link EditorInterface.unhangRange}
+   */
+  unhangRange: (range: Range, options?: EditorUnhangRangeOptions) => Range
+
+  /**
+   * Match a void node in the current branch of the editor.
+   * @see {@link EditorInterface.void}
+   */
+  void: (options?: EditorVoidOptions) => NodeEntry<Element> | undefined
+
+  /**
+   * Determine whether or not to remove the previous node when merging.
+   * @see {@link EditorInterface.shouldMergeNodesRemovePrevNode}
+   */
+  shouldMergeNodesRemovePrevNode: (
+    prevNodeEntry: NodeEntry,
+    curNodeEntry: NodeEntry
+  ) => boolean
 }
 
 export type Editor = ExtendedType<'Editor', BaseEditor>
@@ -220,6 +690,7 @@ export interface EditorFragmentDeletionOptions {
   direction?: TextDirection
 }
 
+/** @expand */
 export interface EditorIsEditorOptions {
   deep?: boolean
 }

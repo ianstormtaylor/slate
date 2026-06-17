@@ -1,0 +1,26 @@
+{
+	"name": "slate",
+	"entryPoints": ["packages/*"],
+	"entryPointStrategy": "packages",
+  "out": "docs/api",
+	"plugin": ["typedoc-plugin-markdown"],
+
+	"readme": "none",
+	// "media": "",
+	"hidePageHeader": true,
+	"hideBreadcrumbs": true,
+	"expandParameters": true,
+	"includeVersion": false,
+	"externalSymbolLinkMappings": {
+    "global": {
+      "Comment": "https://developer.mozilla.org/en-US/docs/Web/API/Comment",
+      "DataTransfer": "https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer",
+      "Element": "https://developer.mozilla.org/en-US/docs/Web/API/Element",
+      "Node": "https://developer.mozilla.org/en-US/docs/Web/API/Node",
+      "Range": "https://developer.mozilla.org/en-US/docs/Web/API/Range",
+      "Selection": "https://developer.mozilla.org/en-US/docs/Web/API/Selection",
+      "StaticRange": "https://developer.mozilla.org/en-US/docs/Web/API/StaticRange",
+      "Text": "https://developer.mozilla.org/en-US/docs/Web/API/Text",
+    }
+  }
+}
