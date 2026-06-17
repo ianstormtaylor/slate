@@ -34,6 +34,9 @@ const RESOLVE_DELAY = 25
 // Time with no user interaction before the current user action is considered as done.
 const FLUSH_DELAY = 200
 
+// Zero-width space character used as placeholder to prevent Android IME restart
+const ZERO_WIDTH_SPACE = '\u200B'
+
 // Replace with `const debug = console.log` to debug
 const debug = (..._: unknown[]) => {}
 
@@ -82,6 +85,11 @@ export function createAndroidInputManager({
   let idCounter = 0
   let insertPositionHint: StringDiff | null | false = false
 
+  // COMPAT: Track zero-width placeholder inserted to prevent Android IME restart on empty nodes.
+  // The placeholder is removed from the AST after composition ends, keeping the AST clean.
+  let hasZeroWidthPlaceholder = false
+  let zeroWidthPlaceholderPath: Path | null = null
+
   const applyPendingSelection = () => {
     const pendingSelection = EDITOR_TO_PENDING_SELECTION.get(editor)
     EDITOR_TO_PENDING_SELECTION.delete(editor)
@@ -121,6 +129,30 @@ export function createAndroidInputManager({
     }
 
     action.run()
+  }
+
+  // COMPAT: Remove the zero-width placeholder from the AST after composition ends.
+  // This keeps the AST clean while still having tricked the IME during composition.
+  const cleanupZeroWidthPlaceholder = () => {
+    if (!hasZeroWidthPlaceholder || !zeroWidthPlaceholderPath) return
+
+    hasZeroWidthPlaceholder = false
+    const path = zeroWidthPlaceholderPath
+    zeroWidthPlaceholderPath = null
+
+    try {
+      const leaf = Node.leaf(editor, path)
+      const zwsIndex = leaf.text.indexOf(ZERO_WIDTH_SPACE)
+      if (zwsIndex !== -1) {
+        Transforms.delete(editor, {
+          at: { path, offset: zwsIndex },
+          distance: 1,
+          unit: 'character',
+        })
+      }
+    } catch (_e) {
+      // Path may no longer exist if the node was deleted during composition
+    }
   }
 
   const flush = () => {
@@ -256,6 +288,7 @@ export function createAndroidInputManager({
     compositionEndTimeoutId = setTimeout(() => {
       IS_COMPOSING.set(editor, false)
       flush()
+      cleanupZeroWidthPlaceholder()
     }, RESOLVE_DELAY)
   }
 
@@ -263,6 +296,29 @@ export function createAndroidInputManager({
     _event: React.CompositionEvent<HTMLDivElement>
   ) => {
     debug('composition start')
+
+    // COMPAT: Check if this is the first composition BEFORE setting IS_COMPOSING
+    const isFirstComposition = !IS_COMPOSING.get(editor)
+
+    // COMPAT: Android IME workaround for empty node first input.
+    // When the cursor is at an empty text node, the DOM goes from <empty> to <char>,
+    // which IME treats as a structural change and restarts composition.
+    // Inserting a \u200B makes the node appear non-empty to IME, preventing the restart.
+    // We apply this whenever the current text node is empty , since the IME restart also happens on new empty lines.
+    // The placeholder is cleaned up from the AST after compositionEnd.
+    if (isFirstComposition && editor.selection) {
+      const { anchor } = editor.selection
+      const currentText = Node.leaf(editor, anchor.path)
+      const isCurrentTextEmpty = currentText.text.length === 0
+      const isAtStart = anchor.offset === 0
+
+      if (isCurrentTextEmpty && isAtStart) {
+        hasZeroWidthPlaceholder = true
+        zeroWidthPlaceholderPath = anchor.path
+        Editor.insertText(editor, ZERO_WIDTH_SPACE)
+        Transforms.select(editor, { path: anchor.path, offset: 0 })
+      }
+    }
 
     IS_COMPOSING.set(editor, true)
 
@@ -396,6 +452,11 @@ export function createAndroidInputManager({
     let canStoreDiff = true
 
     if (type.startsWith('delete')) {
+      // COMPAT: A delete during handwriting/composition may not trigger compositionEnd.
+      // Schedule cleanup after the delete flush completes so the \u200B doesn't linger in the AST.
+      if (hasZeroWidthPlaceholder) {
+        setTimeout(cleanupZeroWidthPlaceholder, 0)
+      }
       const direction = type.endsWith('Backward') ? 'backward' : 'forward'
       let [start, end] = Range.edges(targetRange)
       let [leaf, path] = Editor.leaf(editor, start.path)
