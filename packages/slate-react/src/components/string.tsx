@@ -18,9 +18,16 @@ const String = (props: {
 }) => {
   const { isLast, leaf, parent, text } = props
   const editor = useSlateStatic()
-  const path = ReactEditor.findPath(editor, text)
-  const parentPath = Path.parent(path)
   const isMarkPlaceholder = Boolean(leaf[MARK_PLACEHOLDER_SYMBOL])
+
+  let path: Path
+  let parentPath: Path
+  try {
+    path = ReactEditor.findPath(editor, text)
+    parentPath = Path.parent(path)
+  } catch {
+    return <TextString text={leaf.text} />
+  }
 
   // COMPAT: Render text inside void nodes with a zero-width space.
   // So the node can contain selection but the text is not visible.
