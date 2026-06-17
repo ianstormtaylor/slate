@@ -1,4 +1,11 @@
-import { createContext, useCallback, useContext, useMemo, useRef } from 'react'
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useReducer,
+  useRef,
+} from 'react'
 import { DecoratedRange, Descendant, Node, NodeEntry } from 'slate'
 import { isTextDecorationsEqual, isElementDecorationsEqual } from 'slate-dom'
 import { useSlateStatic } from './use-slate-static'
@@ -52,6 +59,7 @@ export const useDecorations = (
 export const useDecorateContext = (
   decorateProp: (entry: NodeEntry) => DecoratedRange[]
 ) => {
+  const [, forceUpdate] = useReducer(s => s + 1, 0)
   const eventListeners = useRef(new Set<Callback>())
 
   const latestDecorate = useRef(decorateProp)
@@ -59,6 +67,13 @@ export const useDecorateContext = (
   useIsomorphicLayoutEffect(() => {
     latestDecorate.current = decorateProp
     eventListeners.current.forEach(listener => listener())
+    // Force Editable to re-render in the same batch as the text components
+    // notified above, so its selection-restoration layout effect runs after
+    // the decoration-induced DOM changes are committed. Without this, the
+    // text components restructure the DOM in a separate pass where
+    // Editable's layout effect never fires, potentially leaving the caret
+    // at a wrong position.
+    forceUpdate()
   }, [decorateProp])
 
   const decorate = useCallback(
