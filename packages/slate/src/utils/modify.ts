@@ -1,12 +1,14 @@
 import {
   Ancestor,
   Descendant,
+  Editor,
   Element,
   Node,
   Path,
   Scrubber,
   Text,
 } from '../interfaces'
+import { MUTATED_CHILD_ARRAYS_IN_BATCH } from './weak-maps'
 
 export const insertChildren = <T>(
   xs: T[],
@@ -23,34 +25,107 @@ export const replaceChildren = <T>(
 
 export const removeChildren = replaceChildren
 
+export const smartInsertChildren = <T extends Descendant>(
+  modifiedChildArrays: WeakSet<Descendant[]> | undefined,
+  children: T[],
+  index: number,
+  ...newValues: T[]
+) => {
+  return smartReplaceChildren(
+    modifiedChildArrays,
+    children,
+    index,
+    0,
+    ...newValues
+  )
+}
+
+export const smartReplaceChildren = <T extends Descendant>(
+  modifiedChildArrays: WeakSet<Descendant[]> | undefined,
+  children: T[],
+  index: number,
+  removeCount: number,
+  ...newValues: T[]
+) => {
+  let out
+  if (modifiedChildArrays?.has(children)) {
+    out = children
+  } else {
+    out = children.slice()
+    modifiedChildArrays?.add(out)
+  }
+  out.splice(index, removeCount, ...newValues)
+  return out
+}
+
+export const smartReplaceChild = <T extends Descendant>(
+  modifiedChildArrays: WeakSet<Descendant[]> | undefined,
+  children: T[],
+  index: number,
+  newValue: T
+) => {
+  let out
+  if (modifiedChildArrays?.has(children)) {
+    out = children
+  } else {
+    out = children.slice()
+    modifiedChildArrays?.add(out)
+  }
+  out[index] = newValue
+  return out
+}
+
+export const smartRemoveChildren = smartReplaceChildren
+
 /**
  * Replace a descendant with a new node, replacing all ancestors
  */
 export const modifyDescendant = <N extends Descendant>(
   root: Ancestor,
   path: Path,
-  f: (node: N) => N
+  f: (node: N, mutatedChildArrays?: WeakSet<Descendant[]>) => N
 ) => {
   if (path.length === 0) {
     throw new Error('Cannot modify the editor')
   }
 
   const node = Node.get(root, path) as N
+  const mutatedChildArrays = MUTATED_CHILD_ARRAYS_IN_BATCH.get(root as Editor)
+  let modifiedNode: Node = f(node, mutatedChildArrays)
+  if (modifiedNode === node) return
+
   const slicedPath = path.slice()
-  let modifiedNode: Node = f(node)
 
   while (slicedPath.length > 1) {
     const index = slicedPath.pop()!
     const ancestorNode = Node.get(root, slicedPath) as Ancestor
 
+    const children = smartReplaceChild(
+      mutatedChildArrays,
+      ancestorNode.children,
+      index,
+      modifiedNode
+    )
+
+    if (children === ancestorNode.children) {
+      // we were able to directly mutate, no further replacements needed
+      return
+    }
+
     modifiedNode = {
       ...ancestorNode,
-      children: replaceChildren(ancestorNode.children, index, 1, modifiedNode),
+      children,
     }
   }
 
-  const index = slicedPath.pop()!
-  root.children = replaceChildren(root.children, index, 1, modifiedNode)
+  const index = slicedPath[0]
+
+  root.children = smartReplaceChild(
+    mutatedChildArrays,
+    root.children,
+    index,
+    modifiedNode
+  )
 }
 
 /**
@@ -59,12 +134,16 @@ export const modifyDescendant = <N extends Descendant>(
 export const modifyChildren = (
   root: Ancestor,
   path: Path,
-  f: (children: Descendant[]) => Descendant[]
+  f: (
+    children: Descendant[],
+    mutatedChildArrays?: WeakSet<Descendant[]>
+  ) => Descendant[]
 ) => {
   if (path.length === 0) {
-    root.children = f(root.children)
+    const mutatedChildArrays = MUTATED_CHILD_ARRAYS_IN_BATCH.get(root as Editor)
+    root.children = f(root.children, mutatedChildArrays)
   } else {
-    modifyDescendant<Element>(root, path, node => {
+    modifyDescendant<Element>(root, path, (node, mutatedChildArrays) => {
       if (Node.isText(node)) {
         throw new Error(
           `Cannot get the element at path [${path}] because it refers to a leaf node: ${Scrubber.stringify(
@@ -73,7 +152,8 @@ export const modifyChildren = (
         )
       }
 
-      return { ...node, children: f(node.children) }
+      const children = f(node.children, mutatedChildArrays)
+      return children === node.children ? node : { ...node, children }
     })
   }
 }
@@ -84,9 +164,9 @@ export const modifyChildren = (
 export const modifyLeaf = (
   root: Ancestor,
   path: Path,
-  f: (leaf: Text) => Text
+  f: (leaf: Text, mutatedChildArrays?: WeakSet<Descendant[]>) => Text
 ) =>
-  modifyDescendant(root, path, node => {
+  modifyDescendant(root, path, (node, mutatedChildArrays) => {
     if (!Node.isText(node)) {
       throw new Error(
         `Cannot get the leaf node at path [${path}] because it refers to a non-leaf node: ${Scrubber.stringify(
@@ -95,5 +175,5 @@ export const modifyLeaf = (
       )
     }
 
-    return f(node)
+    return f(node, mutatedChildArrays)
   })
