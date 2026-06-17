@@ -1,5 +1,28 @@
 # slate-dom
 
+## 0.124.1
+
+### Patch Changes
+
+- [#6040](https://github.com/ianstormtaylor/slate/pull/6040) [`20a1a937`](https://github.com/ianstormtaylor/slate/commit/20a1a9371538dda1911d533e0f02b1655ffffa12) Thanks [@12joan](https://github.com/12joan)! - - Harden property accessors against untrusted keys
+  - Fix incorrect argument types for the `compare` and `merge` options of `Transforms.setNodes`
+
+## 0.124.0
+
+### Patch Changes
+
+- [#6019](https://github.com/ianstormtaylor/slate/pull/6019) [`b9794a97`](https://github.com/ianstormtaylor/slate/commit/b9794a97dd8141f0e09c7ebb37395197553be2f6) Thanks [@delijah](https://github.com/delijah)! - Fix text node lookup for toSlatePoint
+
+## 0.123.1
+
+### Patch Changes
+
+- [#6004](https://github.com/ianstormtaylor/slate/pull/6004) [`e2a940a0`](https://github.com/ianstormtaylor/slate/commit/e2a940a0e1575a4f084923a16a1ab89cf965dfda) Thanks [@christianhg](https://github.com/christianhg)! - Fix `findPath` throwing "Unable to find the path for Slate node" after component unmount
+
+  When `toSlatePoint` is called with `suppressThrow: true` (e.g., from `toSlateRange` during selection change handling), it should not throw errors. However, the internal `findPath` calls were not respecting this option, causing errors to be thrown when the component was unmounting and node references became stale.
+
+  This fix wraps the `findPath` calls in `toSlatePoint` with try-catch blocks that respect the `suppressThrow` option, returning `null` instead of throwing when the option is enabled.
+
 ## 0.123.0
 
 ### Patch Changes

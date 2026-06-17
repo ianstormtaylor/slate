@@ -700,11 +700,12 @@ export const DOMEditor: DOMEditorInterface = {
       searchDirection?: 'forward' | 'backward'
     }
   ): T extends true ? Point | null : Point => {
-    const { exactMatch, suppressThrow, searchDirection } = options
+    const { exactMatch, suppressThrow } = options
     const [nearestNode, nearestOffset] = exactMatch
       ? domPoint
       : normalizeDOMPoint(domPoint)
     const parentNode = nearestNode.parentNode as DOMElement
+    let searchDirection = options.searchDirection
     let textNode: DOMElement | null = null
     let offset = 0
 
@@ -826,7 +827,7 @@ export const DOMEditor: DOMEditorInterface = {
             leafNodes.findLast(leaf => isBefore(nonEditableNode, leaf)) ?? null
 
           if (leafNode) {
-            searchDirection === 'backward'
+            searchDirection = 'backward'
           }
         }
 
@@ -840,7 +841,7 @@ export const DOMEditor: DOMEditorInterface = {
             leafNodes.find(leaf => isAfter(nonEditableNode, leaf)) ?? null
 
           if (leafNode) {
-            searchDirection === 'forward'
+            searchDirection = 'forward'
           }
         }
 
@@ -888,10 +889,16 @@ export const DOMEditor: DOMEditorInterface = {
 
       if (node && DOMEditor.hasDOMNode(editor, node, { editable: true })) {
         const slateNode = DOMEditor.toSlateNode(editor, node)
-        let { path, offset } = Editor.start(
-          editor,
-          DOMEditor.findPath(editor, slateNode)
-        )
+        let nodePath
+        try {
+          nodePath = DOMEditor.findPath(editor, slateNode)
+        } catch (e) {
+          if (suppressThrow) {
+            return null as T extends true ? Point | null : Point
+          }
+          throw e
+        }
+        let { path, offset } = Editor.start(editor, nodePath)
 
         if (!node.querySelector('[data-slate-leaf]')) {
           offset = nearestOffset
@@ -914,7 +921,15 @@ export const DOMEditor: DOMEditorInterface = {
     // the select event fires twice, once for the old editor's `element`
     // first, and then afterwards for the correct `element`. (2017/03/03)
     const slateNode = DOMEditor.toSlateNode(editor, textNode!)
-    const path = DOMEditor.findPath(editor, slateNode)
+    let path
+    try {
+      path = DOMEditor.findPath(editor, slateNode)
+    } catch (e) {
+      if (suppressThrow) {
+        return null as T extends true ? Point | null : Point
+      }
+      throw e
+    }
     return { path, offset } as T extends true ? Point | null : Point
   },
 

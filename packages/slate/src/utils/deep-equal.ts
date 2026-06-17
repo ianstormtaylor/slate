@@ -15,8 +15,8 @@ export const isDeepEqual = (
   another: Record<string, any>
 ): boolean => {
   for (const key in node) {
-    const a = node[key]
-    const b = another[key]
+    const a = Object.hasOwn(node, key) ? node[key] : undefined
+    const b = Object.hasOwn(another, key) ? another[key] : undefined
     if (Array.isArray(a) && Array.isArray(b)) {
       if (a.length !== b.length) return false
       for (let i = 0; i < a.length; i++) {

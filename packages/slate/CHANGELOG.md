@@ -1,5 +1,24 @@
 # slate
 
+## 0.124.1
+
+### Patch Changes
+
+- [#6040](https://github.com/ianstormtaylor/slate/pull/6040) [`20a1a937`](https://github.com/ianstormtaylor/slate/commit/20a1a9371538dda1911d533e0f02b1655ffffa12) Thanks [@12joan](https://github.com/12joan)! - - Harden property accessors against untrusted keys
+  - Fix incorrect argument types for the `compare` and `merge` options of `Transforms.setNodes`
+
+## 0.124.0
+
+### Minor Changes
+
+- [#6006](https://github.com/ianstormtaylor/slate/pull/6006) [`72e4f025`](https://github.com/ianstormtaylor/slate/commit/72e4f025761ea7670d4944c0f25fc6da97f1e5f5) Thanks [@skorenb](https://github.com/skorenb)! - Added `force` property to `normalizeNode` passed from `normalize` method
+
+### Patch Changes
+
+- [#6018](https://github.com/ianstormtaylor/slate/pull/6018) [`91321bdc`](https://github.com/ianstormtaylor/slate/commit/91321bdcd2c6c0baef010bbcde3079e11841e69f) Thanks [@12joan](https://github.com/12joan)! - Do not allow paths to contain strings when getting nodes
+
+- [#6024](https://github.com/ianstormtaylor/slate/pull/6024) [`a1729221`](https://github.com/ianstormtaylor/slate/commit/a1729221a0c5785f48493177beb81b4b8ef08594) Thanks [@juliankrispel](https://github.com/juliankrispel)! - Fix normalization hanging when merging text under non-selectable elements
+
 ## 0.123.0
 
 ### Minor Changes
