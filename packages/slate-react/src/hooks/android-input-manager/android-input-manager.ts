@@ -698,15 +698,13 @@ export function createAndroidInputManager({
                 offset: start.offset + text.length,
               }
 
-              scheduleAction(
-                () => {
-                  Transforms.select(editor, {
-                    anchor: newPoint,
-                    focus: newPoint,
-                  })
-                },
-                { at: newPoint }
-              )
+              // `Editor.insertText` with `editor.marks` uses `insertNodes` (new text leaf) instead of
+              // extending the current leaf, so `newPoint` can be past the end of `start.path`.
+              // `performAction` already applies `normalizePoint` to `action.at` before `run()`;
+              // a second `Transforms.select` here with the raw point would overwrite that and leave
+              // an invalid selection (e.g. Android keyboard dismiss). Selection is set in
+              // `performAction` only.
+              scheduleAction(() => {}, { at: newPoint })
             }
             return
           }
