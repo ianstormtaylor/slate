@@ -3,7 +3,7 @@ import {
   codepointsIteratorRTL,
   getCharacterDistance,
   getWordDistance,
-} from '../../src/utils/string'
+} from 'slate/src/utils/string'
 
 const codepoints = [
   ['a', 1],

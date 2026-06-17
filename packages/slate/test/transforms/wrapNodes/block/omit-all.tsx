@@ -1,14 +1,14 @@
 /** @jsx jsx */
-import { Editor, Node, Text, Transforms } from 'slate'
+import { Node, Transforms } from 'slate'
 import { jsx } from '../../..'
 
 export const run = editor => {
   Transforms.wrapNodes(editor, <block a />, {
     match: (node, currentPath) => {
-      // reject all nodes inside blocks tagged `noneditable`. Which is everything.
-      if (node.noneditable) return false
+      // reject all nodes inside blocks tagged `x`. Which is everything.
+      if (node.x) return false
       for (const [node, _] of Node.ancestors(editor, currentPath)) {
-        if (node.noneditable) return false
+        if (node.x) return false
       }
       return true
     },
@@ -16,7 +16,7 @@ export const run = editor => {
 }
 export const input = (
   <editor>
-    <block noneditable>
+    <block x>
       <cursor />
       word
     </block>
@@ -24,7 +24,7 @@ export const input = (
 )
 export const output = (
   <editor>
-    <block noneditable>
+    <block x>
       <cursor />
       word
     </block>

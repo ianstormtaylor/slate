@@ -6,5 +6,5 @@
     "outDir": "./lib",
     "composite": true
   },
-  "references": []
+  "references": [{ "path": "../slate" }]
 }

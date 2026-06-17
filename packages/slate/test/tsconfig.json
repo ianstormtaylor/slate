@@ -1,0 +1,6 @@
+{
+  "extends": "../../../config/typescript/tsconfig.test.json",
+  "include": ["./**/*", "../../../support/*"],
+  "exclude": ["./interfaces/CustomTypes/**/*"],
+  "references": [{ "path": "../" }]
+}

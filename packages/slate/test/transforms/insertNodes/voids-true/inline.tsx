@@ -18,7 +18,7 @@ export const run = (editor, options = {}) => {
   Transforms.insertNodes(editor, <text>four</text>, {
     at: [0, 1, 1],
     voids: true,
-    options,
+    ...options,
   })
 }
 export const output = (
