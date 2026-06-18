@@ -10,16 +10,24 @@ import { isBatchingDirtyPaths } from './batch-dirty-paths'
 import { updateDirtyPaths } from './update-dirty-paths'
 
 export const apply: WithEditorFirstArg<Editor['apply']> = (editor, op) => {
+  const changedRefs: Array<PathRef | PointRef | RangeRef> = []
+
   for (const ref of Editor.pathRefs(editor)) {
-    PathRef.transform(ref, op)
+    if (PathRef.transform(ref, op)) {
+      changedRefs.push(ref)
+    }
   }
 
   for (const ref of Editor.pointRefs(editor)) {
-    PointRef.transform(ref, op)
+    if (PointRef.transform(ref, op)) {
+      changedRefs.push(ref)
+    }
   }
 
   for (const ref of Editor.rangeRefs(editor)) {
-    RangeRef.transform(ref, op)
+    if (RangeRef.transform(ref, op)) {
+      changedRefs.push(ref)
+    }
   }
 
   // update dirty paths
@@ -31,6 +39,9 @@ export const apply: WithEditorFirstArg<Editor['apply']> = (editor, op) => {
   }
 
   Transforms.transform(editor, op)
+  changedRefs.forEach(ref => {
+    ref.onChange()
+  })
   editor.operations.push(op)
   Editor.normalize(editor, {
     operation: op,
