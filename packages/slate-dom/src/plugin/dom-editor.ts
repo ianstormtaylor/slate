@@ -920,7 +920,15 @@ export const DOMEditor: DOMEditorInterface = {
     // COMPAT: If someone is clicking from one Slate editor into another,
     // the select event fires twice, once for the old editor's `element`
     // first, and then afterwards for the correct `element`. (2017/03/03)
-    const slateNode = DOMEditor.toSlateNode(editor, textNode!)
+    let slateNode
+    try {
+      slateNode = DOMEditor.toSlateNode(editor, textNode!)
+    } catch (e) {
+      if (suppressThrow) {
+        return null as T extends true ? Point | null : Point
+      }
+      throw e
+    }
     let path
     try {
       path = DOMEditor.findPath(editor, slateNode)
