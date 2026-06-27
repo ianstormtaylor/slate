@@ -1,7 +1,8 @@
 {
-  "extends": "../../../config/typescript/tsconfig.json",
+  "extends": "../../../config/typescript/tsconfig.test.json",
   "compilerOptions": {
-    "types": ["@testing-library/jest-dom"]
+    "jsxFactory": "React.createElement",
+    "jsxFragmentFactory": "React.Fragment"
   },
   "references": [{ "path": "../" }]
 }

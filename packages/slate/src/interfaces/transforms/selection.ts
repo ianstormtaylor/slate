@@ -1,4 +1,4 @@
-import { Editor, Location, Point, Range } from '../../index'
+import { Editor, Location, Point, Selection } from '../../index'
 import { MoveUnit, SelectionEdge } from '../../types/types'
 
 export interface SelectionCollapseOptions {
@@ -49,7 +49,7 @@ export interface SelectionTransforms {
   /**
    * Set new properties on the selection.
    */
-  setSelection: (editor: Editor, props: Partial<Range>) => void
+  setSelection: (editor: Editor, props: Partial<Selection>) => void
 }
 
 // eslint-disable-next-line no-redeclare
