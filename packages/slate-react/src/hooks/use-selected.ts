@@ -21,9 +21,17 @@ export const useSelected = (): boolean => {
   const selector = useCallback(
     (editor: Editor) => {
       if (!editor.selection) return false
-      const path = ReactEditor.findPath(editor, element)
-      const range = Editor.range(editor, path)
-      return !!Range.intersection(range, editor.selection)
+
+      try {
+        const path = ReactEditor.findPath(editor, element)
+        const range = Editor.range(editor, path)
+        return !!Range.intersection(range, editor.selection)
+      } catch (e) {
+        // The element may have been removed from the editor while a component
+        // referencing it is still mounted, in which case its path can no
+        // longer be resolved. Treat it as not selected rather than throwing.
+        return false
+      }
     },
     [element]
   )
