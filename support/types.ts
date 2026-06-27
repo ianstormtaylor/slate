@@ -1,4 +1,5 @@
 import { BaseEditor, BaseElement, BaseSelection, BaseText } from 'slate'
+import { HyperscriptPointRef, HyperscriptRangeRef } from 'slate-hyperscript'
 
 // Allowed tags for jsx elements and allowed types for those tags
 declare global {
@@ -9,8 +10,9 @@ declare global {
 
       selection: {}
       cursor: {}
-      anchor: {} | { path: number[]; offset: number }
-      focus: {} | { path: number[]; offset: number }
+      point: { ref: HyperscriptPointRef }
+      anchor: { ref?: HyperscriptRangeRef } | { path: number[]; offset: number }
+      focus: { ref?: HyperscriptRangeRef } | { path: number[]; offset: number }
 
       element: ElementFlags & ElementAdditions
       text: TextAdditions
