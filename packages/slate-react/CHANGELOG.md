@@ -1,5 +1,13 @@
 # slate-react
 
+## 0.125.1
+
+### Patch Changes
+
+- [#6033](https://github.com/ianstormtaylor/slate/pull/6033) [`23e6a84e`](https://github.com/ianstormtaylor/slate/commit/23e6a84ecddee0ca2580ff76e69f433115265e63) Thanks [@dannelundqvist](https://github.com/dannelundqvist)! - Fix caret jumping to wrong position when the decorate prop changes asynchronously
+
+- [#6079](https://github.com/ianstormtaylor/slate/pull/6079) [`a6b520ed`](https://github.com/ianstormtaylor/slate/commit/a6b520ed168d15718e1255bef53fef582860e4d4) Thanks [@dylans](https://github.com/dylans)! - Fix Firefox contenteditable text input breaking on editor mount, caused by a forced re-render added in `useDecorateContext` for decoration-driven caret restoration (#6078)
+
 ## 0.124.2
 
 ### Patch Changes
