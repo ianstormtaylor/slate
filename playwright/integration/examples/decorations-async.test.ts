@@ -28,9 +28,7 @@ test.describe('decorations-async', () => {
     // the word we typed, not somewhere else in the document.
     await page.keyboard.type('!')
 
-    const lastParagraph = editor
-      .locator('[data-slate-node="element"]')
-      .last()
+    const lastParagraph = editor.locator('[data-slate-node="element"]').last()
     await expect(lastParagraph).toContainText('fox!')
   })
 })
