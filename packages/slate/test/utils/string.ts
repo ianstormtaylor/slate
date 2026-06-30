@@ -97,6 +97,13 @@ const sampleStrings = {
   '22': ['a\u200d', '🛑'],
   '23': ['✁\u200d✁'],
   '24': ['a\u200d', '✁'],
+  // GB9c: do not break within an Indic conjunct cluster, i.e.
+  // Consonant + (Extend | Linker)* + Linker + (Extend | Linker)* + Consonant.
+  '25': ['\u0915\u094d\u0924'], // KA, VIRAMA, TA
+  '26': ['\u0915\u094d\u200d\u0924'], // KA, VIRAMA, ZWJ, TA
+  '27': ['\u0915\u094d\u0924\u094d\u092f'], // KA, VIRAMA, TA, VIRAMA, YA
+  // Two consonants with no linker between them still break.
+  '28': ['\u0915', '\u0924'], // KA | TA
 }
 
 const dirs = ['ltr', 'rtl']
