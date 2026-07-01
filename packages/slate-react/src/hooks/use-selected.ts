@@ -6,9 +6,14 @@ import { ReactEditor } from '../plugin/react-editor'
 
 /**
  * Get the current `selected` state of an element.
+ *
+ * Set `suppressThrow` to return `false` instead of throwing when the element
+ * can no longer be found in the editor.
  */
 
-export const useSelected = (): boolean => {
+export const useSelected = ({
+  suppressThrow = false,
+}: { suppressThrow?: boolean } = {}): boolean => {
   const element = useElementIf()
 
   // Breaking the rules of hooks is fine here since `!element` will remain true
@@ -27,13 +32,14 @@ export const useSelected = (): boolean => {
         const range = Editor.range(editor, path)
         return !!Range.intersection(range, editor.selection)
       } catch (e) {
-        // The element may have been removed from the editor while a component
-        // referencing it is still mounted, in which case its path can no
-        // longer be resolved. Treat it as not selected rather than throwing.
-        return false
+        if (suppressThrow) {
+          return false
+        }
+
+        throw e
       }
     },
-    [element]
+    [element, suppressThrow]
   )
 
   // eslint-disable-next-line react-hooks/rules-of-hooks

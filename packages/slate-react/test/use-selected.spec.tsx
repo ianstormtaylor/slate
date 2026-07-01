@@ -183,11 +183,9 @@ describe('useSelected', () => {
     withChunking(true)
   })
 
-  // Regression test for https://github.com/ianstormtaylor/slate/issues/6053
+  // https://github.com/ianstormtaylor/slate/issues/6053
   describe('when the referenced element has been removed', () => {
-    // A still-mounted component that keeps referencing an element even after it
-    // has been removed from the editor, mimicking an element that removes
-    // "itself" while a component holding its reference is still rendering.
+    // Keeps referencing an element after it has been removed from the editor.
     const StaleConsumer = ({
       captureSelected,
     }: {
@@ -213,7 +211,7 @@ describe('useSelected', () => {
     }: {
       captureSelected: (selected: boolean) => void
     }) => {
-      captureSelected(useSelected())
+      captureSelected(useSelected({ suppressThrow: true }))
       return null
     }
 
@@ -243,15 +241,11 @@ describe('useSelected', () => {
         </Slate>
       )
 
-      // Keep a selection on a node that survives the removal below, so the
-      // selector runs past its early `!editor.selection` return.
+      // A selection on a node that survives the removal below.
       await act(async () => {
         Transforms.select(editor, [0, 0])
       })
 
-      // Removing the last element leaves `StaleConsumer` referencing a node
-      // whose path can no longer be resolved. `useSelected` must return `false`
-      // rather than throwing.
       await act(async () => {
         Transforms.removeNodes(editor, { at: [2] })
       })
@@ -259,8 +253,8 @@ describe('useSelected', () => {
       expect(selected).toBe(false)
     }
 
-    it('returns false instead of throwing (without chunking)', () => run(false))
+    it('returns false with suppressThrow (without chunking)', () => run(false))
 
-    it('returns false instead of throwing (with chunking)', () => run(true))
+    it('returns false with suppressThrow (with chunking)', () => run(true))
   })
 })

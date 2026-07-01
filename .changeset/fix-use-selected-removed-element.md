@@ -1,5 +1,5 @@
 ---
-'slate-react': patch
+'slate-react': minor
 ---
 
-fix: prevent `useSelected` from throwing when its element has been removed from the editor
+Add a `suppressThrow` option to `useSelected` to return `false` instead of throwing when the element can no longer be found in the editor.
