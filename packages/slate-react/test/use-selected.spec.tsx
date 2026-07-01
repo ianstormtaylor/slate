@@ -1,14 +1,16 @@
-import React from 'react'
-import { createEditor, Transforms } from 'slate'
+import React, { useRef } from 'react'
+import { createEditor, Element, Transforms } from 'slate'
 import { render, act } from '@testing-library/react'
 import {
   Slate,
   withReact,
   Editable,
   useSelected,
+  useSlateStatic,
   RenderElementProps,
   ReactEditor,
 } from '../src'
+import { ElementContext } from '../src/hooks/use-element'
 
 let editor: ReactEditor
 let elementSelectedRenders: Record<string, boolean[] | undefined>
@@ -179,5 +181,80 @@ describe('useSelected', () => {
 
   describe('with chunking', () => {
     withChunking(true)
+  })
+
+  // https://github.com/ianstormtaylor/slate/issues/6053
+  describe('when the referenced element has been removed', () => {
+    // Keeps referencing an element after it has been removed from the editor.
+    const StaleConsumer = ({
+      captureSelected,
+    }: {
+      captureSelected: (selected: boolean) => void
+    }) => {
+      const editor = useSlateStatic()
+      const elementRef = useRef<Element>()
+
+      if (!elementRef.current) {
+        const { children } = editor
+        elementRef.current = children[children.length - 1] as Element
+      }
+
+      return (
+        <ElementContext.Provider value={elementRef.current}>
+          <SelectedProbe captureSelected={captureSelected} />
+        </ElementContext.Provider>
+      )
+    }
+
+    const SelectedProbe = ({
+      captureSelected,
+    }: {
+      captureSelected: (selected: boolean) => void
+    }) => {
+      captureSelected(useSelected({ suppressThrow: true }))
+      return null
+    }
+
+    const run = async (chunking: boolean) => {
+      const editor = withReact(createEditor())
+
+      if (chunking) {
+        editor.getChunkSize = () => 3
+      }
+
+      let selected: boolean | undefined
+      const captureSelected = (value: boolean) => {
+        selected = value
+      }
+
+      render(
+        <Slate
+          editor={editor}
+          initialValue={[
+            { children: [{ text: 'one' }] },
+            { children: [{ text: 'two' }] },
+            { children: [{ text: 'three' }] },
+          ]}
+        >
+          <Editable />
+          <StaleConsumer captureSelected={captureSelected} />
+        </Slate>
+      )
+
+      // A selection on a node that survives the removal below.
+      await act(async () => {
+        Transforms.select(editor, [0, 0])
+      })
+
+      await act(async () => {
+        Transforms.removeNodes(editor, { at: [2] })
+      })
+
+      expect(selected).toBe(false)
+    }
+
+    it('returns false with suppressThrow (without chunking)', () => run(false))
+
+    it('returns false with suppressThrow (with chunking)', () => run(true))
   })
 })
