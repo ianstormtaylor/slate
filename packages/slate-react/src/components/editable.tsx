@@ -563,13 +563,21 @@ export const Editable = forwardRef(
           newRange.setStart(range.startContainer, range.startOffset)
           newRange.setEnd(range.endContainer, range.endOffset)
 
-          // Translate the DOM Range into a Slate Range
+          // Translate the DOM Range into a Slate Range. The target range can
+          // point at a DOM node that is no longer resolvable to a Slate node
+          // (stale NODE_MAP entry after a re-render, IME composition), in which
+          // case `findPath` would throw out of the DOM event handler and crash
+          // the app (#3556) — suppress and skip the selection move instead,
+          // matching how the other `toSlateRange` call sites in this file
+          // handle unresolvable ranges.
           const slateRange = ReactEditor.toSlateRange(editor, newRange, {
             exactMatch: false,
-            suppressThrow: false,
+            suppressThrow: true,
           })
 
-          Transforms.select(editor, slateRange)
+          if (slateRange) {
+            Transforms.select(editor, slateRange)
+          }
 
           event.preventDefault()
           event.stopImmediatePropagation()
@@ -689,12 +697,22 @@ export const Editable = forwardRef(
             const [targetRange] = (event as any).getTargetRanges()
 
             if (targetRange) {
+              // The browser's target range can point at a DOM text node whose
+              // Slate node is no longer path-resolvable (stale NODE_MAP entry
+              // after a re-render, IME composition, cross-editor click). With
+              // `suppressThrow: false` the `findPath` throw escapes the DOM
+              // event handler and crashes the app (#3556) — suppress it, and
+              // when the range is unmappable fall back to slate's synthetic
+              // handling at the current selection (native handling can't be
+              // trusted with a range we can't map).
               const range = ReactEditor.toSlateRange(editor, targetRange, {
                 exactMatch: false,
-                suppressThrow: false,
+                suppressThrow: true,
               })
 
-              if (!selection || !Range.equals(selection, range)) {
+              if (!range) {
+                native = false
+              } else if (!selection || !Range.equals(selection, range)) {
                 native = false
 
                 const selectionRef =
