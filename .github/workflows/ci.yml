@@ -27,7 +27,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v6
         with:
-          node-version: 22.22.2
+          node-version: 22.17
           cache: yarn
 
       - name: Run ${{ matrix.command }}
