@@ -563,13 +563,15 @@ export const Editable = forwardRef(
           newRange.setStart(range.startContainer, range.startOffset)
           newRange.setEnd(range.endContainer, range.endOffset)
 
-          // Translate the DOM Range into a Slate Range
+          // Unresolvable ranges would throw out of the handler (#3556); suppress and skip the move.
           const slateRange = ReactEditor.toSlateRange(editor, newRange, {
             exactMatch: false,
-            suppressThrow: false,
+            suppressThrow: true,
           })
 
-          Transforms.select(editor, slateRange)
+          if (slateRange) {
+            Transforms.select(editor, slateRange)
+          }
 
           event.preventDefault()
           event.stopImmediatePropagation()
@@ -689,12 +691,15 @@ export const Editable = forwardRef(
             const [targetRange] = (event as any).getTargetRanges()
 
             if (targetRange) {
+              // Unresolvable ranges would throw out of the handler (#3556); suppress and fall back to synthetic handling.
               const range = ReactEditor.toSlateRange(editor, targetRange, {
                 exactMatch: false,
-                suppressThrow: false,
+                suppressThrow: true,
               })
 
-              if (!selection || !Range.equals(selection, range)) {
+              if (!range) {
+                native = false
+              } else if (!selection || !Range.equals(selection, range)) {
                 native = false
 
                 const selectionRef =
