@@ -1,5 +1,15 @@
 # slate-react
 
+## 0.126.0
+
+### Minor Changes
+
+- [#6073](https://github.com/ianstormtaylor/slate/pull/6073) [`6fa9a129`](https://github.com/ianstormtaylor/slate/commit/6fa9a129ecdd91d6b3297dedd9ee2707bc3c177c) Thanks [@NikunjSonigara](https://github.com/NikunjSonigara)! - Add a `suppressThrow` option to `useSelected` to return `false` instead of throwing when the element can no longer be found in the editor.
+
+### Patch Changes
+
+- [#6080](https://github.com/ianstormtaylor/slate/pull/6080) [`9265c408`](https://github.com/ianstormtaylor/slate/commit/9265c4085aaf22dbfea95e69ea0b20bf9140a840) Thanks [@isachivka](https://github.com/isachivka)! - Suppress the `findPath` throw when translating `beforeinput` target ranges in `<Editable>` (#3556). A browser target range can point at a DOM node no longer resolvable to a Slate node (stale `NODE_MAP` after a re-render, IME composition, cross-editor click); with `suppressThrow: false` the "Unable to find the path" error escaped the DOM event handler and crashed the app. The two `onDOMBeforeInput` call sites now use `suppressThrow: true` (matching the other `toSlateRange` sites) and degrade gracefully — fall back to synthetic handling, or skip the selection move.
+
 ## 0.125.1
 
 ### Patch Changes
