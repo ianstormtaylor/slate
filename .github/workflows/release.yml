@@ -31,7 +31,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v6
         with:
-          node-version: 24.15.0
+          node-version: 22.17
           cache: yarn
           # IMPORTANT: do NOT set registry-url here (avoid auth/.npmrc side effects)
 
@@ -39,7 +39,7 @@ jobs:
         run: corepack enable
 
       - name: Upgrade npm (OIDC fixes ship in npm releases)
-        run: npm i -g npm@latest
+        run: npm i -g npm@11.18.0
 
       - name: Configure npm registry (no token)
         run: |
