@@ -24,12 +24,12 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       - name: Setup node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22.17
           cache: yarn
@@ -66,12 +66,12 @@ jobs:
       - name: Create or update release PR / publish
         if: matrix.channel == 'latest'
         id: changesets
-        uses: changesets/action@v1
+        uses: changesets/action@v2.0.0-next.3
         with:
-          version: yarn changesetversion
-          publish: yarn changeset publish
+          version-script: yarn changesetversion
+          publish-script: yarn changeset publish
+          github-token: ${{ secrets.GITHUB_TOKEN }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           YARN_ENABLE_IMMUTABLE_INSTALLS: false
 
       - name: Release to @dev channel
