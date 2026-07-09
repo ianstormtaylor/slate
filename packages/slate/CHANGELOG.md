@@ -1,5 +1,11 @@
 # slate
 
+## 0.126.0
+
+### Patch Changes
+
+- [#6074](https://github.com/ianstormtaylor/slate/pull/6074) [`c5ea32ea`](https://github.com/ianstormtaylor/slate/commit/c5ea32eac49d8730be10fd4f8208d01e1cbced80) Thanks [@greymoth-jp](https://github.com/greymoth-jp)! - Treat Indic conjunct clusters as a single grapheme in `getCharacterDistance`, implementing Unicode UAX #29 rule GB9c. Character-by-character cursor movement (`Editor.positions` with `unit: 'character'`, and the `Editor.before` / `Editor.after` it powers) over scripts such as Devanagari and Bengali no longer stops inside a `Consonant + virama + Consonant` conjunct.
+
 ## 0.124.1
 
 ### Patch Changes

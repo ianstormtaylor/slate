@@ -1,5 +1,11 @@
 # slate-dom
 
+## 0.126.0
+
+### Patch Changes
+
+- [#6072](https://github.com/ianstormtaylor/slate/pull/6072) [`ea379934`](https://github.com/ianstormtaylor/slate/commit/ea379934d2155a3fc6ce67d8800a2e052fb8efcb) Thanks [@pangoyal-gong](https://github.com/pangoyal-gong)! - Fix `toSlatePoint` not respecting `suppressThrow` when `toSlateNode` throws. Only errors from `findPath` were guarded; errors from the preceding `toSlateNode` propagated unconditionally even with `suppressThrow: true`.
+
 ## 0.124.1
 
 ### Patch Changes
