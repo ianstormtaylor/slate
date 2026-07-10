@@ -91,9 +91,9 @@ Unwrap nodes at the specified location. If necessary, the parent node is split. 
 
 Options supported: `NodeOptions & {split?: boolean}`. For `options.mode`, `'all'` is also supported.
 
-#### `Transforms.setNodes(editor: Editor, props: Partial<Node>, options?)`
+#### `Transforms.setNodes(editor: Editor, props: Partial<NullableProps<Node>>, options?)`
 
-Set properties of nodes at the specified location. If no location is specified, use the selection.
+Set properties of nodes at the specified location. If no location is specified, use the selection. Optional node properties can be set to `null` to unset them.
 
 If `props` contains `undefined` values, the node's corresponding property will also be set to `undefined` as opposed to ignored.
 
