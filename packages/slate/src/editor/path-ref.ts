@@ -6,10 +6,11 @@ export const pathRef: EditorInterface['pathRef'] = (
   path,
   options = {}
 ) => {
-  const { affinity = 'forward' } = options
+  const { affinity = 'forward', onChange = () => {} } = options
   const ref: PathRef = {
     current: path,
     affinity,
+    onChange,
     unref() {
       const { current } = ref
       const pathRefs = Editor.pathRefs(editor)
