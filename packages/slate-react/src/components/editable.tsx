@@ -26,6 +26,7 @@ import {
   LeafPosition,
 } from 'slate'
 import { useAndroidInputManager } from '../hooks/android-input-manager/use-android-input-manager'
+import { getLeafDomText } from './string'
 import useChildren from '../hooks/use-children'
 import { DecorateContext, useDecorateContext } from '../hooks/use-decorations'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
@@ -200,6 +201,14 @@ export const Editable = forwardRef(
     const [isComposing, setIsComposing] = useState(false)
     const ref = useRef<HTMLDivElement | null>(null)
     const deferredOperations = useRef<DeferredOperation[]>([])
+    // COMPAT: Tracks the path of a text node that just received a native
+    // (non-preventDefault'd) character insertion, so we can verify - once
+    // the deferred `Editor.insertText` has been flushed - that Slate's
+    // document actually changed. If a custom `insertText` ignored the
+    // character (see https://github.com/ianstormtaylor/slate/issues/5152),
+    // no Slate operation is applied, so no re-render happens to correct the
+    // DOM via <TextString>'s layout effect; we correct it manually instead.
+    const lastNativeInsertionPath = useRef<Path | null>(null)
     const [placeholderHeight, setPlaceholderHeight] = useState<
       number | undefined
     >()
@@ -829,6 +838,9 @@ export const Editable = forwardRef(
                 // Only insertText operations use the native functionality, for now.
                 // Potentially expand to single character deletes, as well.
                 if (native) {
+                  if (selection) {
+                    lastNativeInsertionPath.current = selection.anchor.path
+                  }
                   deferredOperations.current.push(() =>
                     Editor.insertText(editor, data)
                   )
@@ -1125,6 +1137,71 @@ export const Editable = forwardRef(
                       op()
                     }
                     deferredOperations.current = []
+
+                    // COMPAT: If a native insertion's deferred `Editor.insertText`
+                    // turned out to be a no-op (e.g. a custom `insertText` ignored
+                    // the character), the browser has already mutated the DOM, but
+                    // since Slate's document didn't change, no re-render happens to
+                    // correct it via <TextString>'s layout effect. Verify and fix
+                    // the affected text node's DOM content directly.
+                    // https://github.com/ianstormtaylor/slate/issues/5152
+                    const nativeInsertionPath = lastNativeInsertionPath.current
+                    lastNativeInsertionPath.current = null
+
+                    if (nativeInsertionPath) {
+                      try {
+                        const [node] = Editor.node(editor, nativeInsertionPath)
+
+                        if (Text.isText(node)) {
+                          const [parent] = Editor.parent(
+                            editor,
+                            nativeInsertionPath
+                          )
+                          const isLast =
+                            parent.children[parent.children.length - 1] === node
+                          const isTrailing =
+                            isLast && node.text.slice(-1) === '\n'
+                          const expected = getLeafDomText(node.text, isTrailing)
+                          const domNode = ReactEditor.toDOMNode(editor, node)
+                          const stringNodes = domNode.querySelectorAll(
+                            '[data-slate-string]'
+                          )
+
+                          // Only correct the simple, common case of a single
+                          // text span; a text node split into multiple leaves
+                          // (marks/decorations) isn't reached by the native
+                          // insertion path in practice (see the `native`
+                          // determination above), so don't guess which leaf
+                          // to touch.
+                          if (stringNodes.length === 1) {
+                            const stringNode = stringNodes[0]
+
+                            if (stringNode.textContent !== expected) {
+                              stringNode.textContent = expected
+
+                              // Setting `textContent` replaces the DOM text
+                              // node, which resets the browser's own caret to
+                              // the start of it. Restore it to where Slate's
+                              // (unchanged) selection actually is.
+                              if (editor.selection) {
+                                const window = ReactEditor.getWindow(editor)
+                                const domSelection = window.getSelection()
+                                const [domNode, domOffset] =
+                                  ReactEditor.toDOMPoint(
+                                    editor,
+                                    editor.selection.anchor
+                                  )
+                                domSelection?.collapse(domNode, domOffset)
+                              }
+                            }
+                          }
+                        }
+                      } catch {
+                        // The path may no longer point to a valid node (e.g.
+                        // it was affected by some other operation) - nothing
+                        // to correct in that case.
+                      }
+                    }
 
                     // COMPAT: Since `beforeinput` doesn't fully `preventDefault`,
                     // there's a chance that content might be placed in the browser's undo stack.

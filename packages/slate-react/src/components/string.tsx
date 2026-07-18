@@ -57,15 +57,23 @@ const String = (props: {
 }
 
 /**
+ * Compute what a leaf's `[data-slate-string]` span's `textContent` should be.
+ * Shared between <TextString>'s own reconciliation and any other code path
+ * that needs to verify/correct that DOM text against the model (e.g. after a
+ * native-input insertion that didn't result in a Slate operation).
+ */
+export const getLeafDomText = (text: string, isTrailing: boolean): string => {
+  // null coalescing text to make sure we're not outputing "null" as a string in the extreme case it is nullish at runtime
+  return `${text ?? ''}${isTrailing ? '\n' : ''}`
+}
+
+/**
  * Leaf strings with text in them.
  */
 const TextString = (props: { text: string; isTrailing?: boolean }) => {
   const { text, isTrailing = false } = props
   const ref = useRef<HTMLSpanElement>(null)
-  const getTextContent = () => {
-    return `${text ?? ''}${isTrailing ? '\n' : ''}`
-  }
-  const [initialText] = useState(getTextContent)
+  const [initialText] = useState(() => getLeafDomText(text, isTrailing))
 
   // This is the actual text rendering boundary where we interface with the DOM
   // The text is not rendered as part of the virtual DOM, as since we handle basic character insertions natively,
@@ -77,8 +85,7 @@ const TextString = (props: { text: string; isTrailing?: boolean }) => {
 
   // useLayoutEffect: updating our span before browser paint
   useIsomorphicLayoutEffect(() => {
-    // null coalescing text to make sure we're not outputing "null" as a string in the extreme case it is nullish at runtime
-    const textWithTrailing = getTextContent()
+    const textWithTrailing = getLeafDomText(text, isTrailing)
 
     if (ref.current && ref.current.textContent !== textWithTrailing) {
       ref.current.textContent = textWithTrailing
