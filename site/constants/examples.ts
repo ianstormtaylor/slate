@@ -11,6 +11,8 @@ export const EXAMPLE_NAMES_AND_PATHS = [
   ['Huge Document', 'huge-document'],
   ['Images', 'images'],
   ['Inlines', 'inlines'],
+  ['Insert Text Noop', 'insert-text-noop'],
+  ['Insert Text Noop Decorated', 'insert-text-noop-decorated'],
   ['Markdown Preview', 'markdown-preview'],
   ['Markdown Shortcuts', 'markdown-shortcuts'],
   ['Mentions', 'mentions'],

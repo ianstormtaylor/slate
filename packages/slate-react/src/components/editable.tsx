@@ -200,6 +200,25 @@ export const Editable = forwardRef(
     const [isComposing, setIsComposing] = useState(false)
     const ref = useRef<HTMLDivElement | null>(null)
     const deferredOperations = useRef<DeferredOperation[]>([])
+    // COMPAT: Tracks a text node that just received a native
+    // (non-preventDefault'd) character insertion, so we can verify - once
+    // the deferred `Editor.insertText` has been flushed - that Slate's
+    // document actually changed. If a custom `insertText` ignored the
+    // character (see https://github.com/ianstormtaylor/slate/issues/5152),
+    // no Slate operation is applied, so no re-render happens to correct the
+    // DOM via <TextString>'s layout effect; we correct it manually instead,
+    // by undoing the browser's own single-character insertion at the exact
+    // DOM position it happened. This is leaf-agnostic (works regardless of
+    // how many marks/decorations split the text node into separate spans),
+    // since `domNode`/`domOffset` (from `ReactEditor.toDOMPoint`) already
+    // resolve to the specific leaf span the insertion landed in.
+    const lastNativeInsertion = useRef<{
+      path: Path
+      text: string
+      domNode: DOMText
+      domOffset: number
+      char: string
+    } | null>(null)
     const [placeholderHeight, setPlaceholderHeight] = useState<
       number | undefined
     >()
@@ -829,6 +848,30 @@ export const Editable = forwardRef(
                 // Only insertText operations use the native functionality, for now.
                 // Potentially expand to single character deletes, as well.
                 if (native) {
+                  if (selection) {
+                    try {
+                      const { path } = selection.anchor
+                      const [node] = Editor.node(editor, path)
+
+                      if (Text.isText(node)) {
+                        const [domNode, domOffset] = ReactEditor.toDOMPoint(
+                          editor,
+                          selection.anchor
+                        ) as [DOMText, number]
+
+                        lastNativeInsertion.current = {
+                          path,
+                          text: node.text,
+                          domNode,
+                          domOffset,
+                          char: data,
+                        }
+                      }
+                    } catch {
+                      // Nothing to correct later if we can't resolve the
+                      // DOM point up front.
+                    }
+                  }
                   deferredOperations.current.push(() =>
                     Editor.insertText(editor, data)
                   )
@@ -1125,6 +1168,59 @@ export const Editable = forwardRef(
                       op()
                     }
                     deferredOperations.current = []
+
+                    // COMPAT: If a native insertion's deferred `Editor.insertText`
+                    // turned out to be a no-op (e.g. a custom `insertText` ignored
+                    // the character), the browser has already mutated the DOM, but
+                    // since Slate's document didn't change, no re-render happens to
+                    // correct it via <TextString>'s layout effect. Undo the
+                    // browser's own single-character insertion directly, at the
+                    // exact DOM position it happened - this works regardless of
+                    // how many leaves (marks, decorations) the surrounding text
+                    // node is split into, since `domNode`/`domOffset` already
+                    // identify the specific leaf span the insertion landed in.
+                    // https://github.com/ianstormtaylor/slate/issues/5152
+                    const nativeInsertion = lastNativeInsertion.current
+                    lastNativeInsertion.current = null
+
+                    if (nativeInsertion) {
+                      try {
+                        const [node] = Editor.node(editor, nativeInsertion.path)
+
+                        if (
+                          Text.isText(node) &&
+                          node.text === nativeInsertion.text &&
+                          nativeInsertion.domNode.isConnected &&
+                          nativeInsertion.domNode.data.charAt(
+                            nativeInsertion.domOffset
+                          ) === nativeInsertion.char
+                        ) {
+                          nativeInsertion.domNode.deleteData(
+                            nativeInsertion.domOffset,
+                            1
+                          )
+
+                          // Mutating the DOM text node's data in place
+                          // usually preserves the caret, unlike replacing
+                          // `textContent` (which recreates the node and
+                          // resets it) - restore it explicitly regardless,
+                          // to be safe across browsers.
+                          if (editor.selection) {
+                            const window = ReactEditor.getWindow(editor)
+                            const domSelection = window.getSelection()
+                            const [domNode, domOffset] = ReactEditor.toDOMPoint(
+                              editor,
+                              editor.selection.anchor
+                            )
+                            domSelection?.collapse(domNode, domOffset)
+                          }
+                        }
+                      } catch {
+                        // The path may no longer point to a valid node (e.g.
+                        // it was affected by some other operation) - nothing
+                        // to correct in that case.
+                      }
+                    }
 
                     // COMPAT: Since `beforeinput` doesn't fully `preventDefault`,
                     // there's a chance that content might be placed in the browser's undo stack.
