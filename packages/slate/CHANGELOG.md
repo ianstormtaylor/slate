@@ -1,5 +1,11 @@
 # slate
 
+## 0.126.1
+
+### Patch Changes
+
+- [#6083](https://github.com/ianstormtaylor/slate/pull/6083) [`ad3eaee5`](https://github.com/ianstormtaylor/slate/commit/ad3eaee5c02360a024cb2af0ae2b3c1313bf9655) Thanks [@12joan](https://github.com/12joan)! - Broaden the types of `Transforms.setNodes` and `editor.setNodes` to allow setting optional node properties to null (which has the effect of unsetting them).
+
 ## 0.126.0
 
 ### Patch Changes
