@@ -244,4 +244,97 @@ const App = () => {
 
 That's the benefit of extracting the logic.
 
+We can make the code more modular by separating the logic within a few helper functions using the below code:
+
+```jsx
+// Define our own custom set of helpers.
+// Below code is written for typescript users
+const CustomEditor = {
+    isMarkActive(editor: Editor, mark: string) {
+      const marks = Editor.marks(editor) as Record<string, unknown> | null;
+      return marks ? (marks as Record<string, boolean>)[mark] === true : false;
+    },
+
+    isBlockActive(editor: Editor, block: string) {
+      const [match] = Editor.nodes(editor, {
+        match: (n) => Element.isElement(n) && n.type === block,
+      });
+
+      return match;
+    },
+
+    toggleMark(editor: Editor, mark: string) {
+      if (this.isMarkActive(editor, mark)) {
+        editor.removeMark(mark);
+      } else {
+        editor.addMark(mark, true);
+      }
+    },
+
+    toggleBlock(editor: Editor, block: string) {
+      const isActive = this.isBlockActive(editor, block);
+      Transforms.setNodes(
+        editor,
+        { type: isActive ? undefined : block },
+        {
+          match: (n) => Element.isElement(n) && Editor.isBlock(editor, n),
+        },
+      );
+    },
+  };
+
+const initialValue = [
+  {
+    type: 'paragraph',
+    children: [{ text: 'A line of text in a paragraph.' }],
+  },
+]
+
+const App = () => {
+  const [editor] = useState(() => withReact(createEditor()))
+
+  const renderElement = useCallback(props => {
+    switch (props.element.type) {
+      case 'code':
+        return <CodeElement {...props} />
+      default:
+        return <DefaultElement {...props} />
+    }
+  }, [])
+
+  const renderLeaf = useCallback(props => {
+    return <Leaf {...props} />
+  }, [])
+
+  return (
+    <Slate editor={editor} initialValue={initialValue}>
+      <Editable
+        renderElement={renderElement}
+        renderLeaf={renderLeaf}
+        onKeyDown={event => {
+          if (!event.ctrlKey) {
+            return
+          }
+
+          // Replace the `onKeyDown` logic with our new commands.
+          switch (event.key) {
+            case '`': {
+              event.preventDefault()
+              CustomEditor.toggleBlock(editor, "code");
+              break
+            }
+
+            case 'b': {
+              event.preventDefault()
+              CustomEditor.toggleMark(editor, "bold");
+              break
+            }
+          }
+        }}
+      />
+    </Slate>
+  )
+}
+```
+
 And there you have it! We just added a ton of functionality to the editor with very little work. And we can keep all of our command logic tested and isolated in a single place, making the code easier to maintain.
