@@ -3,12 +3,12 @@ import { isDeepEqual } from '../../../src/utils/deep-equal'
 export const input = {
   objectA: {
     text: 'same text',
-    array: ['array-content'],
+    array: ['array-content', { active: true }],
     bold: true,
   },
   objectB: {
     text: 'same text',
-    array: ['array-content'],
+    array: ['array-content', { active: true }],
     bold: true,
   },
 }
