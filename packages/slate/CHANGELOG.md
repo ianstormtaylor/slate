@@ -1,5 +1,11 @@
 # slate
 
+## 0.126.2
+
+### Patch Changes
+
+- [#6092](https://github.com/ianstormtaylor/slate/pull/6092) [`4231105d`](https://github.com/ianstormtaylor/slate/commit/4231105dbe7cab405406eabd23cf40261e56b9fc) Thanks [@12joan](https://github.com/12joan)! - Deeply compare nested data structures inside array properties on nodes for the purpose of merging identical text nodes. Previously, items in array properties were shallowly compared using `===`.
+
 ## 0.126.1
 
 ### Patch Changes
