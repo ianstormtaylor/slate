@@ -1,5 +1,7 @@
 import { DebouncedFunc } from 'lodash'
-import { flushSync } from 'react-dom'
+// Default import: the UMD build resolves react-dom through its CommonJS entry,
+// whose named exports rollup cannot discover statically.
+import ReactDOM from 'react-dom'
 import { Editor, Location, Node, Path, Point, Range, Transforms } from 'slate'
 import { ReactEditor } from '../../plugin/react-editor'
 import {
@@ -286,7 +288,7 @@ export function createAndroidInputManager({
     // composition in the same tick as this event, so an asynchronous render
     // would replace the text node that composition has already started in.
     if (hasPendingDiffsInEmptyLeaf() && !flushing) {
-      flushSync(() => {
+      ReactDOM.flushSync(() => {
         IS_COMPOSING.set(editor, false)
         flush()
       })
