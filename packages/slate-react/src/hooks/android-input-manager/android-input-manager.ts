@@ -37,6 +37,11 @@ const RESOLVE_DELAY = 25
 // Time with no user interaction before the current user action is considered as done.
 const FLUSH_DELAY = 200
 
+// Time with no composition input after which a composition that never ended is
+// treated as stale. Long enough that pausing mid-word does not cut a live
+// composition short.
+const COMPOSITION_IDLE_TIMEOUT = 5000
+
 // Replace with `const debug = console.log` to debug
 const debug = (..._: unknown[]) => {}
 
@@ -81,6 +86,7 @@ export function createAndroidInputManager({
   let compositionEndTimeoutId: ReturnType<typeof setTimeout> | null = null
   let flushTimeoutId: ReturnType<typeof setTimeout> | null = null
   let actionTimeoutId: ReturnType<typeof setTimeout> | null = null
+  let lastCompositionActivity = 0
 
   let idCounter = 0
   let insertPositionHint: StringDiff | null | false = false
@@ -126,6 +132,29 @@ export function createAndroidInputManager({
     action.run()
   }
 
+  // `compositionend` is not fired reliably in every browser, which Slate
+  // already works around on keydown. Deferring flushes on a composition that
+  // never ends would strand the typed text outside the value, so a composition
+  // that has gone quiet, or that has lost focus, no longer holds flushes back.
+  const isCompositionLive = () => {
+    if (!IS_COMPOSING.get(editor)) {
+      return false
+    }
+
+    try {
+      const editable = ReactEditor.toDOMNode(editor, editor)
+      const { activeElement } = ReactEditor.getWindow(editor).document
+
+      if (activeElement !== editable && !editable.contains(activeElement)) {
+        return false
+      }
+    } catch {
+      // Fall back to the idle check below if the editable can't be resolved.
+    }
+
+    return Date.now() - lastCompositionActivity < COMPOSITION_IDLE_TIMEOUT
+  }
+
   // A leaf that Slate models as empty renders as a zero-width string, which on
   // Android is a `<br>` rather than a text node. When the IME composes the
   // first character into such a leaf, the browser creates a text node for the
@@ -158,7 +187,7 @@ export function createAndroidInputManager({
     // Composing into a leaf that already has text is unaffected: applying the
     // diff there only updates `textContent`, so the value still updates on
     // every `compositionupdate`.
-    if (IS_COMPOSING.get(editor) && hasPendingDiffsInEmptyLeaf()) {
+    if (isCompositionLive() && hasPendingDiffsInEmptyLeaf()) {
       debug('deferring flush during composition in empty leaf')
       flushTimeoutId = setTimeout(flush, FLUSH_DELAY)
       return
@@ -307,6 +336,7 @@ export function createAndroidInputManager({
     debug('composition start')
 
     IS_COMPOSING.set(editor, true)
+    lastCompositionActivity = Date.now()
 
     if (compositionEndTimeoutId) {
       clearTimeout(compositionEndTimeoutId)
@@ -393,6 +423,11 @@ export function createAndroidInputManager({
     }
 
     const { inputType: type } = event
+
+    if (type === 'insertCompositionText' || type === 'deleteCompositionText') {
+      lastCompositionActivity = Date.now()
+    }
+
     let targetRange: Range | null = null
     const data: DataTransfer | string | undefined =
       (event as any).dataTransfer || event.data || undefined
