@@ -42,6 +42,11 @@ const FLUSH_DELAY = 200
 // composition short.
 const COMPOSITION_IDLE_TIMEOUT = 5000
 
+// How often a deferred flush re-checks whether the composition is still live.
+// Only bounds how quickly the value catches up with a composition that ended
+// without firing `compositionend`; one that ends normally flushes immediately.
+const COMPOSITION_RECHECK_DELAY = 50
+
 // Replace with `const debug = console.log` to debug
 const debug = (..._: unknown[]) => {}
 
@@ -189,7 +194,7 @@ export function createAndroidInputManager({
     // every `compositionupdate`.
     if (isCompositionLive() && hasPendingDiffsInEmptyLeaf()) {
       debug('deferring flush during composition in empty leaf')
-      flushTimeoutId = setTimeout(flush, FLUSH_DELAY)
+      flushTimeoutId = setTimeout(flush, COMPOSITION_RECHECK_DELAY)
       return
     }
 
@@ -775,15 +780,15 @@ export function createAndroidInputManager({
                 offset: start.offset + text.length,
               }
 
-              // Storing the selection as pending applies it on the next flush,
-              // like `scheduleAction` did, without forcing that flush to happen
-              // on the next task. Forcing it re-rendered the editor between two
-              // `compositionupdate` events, which is what broke composition of
-              // the first character in a leaf.
-              EDITOR_TO_PENDING_SELECTION.set(editor, {
-                anchor: newPoint,
-                focus: newPoint,
-              })
+              scheduleAction(
+                () => {
+                  Transforms.select(editor, {
+                    anchor: newPoint,
+                    focus: newPoint,
+                  })
+                },
+                { at: newPoint }
+              )
             }
             return
           }
