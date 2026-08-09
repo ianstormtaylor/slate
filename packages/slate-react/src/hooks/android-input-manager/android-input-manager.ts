@@ -92,6 +92,7 @@ export function createAndroidInputManager({
   let flushTimeoutId: ReturnType<typeof setTimeout> | null = null
   let actionTimeoutId: ReturnType<typeof setTimeout> | null = null
   let lastCompositionActivity = 0
+  let compositionCleared = false
 
   let idCounter = 0
   let insertPositionHint: StringDiff | null | false = false
@@ -142,7 +143,7 @@ export function createAndroidInputManager({
   // never ends would strand the typed text outside the value, so a composition
   // that has gone quiet, or that has lost focus, no longer holds flushes back.
   const isCompositionLive = () => {
-    if (!IS_COMPOSING.get(editor)) {
+    if (!IS_COMPOSING.get(editor) || compositionCleared) {
       return false
     }
 
@@ -326,12 +327,22 @@ export function createAndroidInputManager({
         IS_COMPOSING.set(editor, false)
         flush()
       })
+      updatePlaceholderVisibility()
       return
     }
 
     compositionEndTimeoutId = setTimeout(() => {
       IS_COMPOSING.set(editor, false)
       flush()
+
+      if (compositionCleared) {
+        // A cancelled composition can take the empty leaf's text node with
+        // it. A forced render lets RestoreDOM put the leaf's DOM back, so the
+        // next composition starts from a clean state instead of a bare <br>.
+        EDITOR_TO_FORCE_RENDER.get(editor)?.()
+      }
+
+      updatePlaceholderVisibility()
     }, RESOLVE_DELAY)
   }
 
@@ -342,6 +353,7 @@ export function createAndroidInputManager({
 
     IS_COMPOSING.set(editor, true)
     lastCompositionActivity = Date.now()
+    compositionCleared = false
 
     if (compositionEndTimeoutId) {
       clearTimeout(compositionEndTimeoutId)
@@ -431,6 +443,33 @@ export function createAndroidInputManager({
 
     if (type === 'insertCompositionText' || type === 'deleteCompositionText') {
       lastCompositionActivity = Date.now()
+
+      if (event.data) {
+        compositionCleared = false
+      } else {
+        // The IME threw away what it was composing. The deferred text never
+        // reached the value, so the value is already in the desired state -
+        // drop the deferral instead of applying and re-deleting it, which
+        // would churn the DOM mid-composition and can make Android close the
+        // keyboard.
+        compositionCleared = true
+        const deferredDiffs = EDITOR_TO_PENDING_DIFFS.get(editor)
+
+        if (deferredDiffs?.length) {
+          const allInEmptyLeaves = deferredDiffs.every(({ path }) => {
+            try {
+              return Node.leaf(editor, path).text.length === 0
+            } catch {
+              return false
+            }
+          })
+
+          if (allInEmptyLeaves) {
+            EDITOR_TO_PENDING_DIFFS.set(editor, [])
+            EDITOR_TO_PENDING_SELECTION.delete(editor)
+          }
+        }
+      }
     }
 
     let targetRange: Range | null = null

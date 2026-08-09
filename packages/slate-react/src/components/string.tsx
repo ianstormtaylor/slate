@@ -150,9 +150,15 @@ export const ZeroWidthString = (props: {
   // be because accepting an IME suggestion when at the start of a block (no
   // preceding \uFEFF) removes one or more DOM elements that `toSlateRange`
   // depends on. (https://github.com/ianstormtaylor/slate/issues/5703)
+  // A leaf with no text node at all forces the IME to create one when the
+  // first character is composed there, and no re-render can then touch the
+  // leaf without cancelling the composition. Rendering the zero-width space on
+  // Android too gives the composition a React-owned text node to live in; the
+  // wrapper keeps its data-slate-zero-width attributes, so selection mapping
+  // is unchanged.
   return (
     <span {...attributes}>
-      {!IS_ANDROID || !isLineBreak ? '\uFEFF' : null}
+      {'\uFEFF'}
       {isLineBreak ? <br /> : null}
     </span>
   )
