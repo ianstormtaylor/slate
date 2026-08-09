@@ -192,6 +192,26 @@ const TEST_CASES: AndroidTestCase[] = [
       },
     ],
   },
+  {
+    id: 'ime-first-character',
+    name: 'IME first character',
+    instructions:
+      'Using a keyboard that composes (Korean, Japanese or pinyin), type a word into the empty first paragraph, then into the empty paragraph after "Second block". Every character must compose into the word you typed. If composition breaks, the first character is left behind on its own: typing 안녕 in Korean gives ㅇ안녕 or ㅇㅏㄴ녕.',
+    value: [
+      {
+        type: 'paragraph',
+        children: [{ text: '' }],
+      },
+      {
+        type: 'paragraph',
+        children: [{ text: 'Second block', bold: true }],
+      },
+      {
+        type: 'paragraph',
+        children: [{ text: '' }],
+      },
+    ],
+  },
 ]
 
 const AndroidTestsExample = () => {

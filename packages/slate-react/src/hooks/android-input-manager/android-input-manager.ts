@@ -1,4 +1,5 @@
 import { DebouncedFunc } from 'lodash'
+import { flushSync } from 'react-dom'
 import { Editor, Location, Node, Path, Point, Range, Transforms } from 'slate'
 import { ReactEditor } from '../../plugin/react-editor'
 import {
@@ -123,6 +124,22 @@ export function createAndroidInputManager({
     action.run()
   }
 
+  // A leaf that Slate models as empty renders as a zero-width string, which on
+  // Android is a `<br>` rather than a text node. When the IME composes the
+  // first character into such a leaf, the browser creates a text node for the
+  // composition. Applying the pending diffs re-renders that leaf as a text
+  // leaf, which unmounts the zero-width span and takes the text node the IME is
+  // composing in with it, silently cancelling the composition.
+  const hasPendingDiffsInEmptyLeaf = () =>
+    !!EDITOR_TO_PENDING_DIFFS.get(editor)?.some(({ path }) => {
+      try {
+        return Node.leaf(editor, path).text.length === 0
+      } catch {
+        // The path may no longer resolve if the editor changed underneath us.
+        return false
+      }
+    })
+
   const flush = () => {
     if (flushTimeoutId) {
       clearTimeout(flushTimeoutId)
@@ -132,6 +149,17 @@ export function createAndroidInputManager({
     if (actionTimeoutId) {
       clearTimeout(actionTimeoutId)
       actionTimeoutId = null
+    }
+
+    // Defer flushing until the composition ends, so that the re-render that
+    // would replace the composing text node cannot happen mid-composition.
+    // Composing into a leaf that already has text is unaffected: applying the
+    // diff there only updates `textContent`, so the value still updates on
+    // every `compositionupdate`.
+    if (IS_COMPOSING.get(editor) && hasPendingDiffsInEmptyLeaf()) {
+      debug('deferring flush during composition in empty leaf')
+      flushTimeoutId = setTimeout(flush, FLUSH_DELAY)
+      return
     }
 
     if (!hasPendingDiffs() && !hasPendingAction()) {
@@ -251,6 +279,18 @@ export function createAndroidInputManager({
   ) => {
     if (compositionEndTimeoutId) {
       clearTimeout(compositionEndTimeoutId)
+    }
+
+    // Diffs deferred by `flush` have to be applied synchronously here. IMEs
+    // that compose one syllable at a time (Hangul, kana) start the next
+    // composition in the same tick as this event, so an asynchronous render
+    // would replace the text node that composition has already started in.
+    if (hasPendingDiffsInEmptyLeaf() && !flushing) {
+      flushSync(() => {
+        IS_COMPOSING.set(editor, false)
+        flush()
+      })
+      return
     }
 
     compositionEndTimeoutId = setTimeout(() => {
@@ -698,15 +738,15 @@ export function createAndroidInputManager({
                 offset: start.offset + text.length,
               }
 
-              scheduleAction(
-                () => {
-                  Transforms.select(editor, {
-                    anchor: newPoint,
-                    focus: newPoint,
-                  })
-                },
-                { at: newPoint }
-              )
+              // Storing the selection as pending applies it on the next flush,
+              // like `scheduleAction` did, without forcing that flush to happen
+              // on the next task. Forcing it re-rendered the editor between two
+              // `compositionupdate` events, which is what broke composition of
+              // the first character in a leaf.
+              EDITOR_TO_PENDING_SELECTION.set(editor, {
+                anchor: newPoint,
+                focus: newPoint,
+              })
             }
             return
           }
