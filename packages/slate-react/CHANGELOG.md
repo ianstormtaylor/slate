@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.126.3
+
+### Patch Changes
+
+- [#6096](https://github.com/ianstormtaylor/slate/pull/6096) [`b96028a5`](https://github.com/ianstormtaylor/slate/commit/b96028a57a90099d07c615a0b8d8ae06c3b86f12) Thanks [@melodysdreamj](https://github.com/melodysdreamj)! - Fix IME composition being cancelled on the first character typed into an empty leaf on Android, which left the first character behind as a separate, uncomposed character (typing 안녕 in Korean produced ㅇ안녕).
+
 ## 0.126.0
 
 ### Minor Changes
