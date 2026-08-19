@@ -251,35 +251,37 @@ We can make the code more modular by separating the logic within a few helper fu
 // Below code is written for typescript users
 const CustomEditor = {
     isMarkActive(editor: Editor, mark: string) {
-      const marks = Editor.marks(editor) as Record<string, unknown> | null;
-      return marks ? (marks as Record<string, boolean>)[mark] === true : false;
+      const marks = Editor.marks(editor)
+      return marks ? marks?.[mark] === true : false
     },
 
-    isBlockActive(editor: Editor, block: string) {
+    isBlockActive(editor: Editor, block: Element["type"]) {
       const [match] = Editor.nodes(editor, {
         match: (n) => Element.isElement(n) && n.type === block,
-      });
+      })
 
-      return match;
+      return !!match
     },
-
+    
     toggleMark(editor: Editor, mark: string) {
-      if (this.isMarkActive(editor, mark)) {
-        editor.removeMark(mark);
+      if (CustomEditor.isMarkActive(editor, mark)) {
+        editor.removeMark(mark)
       } else {
-        editor.addMark(mark, true);
+        editor.addMark(mark, true)
       }
     },
 
-    toggleBlock(editor: Editor, block: Element['type']) {
+    toggleBlock(editor: Editor, block: Element["type"]) {
       const isActive = CustomEditor.isBlockActive(editor, block)
       Transforms.setNodes(
         editor,
-        { type: isActive ? null : block },
-        { match: n => Element.isElement(n) && Editor.isBlock(editor, n) },
+        { type: isActive ? undefined : block },
+        {
+          match: (n) => Element.isElement(n) && Editor.isBlock(editor, n),
+        },
       )
     },
-  };
+  }
 
 const initialValue = [
   {
@@ -318,13 +320,13 @@ const App = () => {
           switch (event.key) {
             case '`': {
               event.preventDefault()
-              CustomEditor.toggleBlock(editor, "code");
+              CustomEditor.toggleBlock(editor, "code")
               break
             }
 
             case 'b': {
               event.preventDefault()
-              CustomEditor.toggleMark(editor, "bold");
+              CustomEditor.toggleMark(editor, "bold")
               break
             }
           }
