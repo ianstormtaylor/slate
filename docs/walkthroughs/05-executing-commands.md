@@ -271,15 +271,13 @@ const CustomEditor = {
       }
     },
 
-    toggleBlock(editor: Editor, block: string) {
-      const isActive = this.isBlockActive(editor, block);
+    toggleBlock(editor: Editor, block: Element['type']) {
+      const isActive = CustomEditor.isBlockActive(editor, block)
       Transforms.setNodes(
         editor,
-        { type: isActive ? undefined : block },
-        {
-          match: (n) => Element.isElement(n) && Editor.isBlock(editor, n),
-        },
-      );
+        { type: isActive ? null : block },
+        { match: n => Element.isElement(n) && Editor.isBlock(editor, n) },
+      )
     },
   };
 
