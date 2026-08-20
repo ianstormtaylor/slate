@@ -467,7 +467,9 @@ export const Editable = forwardRef(
 
         if (newDomRange) {
           if (ReactEditor.isComposing(editor) && !IS_ANDROID) {
-            domSelection.collapseToEnd()
+            if (domSelection.rangeCount > 0) {
+              domSelection.collapseToEnd()
+            }
           } else if (Range.isBackward(selection!)) {
             domSelection.setBaseAndExtent(
               newDomRange.endContainer,
