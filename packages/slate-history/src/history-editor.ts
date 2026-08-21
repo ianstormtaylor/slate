@@ -95,15 +95,17 @@ export const HistoryEditor = {
    * merged as usual.
    */
   withNewBatch(editor: HistoryEditor, fn: () => void): void {
-    const prev = HistoryEditor.isMerging(editor)
+    const prevMerging = HistoryEditor.isMerging(editor)
     const prevSplitting = HistoryEditor.isSplittingOnce(editor)
     MERGING.set(editor, true)
     SPLITTING_ONCE.set(editor, true)
     try {
       fn()
     } finally {
-      MERGING.set(editor, prev)
-      SPLITTING_ONCE.set(editor, prevSplitting)
+      MERGING.set(editor, prevMerging)
+      if (!prevSplitting) {
+        SPLITTING_ONCE.delete(editor)
+      }
     }
   },
 

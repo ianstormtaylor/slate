@@ -2,4 +2,4 @@
 'slate-history': patch
 ---
 
-fix: wrap withMerging, withNewBatch, and withoutMerging in try/finally to ensure state cleanup on error
+Fix `HistoryEditor.withMerging`, `HistoryEditor.withNewBatch` and `HistoryEditor.withoutMerging` leaving the history flags corrupted when `fn` throws, and a nested `withNewBatch` that applies no operation clearing the pending split of the enclosing `withNewBatch`.
