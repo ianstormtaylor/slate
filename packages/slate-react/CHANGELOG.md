@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.126.4
+
+### Patch Changes
+
+- [#6099](https://github.com/ianstormtaylor/slate/pull/6099) [`ad04f91c`](https://github.com/ianstormtaylor/slate/commit/ad04f91c7f2e9b254bea324eefff1707b6b13bc7) Thanks [@BetterAndBetterII](https://github.com/BetterAndBetterII)! - Skip `Selection.collapseToEnd()` during composition selection-sync when the live DOM selection has no ranges, so a cleared selection no longer throws `InvalidStateError` and unmounts the editor.
+
 ## 0.126.3
 
 ### Patch Changes
