@@ -12,10 +12,19 @@ const doRectsIntersect = (rect: DOMRect, compareRect: DOMRect) => {
 }
 
 const areRangesSameLine = (editor: DOMEditor, range1: Range, range2: Range) => {
-  const rect1 = DOMEditor.toDOMRange(editor, range1).getBoundingClientRect()
-  const rect2 = DOMEditor.toDOMRange(editor, range2).getBoundingClientRect()
+  try {
+    const domRange1 = DOMEditor.toDOMRange(editor, range1)
+    const domRange2 = DOMEditor.toDOMRange(editor, range2)
 
-  return doRectsIntersect(rect1, rect2) && doRectsIntersect(rect2, rect1)
+    if (!domRange1 || !domRange2) return false
+
+    const rect1 = domRange1.getBoundingClientRect()
+    const rect2 = domRange2.getBoundingClientRect()
+
+    return doRectsIntersect(rect1, rect2) && doRectsIntersect(rect2, rect1)
+  } catch {
+    return false
+  }
 }
 
 /**
