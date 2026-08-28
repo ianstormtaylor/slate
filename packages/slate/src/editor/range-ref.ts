@@ -6,10 +6,11 @@ export const rangeRef: EditorInterface['rangeRef'] = (
   range,
   options = {}
 ) => {
-  const { affinity = 'forward' } = options
+  const { affinity = 'forward', onChange = () => {} } = options
   const ref: RangeRef = {
     current: range,
     affinity,
+    onChange,
     unref() {
       const { current } = ref
       const rangeRefs = Editor.rangeRefs(editor)

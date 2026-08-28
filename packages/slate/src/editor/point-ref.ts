@@ -6,10 +6,11 @@ export const pointRef: EditorInterface['pointRef'] = (
   point,
   options = {}
 ) => {
-  const { affinity = 'forward' } = options
+  const { affinity = 'forward', onChange = () => {} } = options
   const ref: PointRef = {
     current: point,
     affinity,
+    onChange,
     unref() {
       const { current } = ref
       const pointRefs = Editor.pointRefs(editor)
