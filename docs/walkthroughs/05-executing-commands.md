@@ -262,7 +262,7 @@ const CustomEditor = {
 
       return !!match
     },
-    
+
     toggleMark(editor: Editor, mark: string) {
       if (CustomEditor.isMarkActive(editor, mark)) {
         editor.removeMark(mark)
