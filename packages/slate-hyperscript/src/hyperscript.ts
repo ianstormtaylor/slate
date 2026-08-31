@@ -73,10 +73,14 @@ const createHyperscript = (
 
 const createFactory = <T extends HyperscriptCreators>(creators: T) => {
   const jsx = <S extends keyof T & string>(
-    tagName: S,
+    tagName: S | Function,
     attributes?: Object,
     ...children: any[]
   ): ReturnType<T[S]> => {
+    if (typeof tagName === 'function') {
+      return tagName({ children, ...attributes })
+    }
+
     const creator = creators[tagName]
 
     if (!creator) {
