@@ -74,9 +74,9 @@ Find a native DOM range from a Slate `range`.
 
 Find a Slate node from a native DOM `element`.
 
-#### `ReactEditor.findEventRange(editor: ReactEditor, event: any): Range`
+#### `ReactEditor.findEventRange(editor: ReactEditor, event: any, options?: { suppressThrow?: boolean }): Range | null`
 
-Get the target range from a DOM `event`.
+Get the target range from a DOM `event`. The range is resolved from the event's coordinates, which can point outside of the editor even when the event's target lies inside it; with `suppressThrow: true` this returns `null` instead of throwing in that case.
 
 #### `ReactEditor.toSlatePoint(editor: ReactEditor, domPoint: DOMPoint): Point | null`
 
