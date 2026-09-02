@@ -284,5 +284,139 @@ describe('slate-react', () => {
         Transforms.select(editor, { path: [0, 0], offset: 2 })
       })
     })
+    describe('onDrop', () => {
+      const initialValue = [{ type: 'block', children: [{ text: 'test' }] }]
+
+      // jsdom implements neither `DataTransfer` nor `caretRangeFromPoint`
+      const makeDataTransfer = (text: string) =>
+        ({
+          getData: (type: string) => (type === 'text/plain' ? text : ''),
+          setData: () => {},
+        }) as unknown as DataTransfer
+
+      const renderEditor = () => {
+        const editor = withReact(createEditor())
+
+        act(() => {
+          render(
+            <Slate
+              editor={editor}
+              initialValue={initialValue}
+              onChange={() => {}}
+            >
+              <Editable />
+            </Slate>
+          )
+        })
+
+        return editor
+      }
+
+      const dispatch = async (
+        editor: ReactEditor,
+        type: 'dragstart' | 'drop',
+        text: string
+      ) => {
+        const event = new MouseEvent(type, {
+          bubbles: true,
+          cancelable: true,
+          clientX: 1,
+          clientY: 1,
+        })
+        Object.defineProperty(event, 'dataTransfer', {
+          value: makeDataTransfer(text),
+        })
+
+        await act(async () => {
+          ReactEditor.toDOMNode(editor, editor).dispatchEvent(event)
+        })
+      }
+
+      const resolveDropPositionTo = (node: Node, offset: number) => {
+        const caretRangeFromPoint = jest.fn(() => {
+          const range = document.createRange()
+          range.setStart(node, offset)
+          range.collapse(true)
+          return range
+        })
+        document.caretRangeFromPoint = caretRangeFromPoint
+        return caretRangeFromPoint
+      }
+
+      // A text node the browser can resolve the drop position to although the
+      // event's target is the editor, e.g. after the page scrolled during the drag.
+      let outside: HTMLElement | null = null
+      const renderTextOutsideEditor = () => {
+        outside = document.body.appendChild(document.createElement('p'))
+        outside.textContent = 'outside'
+        return outside.firstChild!
+      }
+
+      afterEach(() => {
+        delete (document as Partial<Document>).caretRangeFromPoint
+        outside?.remove()
+        outside = null
+      })
+
+      test('inserts the dropped data at the drop position', async () => {
+        const editor = renderEditor()
+        const text = ReactEditor.toDOMNode(editor, editor).querySelector(
+          '[data-slate-string]'
+        )!.firstChild!
+        resolveDropPositionTo(text, 2)
+
+        await dispatch(editor, 'drop', 'drop')
+
+        expect(editor.children).toEqual([
+          { type: 'block', children: [{ text: 'tedropst' }] },
+        ])
+      })
+
+      test('inserts at the selection when the drop position lies outside of the editor', async () => {
+        const editor = renderEditor()
+        const caretRangeFromPoint = resolveDropPositionTo(
+          renderTextOutsideEditor(),
+          7
+        )
+        await act(async () => {
+          Transforms.select(editor, { path: [0, 0], offset: 2 })
+        })
+
+        await dispatch(editor, 'drop', 'drop')
+
+        expect(caretRangeFromPoint).toHaveBeenCalled()
+        expect(editor.children).toEqual([
+          { type: 'block', children: [{ text: 'tedropst' }] },
+        ])
+      })
+
+      test('inserts at the end when the drop position lies outside of the editor and nothing is selected', async () => {
+        const editor = renderEditor()
+        resolveDropPositionTo(renderTextOutsideEditor(), 7)
+        expect(editor.selection).toBeNull()
+
+        await dispatch(editor, 'drop', 'drop')
+
+        expect(editor.children).toEqual([
+          { type: 'block', children: [{ text: 'testdrop' }] },
+        ])
+      })
+
+      test('leaves internally dragged content in place when the drop position lies outside of the editor', async () => {
+        const editor = renderEditor()
+        resolveDropPositionTo(renderTextOutsideEditor(), 7)
+        await act(async () => {
+          Transforms.select(editor, {
+            anchor: { path: [0, 0], offset: 0 },
+            focus: { path: [0, 0], offset: 2 },
+          })
+        })
+        await dispatch(editor, 'dragstart', 'te')
+
+        await dispatch(editor, 'drop', 'te')
+
+        expect(editor.children).toEqual(initialValue)
+      })
+    })
   })
 })
