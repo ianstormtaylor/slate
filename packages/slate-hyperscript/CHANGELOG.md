@@ -1,5 +1,15 @@
 # slate-hyperscript
 
+## 0.127.0
+
+### Minor Changes
+
+- [#6103](https://github.com/ianstormtaylor/slate/pull/6103) [`0e798d36`](https://github.com/ianstormtaylor/slate/commit/0e798d363fb593f5f2ac245b6f4b6d982e2784b8) Thanks [@12joan](https://github.com/12joan)! - Add support for JSX components (the `slate-hyperscript` equivalent of React components)
+
+### Patch Changes
+
+- [#6102](https://github.com/ianstormtaylor/slate/pull/6102) [`45a16ee5`](https://github.com/ianstormtaylor/slate/commit/45a16ee53fa7c54a551c755cb96af5cb39eb868d) Thanks [@12joan](https://github.com/12joan)! - Convert numbers to strings and ignore booleans, consistent with React JSX
+
 ## 0.125.0
 
 ### Minor Changes
