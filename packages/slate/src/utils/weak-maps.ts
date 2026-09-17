@@ -1,9 +1,16 @@
-import { Editor, Path, PathRef, PointRef, RangeRef } from '..'
+import { Descendant, Editor, Path, PathRef, PointRef, RangeRef } from '..'
 
 export const DIRTY_PATHS: WeakMap<Editor, Path[]> = new WeakMap()
 export const DIRTY_PATH_KEYS: WeakMap<Editor, Set<string>> = new WeakMap()
+
 export const FLUSHING: WeakMap<Editor, boolean> = new WeakMap()
 export const NORMALIZING: WeakMap<Editor, boolean> = new WeakMap()
+
 export const PATH_REFS: WeakMap<Editor, Set<PathRef>> = new WeakMap()
 export const POINT_REFS: WeakMap<Editor, Set<PointRef>> = new WeakMap()
 export const RANGE_REFS: WeakMap<Editor, Set<RangeRef>> = new WeakMap()
+
+export const MUTATED_CHILD_ARRAYS_IN_BATCH: WeakMap<
+  Editor,
+  WeakSet<Descendant[]>
+> = new WeakMap()
