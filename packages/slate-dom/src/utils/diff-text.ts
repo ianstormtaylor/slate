@@ -6,7 +6,6 @@ import {
   Point,
   PointTransformingOperation,
   Range,
-  RangeTransformingOperation,
 } from 'slate'
 import { EDITOR_TO_PENDING_DIFFS } from './weak-maps'
 
@@ -183,6 +182,8 @@ export function normalizePoint(editor: Editor, point: Point): Point | null {
     return null
   }
 
+  if (offset <= leaf.text.length) return point
+
   while (offset > leaf.text.length) {
     const entry = Editor.next(editor, { at: path, match: Node.isText })
     if (!entry || !Path.isDescendant(entry[1], parentBlock[1])) {
@@ -207,7 +208,7 @@ export function normalizeRange(editor: Editor, range: Range): Range | null {
   }
 
   if (Range.isCollapsed(range)) {
-    return { anchor, focus: anchor }
+    return anchor === range.anchor ? range : { anchor, focus: anchor }
   }
 
   const focus = normalizePoint(editor, range.focus)
@@ -215,6 +216,7 @@ export function normalizeRange(editor: Editor, range: Range): Range | null {
     return null
   }
 
+  if (anchor === range.anchor && focus === range.focus) return range
   return { anchor, focus }
 }
 
@@ -281,7 +283,7 @@ export function transformPendingPoint(
 export function transformPendingRange(
   editor: Editor,
   range: Range,
-  op: RangeTransformingOperation
+  op: PointTransformingOperation
 ): Range | null {
   const anchor = transformPendingPoint(editor, range.anchor, op)
   if (!anchor) {
@@ -302,7 +304,7 @@ export function transformPendingRange(
 
 export function transformTextDiff(
   textDiff: TextDiff,
-  op: RangeTransformingOperation
+  op: PointTransformingOperation
 ): TextDiff | null {
   const { path, diff, id } = textDiff
   const { start, end, text } = diff

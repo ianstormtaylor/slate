@@ -7,8 +7,8 @@ import {
   Operation,
   Path,
   Point,
+  PointTransformingOperation,
   Range,
-  RangeTransformingOperation,
   Scrubber,
   Selection,
   Text,
@@ -189,9 +189,7 @@ export const GeneralTransforms: GeneralTransforms = {
             }
           }
 
-          if (!selection || !Range.equals(selection, editor.selection)) {
-            editor.selection = selection
-          }
+          editor.selection = selection
         }
 
         break
@@ -342,16 +340,11 @@ export const GeneralTransforms: GeneralTransforms = {
     }
 
     if (transformSelection && editor.selection) {
-      const selection = Range.transform(
+      editor.selection = Range.transform(
         editor.selection,
-        op as RangeTransformingOperation, // transformSelection is only true for ops that transform ranges
+        op as PointTransformingOperation, // transformSelection is only true for ops that transform points
         { affinity: 'forward' }
       )
-
-      // TODO: once we have tests to validate that noops return the same object reference then this conditional can be removed
-      if (!selection || !Range.equals(selection, editor.selection)) {
-        editor.selection = selection
-      }
     }
   },
 }
