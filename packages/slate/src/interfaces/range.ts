@@ -279,7 +279,11 @@ export const Range: RangeInterface = {
 
     if (anchor === range.anchor && focus === range.focus) return range
 
-    if (Point.equals(anchor, focus)) return { anchor, focus: anchor }
+    // if this operation collapses the range, don't keep two refs in memory
+    if (Point.equals(anchor, focus))
+      return focus === range.focus
+        ? { anchor: focus, focus }
+        : { anchor, focus: anchor }
 
     return { anchor, focus }
   }) as RangeInterface['transform'],
