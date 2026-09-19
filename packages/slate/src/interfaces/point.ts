@@ -55,6 +55,12 @@ export interface PointInterface {
 
   /**
    * Transform a point by an operation.
+   * If the point is unaffected by the operation, it is returned as-is. If only the offset is affected, a new point with the same path object is returned.
+   *
+   * @param point The point to transform
+   * @param operation The operation to transform the point by
+   * @param options.affinity If the point is split, which side of the split to return, or to return `null` (passing `null` on `insert_text` coerces to "backward"). Defaults to `"forward"`.
+   * @returns A point representing where the input point would be after the operation is applied, or `null` if the point woould be removed.
    */
   transform(
     point: Point,

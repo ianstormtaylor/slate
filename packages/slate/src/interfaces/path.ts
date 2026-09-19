@@ -168,6 +168,12 @@ export interface PathInterface {
 
   /**
    * Transform a path by an operation.
+   * Unaffected paths are returned as-is. If a path is removed by an operation, `null` is returned.
+   *
+   * @param path The path to transform
+   * @param operation The operation to transform the path by
+   * @param options.affinity If the path is split, which side of the split to return, or to return `null`. Defaults to `"forward"`.
+   * @returns A path representing where the input path would be after the operation is applied, or `null` if the path woould be removed.
    */
   transform(
     path: Path,

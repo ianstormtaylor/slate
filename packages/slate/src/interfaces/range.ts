@@ -107,6 +107,14 @@ export interface RangeInterface {
 
   /**
    * Transform a range by an operation.
+   * If the range is unaffected by the operation, it is returned as-is.
+   * If one of the edges is unaffected by the operation, it is returned as-is, but the other edge is transformed and a new range is returned.
+   * If the resulting range is collapsed, it will be returned with a single point object for both the anchor and focus.
+   *
+   * @param range The range to transform
+   * @param operation The operation to transform the range by
+   * @param options.affinity If the range is split, which side of the split to return, or to return `null` (passing `null` on `insert_text` coerces to "backward"). Defaults to `"forward"`.
+   * @returns A range representing where the input range would be after the operation is applied, or `null` if the range woould be removed.
    */
   transform(
     range: Range,
