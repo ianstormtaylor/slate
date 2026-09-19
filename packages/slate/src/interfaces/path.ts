@@ -418,7 +418,7 @@ export const Path: PathInterface = {
 
     const opDepth = op.length - 1 // depth of the children array where the operation is performed
     const opEqOrAbovePath = commonDepth === op.length
-    const opEqualPath = commonDepth === path.length // only accurate because we can guarantee cd <= op.length <= p.length (except during move_node, but that doesnt use this value)
+    const opEqualPath = commonDepth === path.length // only accurate because we can guarantee commonDepth <= op.length <= path.length (except during move_node, but that doesnt use this value)
 
     // true if `op` is an earlier sibling of `path` or of one of its ancestors
     const opEndsBeforePath =

@@ -134,8 +134,6 @@ export type PointTransformingOperation =
   | PathTransformingOperation
   | TextOperation
 
-export type RangeTransformingOperation = PointTransformingOperation
-
 export type SelectionOperation = SetSelectionOperation
 
 export type TextOperation = InsertTextOperation | RemoveTextOperation
