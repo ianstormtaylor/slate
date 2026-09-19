@@ -35,13 +35,16 @@ const getPointAffinities = (
   let anchor: TextDirection | null | undefined
   let focus: TextDirection | null | undefined
 
-  if (affinity === 'inward') {
-    if (Range.isForward(range)) {
+  if (affinity === 'inward' || affinity === undefined) {
+    if (Range.isCollapsed(range)) {
       anchor = 'forward'
-      focus = Range.isCollapsed(range) ? anchor : 'backward'
+      focus = 'forward'
+    } else if (Range.isForward(range)) {
+      anchor = 'forward'
+      focus = 'backward'
     } else {
       anchor = 'backward'
-      focus = Range.isCollapsed(range) ? anchor : 'forward'
+      focus = 'forward'
     }
   } else if (affinity === 'outward') {
     if (Range.isForward(range)) {
@@ -104,6 +107,8 @@ describe('.transform', () => {
     callback: (args: {
       op: T
       range: Range
+      anchorNode: Text
+      focusNode: Text
       root: Editor
       createDuplicateTree: () => Editor
     }) => void
@@ -131,7 +136,14 @@ describe('.transform', () => {
             const anchorNode = Node.get(root, anchor.path) as Text
             const focusNode = Node.get(root, focus.path) as Text
             try {
-              callback({ op, range, root, createDuplicateTree })
+              callback({
+                op,
+                range,
+                anchorNode,
+                focusNode,
+                root,
+                createDuplicateTree,
+              })
             } catch (e) {
               if (!(e instanceof Error)) throw e
               const { node: _, ...slimmedOp } = op as T & { node?: unknown }
@@ -162,25 +174,10 @@ describe('.transform', () => {
 
   const testItAlwaysReUsesRefsWhenPossible = (ops: TestOps) => {
     return it('always re-uses refs when possible', () => {
-      const getTests = (
-        result: Range,
-        range: Range
-      ): [string, unknown, unknown][] => [
-        ['new range from old range', result, range],
-        ['new focus from new anchor', result.anchor, result.focus],
-        ['new anchor from old anchor', result.anchor, range.anchor],
-        [
-          'new anchor path from old anchor path',
-          result.anchor.path,
-          range.anchor.path,
-        ],
-        ['new focus from old focus', result.focus, range.focus],
-        [
-          'new focus path from old focus path',
-          result.focus.path,
-          range.focus.path,
-        ],
-      ]
+      function assertEqualOrDeeplyDifferent<T>(a: T, b: T, message: string) {
+        if (a === b) return
+        assert.notDeepEqual(a, b, message)
+      }
 
       forEachCase(ops, ({ op, range }) => {
         const affinitiesToTest = isEdgeOnSplitPoint(range, op)
@@ -190,39 +187,31 @@ describe('.transform', () => {
           const result = Range.transform(range, op, { affinity })
           if (!result) continue
           try {
+            // matching the input ref if possible is top priority, even if points within the input have duplicate refs.
             if (result === range) continue
-            assert.notDeepEqual(result, range, `identical result`)
-            if (result.anchor !== range.anchor) {
-              assert.notDeepEqual(
-                result.anchor,
-                range.anchor,
-                `identical anchor`
-              )
-              if (result.anchor.path !== range.anchor.path) {
-                assert.notDeepEqual(
-                  result.anchor,
-                  range.anchor,
-                  `identical path for anchor`
-                )
-              }
-            }
-            if (
-              result.focus !== result.anchor &&
-              result.focus !== range.focus
-            ) {
-              assert.notDeepEqual(result.focus, range.focus, `identical focus`)
-              if (result.focus.path !== range.focus.path) {
-                assert.notDeepEqual(
-                  result.focus,
-                  range.focus,
-                  `identical path for focus`
-                )
-              }
-            }
+
+            assertEqualOrDeeplyDifferent(result, range, `result`)
+            assertEqualOrDeeplyDifferent(result.anchor, range.anchor, `anchor`)
+            assertEqualOrDeeplyDifferent(
+              result.anchor.path,
+              range.anchor.path,
+              `anchor path`
+            )
+
+            // matching point refs for collapsed ranges is more important than the output focus matching the input focus.
+            if (result.focus === result.anchor) continue
+
+            assertEqualOrDeeplyDifferent(result.focus, result.anchor, `edges`)
+            assertEqualOrDeeplyDifferent(result.focus, range.focus, `focus`)
+            assertEqualOrDeeplyDifferent(
+              result.focus.path,
+              range.focus.path,
+              `focus path`
+            )
           } catch (e) {
             if (!(e instanceof Error)) throw e
             throw new Error(
-              `${e.message} with different ref for ${affinity} affinity`,
+              `identical ${e.message} with different ref for ${affinity} affinity`,
               { cause: e }
             )
           }
@@ -254,6 +243,37 @@ describe('.transform', () => {
     })
   }
 
+  const testItMatchesPointTransformOnEdges = (ops: TestOps) => {
+    return it('matches Point.transform on edges', () => {
+      forEachCase(ops, ({ op, range }) => {
+        const affinitiesToTest = isEdgeOnSplitPoint(range, op)
+          ? affinities
+          : [undefined]
+        for (const affinity of affinitiesToTest) {
+          const newRange = Range.transform(range, op, { affinity })
+
+          const pointAffinities = getPointAffinities(range, affinity)
+          const newAnchor = Point.transform(range.anchor, op, {
+            affinity: pointAffinities.anchor,
+          })
+          const newFocus = Point.transform(range.focus, op, {
+            affinity: pointAffinities.focus,
+          })
+
+          if (newRange === null) {
+            assert(
+              newAnchor === null || newFocus === null,
+              `expected edge to be null if range is null, but got newAnchor=${newAnchor} and newFocus=${newFocus}`
+            )
+          } else {
+            assert.deepEqual(newRange.anchor, newAnchor)
+            assert.deepEqual(newRange.focus, newFocus)
+          }
+        }
+      })
+    })
+  }
+
   describe('called with insert_node, remove_node, and move_node', () => {
     const ops: TestOps = {
       elementOps: [
@@ -278,34 +298,6 @@ describe('.transform', () => {
           // filter out illegal moves:
           .filter(op => op.newPath.length !== 0) // can't move the root
           .filter(op => !Path.isDescendant(op.newPath, op.path)), // can't become a descendant of yourself
-      ],
-    }
-
-    testItNeverMutatesInputs(ops)
-    testItAlwaysReUsesRefsWhenPossible(ops)
-    testItIsNotAffectedByAffinity(ops)
-
-    it('never changes offset when not null', () => {
-      forEachCase(ops, ({ op, range }) => {
-        const result = Range.transform(range, op)
-        if (!result) return
-        assert.equal(result.offset, range.offset)
-      })
-    })
-
-    it('matches Path.transform', () => {
-      forEachCase(ops, ({ op, range }) => {
-        const newRange = Range.transform(range, op)
-        const newPath = Path.transform(range.path, op)
-        assert.deepEqual(newRange === null ? null : newRange.path, newPath)
-      })
-    })
-  })
-
-  describe('called with merge_node', () => {
-    // this means operand will be merged into earlier sibling
-    const ops: TestOps<MergeNodeOperation> = {
-      elementOps: [
         {
           type: 'merge_node',
           path: elementOperandPath,
@@ -315,7 +307,7 @@ describe('.transform', () => {
               Path.previous(elementOperandPath)
             ) as Element
           ).children.length,
-          properties: { ...elementOperandNode, children: undefined },
+          properties: Node.extractProps(elementOperandNode),
         },
       ],
       textOps: [
@@ -328,37 +320,15 @@ describe('.transform', () => {
               Path.previous(textOperandPath)
             ) as Text
           ).text.length,
-          properties: { ...textOperandNode, text: undefined },
+          properties: Node.extractProps(textOperandNode),
         },
       ],
     }
 
     testItNeverMutatesInputs(ops)
     testItAlwaysReUsesRefsWhenPossible(ops)
-    testItNeverReturnsNull(ops)
     testItIsNotAffectedByAffinity(ops)
-
-    it('matches Transforms.transform with expected offset', () => {
-      forEachCase(ops, ({ op, range, node, createDuplicateTree }) => {
-        const newRange = Range.transform(range, op)
-
-        const anotherTree = createDuplicateTree()
-
-        Transforms.transform(anotherTree, op)
-        const nodeAtNewRange = Node.get(anotherTree, newRange.path) as Text
-        if (node.id === 'operand') {
-          assert.equal(
-            nodeAtNewRange.id,
-            'earlier sibling',
-            `does not match for operand merging into earlier sibling`
-          )
-          assert.equal(newRange.offset, range.offset + op.position)
-        } else {
-          assert.equal(nodeAtNewRange.id, node.id)
-          assert.equal(newRange.offset, range.offset)
-        }
-      })
-    })
+    testItMatchesPointTransformOnEdges(ops)
   })
 
   describe('called with split_node', () => {
@@ -373,11 +343,11 @@ describe('.transform', () => {
         },
       ],
       textOps: [
-        // this means operand will be split into two nodes containing "A" and "B" separately
+        // this means operand will be split into two nodes containing "ABC" and "DEF" separately
         {
           type: 'split_node',
           path: textOperandPath,
-          position: 1,
+          position: 3,
           properties: { id: 'split sibling' },
         },
       ],
@@ -385,17 +355,14 @@ describe('.transform', () => {
 
     testItNeverMutatesInputs(ops)
     testItAlwaysReUsesRefsWhenPossible(ops)
+    testItMatchesPointTransformOnEdges(ops)
 
-    it('only returns null at split range with null affinity', () => {
-      forEachCase(ops, ({ op, range, node }) => {
+    it('returns null if and only if edge is on split point with null affinity', () => {
+      forEachCase(ops, ({ op, range }) => {
         for (const affinity of affinities) {
           const newRange = Range.transform(range, op, { affinity })
-
-          if (
-            node.id === 'operand' &&
-            range.offset === op.position &&
-            affinity === null
-          ) {
+          isEdgeOnSplitPoint(range, op)
+          if (affinity === null && isEdgeOnSplitPoint(range, op)) {
             assert.equal(newRange, null, `null affinity`)
           } else {
             assert.notEqual(newRange, null, `${affinity} affinity`)
@@ -404,83 +371,69 @@ describe('.transform', () => {
       })
     })
 
-    it('is affected by affinity only at split range', () => {
-      forEachCase(ops, ({ op, range, node }) => {
-        if (node.id === 'operand' && range.offset === op.position) {
-          const backwardAffinity = Range.transform(range, op, {
-            affinity: 'backward',
-          })
-          const forwardAffinity = Range.transform(range, op, {
-            affinity: 'forward',
-          })
-          assert.notDeepEqual(backwardAffinity, forwardAffinity)
-          assert(
-            Range.isBefore(backwardAffinity, forwardAffinity),
-            `backward affinity ${backwardAffinity} should be before forward affinity ${forwardAffinity}`
-          )
-        } else {
-          const baseline = Range.transform(range, op)
-
-          for (const affinity of affinities) {
-            assert.deepEqual(
-              Range.transform(range, op, { affinity }),
-              baseline,
-              `${affinity} affinity should match baseline`
+    it('is affected by affinity if and only if edge is split', () => {
+      forEachCase(ops, ({ op, range, anchorNode, focusNode }) => {
+        for (const [edge, node] of [
+          ['anchor', anchorNode],
+          ['focus', focusNode],
+        ] as const) {
+          const point = range[edge]
+          if (node.id === 'operand' && point.offset === op.position) {
+            const backwardAffinity = Range.transform(range, op, {
+              affinity: 'backward',
+            })
+            const forwardAffinity = Range.transform(range, op, {
+              affinity: 'forward',
+            })
+            assert.notDeepEqual(
+              backwardAffinity,
+              forwardAffinity,
+              `${edge} edge`
             )
+            assert(
+              Point.isBefore(backwardAffinity[edge], forwardAffinity[edge]),
+              `backward affinity ${backwardAffinity} should be before forward affinity ${forwardAffinity} for ${edge} edge`
+            )
+          } else {
+            const baseline = Range.transform(range, op)
+
+            for (const affinity of affinities) {
+              assert.deepEqual(
+                Range.transform(range, op, { affinity }),
+                baseline,
+                `${affinity} affinity should match baseline for ${edge} edge`
+              )
+            }
           }
         }
       })
     })
 
-    it('defaults to forward affinity', () => {
-      const range = { path: textOperandPath, offset: 1 }
-      const noOptions = Range.transform(range, ops.textOps![0])
-      const undefinedAffinity = Range.transform(range, ops.textOps![0], {
-        affinity: undefined,
-      })
-      const forwardAffinity = Range.transform(range, ops.textOps![0], {
-        affinity: 'forward',
-      })
-      assert.deepEqual(
-        noOptions,
-        forwardAffinity,
-        `with no options has different result`
-      )
-      assert.deepEqual(
-        undefinedAffinity,
-        forwardAffinity,
-        `with undefined affinity has different result`
-      )
-    })
-
-    it('matches Transforms.transform with expected offset', () => {
-      forEachCase(ops, ({ op, range, node, createDuplicateTree }) => {
-        const newRange = Range.transform(range, op, {
-          affinity: 'forward',
-        })
-
-        const anotherTree = createDuplicateTree()
-
-        Transforms.transform(anotherTree, op)
-        const nodeAtNewRange = Node.get(anotherTree, newRange.path) as Text
-        if (node.id === 'operand' && range.offset >= op.position) {
-          assert.equal(nodeAtNewRange.id, op.properties.id)
-          assert.equal(newRange.offset, range.offset - op.position)
-
-          if (range.offset === op.position) {
-            const otherNewRange = Range.transform(range, op, {
-              affinity: 'backward',
-            })
-            const nodeAtOtherNewRange = Node.get(
-              anotherTree,
-              otherNewRange.path
-            )
-            assert.equal(nodeAtOtherNewRange.id, node.id)
-            assert.equal(otherNewRange.offset, range.offset)
-          }
-        } else {
-          assert.equal(nodeAtNewRange.id, node.id)
-          assert.equal(newRange.offset, range.offset)
+    it('defaults to inward affinity', () => {
+      forEachCase(ops, ({ op, range, anchorNode, focusNode }) => {
+        for (const [edge, node] of [
+          ['anchor', anchorNode],
+          ['focus', focusNode],
+        ] as const) {
+          const point = range[edge]
+          if (node.id !== 'operand' || point.offset !== op.position) continue
+          const noOptions = Point.transform(point, op)
+          const undefinedAffinity = Point.transform(point, op, {
+            affinity: undefined,
+          })
+          const inwardAffinity = Range.transform(range, op, {
+            affinity: 'inward',
+          })
+          assert.deepEqual(
+            noOptions,
+            inwardAffinity,
+            `with no options has different result`
+          )
+          assert.deepEqual(
+            undefinedAffinity,
+            inwardAffinity,
+            `with undefined affinity has different result`
+          )
         }
       })
     })
@@ -507,80 +460,71 @@ describe('.transform', () => {
     testItNeverMutatesInputs(ops)
     testItAlwaysReUsesRefsWhenPossible(ops)
     testItNeverReturnsNull(ops)
+    testItMatchesPointTransformOnEdges(ops)
 
-    it('always returns the same path', () => {
-      forEachCase(ops, ({ op, range }) => {
-        assert.equal(Range.transform(range, op).path, range.path)
-      })
-    })
-
-    it('is affected by affinity only at insertion range', () => {
-      forEachCase(ops, ({ op, range, node }) => {
-        if (node.id === 'operand' && range.offset === op.offset) {
-          const backwardAffinity = Range.transform(range, op, {
-            affinity: 'backward',
-          })
-          const forwardAffinity = Range.transform(range, op, {
-            affinity: 'forward',
-          })
-          assert.deepEqual(backwardAffinity.path, forwardAffinity.path)
-          assert.equal(
-            forwardAffinity.offset,
-            backwardAffinity.offset + op.text.length
-          )
-        } else {
-          const baseline = Range.transform(range, op)
-
-          for (const affinity of affinities) {
-            assert.deepEqual(
-              Range.transform(range, op, { affinity }),
-              baseline,
-              `${affinity} affinity should match baseline`
+    it('is affected by affinity if and only if insertion on edge', () => {
+      forEachCase(ops, ({ op, range, anchorNode, focusNode }) => {
+        for (const [edge, node] of [
+          ['anchor', anchorNode],
+          ['focus', focusNode],
+        ] as const) {
+          const point = range[edge]
+          if (node.id === 'operand' && point.offset === op.offset) {
+            const backwardAffinity = Range.transform(range, op, {
+              affinity: 'backward',
+            })
+            const forwardAffinity = Range.transform(range, op, {
+              affinity: 'forward',
+            })
+            assert.notDeepEqual(
+              backwardAffinity,
+              forwardAffinity,
+              `${edge} edge`
             )
+            assert(
+              Point.isBefore(backwardAffinity[edge], forwardAffinity[edge]),
+              `backward affinity ${backwardAffinity} should be before forward affinity ${forwardAffinity} for ${edge} edge`
+            )
+          } else {
+            const baseline = Range.transform(range, op)
+
+            for (const affinity of affinities) {
+              assert.deepEqual(
+                Range.transform(range, op, { affinity }),
+                baseline,
+                `${affinity} affinity should match baseline for ${edge} edge`
+              )
+            }
           }
         }
       })
     })
 
-    it('defaults to forward affinity', () => {
-      const range = { path: textOperandPath, offset: 1 }
-      const noOptions = Range.transform(range, ops.textOps![0])
-      const undefinedAffinity = Range.transform(range, ops.textOps![0], {
-        affinity: undefined,
-      })
-      const forwardAffinity = Range.transform(range, ops.textOps![0], {
-        affinity: 'forward',
-      })
-      assert.deepEqual(
-        noOptions,
-        forwardAffinity,
-        `with no options has different result`
-      )
-      assert.deepEqual(
-        undefinedAffinity,
-        forwardAffinity,
-        `with undefined affinity has different result`
-      )
-    })
-
-    it('has expected offset at insertion node', () => {
-      forEachCase(ops, ({ op, range, node }) => {
-        if (node.id !== 'operand') return // we only need to test the operand
-        const newRange = Range.transform(range, op, {
-          affinity: 'forward',
-        })
-
-        if (range.offset >= op.offset) {
-          assert.equal(newRange.offset, range.offset + op.text.length)
-
-          if (range.offset === op.offset) {
-            const otherNewRange = Range.transform(range, op, {
-              affinity: 'backward',
-            })
-            assert.equal(otherNewRange.offset, range.offset)
-          }
-        } else {
-          assert.equal(newRange.offset, range.offset)
+    it('defaults to inward affinity', () => {
+      forEachCase(ops, ({ op, range, anchorNode, focusNode }) => {
+        for (const [edge, node] of [
+          ['anchor', anchorNode],
+          ['focus', focusNode],
+        ] as const) {
+          const point = range[edge]
+          if (node.id !== 'operand' || point.offset !== op.offset) continue
+          const noOptions = Point.transform(point, op)
+          const undefinedAffinity = Point.transform(point, op, {
+            affinity: undefined,
+          })
+          const inwardAffinity = Range.transform(range, op, {
+            affinity: 'inward',
+          })
+          assert.deepEqual(
+            noOptions,
+            inwardAffinity,
+            `with no options has different result`
+          )
+          assert.deepEqual(
+            undefinedAffinity,
+            inwardAffinity,
+            `with undefined affinity has different result`
+          )
         }
       })
     })
@@ -608,27 +552,7 @@ describe('.transform', () => {
     testItAlwaysReUsesRefsWhenPossible(ops)
     testItNeverReturnsNull(ops)
     testItIsNotAffectedByAffinity(ops)
-
-    it('always returns the same path', () => {
-      forEachCase(ops, ({ op, range }) => {
-        assert.equal(Range.transform(range, op).path, range.path)
-      })
-    })
-
-    it('has expected offset at removal node', () => {
-      forEachCase(ops, ({ op, range, node }) => {
-        if (node.id !== 'operand') return // we only need to test the operand
-        const newRange = Range.transform(range, op)
-
-        if (range.offset > op.offset + op.text.length) {
-          assert.equal(newRange.offset, range.offset - op.text.length) // after removal
-        } else if (range.offset > op.offset) {
-          assert.equal(newRange.offset, op.offset) // within removal
-        } else {
-          assert.equal(newRange.offset, range.offset) // before removal
-        }
-      })
-    })
+    testItMatchesPointTransformOnEdges(ops)
   })
 
   describe('called with other operations', () => {

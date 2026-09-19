@@ -233,7 +233,7 @@ describe('.transform', () => {
               Path.previous(elementOperandPath)
             ) as Element
           ).children.length,
-          properties: { ...elementOperandNode, children: undefined },
+          properties: Node.extractProps(elementOperandNode),
         },
       ],
       textOps: [
@@ -246,7 +246,7 @@ describe('.transform', () => {
               Path.previous(textOperandPath)
             ) as Text
           ).text.length,
-          properties: { ...textOperandNode, text: undefined },
+          properties: Node.extractProps(textOperandNode),
         },
       ],
     }
@@ -291,11 +291,11 @@ describe('.transform', () => {
         },
       ],
       textOps: [
-        // this means operand will be split into two nodes containing "A" and "B" separately
+        // this means operand will be split into two nodes containing "ABC" and "DEF" separately
         {
           type: 'split_node',
           path: textOperandPath,
-          position: 1,
+          position: 3,
           properties: { id: 'split sibling' },
         },
       ],
@@ -304,7 +304,7 @@ describe('.transform', () => {
     testItNeverMutatesInputs(ops)
     testItAlwaysReUsesRefsWhenPossible(ops)
 
-    it('only returns null at split point with null affinity', () => {
+    it('returns null at and only at split point with null affinity', () => {
       forEachCase(ops, ({ op, point, node }) => {
         for (const affinity of affinities) {
           const newPoint = Point.transform(point, op, { affinity })
@@ -322,7 +322,7 @@ describe('.transform', () => {
       })
     })
 
-    it('is affected by affinity only at split point', () => {
+    it('is affected by affinity at and only at split point', () => {
       forEachCase(ops, ({ op, point, node }) => {
         if (node.id === 'operand' && point.offset === op.position) {
           const backwardAffinity = Point.transform(point, op, {
@@ -343,7 +343,7 @@ describe('.transform', () => {
             assert.deepEqual(
               Point.transform(point, op, { affinity }),
               baseline,
-              `${affinity} affinity should match baseline`
+              `${affinity} affinity doesn't match baseline`
             )
           }
         }
@@ -405,7 +405,7 @@ describe('.transform', () => {
   })
 
   describe('called with insert_text', () => {
-    const ops: TestOps<InsertTextOperation> = {
+    const ops = {
       textOps: [
         {
           type: 'insert_text',
@@ -420,7 +420,7 @@ describe('.transform', () => {
           text: '',
         },
       ],
-    }
+    } satisfies TestOps<InsertTextOperation>
 
     testItNeverMutatesInputs(ops)
     testItAlwaysReUsesRefsWhenPossible(ops)
@@ -432,7 +432,7 @@ describe('.transform', () => {
       })
     })
 
-    it('is affected by affinity only at insertion point', () => {
+    it('is affected by affinity at and only at insertion point', () => {
       forEachCase(ops, ({ op, point, node }) => {
         if (node.id === 'operand' && point.offset === op.offset) {
           const backwardAffinity = Point.transform(point, op, {
@@ -445,6 +445,10 @@ describe('.transform', () => {
           assert.equal(
             forwardAffinity.offset,
             backwardAffinity.offset + op.text.length
+          )
+          assert(
+            Point.isBefore(backwardAffinity, forwardAffinity),
+            `backward affinity ${backwardAffinity} should be before forward affinity ${forwardAffinity}`
           )
         } else {
           const baseline = Point.transform(point, op)
@@ -461,12 +465,13 @@ describe('.transform', () => {
     })
 
     it('defaults to forward affinity', () => {
+      const op = ops.textOps[0]
       const point = { path: textOperandPath, offset: 1 }
-      const noOptions = Point.transform(point, ops.textOps![0])
-      const undefinedAffinity = Point.transform(point, ops.textOps![0], {
+      const noOptions = Point.transform(point, op)
+      const undefinedAffinity = Point.transform(point, op, {
         affinity: undefined,
       })
-      const forwardAffinity = Point.transform(point, ops.textOps![0], {
+      const forwardAffinity = Point.transform(point, op, {
         affinity: 'forward',
       })
       assert.deepEqual(
@@ -481,22 +486,17 @@ describe('.transform', () => {
       )
     })
 
-    it('has expected offset at insertion node', () => {
+    it('changes offset only in the insertion node', () => {
       forEachCase(ops, ({ op, point, node }) => {
-        if (node.id !== 'operand') return // we only need to test the operand
-        const newPoint = Point.transform(point, op, {
-          affinity: 'forward',
-        })
-
-        if (point.offset >= op.offset) {
+        const newPoint = Point.transform(point, op)
+        if (node.id === 'operand' && point.offset > op.offset) {
           assert.equal(newPoint.offset, point.offset + op.text.length)
-
-          if (point.offset === op.offset) {
-            const otherNewPoint = Point.transform(point, op, {
-              affinity: 'backward',
-            })
-            assert.equal(otherNewPoint.offset, point.offset)
-          }
+        } else if (node.id === 'operand' && point.offset === op.offset) {
+          const otherNewPoint = Point.transform(point, op, {
+            affinity: 'backward',
+          })
+          assert.equal(newPoint.offset, point.offset + op.text.length)
+          assert.equal(otherNewPoint.offset, point.offset)
         } else {
           assert.equal(newPoint.offset, point.offset)
         }
@@ -533,17 +533,18 @@ describe('.transform', () => {
       })
     })
 
-    it('has expected offset at removal node', () => {
+    it('changes offset only in the insertion node', () => {
       forEachCase(ops, ({ op, point, node }) => {
-        if (node.id !== 'operand') return // we only need to test the operand
         const newPoint = Point.transform(point, op)
-
-        if (point.offset > op.offset + op.text.length) {
-          assert.equal(newPoint.offset, point.offset - op.text.length) // after removal
-        } else if (point.offset > op.offset) {
-          assert.equal(newPoint.offset, op.offset) // within removal
+        if (
+          node.id === 'operand' &&
+          point.offset > op.offset + op.text.length
+        ) {
+          assert.equal(newPoint.offset, point.offset - op.text.length) // after removal range
+        } else if (node.id === 'operand' && point.offset > op.offset) {
+          assert.equal(newPoint.offset, op.offset) // within removal range
         } else {
-          assert.equal(newPoint.offset, point.offset) // before removal
+          assert.equal(newPoint.offset, point.offset) // different node or before removal range
         }
       })
     })
