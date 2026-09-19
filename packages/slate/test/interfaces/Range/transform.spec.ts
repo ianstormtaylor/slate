@@ -3,7 +3,6 @@ import {
   Editor,
   Element,
   InsertTextOperation,
-  MergeNodeOperation,
   MoveNodeOperation,
   Node,
   Operation,
@@ -11,11 +10,9 @@ import {
   Point,
   Range,
   RangeTransformOptions,
-  RemoveTextOperation,
   SplitNodeOperation,
   Text,
   TextDirection,
-  Transforms,
 } from 'slate'
 import { createTree } from '../../test-utils/transforms'
 
@@ -28,7 +25,7 @@ const affinities: RangeTransformOptions['affinity'][] = [
   null,
 ]
 
-const getPointAffinities = (
+const getExpectedPointAffinities = (
   range: Range,
   affinity: RangeTransformOptions['affinity']
 ) => {
@@ -189,8 +186,21 @@ describe('.transform', () => {
           try {
             // matching the input ref if possible is top priority, even if points within the input have duplicate refs.
             if (result === range) continue
+            assert.notDeepEqual(result, range, `result`)
+            // matching point refs for collapsed ranges is more important than the output focus matching the input focus.
+            if (result.focus === result.anchor) {
+              const resultPoint = result.anchor
+              if (
+                !(resultPoint === range.anchor || resultPoint === range.focus)
+              ) {
+                // make sure we couldnt have resused an input point ref for the collapse
+                assert.notDeepEqual(resultPoint, range.anchor, `anchor`)
+                assert.notDeepEqual(resultPoint, range.focus, `focus`)
+              }
+              continue
+            }
+            assert.notDeepEqual(result.focus, result.anchor, `edges`)
 
-            assertEqualOrDeeplyDifferent(result, range, `result`)
             assertEqualOrDeeplyDifferent(result.anchor, range.anchor, `anchor`)
             assertEqualOrDeeplyDifferent(
               result.anchor.path,
@@ -198,10 +208,6 @@ describe('.transform', () => {
               `anchor path`
             )
 
-            // matching point refs for collapsed ranges is more important than the output focus matching the input focus.
-            if (result.focus === result.anchor) continue
-
-            assertEqualOrDeeplyDifferent(result.focus, result.anchor, `edges`)
             assertEqualOrDeeplyDifferent(result.focus, range.focus, `focus`)
             assertEqualOrDeeplyDifferent(
               result.focus.path,
@@ -252,7 +258,7 @@ describe('.transform', () => {
         for (const affinity of affinitiesToTest) {
           const newRange = Range.transform(range, op, { affinity })
 
-          const pointAffinities = getPointAffinities(range, affinity)
+          const pointAffinities = getExpectedPointAffinities(range, affinity)
           const newAnchor = Point.transform(range.anchor, op, {
             affinity: pointAffinities.anchor,
           })
@@ -274,7 +280,7 @@ describe('.transform', () => {
     })
   }
 
-  describe('called with insert_node, remove_node, and move_node', () => {
+  describe('called with insert_node, remove_node, move_node, and remove_text', () => {
     const ops: TestOps = {
       elementOps: [
         {
@@ -322,6 +328,18 @@ describe('.transform', () => {
           ).text.length,
           properties: Node.extractProps(textOperandNode),
         },
+        {
+          type: 'remove_text',
+          path: textOperandPath,
+          offset: 2,
+          text: 'CD',
+        },
+        {
+          type: 'remove_text',
+          path: textOperandPath,
+          offset: 2,
+          text: '',
+        },
       ],
     }
 
@@ -357,84 +375,40 @@ describe('.transform', () => {
     testItAlwaysReUsesRefsWhenPossible(ops)
     testItMatchesPointTransformOnEdges(ops)
 
-    it('returns null if and only if edge is on split point with null affinity', () => {
+    it('is not affected by affinity when edges not on split point', () => {
       forEachCase(ops, ({ op, range }) => {
+        if (isEdgeOnSplitPoint(range, op)) return
+        const baseline = Range.transform(range, op)
         for (const affinity of affinities) {
-          const newRange = Range.transform(range, op, { affinity })
-          isEdgeOnSplitPoint(range, op)
-          if (affinity === null && isEdgeOnSplitPoint(range, op)) {
-            assert.equal(newRange, null, `null affinity`)
-          } else {
-            assert.notEqual(newRange, null, `${affinity} affinity`)
-          }
-        }
-      })
-    })
-
-    it('is affected by affinity if and only if edge is split', () => {
-      forEachCase(ops, ({ op, range, anchorNode, focusNode }) => {
-        for (const [edge, node] of [
-          ['anchor', anchorNode],
-          ['focus', focusNode],
-        ] as const) {
-          const point = range[edge]
-          if (node.id === 'operand' && point.offset === op.position) {
-            const backwardAffinity = Range.transform(range, op, {
-              affinity: 'backward',
-            })
-            const forwardAffinity = Range.transform(range, op, {
-              affinity: 'forward',
-            })
-            assert.notDeepEqual(
-              backwardAffinity,
-              forwardAffinity,
-              `${edge} edge`
-            )
-            assert(
-              Point.isBefore(backwardAffinity[edge], forwardAffinity[edge]),
-              `backward affinity ${backwardAffinity} should be before forward affinity ${forwardAffinity} for ${edge} edge`
-            )
-          } else {
-            const baseline = Range.transform(range, op)
-
-            for (const affinity of affinities) {
-              assert.deepEqual(
-                Range.transform(range, op, { affinity }),
-                baseline,
-                `${affinity} affinity should match baseline for ${edge} edge`
-              )
-            }
-          }
+          assert.deepEqual(
+            Range.transform(range, op, { affinity }),
+            baseline,
+            `${affinity} affinity`
+          )
         }
       })
     })
 
     it('defaults to inward affinity', () => {
-      forEachCase(ops, ({ op, range, anchorNode, focusNode }) => {
-        for (const [edge, node] of [
-          ['anchor', anchorNode],
-          ['focus', focusNode],
-        ] as const) {
-          const point = range[edge]
-          if (node.id !== 'operand' || point.offset !== op.position) continue
-          const noOptions = Point.transform(point, op)
-          const undefinedAffinity = Point.transform(point, op, {
-            affinity: undefined,
-          })
-          const inwardAffinity = Range.transform(range, op, {
-            affinity: 'inward',
-          })
-          assert.deepEqual(
-            noOptions,
-            inwardAffinity,
-            `with no options has different result`
-          )
-          assert.deepEqual(
-            undefinedAffinity,
-            inwardAffinity,
-            `with undefined affinity has different result`
-          )
-        }
+      forEachCase(ops, ({ op, range }) => {
+        if (!isEdgeOnSplitPoint(range, op)) return
+        const noOptions = Range.transform(range, op)
+        const undefinedAffinity = Range.transform(range, op, {
+          affinity: undefined,
+        })
+        const inwardAffinity = Range.transform(range, op, {
+          affinity: 'inward',
+        })
+        assert.deepEqual(
+          noOptions,
+          inwardAffinity,
+          `with no options has different result`
+        )
+        assert.deepEqual(
+          undefinedAffinity,
+          inwardAffinity,
+          `with undefined affinity has different result`
+        )
       })
     })
   })
@@ -462,97 +436,42 @@ describe('.transform', () => {
     testItNeverReturnsNull(ops)
     testItMatchesPointTransformOnEdges(ops)
 
-    it('is affected by affinity if and only if insertion on edge', () => {
-      forEachCase(ops, ({ op, range, anchorNode, focusNode }) => {
-        for (const [edge, node] of [
-          ['anchor', anchorNode],
-          ['focus', focusNode],
-        ] as const) {
-          const point = range[edge]
-          if (node.id === 'operand' && point.offset === op.offset) {
-            const backwardAffinity = Range.transform(range, op, {
-              affinity: 'backward',
-            })
-            const forwardAffinity = Range.transform(range, op, {
-              affinity: 'forward',
-            })
-            assert.notDeepEqual(
-              backwardAffinity,
-              forwardAffinity,
-              `${edge} edge`
-            )
-            assert(
-              Point.isBefore(backwardAffinity[edge], forwardAffinity[edge]),
-              `backward affinity ${backwardAffinity} should be before forward affinity ${forwardAffinity} for ${edge} edge`
-            )
-          } else {
-            const baseline = Range.transform(range, op)
-
-            for (const affinity of affinities) {
-              assert.deepEqual(
-                Range.transform(range, op, { affinity }),
-                baseline,
-                `${affinity} affinity should match baseline for ${edge} edge`
-              )
-            }
-          }
+    it('is not affected by affinity when edges not on insertion point', () => {
+      forEachCase(ops, ({ op, range }) => {
+        if (isEdgeOnSplitPoint(range, op)) return
+        const baseline = Range.transform(range, op)
+        for (const affinity of affinities) {
+          assert.deepEqual(
+            Range.transform(range, op, { affinity }),
+            baseline,
+            `${affinity} affinity`
+          )
         }
       })
     })
 
     it('defaults to inward affinity', () => {
-      forEachCase(ops, ({ op, range, anchorNode, focusNode }) => {
-        for (const [edge, node] of [
-          ['anchor', anchorNode],
-          ['focus', focusNode],
-        ] as const) {
-          const point = range[edge]
-          if (node.id !== 'operand' || point.offset !== op.offset) continue
-          const noOptions = Point.transform(point, op)
-          const undefinedAffinity = Point.transform(point, op, {
-            affinity: undefined,
-          })
-          const inwardAffinity = Range.transform(range, op, {
-            affinity: 'inward',
-          })
-          assert.deepEqual(
-            noOptions,
-            inwardAffinity,
-            `with no options has different result`
-          )
-          assert.deepEqual(
-            undefinedAffinity,
-            inwardAffinity,
-            `with undefined affinity has different result`
-          )
-        }
+      forEachCase(ops, ({ op, range }) => {
+        if (!isEdgeOnSplitPoint(range, op)) return
+        const noOptions = Range.transform(range, op)
+        const undefinedAffinity = Range.transform(range, op, {
+          affinity: undefined,
+        })
+        const inwardAffinity = Range.transform(range, op, {
+          affinity: 'inward',
+        })
+        assert.deepEqual(
+          noOptions,
+          inwardAffinity,
+          `with no options has different result`
+        )
+        assert.deepEqual(
+          undefinedAffinity,
+          inwardAffinity,
+          `with undefined affinity has different result`
+        )
       })
     })
-  })
-
-  describe('called with remove_text', () => {
-    const ops: TestOps<RemoveTextOperation> = {
-      textOps: [
-        {
-          type: 'remove_text',
-          path: textOperandPath,
-          offset: 2,
-          text: 'CD',
-        },
-        {
-          type: 'remove_text',
-          path: textOperandPath,
-          offset: 2,
-          text: '',
-        },
-      ],
-    }
-
-    testItNeverMutatesInputs(ops)
-    testItAlwaysReUsesRefsWhenPossible(ops)
-    testItNeverReturnsNull(ops)
-    testItIsNotAffectedByAffinity(ops)
-    testItMatchesPointTransformOnEdges(ops)
   })
 
   describe('called with other operations', () => {

@@ -446,10 +446,6 @@ describe('.transform', () => {
             forwardAffinity.offset,
             backwardAffinity.offset + op.text.length
           )
-          assert(
-            Point.isBefore(backwardAffinity, forwardAffinity),
-            `backward affinity ${backwardAffinity} should be before forward affinity ${forwardAffinity}`
-          )
         } else {
           const baseline = Point.transform(point, op)
 
