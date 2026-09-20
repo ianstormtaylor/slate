@@ -6,82 +6,76 @@ export const createTree = (
   operandType: 'element' | 'text' = 'element'
 ): Editor => (
   <editor id="root">
-    <block id="earlier sibling of ancestor">
-      <block id="child of earler sibling of ancestor">
-        <text id="descendant of earler sibling of ancestor">AB</text>
-      </block>
-    </block>
-    <block id="ancestor">
+    <element id="earlier sibling of ancestor">
+      <element id="child of earlier sibling of ancestor">
+        <text id="descendant of earlier sibling of ancestor">AB</text>
+      </element>
+    </element>
+    <element id="ancestor">
       <text id="earliest sibling of parent">AB</text>
-      <inline id="earlier sibling of parent">
-        <text id="before child of earler sibling of parent">AB</text>
-        <inline id="child of earler sibling of parent">
-          <text id="descendant of earler sibling of parent">AB</text>
-        </inline>
-        <text id="after child of earler sibling of parent">AB</text>
-      </inline>
-      <text id="before parent">AB</text>
+      <element id="earlier sibling of parent">
+        <element id="child of earlier sibling of parent">
+          <text id="descendant of earlier sibling of parent">AB</text>
+        </element>
+      </element>
       {operandType === 'element' ? (
-        <inline id="parent">
+        <element id="parent">
           <text id="earliest sibling">AB</text>
-          <inline id="earlier sibling">
-            <text id="before child of earlier sibling">AB</text>
-            <inline id="child of earlier sibling">
+          <element id="earlier sibling">
+            <element id="first child of earlier sibling">
               <text id="descendant of earlier sibling">AB</text>
-            </inline>
-            <text id="after child of earlier sibling">AB</text>
-          </inline>
-          <inline id="operand">
-            <text id="before child">AB</text>
-            <inline id="child">
+            </element>
+            <text id="second child of earlier sibling">AB</text>
+            <text id="third child of earlier sibling">AB</text>
+          </element>
+          <element id="operand">
+            <element id="first child">
               <text id="descendant">AB</text>
-            </inline>
-            <text id="after child">AB</text>
-          </inline>
-          <inline id="later sibling">
-            <text id="before child of later sibling">AB</text>
-            <inline id="child of later sibling">
+            </element>
+            <text id="second child">AB</text>
+            <text id="third child">AB</text>
+          </element>
+          <element id="later sibling">
+            <element id="first child of later sibling">
               <text id="descendant of later sibling">AB</text>
-            </inline>
-            <text id="after child of later sibling">AB</text>
-          </inline>
+            </element>
+            <text id="second child of later sibling">AB</text>
+            <text id="third child of later sibling">AB</text>
+          </element>
           <text id="latest sibling">AB</text>
-        </inline>
+        </element>
       ) : (
-        <inline id="parent">
-          <inline id="earliest sibling">
-            <text id="before child of earliest sibling">AB</text>
-            <inline id="child of earliest sibling">
+        <element id="parent">
+          <element id="earliest sibling">
+            <element id="first child of earliest sibling">
               <text id="descendant of earliest sibling">AB</text>
-            </inline>
-            <text id="after child of earliest sibling">AB</text>
-          </inline>
+            </element>
+            <text id="second child of earliest sibling">AB</text>
+            <text id="third child of earliest sibling">AB</text>
+          </element>
           <text id="earlier sibling">AB</text>
           <text id="operand">ABCDEF</text>
           <text id="later sibling">AB</text>
-          <inline id="latest sibling">
-            <text id="before child of latest sibling">AB</text>
-            <inline id="child of latest sibling">
+          <element id="latest sibling">
+            <element id="first child of latest sibling">
               <text id="descendant of latest sibling">AB</text>
-            </inline>
-            <text id="after child of latest sibling">AB</text>
-          </inline>
-        </inline>
+            </element>
+            <text id="second child of latest sibling">AB</text>
+            <text id="third child of latest sibling">AB</text>
+          </element>
+        </element>
       )}
-      <text id="after parent">AB</text>
-      <inline id="later sibling of parent">
-        <text id="before child of later sibling of parent">AB</text>
-        <inline id="child of later sibling of parent">
+      <element id="later sibling of parent">
+        <element id="child of later sibling of parent">
           <text id="descendant of later sibling of parent">AB</text>
-        </inline>
-        <text id="after child of later sibling of parent">AB</text>
-      </inline>
+        </element>
+      </element>
       <text id="latest sibling of parent">AB</text>
-    </block>
-    <block id="later sibling of ancestor">
-      <block id="child of later sibling of ancestor">
+    </element>
+    <element id="later sibling of ancestor">
+      <element id="child of later sibling of ancestor">
         <text id="descendant of later sibling of ancestor">AB</text>
-      </block>
-    </block>
+      </element>
+    </element>
   </editor>
 )
