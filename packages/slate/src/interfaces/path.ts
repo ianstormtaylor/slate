@@ -402,7 +402,7 @@ export const Path: PathInterface = {
 
     // PERF: Exit early if the operation is guaranteed not to have an effect.
     if (path.length === 0) {
-      return p
+      return path
     }
 
     switch (operation.type) {
@@ -415,6 +415,7 @@ export const Path: PathInterface = {
           Path.isAncestor(op, p)
         ) {
           p[op.length - 1] += 1
+          return p
         }
 
         break
@@ -427,6 +428,7 @@ export const Path: PathInterface = {
           return null
         } else if (Path.endsBefore(op, p)) {
           p[op.length - 1] -= 1
+          return p
         }
 
         break
@@ -437,9 +439,11 @@ export const Path: PathInterface = {
 
         if (Path.equals(op, p) || Path.endsBefore(op, p)) {
           p[op.length - 1] -= 1
+          return p
         } else if (Path.isAncestor(op, p)) {
           p[op.length - 1] -= 1
           p[op.length] += position
+          return p
         }
 
         break
@@ -451,6 +455,7 @@ export const Path: PathInterface = {
         if (Path.equals(op, p)) {
           if (affinity === 'forward') {
             p[p.length - 1] += 1
+            return p
           } else if (affinity === 'backward') {
             // Nothing, because it still refers to the right path.
           } else {
@@ -458,9 +463,11 @@ export const Path: PathInterface = {
           }
         } else if (Path.endsBefore(op, p)) {
           p[op.length - 1] += 1
+          return p
         } else if (Path.isAncestor(op, p) && path[op.length] >= position) {
           p[op.length - 1] += 1
           p[op.length] -= position
+          return p
         }
 
         break
@@ -471,7 +478,7 @@ export const Path: PathInterface = {
 
         // If the old and new path are the same, it's a no-op.
         if (Path.equals(op, onp)) {
-          return p
+          return path
         }
 
         if (Path.isAncestor(op, p) || Path.equals(op, p)) {
@@ -488,8 +495,10 @@ export const Path: PathInterface = {
         ) {
           if (Path.endsBefore(op, p)) {
             p[op.length - 1] -= 1
+            return p
           } else {
             p[op.length - 1] += 1
+            return p
           }
         } else if (
           Path.endsBefore(onp, p) ||
@@ -501,18 +510,20 @@ export const Path: PathInterface = {
           }
 
           p[onp.length - 1] += 1
+          return p
         } else if (Path.endsBefore(op, p)) {
           if (Path.equals(onp, p)) {
             p[onp.length - 1] += 1
           }
 
           p[op.length - 1] -= 1
+          return p
         }
 
         break
       }
     }
 
-    return p
+    return path
   },
 }
