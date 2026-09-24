@@ -40,10 +40,20 @@
     "source-map-loader": "^4.0.1"
   },
   "peerDependencies": {
+    "@types/lodash": "^4.14.0",
+    "@types/react": ">=18.0.0",
     "react": ">=18.2.0",
     "react-dom": ">=18.2.0",
     "slate": ">=0.121.0",
     "slate-dom": ">=0.119.1"
+  },
+  "peerDependenciesMeta": {
+    "@types/lodash": {
+      "optional": true
+    },
+    "@types/react": {
+      "optional": true
+    }
   },
   "umdGlobals": {
     "react": "React",
