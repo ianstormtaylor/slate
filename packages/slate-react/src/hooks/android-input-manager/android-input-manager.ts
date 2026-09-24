@@ -1,4 +1,7 @@
 import { DebouncedFunc } from 'lodash'
+// Default import: the UMD build resolves react-dom through its CommonJS entry,
+// whose named exports rollup cannot discover statically.
+import ReactDOM from 'react-dom'
 import { Editor, Location, Node, Path, Point, Range, Transforms } from 'slate'
 import { ReactEditor } from '../../plugin/react-editor'
 import {
@@ -33,6 +36,16 @@ const RESOLVE_DELAY = 25
 
 // Time with no user interaction before the current user action is considered as done.
 const FLUSH_DELAY = 200
+
+// Time with no composition input after which a composition that never ended is
+// treated as stale. Long enough that pausing mid-word does not cut a live
+// composition short.
+const COMPOSITION_IDLE_TIMEOUT = 5000
+
+// How often a deferred flush re-checks whether the composition is still live.
+// Only bounds how quickly the value catches up with a composition that ended
+// without firing `compositionend`; one that ends normally flushes immediately.
+const COMPOSITION_RECHECK_DELAY = 50
 
 // Replace with `const debug = console.log` to debug
 const debug = (..._: unknown[]) => {}
@@ -78,6 +91,8 @@ export function createAndroidInputManager({
   let compositionEndTimeoutId: ReturnType<typeof setTimeout> | null = null
   let flushTimeoutId: ReturnType<typeof setTimeout> | null = null
   let actionTimeoutId: ReturnType<typeof setTimeout> | null = null
+  let lastCompositionActivity = 0
+  let compositionCleared = false
 
   let idCounter = 0
   let insertPositionHint: StringDiff | null | false = false
@@ -123,6 +138,45 @@ export function createAndroidInputManager({
     action.run()
   }
 
+  // `compositionend` is not fired reliably in every browser, which Slate
+  // already works around on keydown. Deferring flushes on a composition that
+  // never ends would strand the typed text outside the value, so a composition
+  // that has gone quiet, or that has lost focus, no longer holds flushes back.
+  const isCompositionLive = () => {
+    if (!IS_COMPOSING.get(editor) || compositionCleared) {
+      return false
+    }
+
+    try {
+      const editable = ReactEditor.toDOMNode(editor, editor)
+      const { activeElement } = ReactEditor.getWindow(editor).document
+
+      if (activeElement !== editable && !editable.contains(activeElement)) {
+        return false
+      }
+    } catch {
+      // Fall back to the idle check below if the editable can't be resolved.
+    }
+
+    return Date.now() - lastCompositionActivity < COMPOSITION_IDLE_TIMEOUT
+  }
+
+  // A leaf that Slate models as empty renders as a zero-width string, which on
+  // Android is a `<br>` rather than a text node. When the IME composes the
+  // first character into such a leaf, the browser creates a text node for the
+  // composition. Applying the pending diffs re-renders that leaf as a text
+  // leaf, which unmounts the zero-width span and takes the text node the IME is
+  // composing in with it, silently cancelling the composition.
+  const hasPendingDiffsInEmptyLeaf = () =>
+    !!EDITOR_TO_PENDING_DIFFS.get(editor)?.some(({ path }) => {
+      try {
+        return Node.leaf(editor, path).text.length === 0
+      } catch {
+        // The path may no longer resolve if the editor changed underneath us.
+        return false
+      }
+    })
+
   const flush = () => {
     if (flushTimeoutId) {
       clearTimeout(flushTimeoutId)
@@ -132,6 +186,17 @@ export function createAndroidInputManager({
     if (actionTimeoutId) {
       clearTimeout(actionTimeoutId)
       actionTimeoutId = null
+    }
+
+    // Defer flushing until the composition ends, so that the re-render that
+    // would replace the composing text node cannot happen mid-composition.
+    // Composing into a leaf that already has text is unaffected: applying the
+    // diff there only updates `textContent`, so the value still updates on
+    // every `compositionupdate`.
+    if (isCompositionLive() && hasPendingDiffsInEmptyLeaf()) {
+      debug('deferring flush during composition in empty leaf')
+      flushTimeoutId = setTimeout(flush, COMPOSITION_RECHECK_DELAY)
+      return
     }
 
     if (!hasPendingDiffs() && !hasPendingAction()) {
@@ -253,9 +318,31 @@ export function createAndroidInputManager({
       clearTimeout(compositionEndTimeoutId)
     }
 
+    // Diffs deferred by `flush` have to be applied synchronously here. IMEs
+    // that compose one syllable at a time (Hangul, kana) start the next
+    // composition in the same tick as this event, so an asynchronous render
+    // would replace the text node that composition has already started in.
+    if (hasPendingDiffsInEmptyLeaf() && !flushing) {
+      ReactDOM.flushSync(() => {
+        IS_COMPOSING.set(editor, false)
+        flush()
+      })
+      updatePlaceholderVisibility()
+      return
+    }
+
     compositionEndTimeoutId = setTimeout(() => {
       IS_COMPOSING.set(editor, false)
       flush()
+
+      if (compositionCleared) {
+        // A cancelled composition can take the empty leaf's text node with
+        // it. A forced render lets RestoreDOM put the leaf's DOM back, so the
+        // next composition starts from a clean state instead of a bare <br>.
+        EDITOR_TO_FORCE_RENDER.get(editor)?.()
+      }
+
+      updatePlaceholderVisibility()
     }, RESOLVE_DELAY)
   }
 
@@ -265,6 +352,8 @@ export function createAndroidInputManager({
     debug('composition start')
 
     IS_COMPOSING.set(editor, true)
+    lastCompositionActivity = Date.now()
+    compositionCleared = false
 
     if (compositionEndTimeoutId) {
       clearTimeout(compositionEndTimeoutId)
@@ -351,6 +440,38 @@ export function createAndroidInputManager({
     }
 
     const { inputType: type } = event
+
+    if (type === 'insertCompositionText' || type === 'deleteCompositionText') {
+      lastCompositionActivity = Date.now()
+
+      if (event.data) {
+        compositionCleared = false
+      } else {
+        // The IME threw away what it was composing. The deferred text never
+        // reached the value, so the value is already in the desired state -
+        // drop the deferral instead of applying and re-deleting it, which
+        // would churn the DOM mid-composition and can make Android close the
+        // keyboard.
+        compositionCleared = true
+        const deferredDiffs = EDITOR_TO_PENDING_DIFFS.get(editor)
+
+        if (deferredDiffs?.length) {
+          const allInEmptyLeaves = deferredDiffs.every(({ path }) => {
+            try {
+              return Node.leaf(editor, path).text.length === 0
+            } catch {
+              return false
+            }
+          })
+
+          if (allInEmptyLeaves) {
+            EDITOR_TO_PENDING_DIFFS.set(editor, [])
+            EDITOR_TO_PENDING_SELECTION.delete(editor)
+          }
+        }
+      }
+    }
+
     let targetRange: Range | null = null
     const data: DataTransfer | string | undefined =
       (event as any).dataTransfer || event.data || undefined

@@ -19,18 +19,18 @@ import {
 
 const STRINGS: WeakSet<Text> = new WeakSet()
 
-function resolveDescendants(children: any[]): Descendant[] {
+function resolveDescendants(children: unknown[]): Descendant[] {
   const nodes: Node[] = []
 
-  function addChild(child: Node | Token | string) {
-    if (child == null) {
+  function addChild(child: unknown) {
+    if (child == null || typeof child === 'boolean') {
       return
     }
 
     const prev = nodes[nodes.length - 1]
 
-    if (typeof child === 'string') {
-      const text = { text: child }
+    if (typeof child === 'string' || typeof child === 'number') {
+      const text = { text: child.toString() }
       STRINGS.add(text)
       child = text
     }

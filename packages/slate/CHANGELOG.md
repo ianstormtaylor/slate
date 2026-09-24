@@ -1,5 +1,23 @@
 # slate
 
+## 0.126.2
+
+### Patch Changes
+
+- [#6092](https://github.com/ianstormtaylor/slate/pull/6092) [`4231105d`](https://github.com/ianstormtaylor/slate/commit/4231105dbe7cab405406eabd23cf40261e56b9fc) Thanks [@12joan](https://github.com/12joan)! - Deeply compare nested data structures inside array properties on nodes for the purpose of merging identical text nodes. Previously, items in array properties were shallowly compared using `===`.
+
+## 0.126.1
+
+### Patch Changes
+
+- [#6083](https://github.com/ianstormtaylor/slate/pull/6083) [`ad3eaee5`](https://github.com/ianstormtaylor/slate/commit/ad3eaee5c02360a024cb2af0ae2b3c1313bf9655) Thanks [@12joan](https://github.com/12joan)! - Broaden the types of `Transforms.setNodes` and `editor.setNodes` to allow setting optional node properties to null (which has the effect of unsetting them).
+
+## 0.126.0
+
+### Patch Changes
+
+- [#6074](https://github.com/ianstormtaylor/slate/pull/6074) [`c5ea32ea`](https://github.com/ianstormtaylor/slate/commit/c5ea32eac49d8730be10fd4f8208d01e1cbced80) Thanks [@greymoth-jp](https://github.com/greymoth-jp)! - Treat Indic conjunct clusters as a single grapheme in `getCharacterDistance`, implementing Unicode UAX #29 rule GB9c. Character-by-character cursor movement (`Editor.positions` with `unit: 'character'`, and the `Editor.before` / `Editor.after` it powers) over scripts such as Devanagari and Bengali no longer stops inside a `Consonant + virama + Consonant` conjunct.
+
 ## 0.124.1
 
 ### Patch Changes

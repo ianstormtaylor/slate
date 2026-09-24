@@ -1,5 +1,5 @@
 import { Editor, Element, Location, Node, Path } from '../../index'
-import { NodeMatch, PropsCompare, PropsMerge } from '../editor'
+import { NodeMatch, NullableProps, PropsCompare, PropsMerge } from '../editor'
 import { MaximizeMode, RangeMode } from '../../types/types'
 
 export interface NodeInsertNodesOptions<T extends Node> {
@@ -85,7 +85,7 @@ export interface NodeTransforms {
    */
   setNodes: <T extends Node>(
     editor: Editor,
-    props: Partial<T>,
+    props: Partial<NullableProps<T>>,
     options?: {
       at?: Location
       match?: NodeMatch<T>

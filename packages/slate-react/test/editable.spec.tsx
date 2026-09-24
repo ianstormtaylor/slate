@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react'
 import { createEditor, Text, Transforms } from 'slate'
+import { IS_COMPOSING } from 'slate-dom'
 import { act, render } from '@testing-library/react'
-import { Slate, withReact, Editable } from '../src'
+import { Slate, withReact, Editable, ReactEditor } from '../src'
 
 describe('slate-react', () => {
   describe('Editable', () => {
@@ -235,6 +236,52 @@ describe('slate-react', () => {
 
         const editableElement = container.querySelector('[data-slate-editor]')
         expect(editableElement?.getAttribute('translate')).toBe('yes')
+      })
+    })
+
+    test('does not throw while composing when the live DOM selection has rangeCount 0', async () => {
+      const editor = withReact(createEditor())
+      const initialValue = [{ type: 'block', children: [{ text: 'test' }] }]
+
+      act(() => {
+        render(
+          <Slate
+            editor={editor}
+            initialValue={initialValue}
+            onChange={() => {}}
+          >
+            <Editable />
+          </Slate>
+        )
+      })
+
+      await act(async () => {
+        ReactEditor.focus(editor)
+      })
+
+      expect(editor.selection).not.toBeNull()
+      IS_COMPOSING.set(editor, true)
+
+      const win = ReactEditor.getWindow(editor)
+      const domSelection = win.getSelection()
+      expect(domSelection).not.toBeNull()
+      domSelection!.removeAllRanges()
+      expect(domSelection!.rangeCount).toBe(0)
+
+      const originalCollapseToEnd =
+        domSelection!.collapseToEnd.bind(domSelection)
+      domSelection!.collapseToEnd = () => {
+        if (domSelection!.rangeCount === 0) {
+          throw new DOMException(
+            "Failed to execute 'collapseToEnd' on 'Selection': there is no selection.",
+            'InvalidStateError'
+          )
+        }
+        return originalCollapseToEnd()
+      }
+
+      await act(async () => {
+        Transforms.select(editor, { path: [0, 0], offset: 2 })
       })
     })
   })

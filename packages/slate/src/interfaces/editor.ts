@@ -98,7 +98,7 @@ export interface BaseEditor {
   removeNodes: OmitFirstArg<typeof Transforms.removeNodes>
   select: OmitFirstArg<typeof Transforms.select>
   setNodes: <T extends Node>(
-    props: Partial<T>,
+    props: Partial<NullableProps<T>>,
     options?: {
       at?: Location
       match?: NodeMatch<T>
@@ -988,3 +988,7 @@ export type NodeMatch<T extends Node> =
 
 export type PropsCompare = (prop: unknown, node: unknown) => boolean
 export type PropsMerge = (prop: unknown, node: unknown) => object
+
+export type NullableProps<T> = {
+  [K in keyof T]: undefined extends T[K] ? T[K] | null : T[K]
+}

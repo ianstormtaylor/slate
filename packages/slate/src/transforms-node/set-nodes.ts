@@ -1,5 +1,5 @@
 import { NodeTransforms } from '../interfaces/transforms/node'
-import { Editor } from '../interfaces/editor'
+import { Editor, NullableProps } from '../interfaces/editor'
 import { matchPath } from '../utils/match-path'
 import { Range } from '../interfaces/range'
 import { Transforms } from '../interfaces/transforms'
@@ -9,7 +9,7 @@ import { NON_SETTABLE_NODE_PROPERTIES } from '../interfaces/transforms/general'
 
 export const setNodes: NodeTransforms['setNodes'] = (
   editor,
-  props: Partial<Node>,
+  props: Partial<NullableProps<Node>>,
   options = {}
 ) => {
   Editor.withoutNormalizing(editor, () => {

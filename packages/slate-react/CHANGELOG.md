@@ -1,5 +1,41 @@
 # slate-react
 
+## 0.127.1
+
+### Patch Changes
+
+- [#6110](https://github.com/ianstormtaylor/slate/pull/6110) [`fbe8e50b`](https://github.com/ianstormtaylor/slate/commit/fbe8e50befd728ecff7117d2ae3a4b45e0a79d7c) Thanks [@unrevised6419](https://github.com/unrevised6419)! - Declare `@types/react` (`>=18.0.0`) and `@types/lodash` (`^4.14.0`) as optional peer dependencies. The shipped type declarations import from `react` and `lodash` in type positions, but the typings packages were only listed in `devDependencies`. Under a hoisted `node_modules` layout that resolves by accident; under pnpm's isolated linker with a global virtual store it does not, and consumers get `TS7016` implicit-any errors (or silently degraded `any` props) for the editor components. Both entries are optional, so JavaScript-only consumers do not get unmet-peer warnings.
+
+## 0.126.4
+
+### Patch Changes
+
+- [#6099](https://github.com/ianstormtaylor/slate/pull/6099) [`ad04f91c`](https://github.com/ianstormtaylor/slate/commit/ad04f91c7f2e9b254bea324eefff1707b6b13bc7) Thanks [@BetterAndBetterII](https://github.com/BetterAndBetterII)! - Skip `Selection.collapseToEnd()` during composition selection-sync when the live DOM selection has no ranges, so a cleared selection no longer throws `InvalidStateError` and unmounts the editor.
+
+## 0.126.3
+
+### Patch Changes
+
+- [#6096](https://github.com/ianstormtaylor/slate/pull/6096) [`b96028a5`](https://github.com/ianstormtaylor/slate/commit/b96028a57a90099d07c615a0b8d8ae06c3b86f12) Thanks [@melodysdreamj](https://github.com/melodysdreamj)! - Fix IME composition being cancelled on the first character typed into an empty leaf on Android, which left the first character behind as a separate, uncomposed character (typing 안녕 in Korean produced ㅇ안녕).
+
+## 0.126.0
+
+### Minor Changes
+
+- [#6073](https://github.com/ianstormtaylor/slate/pull/6073) [`6fa9a129`](https://github.com/ianstormtaylor/slate/commit/6fa9a129ecdd91d6b3297dedd9ee2707bc3c177c) Thanks [@NikunjSonigara](https://github.com/NikunjSonigara)! - Add a `suppressThrow` option to `useSelected` to return `false` instead of throwing when the element can no longer be found in the editor.
+
+### Patch Changes
+
+- [#6080](https://github.com/ianstormtaylor/slate/pull/6080) [`9265c408`](https://github.com/ianstormtaylor/slate/commit/9265c4085aaf22dbfea95e69ea0b20bf9140a840) Thanks [@isachivka](https://github.com/isachivka)! - Suppress the `findPath` throw when translating `beforeinput` target ranges in `<Editable>` (#3556). A browser target range can point at a DOM node no longer resolvable to a Slate node (stale `NODE_MAP` after a re-render, IME composition, cross-editor click); with `suppressThrow: false` the "Unable to find the path" error escaped the DOM event handler and crashed the app. The two `onDOMBeforeInput` call sites now use `suppressThrow: true` (matching the other `toSlateRange` sites) and degrade gracefully — fall back to synthetic handling, or skip the selection move.
+
+## 0.125.1
+
+### Patch Changes
+
+- [#6033](https://github.com/ianstormtaylor/slate/pull/6033) [`23e6a84e`](https://github.com/ianstormtaylor/slate/commit/23e6a84ecddee0ca2580ff76e69f433115265e63) Thanks [@dannelundqvist](https://github.com/dannelundqvist)! - Fix caret jumping to wrong position when the decorate prop changes asynchronously
+
+- [#6079](https://github.com/ianstormtaylor/slate/pull/6079) [`a6b520ed`](https://github.com/ianstormtaylor/slate/commit/a6b520ed168d15718e1255bef53fef582860e4d4) Thanks [@dylans](https://github.com/dylans)! - Fix Firefox contenteditable text input breaking on editor mount, caused by a forced re-render added in `useDecorateContext` for decoration-driven caret restoration (#6078)
+
 ## 0.124.2
 
 ### Patch Changes
