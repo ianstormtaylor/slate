@@ -1491,22 +1491,42 @@ export const Editable = forwardRef(
                       // Keep a reference to the dragged range before updating selection
                       const draggedRange = editor.selection
 
-                      // Find the range where the drop happened
-                      const range = ReactEditor.findEventRange(editor, event)
+                      // Find the range where the drop happened. It is resolved from
+                      // the drop coordinates, which can point outside of the editor
+                      // even though the event's target is inside it (e.g. when the
+                      // page scrolled during the drag), leaving no range to drop at.
+                      const range = ReactEditor.findEventRange(editor, event, {
+                        suppressThrow: true,
+                      })
                       const data = event.dataTransfer
 
-                      Transforms.select(editor, range)
+                      if (!range && state.isDraggingInternally) {
+                        // The dragged content already sits in the editor, so without
+                        // a target it stays where it is.
+                        return
+                      }
 
-                      if (state.isDraggingInternally) {
-                        if (
-                          draggedRange &&
-                          !Range.equals(draggedRange, range) &&
-                          !Editor.void(editor, { at: range, voids: true })
-                        ) {
-                          Transforms.delete(editor, {
-                            at: draggedRange,
-                          })
+                      if (range) {
+                        Transforms.select(editor, range)
+
+                        if (state.isDraggingInternally) {
+                          if (
+                            draggedRange &&
+                            !Range.equals(draggedRange, range) &&
+                            !Editor.void(editor, { at: range, voids: true })
+                          ) {
+                            Transforms.delete(editor, {
+                              at: draggedRange,
+                            })
+                          }
                         }
+                      } else if (
+                        !editor.selection &&
+                        editor.children.length > 0
+                      ) {
+                        // Without a drop position the data goes to the current
+                        // selection, or to the end of the document if there is none.
+                        Transforms.select(editor, Editor.end(editor, []))
                       }
 
                       ReactEditor.insertData(editor, data)

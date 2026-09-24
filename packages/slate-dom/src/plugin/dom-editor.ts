@@ -105,8 +105,16 @@ export interface DOMEditorInterface {
 
   /**
    * Get the target range from a DOM `event`.
+   *
+   * The range is resolved from the event's coordinates, which can point
+   * outside of the editor even when the event's target lies inside it. With
+   * `suppressThrow`, `null` is returned instead of throwing in that case.
    */
-  findEventRange: (editor: DOMEditor, event: any) => Range
+  findEventRange: <T extends boolean = false>(
+    editor: DOMEditor,
+    event: any,
+    options?: { suppressThrow?: T }
+  ) => T extends true ? Range | null : Range
 
   /**
    * Find a key for a Slate node.
@@ -311,7 +319,13 @@ export const DOMEditor: DOMEditorInterface = {
     return el.ownerDocument
   },
 
-  findEventRange: (editor, event) => {
+  findEventRange: <T extends boolean = false>(
+    editor: DOMEditor,
+    event: any,
+    options: { suppressThrow?: T } = {}
+  ): T extends true ? Range | null : Range => {
+    const { suppressThrow = false } = options
+
     if ('nativeEvent' in event) {
       event = event.nativeEvent
     }
@@ -319,6 +333,9 @@ export const DOMEditor: DOMEditorInterface = {
     const { clientX: x, clientY: y, target } = event
 
     if (x == null || y == null) {
+      if (suppressThrow) {
+        return null as T extends true ? Range | null : Range
+      }
       throw new Error(`Cannot resolve a Slate range from a DOM event: ${event}`)
     }
 
@@ -343,7 +360,7 @@ export const DOMEditor: DOMEditorInterface = {
 
       if (point) {
         const range = Editor.range(editor, point)
-        return range
+        return range as T extends true ? Range | null : Range
       }
     }
 
@@ -365,15 +382,18 @@ export const DOMEditor: DOMEditorInterface = {
     }
 
     if (!domRange) {
+      if (suppressThrow) {
+        return null as T extends true ? Range | null : Range
+      }
       throw new Error(`Cannot resolve a Slate range from a DOM event: ${event}`)
     }
 
     // Resolve a Slate range from the DOM range.
     const range = DOMEditor.toSlateRange(editor, domRange, {
       exactMatch: false,
-      suppressThrow: false,
+      suppressThrow,
     })
-    return range
+    return range as T extends true ? Range | null : Range
   },
 
   findKey: (editor, node) => {
