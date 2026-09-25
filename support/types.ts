@@ -5,20 +5,26 @@ import { HyperscriptPointRef, HyperscriptRangeRef } from 'slate-hyperscript'
 declare global {
   namespace jsx.JSX {
     interface IntrinsicElements {
-      editor: GenericAdditions
-      fragment: {}
+      editor: GenericAdditions & { children?: any }
+      fragment: { children?: any }
 
-      selection: {}
+      selection: { children?: any }
       cursor: {}
       point: { ref: HyperscriptPointRef }
       anchor: { ref?: HyperscriptRangeRef } | { path: number[]; offset: number }
       focus: { ref?: HyperscriptRangeRef } | { path: number[]; offset: number }
 
-      element: ElementFlags & ElementAdditions
-      text: TextAdditions
+      element: ElementFlags & ElementAdditions & { children?: any }
+      text: TextAdditions & { children?: any }
 
-      block: Omit<ElementFlags, 'inline'> & ElementAdditions
-      inline: Omit<ElementFlags, 'inline'> & ElementAdditions
+      block: Omit<ElementFlags, 'inline'> &
+        ElementAdditions & { children?: any }
+      inline: Omit<ElementFlags, 'inline'> &
+        ElementAdditions & { children?: any }
+    }
+
+    interface ElementChildrenAttribute {
+      children: {}
     }
   }
 }
