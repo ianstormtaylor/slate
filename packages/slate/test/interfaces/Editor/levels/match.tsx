@@ -1,6 +1,6 @@
 /** @jsx jsx  */
 import { Editor } from 'slate'
-import { jsx } from 'slate-hyperscript'
+import { jsx } from '../../..'
 
 export const input = (
   <editor>
@@ -13,7 +13,7 @@ export const test = editor => {
   return Array.from(
     Editor.levels(editor, {
       at: [0, 0],
-      match: n => n.a,
+      match: n => n.a === true,
     })
   )
 }

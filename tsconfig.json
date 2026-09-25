@@ -2,8 +2,14 @@
   "files": [],
   "references": [
     { "path": "./packages/slate" },
+    { "path": "./packages/slate-dom" },
     { "path": "./packages/slate-history" },
     { "path": "./packages/slate-hyperscript" },
-    { "path": "./packages/slate-react" }
+    { "path": "./packages/slate-react" },
+
+    { "path": "./packages/slate/test" },
+    { "path": "./packages/slate-history/test" },
+    { "path": "./packages/slate-hyperscript/test" },
+    { "path": "./packages/slate-react/test" }
   ]
 }
