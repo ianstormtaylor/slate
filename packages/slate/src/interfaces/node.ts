@@ -56,7 +56,7 @@ export interface NodeTextsOptions {
 
 export interface NodeInterface {
   /**
-   * Get the node at a specific path, asserting that it's an ancestor node.
+   * Get the node at a specific path, asserting that it's an ancestor node. If the specified node is not an ancestor node, throw an error.
    */
   ancestor: (root: Node, path: Path) => Ancestor
 
@@ -87,7 +87,7 @@ export interface NodeInterface {
   ) => Generator<NodeEntry<Descendant>, void, undefined>
 
   /**
-   * Get an entry for the common ancesetor node of two paths.
+   * Get an entry for the common ancesetor node of two paths. It might be a Text node, an Element, or the Editor itself.
    */
   common: (root: Node, path: Path, another: Path) => NodeEntry
 
@@ -115,7 +115,8 @@ export interface NodeInterface {
   ) => Generator<ElementEntry, void, undefined>
 
   /**
-   * Extract props from a Node.
+   * Extract all properties from a Node except for its content-related fields (`children` for Element nodes and `text` for Text nodes).
+   * @returns An object containing the extracted properties of the node1.
    */
   extractProps: (node: Node) => NodeProps
 
@@ -139,7 +140,7 @@ export interface NodeInterface {
   get: (root: Node, path: Path) => Node
 
   /**
-   * Similar to get, but returns undefined if the node does not exist.
+   * Get a descendant node at a specific path, returning `undefined` if the node does not exist. This is a safer alternative to `Node.get()` as it won't throw an error if the path is invalid.
    */
   getIf: (root: Node, path: Path) => Node | undefined
 
@@ -184,7 +185,7 @@ export interface NodeInterface {
   last: (root: Node, path: Path) => NodeEntry
 
   /**
-   * Get the node at a specific path, ensuring it's a leaf text node.
+   * Get the node at a specific path, ensuring it's a leaf text node. If the node is not a leaf text node, throw an error.
    */
   leaf: (root: Node, path: Path) => Text
 
@@ -653,7 +654,6 @@ export const Node: NodeInterface = {
  * tree. It is returned as a convenience in certain cases to narrow a value
  * further than the more generic `Node` union.
  */
-
 export type Descendant = Element | Text
 
 /**
@@ -661,15 +661,13 @@ export type Descendant = Element | Text
  * It is returned as a convenience in certain cases to narrow a value further
  * than the more generic `Node` union.
  */
-
 export type Ancestor = Editor | Element
 
 /**
  * `NodeEntry` objects are returned when iterating over the nodes in a Slate
- * document tree. They consist of the node and its `Path` relative to the root
+ * document tree. They consist of the node and its path relative to the root
  * node in the document.
  */
-
 export type NodeEntry<T extends Node = Node> = [T, Path]
 
 /**

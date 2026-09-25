@@ -34,7 +34,11 @@ import {
   TextInsertTextOptions,
 } from './transforms/text'
 import { NodeInsertNodesOptions } from './transforms/node'
-import { SelectionCollapseOptions, SelectionMoveOptions, SelectionSetPointOptions } from './transforms/selection'
+import {
+  SelectionCollapseOptions,
+  SelectionMoveOptions,
+  SelectionSetPointOptions,
+} from './transforms/selection'
 
 /**
  * The `Editor` interface stores all the state of a Slate editor. It is extended
@@ -165,21 +169,30 @@ export interface BaseEditor {
    * expanded, delete it first.
    * @see {@link EditorInterface.insertFragment}
    */
-  insertFragment: (fragment: Node[], options?: TextInsertFragmentOptions) => void
+  insertFragment: (
+    fragment: Node[],
+    options?: TextInsertFragmentOptions
+  ) => void
 
   /**
    * Insert a node at the current selection. If the selection is currently
    * expanded, delete it first.
    * @see {@link EditorInterface.insertNode}
    */
-  insertNode: <T extends Node>(node: Node, options?: NodeInsertNodesOptions<T>) => void
+  insertNode: <T extends Node>(
+    node: Node,
+    options?: NodeInsertNodesOptions<T>
+  ) => void
 
   /**
    * Insert nodes in the editor at the specified location or (if not defined)
    * the current selection or (if not defined) the end of the document.
    * @see {@link Transforms.insertNodes}
    */
-  insertNodes: <T extends Node>(nodes: Node | Node[], options?: NodeInsertNodesOptions<T>) => void
+  insertNodes: <T extends Node>(
+    nodes: Node | Node[],
+    options?: NodeInsertNodesOptions<T>
+  ) => void
 
   /**
    * Insert a soft break at the current selection. If the selection is
@@ -379,7 +392,9 @@ export interface BaseEditor {
    * Get the ancestor above a location in the document.
    * @see {@link EditorInterface.above}
    */
-  above: <T extends Ancestor>(options?: EditorAboveOptions<T>) => NodeEntry<T> | undefined
+  above: <T extends Ancestor>(
+    options?: EditorAboveOptions<T>
+  ) => NodeEntry<T> | undefined
 
   /**
    * Get the point after a location.
@@ -403,7 +418,9 @@ export interface BaseEditor {
    * Match a read-only element in the current branch of the editor.
    * @see {@link EditorInterface.elementReadOnly}
    */
-  elementReadOnly: (options?: EditorElementReadOnlyOptions) => NodeEntry<Element> | undefined
+  elementReadOnly: (
+    options?: EditorElementReadOnlyOptions
+  ) => NodeEntry<Element> | undefined
 
   /**
    * Get the end point of a location.
@@ -516,13 +533,17 @@ export interface BaseEditor {
    * Iterate through all of the levels at a location.
    * @see {@link EditorInterface.levels}
    */
-  levels: <T extends Node>(options?: EditorLevelsOptions<T>) => Generator<NodeEntry<T>, void, undefined>
+  levels: <T extends Node>(
+    options?: EditorLevelsOptions<T>
+  ) => Generator<NodeEntry<T>, void, undefined>
 
   /**
    * Get the matching node in the branch of the document after a location.
    * @see {@link EditorInterface.next}
    */
-  next: <T extends Descendant>(options?: EditorNextOptions<T>) => NodeEntry<T> | undefined
+  next: <T extends Descendant>(
+    options?: EditorNextOptions<T>
+  ) => NodeEntry<T> | undefined
 
   /**
    * Get the node at a location.
@@ -534,7 +555,9 @@ export interface BaseEditor {
    * Iterate through all of the nodes in the Editor.
    * @see {@link EditorInterface.nodes}
    */
-  nodes: <T extends Node>(options?: EditorNodesOptions<T>) => Generator<NodeEntry<T>, void, undefined>
+  nodes: <T extends Node>(
+    options?: EditorNodesOptions<T>
+  ) => Generator<NodeEntry<T>, void, undefined>
 
   /**
    * Get the parent node of a location.
@@ -584,13 +607,17 @@ export interface BaseEditor {
    * Return all the positions in `at` range where a `Point` can be placed.
    * @see {@link EditorInterface.positions}
    */
-  positions: (options?: EditorPositionsOptions) => Generator<Point, void, undefined>
+  positions: (
+    options?: EditorPositionsOptions
+  ) => Generator<Point, void, undefined>
 
   /**
    * Get the matching node in the branch of the document before a location.
    * @see {@link EditorInterface.previous}
    */
-  previous: <T extends Node>(options?: EditorPreviousOptions<T>) => NodeEntry<T> | undefined
+  previous: <T extends Node>(
+    options?: EditorPreviousOptions<T>
+  ) => NodeEntry<T> | undefined
 
   /**
    * Get a range of a location.
