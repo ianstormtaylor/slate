@@ -116,7 +116,7 @@ export interface NodeInterface {
 
   /**
    * Extract all properties from a Node except for its content-related fields (`children` for Element nodes and `text` for Text nodes).
-   * @returns An object containing the extracted properties of the node1.
+   * @returns An object containing the extracted properties of the node.
    */
   extractProps: (node: Node) => NodeProps
 
