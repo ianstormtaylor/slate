@@ -809,6 +809,15 @@ export function createAndroidInputManager({
             insertPositionHint = false
           }
 
+          if (
+            type === 'insertCompositionText' ||
+            type === 'deleteCompositionText'
+          ) {
+            storeDiff(start.path, diff)
+            // Don't schedule selection updates during composition
+            return
+          }
+
           if (canStoreDiff) {
             const currentSelection = editor.selection
             storeDiff(start.path, diff)
@@ -882,7 +891,7 @@ export function createAndroidInputManager({
       insertPositionHint = false
     }
 
-    if (pathChanged || hasPendingDiffs()) {
+    if ((pathChanged || hasPendingDiffs()) && !IS_COMPOSING.get(editor)) {
       flushTimeoutId = setTimeout(flush, FLUSH_DELAY)
     }
   }
