@@ -1,6 +1,7 @@
 import { Editor, EditorInterface } from '../interfaces/editor'
 import { RangeRef } from '../interfaces/range-ref'
 
+/** @ignore */
 export const rangeRef: EditorInterface['rangeRef'] = (
   editor,
   range,

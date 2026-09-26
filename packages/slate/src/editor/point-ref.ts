@@ -1,6 +1,7 @@
 import { Editor, EditorInterface } from '../interfaces/editor'
 import { PointRef } from '../interfaces/point-ref'
 
+/** @ignore */
 export const pointRef: EditorInterface['pointRef'] = (
   editor,
   point,

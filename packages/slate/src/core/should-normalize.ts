@@ -1,6 +1,7 @@
 import { WithEditorFirstArg } from '../utils/types'
 import { Editor } from '../interfaces/editor'
 
+/** @ignore */
 export const shouldNormalize: WithEditorFirstArg<Editor['shouldNormalize']> = (
   editor,
   { iteration, initialDirtyPathsLength }

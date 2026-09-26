@@ -7,6 +7,7 @@ import { Transforms } from '../interfaces/transforms'
 import { Node, NodeEntry } from '../interfaces/node'
 import { Location } from '../interfaces'
 
+/** @ignore */
 export const deleteText: TextTransforms['delete'] = (editor, options = {}) => {
   Editor.withoutNormalizing(editor, () => {
     const {

@@ -1,5 +1,6 @@
 import { EditorInterface, Editor, Node } from '../interfaces'
 
+/** @ignore */
 export const shouldMergeNodesRemovePrevNode: EditorInterface['shouldMergeNodesRemovePrevNode'] =
   (editor, [prevNode, prevPath], [curNode, curNodePath]) => {
     // If the target node that we're merging with is empty, remove it instead

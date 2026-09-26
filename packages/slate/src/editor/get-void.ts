@@ -1,6 +1,7 @@
 import { Editor, EditorInterface } from '../interfaces/editor'
 import { Node } from '../interfaces/node'
 
+/** @ignore */
 export const getVoid: EditorInterface['void'] = (editor, options = {}) => {
   return Editor.above(editor, {
     ...options,

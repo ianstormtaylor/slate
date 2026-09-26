@@ -2,6 +2,7 @@ import { SelectionTransforms } from '../interfaces/transforms/selection'
 import { Range } from '../interfaces/range'
 import { Point } from '../interfaces/point'
 
+/** @ignore */
 export const setSelection: SelectionTransforms['setSelection'] = (
   editor,
   props

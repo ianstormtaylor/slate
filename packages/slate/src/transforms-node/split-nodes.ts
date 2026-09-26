@@ -22,6 +22,7 @@ const deleteRange = (editor: Editor, range: Range): Point | null => {
   }
 }
 
+/** @ignore */
 export const splitNodes: NodeTransforms['splitNodes'] = (
   editor,
   options = {}

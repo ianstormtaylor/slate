@@ -9,6 +9,7 @@ import { batchDirtyPaths } from '../core/batch-dirty-paths'
 import { BaseInsertNodeOperation, Location } from '../interfaces'
 import { updateDirtyPaths } from '../core/update-dirty-paths'
 
+/** @ignore */
 export const insertNodes: NodeTransforms['insertNodes'] = (
   editor,
   nodes,

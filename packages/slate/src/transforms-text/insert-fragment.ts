@@ -8,6 +8,7 @@ import { TextTransforms } from '../interfaces/transforms/text'
 import { getDefaultInsertLocation } from '../utils'
 import { Location } from '../interfaces'
 
+/** @ignore */
 export const insertFragment: TextTransforms['insertFragment'] = (
   editor,
   fragment,

@@ -2,6 +2,7 @@ import { Range } from '../interfaces/range'
 import { Transforms } from '../interfaces/transforms'
 import { EditorInterface } from '../interfaces/editor'
 
+/** @ignore */
 export const deleteFragment: EditorInterface['deleteFragment'] = (
   editor,
   { direction = 'forward' } = {}

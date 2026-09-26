@@ -3,12 +3,13 @@ import { NodeTransforms } from './node'
 import { SelectionTransforms } from './selection'
 import { TextTransforms } from './text'
 
-export interface Transforms extends
-  GeneralTransforms,
-  NodeTransforms,
-  SelectionTransforms,
-  TextTransforms {}
+export interface Transforms
+  extends GeneralTransforms,
+    NodeTransforms,
+    SelectionTransforms,
+    TextTransforms {}
 
+// eslint-disable-next-line no-redeclare
 export const Transforms: GeneralTransforms &
   NodeTransforms &
   SelectionTransforms &

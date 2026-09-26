@@ -1,6 +1,7 @@
 import { Transforms } from '../interfaces/transforms'
 import { EditorInterface } from '../interfaces/editor'
 
+/** @ignore */
 export const insertText: EditorInterface['insertText'] = (
   editor,
   text,

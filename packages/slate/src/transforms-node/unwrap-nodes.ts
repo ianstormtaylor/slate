@@ -5,6 +5,7 @@ import { Range } from '../interfaces/range'
 import { Transforms } from '../interfaces/transforms'
 import { Location, Node } from '../interfaces'
 
+/** @ignore */
 export const unwrapNodes: NodeTransforms['unwrapNodes'] = (
   editor,
   options = {}

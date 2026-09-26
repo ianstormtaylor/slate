@@ -3,6 +3,7 @@ import { Range } from '../interfaces/range'
 import { Path } from '../interfaces/path'
 import { Node } from '../interfaces'
 
+/** @ignore */
 export const string: EditorInterface['string'] = (editor, at, options = {}) => {
   const { voids = false } = options
   const range = Editor.range(editor, at)

@@ -6,6 +6,7 @@ import { Transforms } from '../interfaces/transforms'
 import { Node } from '../interfaces/node'
 import { Location } from '../interfaces'
 
+/** @ignore */
 export const setNodes: NodeTransforms['setNodes'] = (
   editor,
   props: Partial<Node>,

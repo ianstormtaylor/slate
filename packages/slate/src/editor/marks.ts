@@ -4,6 +4,7 @@ import { Range } from '../interfaces/range'
 import { Path } from '../interfaces/path'
 import { Point } from '../interfaces'
 
+/** @ignore */
 export const marks: EditorInterface['marks'] = (editor, options = {}) => {
   const { marks, selection } = editor
 

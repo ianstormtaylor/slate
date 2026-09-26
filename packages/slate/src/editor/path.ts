@@ -1,5 +1,6 @@
 import { EditorInterface, Location, Node, Path, Range } from '../interfaces'
 
+/** @ignore */
 export const path: EditorInterface['path'] = (editor, at, options = {}) => {
   const { depth, edge } = options
 
