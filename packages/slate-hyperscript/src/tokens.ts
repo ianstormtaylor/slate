@@ -14,14 +14,14 @@ const FOCUS: WeakMap<Node, [number, FocusToken]> = new WeakMap()
 
 /**
  * All tokens inherit from a single constructor for `instanceof` checking.
+ * @inline
  */
-
 export class Token {}
 
 /**
  * Anchor tokens represent the selection's anchor point.
+ * @inline
  */
-
 export class AnchorToken extends Token {
   offset?: number
   path?: Path
@@ -41,8 +41,8 @@ export class AnchorToken extends Token {
 
 /**
  * Focus tokens represent the selection's focus point.
+ * @inline
  */
-
 export class FocusToken extends Token {
   offset?: number
   path?: Path

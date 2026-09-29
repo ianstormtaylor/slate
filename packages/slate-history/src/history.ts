@@ -1,5 +1,6 @@
 import { Operation, Range, isObject } from 'slate'
 
+/** @inline */
 interface Batch {
   operations: Operation[]
   selectionBefore: Range | null

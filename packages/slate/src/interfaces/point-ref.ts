@@ -4,7 +4,7 @@ import { TextDirection } from '../types/types'
 /**
  * `PointRef` objects keep a specific point in a document synced over time as new
  * operations are applied to the editor. It is created using the
- * {@link Editor.PointRef} method. You can access their property `current` at any time
+ * {@link BaseEditor#pointRef} method. You can access their property `current` at any time
  * for the up-to-date `Point` value. When you no longer need to track this
  * location, call `unref()` to free the resources.
  */

@@ -11,6 +11,7 @@ import {
 import { TextDiff } from './diff-text'
 import { Key } from './key'
 
+/** @inline */
 export type Action = { at?: Point | Range; run: () => void }
 
 /**

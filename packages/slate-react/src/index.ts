@@ -2,6 +2,7 @@
 export {
   Editable,
   RenderElementProps,
+  RenderTextProps,
   RenderChunkProps,
   RenderLeafProps,
   RenderPlaceholderProps,
@@ -23,11 +24,14 @@ export { useFocused } from './hooks/use-focused'
 export { useReadOnly } from './hooks/use-read-only'
 export { useSelected } from './hooks/use-selected'
 export { useSlate, useSlateWithV } from './hooks/use-slate'
-export { useSlateSelector } from './hooks/use-slate-selector'
+export {
+  useSlateSelector,
+  SlateSelectorOptions,
+} from './hooks/use-slate-selector'
 export { useSlateSelection } from './hooks/use-slate-selection'
 
 // Plugin
-export { ReactEditor } from './plugin/react-editor'
+export { ReactEditor, ReactEditorInterface } from './plugin/react-editor'
 export { withReact } from './plugin/with-react'
 
 // Utils

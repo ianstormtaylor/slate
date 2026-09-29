@@ -3,7 +3,7 @@ import { Operation, Range } from '..'
 /**
  * `RangeRef` objects keep a specific range in a document synced over time as new
  * operations are applied to the editor. It is created using the
- * {@link Editor.RangeRef} method. You can access their property `current` at any time
+ * {@link BaseEditor#rangeRef} method. You can access their property `current` at any time
  * for the up-to-date `Range` value. When you no longer need to track this
  * location, call `unref()` to free the resources.
  */

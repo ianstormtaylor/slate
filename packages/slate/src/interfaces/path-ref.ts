@@ -3,7 +3,7 @@ import { Editor, Operation, Path } from '..'
 /**
  * `PathRef` objects keep a specific path in a document synced over time as new
  * operations are applied to the editor. It is created using the
- * {@link Editor.pathRef} method. You can access their property `current` at any time
+ * {@link Editor#pathRef} method. You can access their property `current` at any time
  * for the up-to-date `Path` value. When you no longer need to track this
  * location, call `unref()` to free the resources.
  */
