@@ -87,7 +87,8 @@ export interface NodeInterface {
   ) => Generator<NodeEntry<Descendant>, void, undefined>
 
   /**
-   * Get an entry for the common ancesetor node of two paths. It might be a Text node, an Element, or the Editor itself.
+   * Get an entry for the common ancesetor of two paths.
+   * In most cases this will be an Element node, but could the root Editor node if the paths have no other common ancestors, or a Text node if the paths are the same (or if they point to nodes that don't exist).
    */
   common: (root: Node, path: Path, another: Path) => NodeEntry
 
