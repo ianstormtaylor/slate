@@ -44,7 +44,23 @@ export const deleteText: TextTransforms['delete'] = (editor, options = {}) => {
     }
 
     if (Location.isPath(at)) {
+      // When deleting a void backward from the cursor, keep the cursor before
+      // it instead of letting it move into the following node.
+      const before =
+        options.at == null && reverse ? Editor.before(editor, at) : undefined
+      const beforeRef =
+        before && Path.isAncestor(Path.parent(at), before.path)
+          ? Editor.pointRef(editor, before)
+          : undefined
+
       Transforms.removeNodes(editor, { at, voids })
+
+      const point = beforeRef && beforeRef.unref()
+
+      if (point) {
+        Transforms.select(editor, point)
+      }
+
       return
     }
 
