@@ -177,6 +177,8 @@ export interface BaseEditor {
   /**
    * Insert a node at the current selection. If the selection is currently
    * expanded, delete it first.
+   *
+   * **WARNING**: Inserting a node that already exists in the document (or another active document) can cause problems with certain plugins like `slate-dom` and `slate-react` that expect each node to be a unique object.
    * @see {@link EditorInterface.insertNode}
    */
   insertNode: <T extends Node>(
@@ -187,6 +189,8 @@ export interface BaseEditor {
   /**
    * Insert nodes in the editor at the specified location or (if not defined)
    * the current selection or (if not defined) the end of the document.
+   *
+   * **WARNING**: Inserting a node that already exists in the document (or another active document) can cause problems with certain plugins like `slate-dom` and `slate-react` that expect each node to be a unique object.
    * @see {@link Transforms.insertNodes}
    */
   insertNodes: <T extends Node>(
@@ -928,6 +932,8 @@ export interface EditorInterface {
   /**
    * Inserts a fragment
    * at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
+   *
+   * **WARNING**: Inserting a node that already exists in the document (or another active document) can cause problems with certain plugins like `slate-dom` and `slate-react` that expect each node to be a unique object.
    */
   insertFragment: (
     editor: Editor,
@@ -938,6 +944,8 @@ export interface EditorInterface {
   /**
    * Atomically inserts `nodes`
    * at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
+   *
+   * **WARNING**: Inserting a node that already exists in the document (or another active document) can cause problems with certain plugins like `slate-dom` and `slate-react` that expect each node to be a unique object.
    */
   insertNode: <T extends Node>(
     editor: Editor,

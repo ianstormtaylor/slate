@@ -16,6 +16,8 @@ export interface NodeTransforms {
   /**
    * Insert nodes in the editor
    * at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
+   *
+   * **WARNING**: Inserting a node that already exists in the document (or another active document) can cause problems with certain plugins like `slate-dom` and `slate-react` that expect each node to be a unique object.
    */
   insertNodes: <T extends Node>(
     editor: Editor,
