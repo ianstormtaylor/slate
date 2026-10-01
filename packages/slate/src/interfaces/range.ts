@@ -49,7 +49,7 @@ export interface RangeInterface {
 
   /**
    * Check if a `range` includes a path, a point, or part of another range.
-   * 
+   *
    * For clarity the definition of `includes` can mean partially includes.
    * Another way to describe this is if one Range intersects the other Range.
    */

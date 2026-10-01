@@ -2,4 +2,5 @@
   "entryPoints": ["src/index.ts"],
   "name": "slate-dom",
   "readme": "none",
+  "excludeInternal": true,
 }
