@@ -550,6 +550,10 @@ export const Editable = forwardRef(
     // https://github.com/facebook/react/issues/11211
     const onDOMBeforeInput = useCallback(
       (event: InputEvent) => {
+        if (!event.isTrusted) {
+          return
+        }
+
         handleNativeHistoryEvents(editor, event)
         const el = ReactEditor.toDOMNode(editor, editor)
         const root = el.getRootNode()
@@ -1476,6 +1480,7 @@ export const Editable = forwardRef(
                   (event: React.DragEvent<HTMLDivElement>) => {
                     if (
                       !readOnly &&
+                      event.isTrusted &&
                       ReactEditor.hasTarget(editor, event.target) &&
                       !isEventHandled(event, attributes.onDrop)
                     ) {
@@ -1852,6 +1857,7 @@ export const Editable = forwardRef(
                   (event: React.ClipboardEvent<HTMLDivElement>) => {
                     if (
                       !readOnly &&
+                      event.isTrusted &&
                       ReactEditor.hasEditableTarget(editor, event.target) &&
                       !isEventHandled(event, attributes.onPaste)
                     ) {
