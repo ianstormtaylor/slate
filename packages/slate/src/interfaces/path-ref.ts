@@ -30,7 +30,7 @@ export interface PathRefInterface {
   /**
    * Transform a PathRef's current value by an operation.
    */
-  transform: (ref: PathRef, op: Operation) => void
+  transform(ref: PathRef, op: Operation): void
 }
 
 // eslint-disable-next-line no-redeclare

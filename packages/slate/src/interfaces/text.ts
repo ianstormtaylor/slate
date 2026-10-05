@@ -42,22 +42,22 @@ export interface TextInterface {
    *
    * @param options.loose When `true`, it checks if the properties of the `Text` object are equal except for the `text` property (i.e. the `String` value of the `Text`). When `false` (default), checks all properties including `text`. Defaults to `false`.
    */
-  equals: (text: Text, another: Text, options?: TextEqualsOptions) => boolean
+  equals(text: Text, another: Text, options?: TextEqualsOptions): boolean
 
   /**
    * Check if a value implements the `Text` interface.
    */
-  isText: (value: any) => value is Text
+  isText(value: any): value is Text
 
   /**
    * Check if a value is a list of `Text` objects.
    */
-  isTextList: (value: any) => value is Text[]
+  isTextList(value: any): value is Text[]
 
   /**
    * Check if some props are a partial of Text.
    */
-  isTextProps: (props: any) => props is Partial<Text>
+  isTextProps(props: any): props is Partial<Text>
 
   /**
    * Check if `text` matches a set of `props`.
@@ -66,15 +66,15 @@ export interface TextInterface {
    * If a `props.text` property is passed in, it will be ignored.
    * If there are properties in `text` that are not in `props`, those will be ignored when it comes to testing for a match.
    */
-  matches: (text: Text, props: Partial<Text>) => boolean
+  matches(text: Text, props: Partial<Text>): boolean
 
   /**
    * Get the leaves for a text node given decorations.
    */
-  decorations: (
+  decorations(
     node: Text,
     decorations: DecoratedRange[]
-  ) => { leaf: Text; position?: LeafPosition }[]
+  ): { leaf: Text; position?: LeafPosition }[]
 }
 
 // eslint-disable-next-line no-redeclare

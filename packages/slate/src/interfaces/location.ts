@@ -14,27 +14,27 @@ export interface LocationInterface {
   /**
    * Check if a value implements the `Location` interface.
    */
-  isLocation: (value: any) => value is Location
+  isLocation(value: any): value is Location
 
   /**
    * Check if a location is a `Path`.
    */
-  isPath: (at: Location) => at is Path
+  isPath(at: Location): at is Path
 
   /**
    * Check if a location is a `Point`.
    */
-  isPoint: (at: Location) => at is Point
+  isPoint(at: Location): at is Point
 
   /**
    * Check if a location is a `Range`.
    */
-  isRange: (at: Location) => at is Range
+  isRange(at: Location): at is Range
 
   /**
    * Differentiate between a normal `Location` and a `Span`.
    */
-  isSpan: (at: Location | Span) => at is Span
+  isSpan(at: Location | Span): at is Span
 }
 
 // eslint-disable-next-line no-redeclare
@@ -70,7 +70,7 @@ export interface SpanInterface {
   /**
    * Check if a value implements the `Span` interface.
    */
-  isSpan: (value: any) => value is Span
+  isSpan(value: any): value is Span
 }
 
 // eslint-disable-next-line no-redeclare

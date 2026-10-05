@@ -141,33 +141,33 @@ export interface OperationInterface {
   /**
    * Check if a value is a `NodeOperation` object.
    */
-  isNodeOperation: (value: any) => value is NodeOperation
+  isNodeOperation(value: any): value is NodeOperation
 
   /**
    * Check if a value is an `Operation` object.
    */
-  isOperation: (value: any) => value is Operation
+  isOperation(value: any): value is Operation
 
   /**
    * Check if a value is a list of `Operation` objects.
    */
-  isOperationList: (value: any) => value is Operation[]
+  isOperationList(value: any): value is Operation[]
 
   /**
    * Check if a value is a `SelectionOperation` object.
    */
-  isSelectionOperation: (value: any) => value is SelectionOperation
+  isSelectionOperation(value: any): value is SelectionOperation
 
   /**
    * Check if a value is a `TextOperation` object.
    */
-  isTextOperation: (value: any) => value is TextOperation
+  isTextOperation(value: any): value is TextOperation
 
   /**
    * Invert an operation, returning a new operation that will exactly undo the
    * original when applied.
    */
-  inverse: (op: Operation) => Operation
+  inverse(op: Operation): Operation
 }
 
 // eslint-disable-next-line no-redeclare

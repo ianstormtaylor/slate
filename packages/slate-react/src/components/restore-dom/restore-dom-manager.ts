@@ -3,9 +3,9 @@ import { ReactEditor } from '../../plugin/react-editor'
 import { isTrackedMutation } from 'slate-dom'
 
 export type RestoreDOMManager = {
-  registerMutations: (mutations: MutationRecord[]) => void
-  restoreDOM: () => void
-  clear: () => void
+  registerMutations(mutations: MutationRecord[]): void
+  restoreDOM(): void
+  clear(): void
 }
 
 export const createRestoreDomManager = (

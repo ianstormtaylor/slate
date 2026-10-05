@@ -36,18 +36,18 @@ export interface RangeInterface {
    * Get the start and end points of a range, in the order in which they appear
    * in the document.
    */
-  edges: (range: Range, options?: RangeEdgesOptions) => [Point, Point]
+  edges(range: Range, options?: RangeEdgesOptions): [Point, Point]
 
   /**
    * Get the end point of a range according to the order in which it appears in
    * the document.
    */
-  end: (range: Range) => Point
+  end(range: Range): Point
 
   /**
    * Check if a range is exactly equal to another.
    */
-  equals: (range: Range, another: Range) => boolean
+  equals(range: Range, another: Range): boolean
 
   /**
    * Check if a `range` includes a path, a point, or part of another range.
@@ -55,30 +55,30 @@ export interface RangeInterface {
    * For clarity the definition of `includes` can mean partially includes.
    * Another way to describe this is if one Range intersects the other Range.
    */
-  includes: (range: Range, target: Location) => boolean
+  includes(range: Range, target: Location): boolean
 
   /**
    * Check if a range includes another range.
    */
-  surrounds: (range: Range, target: Range) => boolean
+  surrounds(range: Range, target: Range): boolean
 
   /**
    * Get the intersection of one `range` with `another`. If the two ranges do
    * not overlap, return `null`.
    */
-  intersection: (range: Range, another: Range) => Range | null
+  intersection(range: Range, another: Range): Range | null
 
   /**
    * Check if a range is backward, meaning that its anchor point appears in the
    * document _after_ its focus point.
    */
-  isBackward: (range: Range) => boolean
+  isBackward(range: Range): boolean
 
   /**
    * Check if a range is collapsed, meaning that both its anchor and focus
    * points refer to the exact same position in the document.
    */
-  isCollapsed: (range: Range) => boolean
+  isCollapsed(range: Range): boolean
 
   /**
    * Check if a range is expanded.
@@ -86,39 +86,39 @@ export interface RangeInterface {
    * This is the opposite of {@link Range.isCollapsed} and is provided for
    * legibility.
    */
-  isExpanded: (range: Range) => boolean
+  isExpanded(range: Range): boolean
 
   /**
    * Check if a range is forward, meaning that its anchor point appears in the
    * document _before_ its focus point.
    */
-  isForward: (range: Range) => boolean
+  isForward(range: Range): boolean
 
   /**
    * Check if a value implements the {@link Range} interface.
    */
-  isRange: (value: any) => value is Range
+  isRange(value: any): value is Range
 
   /**
    * Iterate through the two point entries in a `Range`. First it will yield a
    * {@link PointEntry} representing the `anchor`, then the `focus`.
    */
-  points: (range: Range) => Generator<PointEntry, void, undefined>
+  points(range: Range): Generator<PointEntry, void, undefined>
 
   /**
    * Get the start point of a range according to the order in which it appears
    * in the document.
    */
-  start: (range: Range) => Point
+  start(range: Range): Point
 
   /**
    * Transform a range by an operation.
    */
-  transform: (
+  transform(
     range: Range,
     op: Operation,
     options?: RangeTransformOptions
-  ) => Range | null
+  ): Range | null
 }
 
 // eslint-disable-next-line no-redeclare

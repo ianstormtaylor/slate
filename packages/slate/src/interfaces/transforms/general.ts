@@ -25,7 +25,7 @@ export interface GeneralTransforms {
   /**
    * Transform the editor by an operation.
    */
-  transform: (editor: Editor, op: Operation) => void
+  transform(editor: Editor, op: Operation): void
 }
 
 // eslint-disable-next-line no-redeclare

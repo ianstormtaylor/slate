@@ -29,38 +29,35 @@ export interface ElementInterface {
   /**
    * Check if a value implements the 'Ancestor' interface.
    */
-  isAncestor: (
-    value: any,
-    options?: ElementIsElementOptions
-  ) => value is Ancestor
+  isAncestor(value: any, options?: ElementIsElementOptions): value is Ancestor
 
   /**
    * Check if a value implements the `Element` interface.
    */
-  isElement: (value: any, options?: ElementIsElementOptions) => value is Element
+  isElement(value: any, options?: ElementIsElementOptions): value is Element
 
   /**
    * Check if a value is an array of `Element` objects.
    */
-  isElementList: (
+  isElementList(
     value: any,
     options?: ElementIsElementOptions
-  ) => value is Element[]
+  ): value is Element[]
 
   /**
    * Check if a set of props is a partial of Element.
    */
-  isElementProps: (props: any) => props is Partial<Element>
+  isElementProps(props: any): props is Partial<Element>
 
   /**
    * Check if a value implements the `Element` interface and has elementKey with selected value.
    * Default it check to `type` key value
    */
-  isElementType: <T extends Element>(
+  isElementType<T extends Element>(
     value: any,
     elementVal: string,
     elementKey?: string
-  ) => value is T
+  ): value is T
 
   /**
    * Check if an element matches set of properties.
@@ -68,7 +65,7 @@ export interface ElementInterface {
    * Note: this checks custom properties, and it does not ensure that any
    * children are equivalent.
    */
-  matches: (element: Element, props: Partial<Element>) => boolean
+  matches(element: Element, props: Partial<Element>): boolean
 }
 
 /**

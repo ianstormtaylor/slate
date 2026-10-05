@@ -20,17 +20,17 @@ export interface NodeTransforms {
    *
    * **WARNING**: Inserting a node that already exists in the document (or another active document) can cause problems with certain plugins like `slate-dom` and `slate-react` that expect each node to be a unique object.
    */
-  insertNodes: <T extends Node>(
+  insertNodes<T extends Node>(
     editor: Editor,
     nodes: Node | Node[],
     options?: NodeInsertNodesOptions<T>
-  ) => void
+  ): void
 
   /**
    * Lift nodes at a specific location upwards in the document tree, splitting
    * their parent in two if necessary.
    */
-  liftNodes: <T extends Node>(
+  liftNodes<T extends Node>(
     editor: Editor,
     options?: {
       at?: Location
@@ -38,13 +38,13 @@ export interface NodeTransforms {
       mode?: MaximizeMode
       voids?: boolean
     }
-  ) => void
+  ): void
 
   /**
    * Merge a node at a location with the previous node of the same depth,
    * removing any empty containing nodes after the merge if necessary.
    */
-  mergeNodes: <T extends Node>(
+  mergeNodes<T extends Node>(
     editor: Editor,
     options?: {
       at?: Location
@@ -53,12 +53,12 @@ export interface NodeTransforms {
       hanging?: boolean
       voids?: boolean
     }
-  ) => void
+  ): void
 
   /**
    * Move the nodes at a location to a new location.
    */
-  moveNodes: <T extends Node>(
+  moveNodes<T extends Node>(
     editor: Editor,
     options: {
       at?: Location
@@ -67,12 +67,12 @@ export interface NodeTransforms {
       to: Path
       voids?: boolean
     }
-  ) => void
+  ): void
 
   /**
    * Remove the nodes at a specific location in the document.
    */
-  removeNodes: <T extends Node>(
+  removeNodes<T extends Node>(
     editor: Editor,
     options?: {
       at?: Location
@@ -81,12 +81,12 @@ export interface NodeTransforms {
       hanging?: boolean
       voids?: boolean
     }
-  ) => void
+  ): void
 
   /**
    * Set new properties on the nodes at a location.
    */
-  setNodes: <T extends Node>(
+  setNodes<T extends Node>(
     editor: Editor,
     props: Partial<T>,
     options?: {
@@ -99,12 +99,12 @@ export interface NodeTransforms {
       compare?: PropsCompare
       merge?: PropsMerge
     }
-  ) => void
+  ): void
 
   /**
    * Split the nodes at a specific location.
    */
-  splitNodes: <T extends Node>(
+  splitNodes<T extends Node>(
     editor: Editor,
     options?: {
       at?: Location
@@ -114,12 +114,12 @@ export interface NodeTransforms {
       height?: number
       voids?: boolean
     }
-  ) => void
+  ): void
 
   /**
    * Unset properties on the nodes at a location.
    */
-  unsetNodes: <T extends Node>(
+  unsetNodes<T extends Node>(
     editor: Editor,
     props: string | string[],
     options?: {
@@ -130,13 +130,13 @@ export interface NodeTransforms {
       split?: boolean
       voids?: boolean
     }
-  ) => void
+  ): void
 
   /**
    * Unwrap the nodes at a location from a parent node, splitting the parent if
    * necessary to ensure that only the content in the range is unwrapped.
    */
-  unwrapNodes: <T extends Node>(
+  unwrapNodes<T extends Node>(
     editor: Editor,
     options?: {
       at?: Location
@@ -145,13 +145,13 @@ export interface NodeTransforms {
       split?: boolean
       voids?: boolean
     }
-  ) => void
+  ): void
 
   /**
    * Wrap the nodes at a location in a new container node, splitting the edges
    * of the range first to ensure that only the content in the range is wrapped.
    */
-  wrapNodes: <T extends Node>(
+  wrapNodes<T extends Node>(
     editor: Editor,
     element: Element,
     options?: {
@@ -161,7 +161,7 @@ export interface NodeTransforms {
       split?: boolean
       voids?: boolean
     }
-  ) => void
+  ): void
 }
 
 // eslint-disable-next-line no-redeclare

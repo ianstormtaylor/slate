@@ -33,7 +33,7 @@ export interface RangeRefInterface {
   /**
    * Transform the range ref's current value by an operation.
    */
-  transform: (ref: RangeRef, op: Operation) => void
+  transform(ref: RangeRef, op: Operation): void
 }
 
 // eslint-disable-next-line no-redeclare

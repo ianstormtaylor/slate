@@ -49,24 +49,22 @@ export type CreateAndroidInputManagerOptions = {
 }
 
 export type AndroidInputManager = {
-  flush: () => void
-  scheduleFlush: () => void
+  flush(): void
+  scheduleFlush(): void
 
-  hasPendingDiffs: () => boolean
-  hasPendingAction: () => boolean
-  hasPendingChanges: () => boolean
-  isFlushing: () => boolean | 'action'
+  hasPendingDiffs(): boolean
+  hasPendingAction(): boolean
+  hasPendingChanges(): boolean
+  isFlushing(): boolean | 'action'
 
-  handleUserSelect: (range: Range | null) => void
-  handleCompositionEnd: (event: React.CompositionEvent<HTMLDivElement>) => void
-  handleCompositionStart: (
-    event: React.CompositionEvent<HTMLDivElement>
-  ) => void
-  handleDOMBeforeInput: (event: InputEvent) => void
-  handleKeyDown: (event: React.KeyboardEvent<HTMLDivElement>) => void
+  handleUserSelect(range: Range | null): void
+  handleCompositionEnd(event: React.CompositionEvent<HTMLDivElement>): void
+  handleCompositionStart(event: React.CompositionEvent<HTMLDivElement>): void
+  handleDOMBeforeInput(event: InputEvent): void
+  handleKeyDown(event: React.KeyboardEvent<HTMLDivElement>): void
 
-  handleDomMutations: (mutations: MutationRecord[]) => void
-  handleInput: () => void
+  handleDomMutations(mutations: MutationRecord[]): void
+  handleInput(): void
 }
 
 export function createAndroidInputManager({

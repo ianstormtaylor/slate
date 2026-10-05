@@ -37,27 +37,27 @@ export interface TextTransforms {
   /**
    * Delete content in the editor.
    */
-  delete: (editor: Editor, options?: TextDeleteOptions) => void
+  delete(editor: Editor, options?: TextDeleteOptions): void
 
   /**
    * Insert a fragment in the editor
    * at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
    */
-  insertFragment: (
+  insertFragment(
     editor: Editor,
     fragment: Node[],
     options?: TextInsertFragmentOptions
-  ) => void
+  ): void
 
   /**
    * Insert a string of text in the editor
    * at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
    */
-  insertText: (
+  insertText(
     editor: Editor,
     text: string,
     options?: TextInsertTextOptions
-  ) => void
+  ): void
 }
 
 // eslint-disable-next-line no-redeclare

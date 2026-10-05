@@ -66,7 +66,7 @@ export interface NodeInterface {
   /**
    * Get the node at a specific path, asserting that it's an ancestor node. If the specified node is not an ancestor node, throw an error.
    */
-  ancestor: (root: Node, path: Path) => Ancestor
+  ancestor(root: Node, path: Path): Ancestor
 
   /**
    * Return a generator of all the ancestor nodes above a specific path.
@@ -74,129 +74,126 @@ export interface NodeInterface {
    * By default the order is top-down, from highest to lowest ancestor in
    * the tree, but you can pass the `reverse: true` option to go bottom-up.
    */
-  ancestors: (
+  ancestors(
     root: Node,
     path: Path,
     options?: NodeAncestorsOptions
-  ) => Generator<NodeEntry<Ancestor>, void, undefined>
+  ): Generator<NodeEntry<Ancestor>, void, undefined>
 
   /**
    * Get the child of a node at a specific index.
    */
-  child: (root: Node, index: number) => Descendant
+  child(root: Node, index: number): Descendant
 
   /**
    * Iterate over the children of a node at a specific path.
    */
-  children: (
+  children(
     root: Node,
     path: Path,
     options?: NodeChildrenOptions
-  ) => Generator<NodeEntry<Descendant>, void, undefined>
+  ): Generator<NodeEntry<Descendant>, void, undefined>
 
   /**
    * Get an entry for the common ancesetor of two paths.
    * In most cases this will be an Element node, but could the root Editor node if the paths have no other common ancestors, or a Text node if the paths are the same (or if they point to nodes that don't exist).
    */
-  common: (root: Node, path: Path, another: Path) => NodeEntry
+  common(root: Node, path: Path, another: Path): NodeEntry
 
   /**
    * Get the node at a specific path, asserting that it's a descendant node.
    */
-  descendant: (root: Node, path: Path) => Descendant
+  descendant(root: Node, path: Path): Descendant
 
   /**
    * Return a generator of all the descendant node entries inside a root node.
    */
-  descendants: (
+  descendants(
     root: Node,
     options?: NodeDescendantsOptions
-  ) => Generator<NodeEntry<Descendant>, void, undefined>
+  ): Generator<NodeEntry<Descendant>, void, undefined>
 
   /**
    * Return a generator of all the element nodes inside a root node. Each iteration
    * will return an `ElementEntry` tuple consisting of `[Element, Path]`. If the
    * root node is an element it will be included in the iteration as well.
    */
-  elements: (
+  elements(
     root: Node,
     options?: NodeElementsOptions
-  ) => Generator<ElementEntry, void, undefined>
+  ): Generator<ElementEntry, void, undefined>
 
   /**
    * Extract all properties from a Node except for its content-related fields (`children` for Element nodes and `text` for Text nodes).
    * @returns An object containing the extracted properties of the node.
    */
-  extractProps: (node: Node) => NodeProps
+  extractProps(node: Node): NodeProps
 
   /**
    * Get the first leaf node entry in a root node from a path.
    */
-  first: (root: Node, path: Path) => NodeEntry
+  first(root: Node, path: Path): NodeEntry
 
   /**
    * Get the sliced fragment represented by a range inside a root node.
    */
-  fragment: <T extends Ancestor = Editor>(
-    root: T,
-    range: Range
-  ) => T['children']
+  fragment<T extends Ancestor = Editor>(root: T, range: Range): T['children']
 
   /**
    * Get the descendant node referred to by a specific path. If the path is an
    * empty array, it refers to the root node itself.
    */
-  get: (root: Node, path: Path) => Node
+  get(root: Node, path: Path): Node
 
   /**
    * Get a descendant node at a specific path, returning `undefined` if the node does not exist. This is a safer alternative to `Node.get()` as it won't throw an error if the path is invalid.
    */
-  getIf: (root: Node, path: Path) => Node | undefined
+  getIf(root: Node, path: Path): Node | undefined
 
   /**
    * Check if a descendant node exists at a specific path.
    */
-  has: (root: Node, path: Path) => boolean
+  has(root: Node, path: Path): boolean
 
   /**
    * Check if a node is an `Editor` or `Element` object.
    */
-  isAncestor: (node: Node) => node is Ancestor
+  isAncestor(node: Node): node is Ancestor
 
   /**
    * Check if a node is an `Editor` object.
    */
-  isEditor: (node: Node) => node is Editor
+  isEditor(node: Node): node is Editor
 
   /**
    * Check if a node is an `Element` object.
    */
-  isElement: (node: Node) => node is Element
+  isElement(node: Node): node is Element
 
   /**
    * Check if a value implements the `Node` interface.
    */
-  isNode: (value: any, options?: NodeIsNodeOptions) => value is Node
+  isNode(value: any, options?: NodeIsNodeOptions): value is Node
 
   /**
    * Check if a value is a list of `Node` objects.
    */
-  isNodeList: (value: any, options?: NodeIsNodeOptions) => value is Node[]
+  isNodeList(value: any, options?: NodeIsNodeOptions): value is Node[]
 
   /**
    * Check if a node is an `Text` object.
    */
-  isText: (node: Node) => node is Text
+  isText(node: Node): node is Text
 
   /**
    * Get the last leaf node entry in a root node from a path.
    */
-  last: (root: Node, path: Path) => NodeEntry
+  last(root: Node, path: Path): NodeEntry
 
   /**
    * Get the node at a specific path, ensuring it's a leaf text node. If the node is not a leaf text node, throw an error.
    */
-  leaf: (root: Node, path: Path) => Text
+  leaf(root: Node, path: Path): Text
 
   /**
    * Return a generator of the in a branch of the tree, from a specific path.
@@ -204,31 +201,31 @@ export interface NodeInterface {
    * By default the order is top-down, from highest to lowest node in the tree,
    * but you can pass the `reverse: true` option to go bottom-up.
    */
-  levels: (
+  levels(
     root: Node,
     path: Path,
     options?: NodeLevelsOptions
-  ) => Generator<NodeEntry, void, undefined>
+  ): Generator<NodeEntry, void, undefined>
 
   /**
    * Check if a node matches a set of props.
    */
-  matches: (node: Node, props: Partial<Node>) => boolean
+  matches(node: Node, props: Partial<Node>): boolean
 
   /**
    * Return a generator of all the node entries of a root node. Each entry is
    * returned as a `[Node, Path]` tuple, with the path referring to the node's
    * position inside the root node.
    */
-  nodes: (
+  nodes(
     root: Node,
     options?: NodeNodesOptions
-  ) => Generator<NodeEntry, void, undefined>
+  ): Generator<NodeEntry, void, undefined>
 
   /**
    * Get the parent of a node at a specific path.
    */
-  parent: (root: Node, path: Path) => Ancestor
+  parent(root: Node, path: Path): Ancestor
 
   /**
    * Get the concatenated text string of a node's content.
@@ -237,15 +234,15 @@ export interface NodeInterface {
    * It is not a user-facing string, but a string for performing offset-related
    * computations for a node.
    */
-  string: (node: Node) => string
+  string(node: Node): string
 
   /**
    * Return a generator of all leaf text nodes in a root node.
    */
-  texts: (
+  texts(
     root: Node,
     options?: NodeTextsOptions
-  ) => Generator<NodeEntry<Text>, void, undefined>
+  ): Generator<NodeEntry<Text>, void, undefined>
 }
 
 // eslint-disable-next-line no-redeclare

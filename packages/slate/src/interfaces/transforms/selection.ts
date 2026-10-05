@@ -23,36 +23,36 @@ export interface SelectionTransforms {
   /**
    * Collapse the selection.
    */
-  collapse: (editor: Editor, options?: SelectionCollapseOptions) => void
+  collapse(editor: Editor, options?: SelectionCollapseOptions): void
 
   /**
    * Unset the selection.
    */
-  deselect: (editor: Editor) => void
+  deselect(editor: Editor): void
 
   /**
    * Move the selection's point forward or backward.
    */
-  move: (editor: Editor, options?: SelectionMoveOptions) => void
+  move(editor: Editor, options?: SelectionMoveOptions): void
 
   /**
    * Set the selection to a new value.
    */
-  select: (editor: Editor, target: Location) => void
+  select(editor: Editor, target: Location): void
 
   /**
    * Set new properties on one of the selection's points.
    */
-  setPoint: (
+  setPoint(
     editor: Editor,
     props: Partial<Point>,
     options?: SelectionSetPointOptions
-  ) => void
+  ): void
 
   /**
    * Set new properties on the selection.
    */
-  setSelection: (editor: Editor, props: Partial<Range>) => void
+  setSelection(editor: Editor, props: Partial<Range>): void
 }
 
 // eslint-disable-next-line no-redeclare

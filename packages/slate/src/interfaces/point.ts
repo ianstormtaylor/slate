@@ -28,36 +28,36 @@ export interface PointInterface {
    * Compare a point to another, returning an integer indicating whether the
    * point was before, at, or after the other.
    */
-  compare: (point: Point, another: Point) => -1 | 0 | 1
+  compare(point: Point, another: Point): -1 | 0 | 1
 
   /**
    * Check if a point is after another.
    */
-  isAfter: (point: Point, another: Point) => boolean
+  isAfter(point: Point, another: Point): boolean
 
   /**
    * Check if a point is before another.
    */
-  isBefore: (point: Point, another: Point) => boolean
+  isBefore(point: Point, another: Point): boolean
 
   /**
    * Check if a point is exactly equal to another.
    */
-  equals: (point: Point, another: Point) => boolean
+  equals(point: Point, another: Point): boolean
 
   /**
    * Check if a value implements the `Point` interface.
    */
-  isPoint: (value: any) => value is Point
+  isPoint(value: any): value is Point
 
   /**
    * Transform a point by an operation.
    */
-  transform: (
+  transform(
     point: Point,
     op: Operation,
     options?: PointTransformOptions
-  ) => Point | null
+  ): Point | null
 }
 
 // eslint-disable-next-line no-redeclare

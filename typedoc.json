@@ -12,6 +12,7 @@
   "excludeInternal": true,
   "expandParameters": true,
   "parametersFormat": "htmlTable",
+  "propertiesFormat": "htmlTable",
 
   "externalSymbolLinkMappings": {
     "global": {
