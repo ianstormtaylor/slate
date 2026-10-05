@@ -13849,6 +13849,7 @@ __metadata:
     ts-jest: "npm:^29.1.1"
     typedoc: "npm:^0.28.18"
     typedoc-plugin-markdown: "npm:^4.11.0"
+    typedoc-plugin-no-inherit: "npm:^1.6.1"
     typescript: "npm:5.2.2"
   languageName: unknown
   linkType: soft
@@ -15032,6 +15033,15 @@ __metadata:
   peerDependencies:
     typedoc: 0.28.x
   checksum: dbde98e76536f6bd713041cfc22b07adacdec8a314da9d1848b5daa9e0de46ef471718b916a2938cac627bc45b0609a3d1765b795aa96aeea2771093207d4faf
+  languageName: node
+  linkType: hard
+
+"typedoc-plugin-no-inherit@npm:^1.6.1":
+  version: 1.6.1
+  resolution: "typedoc-plugin-no-inherit@npm:1.6.1"
+  peerDependencies:
+    typedoc: 0.26.x || 0.27.x || 0.28.x
+  checksum: 061979ad8209ca3c42872fb7b51c2ffb7298f7cac092373f8e53c14ff36287336897eaaf061fa5a2c001df3bf67ddc165354c77732669436daec14c52d38f58c
   languageName: node
   linkType: hard
 

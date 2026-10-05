@@ -121,6 +121,7 @@
     "ts-jest": "^29.1.1",
     "typedoc": "^0.28.18",
     "typedoc-plugin-markdown": "^4.11.0",
+    "typedoc-plugin-no-inherit": "^1.6.1",
     "typescript": "5.2.2"
   },
   "simple-git-hooks": {

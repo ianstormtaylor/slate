@@ -47,8 +47,8 @@ import {
 
 /**
  * A DOM-specific version of the `Editor` interface.
+ * @noInheritDoc
  */
-
 export interface DOMEditor extends BaseEditor {
   hasEditableTarget: (
     editor: DOMEditor,

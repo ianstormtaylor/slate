@@ -1,4 +1,6 @@
 {
+  "extends": ["../../typedoc.json"],
+  "entryPointStrategy": "resolve",
   "entryPoints": ["src/index.ts"],
   "name": "slate-react",
   "readme": "none",

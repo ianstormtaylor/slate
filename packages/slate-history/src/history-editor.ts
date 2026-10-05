@@ -11,8 +11,8 @@ export const SPLITTING_ONCE = new WeakMap<Editor, boolean | undefined>()
 
 /**
  * `HistoryEditor` contains helpers for history-enabled editors.
+ * @noInheritDoc
  */
-
 export interface HistoryEditor extends BaseEditor {
   history: History
   undo: () => void

@@ -1,4 +1,6 @@
 {
+  "extends": ["../../typedoc.json"],
+  "entryPointStrategy": "resolve",
   "entryPoints": ["src/index.ts"],
   "name": "slate-history",
   "readme": "none",
