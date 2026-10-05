@@ -20,6 +20,7 @@ export interface LeafPosition {
   isLast?: true
 }
 
+/** @inline */
 export interface TextEqualsOptions {
   loose?: boolean
 }

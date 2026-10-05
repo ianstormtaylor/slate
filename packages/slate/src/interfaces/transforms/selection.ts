@@ -1,10 +1,12 @@
 import { Editor, Location, Point, Range } from '../../index'
 import { MoveUnit, SelectionEdge } from '../../types/types'
 
+/** @inline */
 export interface SelectionCollapseOptions {
   edge?: SelectionEdge
 }
 
+/** @inline */
 export interface SelectionMoveOptions {
   distance?: number
   unit?: MoveUnit
@@ -12,6 +14,7 @@ export interface SelectionMoveOptions {
   edge?: SelectionEdge
 }
 
+/** @inline */
 export interface SelectionSetPointOptions {
   edge?: SelectionEdge
 }

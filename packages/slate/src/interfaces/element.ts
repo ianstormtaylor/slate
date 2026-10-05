@@ -20,6 +20,7 @@ export interface BaseElement {
 
 export type Element = ExtendedType<'Element', BaseElement>
 
+/** @inline */
 export interface ElementIsElementOptions {
   deep?: boolean
 }

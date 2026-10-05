@@ -4,14 +4,27 @@
   "entryPointStrategy": "packages",
   "out": "docs/api",
   "plugin": ["typedoc-plugin-markdown", "typedoc-plugin-no-inherit"],
+
   "readme": "none",
   "hidePageHeader": true,
-  "hideBreadcrumbs": true,
-  "expandParameters": true,
   "includeVersion": false,
+  "hideBreadcrumbs": true,
   "excludeInternal": true,
+  "expandParameters": true,
+  "parametersFormat": "htmlTable",
+
   "externalSymbolLinkMappings": {
     "global": {
+      "Comment": "https://developer.mozilla.org/en-US/docs/Web/API/Comment",
+      "DataTransfer": "https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer",
+      "Element": "https://developer.mozilla.org/en-US/docs/Web/API/Element",
+      "Node": "https://developer.mozilla.org/en-US/docs/Web/API/Node",
+      "Range": "https://developer.mozilla.org/en-US/docs/Web/API/Range",
+      "Selection": "https://developer.mozilla.org/en-US/docs/Web/API/Selection",
+      "StaticRange": "https://developer.mozilla.org/en-US/docs/Web/API/StaticRange",
+      "Text": "https://developer.mozilla.org/en-US/docs/Web/API/Text",
+    },
+    "typescript": {
       "Comment": "https://developer.mozilla.org/en-US/docs/Web/API/Comment",
       "DataTransfer": "https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer",
       "Element": "https://developer.mozilla.org/en-US/docs/Web/API/Element",

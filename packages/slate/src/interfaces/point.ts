@@ -18,6 +18,7 @@ export interface BasePoint {
 
 export type Point = ExtendedType<'Point', BasePoint>
 
+/** @inline */
 export interface PointTransformOptions {
   affinity?: TextDirection | null
 }

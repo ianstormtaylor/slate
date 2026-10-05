@@ -6,6 +6,7 @@ import { useGenericSelector } from './use-generic-selector'
 
 type Callback = () => void
 
+/** @inline */
 export interface SlateSelectorOptions {
   /**
    * If true, defer calling the selector function until after `Editable` has

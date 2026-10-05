@@ -687,6 +687,7 @@ export type Selection = ExtendedType<'Selection', BaseSelection>
 
 export type EditorMarks = Omit<Text, 'text'>
 
+/** @inline */
 export interface EditorAboveOptions<T extends Ancestor> {
   at?: Location
   match?: NodeMatch<T>
@@ -694,42 +695,49 @@ export interface EditorAboveOptions<T extends Ancestor> {
   voids?: boolean
 }
 
+/** @inline */
 export interface EditorAfterOptions {
   distance?: number
   unit?: TextUnitAdjustment
   voids?: boolean
 }
 
+/** @inline */
 export interface EditorBeforeOptions {
   distance?: number
   unit?: TextUnitAdjustment
   voids?: boolean
 }
 
+/** @inline */
 export interface EditorDirectedDeletionOptions {
   unit?: TextUnit
 }
 
+/** @inline */
 export interface EditorElementReadOnlyOptions {
   at?: Location
   mode?: MaximizeMode
   voids?: boolean
 }
 
+/** @inline */
 export interface EditorFragmentDeletionOptions {
   direction?: TextDirection
 }
 
-/** @expand */
+/** @inline */
 export interface EditorIsEditorOptions {
   deep?: boolean
 }
 
+/** @inline */
 export interface EditorLeafOptions {
   depth?: number
   edge?: LeafEdge
 }
 
+/** @inline */
 export interface EditorLevelsOptions<T extends Node> {
   at?: Location
   match?: NodeMatch<T>
@@ -737,6 +745,7 @@ export interface EditorLevelsOptions<T extends Node> {
   voids?: boolean
 }
 
+/** @inline */
 export interface EditorNextOptions<T extends Descendant> {
   at?: Location
   match?: NodeMatch<T>
@@ -744,12 +753,18 @@ export interface EditorNextOptions<T extends Descendant> {
   voids?: boolean
 }
 
+/** @inline */
 export interface EditorNodeOptions {
   depth?: number
   edge?: LeafEdge
 }
 
+/** @inline */
 export interface EditorNodesOptions<T extends Node> {
+  /**
+   * The location to iterate over.
+   * @default The current selection. If there is no selection, nothing is yielded.
+   */
   at?: Location | Span
   match?: NodeMatch<T>
   mode?: SelectionMode
@@ -759,33 +774,40 @@ export interface EditorNodesOptions<T extends Node> {
   pass?: (entry: NodeEntry) => boolean
 }
 
+/** @inline */
 export interface EditorNormalizeOptions {
   force?: boolean
   operation?: Operation
 }
 
+/** @inline */
 export interface EditorParentOptions {
   depth?: number
   edge?: LeafEdge
 }
 
+/** @inline */
 export interface EditorPathOptions {
   depth?: number
   edge?: LeafEdge
 }
 
+/** @inline */
 export interface EditorPathRefOptions {
   affinity?: TextDirection | null
 }
 
+/** @inline */
 export interface EditorPointOptions {
   edge?: LeafEdge
 }
 
+/** @inline */
 export interface EditorPointRefOptions {
   affinity?: TextDirection | null
 }
 
+/** @inline */
 export interface EditorPositionsOptions {
   at?: Location
   unit?: TextUnitAdjustment
@@ -793,6 +815,7 @@ export interface EditorPositionsOptions {
   voids?: boolean
 }
 
+/** @inline */
 export interface EditorPreviousOptions<T extends Node> {
   at?: Location
   match?: NodeMatch<T>
@@ -800,18 +823,22 @@ export interface EditorPreviousOptions<T extends Node> {
   voids?: boolean
 }
 
+/** @inline */
 export interface EditorRangeRefOptions {
   affinity?: RangeDirection | null
 }
 
+/** @inline */
 export interface EditorStringOptions {
   voids?: boolean
 }
 
+/** @inline */
 export interface EditorUnhangRangeOptions {
   voids?: boolean
 }
 
+/** @inline */
 export interface EditorVoidOptions {
   at?: Location
   mode?: MaximizeMode
