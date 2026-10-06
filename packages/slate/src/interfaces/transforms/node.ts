@@ -19,6 +19,16 @@ export interface NodeTransforms {
    * at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
    *
    * **WARNING**: Inserting a node that already exists in the document (or another active document) can cause problems with certain plugins like `slate-dom` and `slate-react` that expect each node to be a unique object.
+   *
+   * @example
+   * For example, to insert at the very end, without replacing the current selection and regardless of block nesting, use
+   * ```javascript
+   * Transforms.insertNodes(
+   *   editor,
+   *   { type: targetType, children: [{ text: '' }] },
+   *   { at: [editor.children.length] }
+   * )
+   * ```
    */
   insertNodes<T extends Node>(
     editor: Editor,

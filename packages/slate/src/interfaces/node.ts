@@ -135,6 +135,23 @@ export interface NodeInterface {
    * Extract all properties from a Node except for its content-related fields (`children` for Element nodes and `text` for Text nodes).
    * @returns An object containing the extracted properties of the node.
    * @category Queries
+   *
+   * @example
+   * ```typescript
+   * // For an Element node
+   * const element = {
+   *   type: 'paragraph',
+   *   align: 'center',
+   *   children: [{ text: 'Try it out for yourself!' }],
+   * }
+   * const props = Node.extractProps(element)
+   * // Returns: { type: 'paragraph', align: "center" }
+   *
+   * // For a Text node
+   * const text = { text: 'Hello', bold: true }
+   * const props = Node.extractProps(text)
+   * // Returns: { bold: true }
+   * ```
    */
   extractProps(node: Node): NodeProps
 
@@ -160,6 +177,16 @@ export interface NodeInterface {
   /**
    * Get a descendant node at a specific path, returning `undefined` if the node does not exist. This is a safer alternative to `Node.get()` as it won't throw an error if the path is invalid.
    * @category Retrieval
+   *
+   * @example
+   * ```typescript
+   * const node = Node.getIf(root, [0, 1])
+   * if (node) {
+   *   // node exists at path [0, 1]
+   * } else {
+   *   // no node exists at path [0, 1]
+   * }
+   * ```
    */
   getIf(root: Node, path: Path): Node | undefined
 

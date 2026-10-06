@@ -14,14 +14,58 @@ export type Scrubber = (key: string, value: unknown) => unknown
  * using Slate may call Scrubber.setScrubber() to alter the behavior of this
  * stringify() function.
  *
+ * @example
  * For example, to prevent the cleartext logging of 'text' fields within Nodes:
+ * ```ts
+ * import { Scrubber } from 'slate';
+ * Scrubber.setScrubber((key, val) => {
+ *   if (key === 'text') return '...scrubbed...'
+ *   return val
+ * });
+ * ```
  *
- *    import { Scrubber } from 'slate';
- *    Scrubber.setScrubber((key, val) => {
- *      if (key === 'text') return '...scrubbed...'
- *      return val
- *    });
+ * @example
+ * Here's an example "textRandomizer" scrubber, which randomizes particular fields
+ * of Nodes, preserving their length, but replacing their contents with randomly
+ * chosen alphanumeric characters.
  *
+ * ```ts
+ * import { Scrubber } from 'slate'
+ *
+ * const textRandomizer = (fieldNames: string[]) => (key, value) => {
+ *   if (fieldNames.includes(key)) {
+ *     if (typeof value === 'string') {
+ *       return value.split('').map(generateRandomCharacter).join('')
+ *     } else {
+ *       return '... scrubbed ...'
+ *     }
+ *   }
+ *
+ *   return value
+ * }
+ *
+ * const generateRandomCharacter = (): string => {
+ *   const chars =
+ *     'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLKMNOPQRSTUVWXYZ1234567890'
+ *   return chars.charAt(Math.floor(Math.random() * chars.length))
+ * }
+ *
+ * // randomize the 'text' and 'src' fields of any Node that is included in an
+ * // exception thrown by Slate
+ * Scrubber.setScrubber(Scrubber.textRandomizer(['text', 'src']))
+ * ```
+ *
+ * In this example, a Node that looked like:
+ *
+ * ```json
+ * { "text": "My test input string", "count": 5 }
+ * ```
+ *
+ * will be logged by Slate in an exception as (the random string will differ):
+ *
+ * ```json
+ * { "text": "rSIvEzKe39l6rqQSCfyv", "count": 5 }
+ * ```
  */
 export interface ScrubberInterface {
   /**

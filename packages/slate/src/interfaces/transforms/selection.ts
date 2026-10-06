@@ -37,6 +37,15 @@ export interface SelectionTransforms {
 
   /**
    * Set the selection to a new value.
+   *
+   * @example
+   * For example, to set the selection to the entire contents of the editor:
+   * ```javascript
+   * Transforms.select(editor, {
+   *   anchor: Editor.start(editor, []),
+   *   focus: Editor.end(editor, []),
+   * })
+   * ```
    */
   select(editor: Editor, target: Location): void
 
