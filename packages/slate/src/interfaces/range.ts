@@ -91,7 +91,7 @@ export interface RangeInterface {
   /**
    * Check if a range is expanded.
    *
-   * This is the opposite of {@link Range.isCollapsed} and is provided for
+   * This is the opposite of {@link isCollapsed} and is provided for
    * legibility.
    * @category Queries
    */

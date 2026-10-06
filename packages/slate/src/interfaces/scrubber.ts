@@ -70,7 +70,7 @@ export type Scrubber = (key: string, value: unknown) => unknown
 export interface ScrubberInterface {
   /**
    * Set the scrubber function.
-   * @param scrubber The scrubber function to use on inputs of {@link Scrubber.stringify} and each of its properties, or `undefined` for no scrubbing
+   * @param scrubber The scrubber function to use on inputs of {@link ScrubberInterface#stringify} and each of its properties, or `undefined` for no scrubbing
    */
   setScrubber(scrubber: Scrubber | undefined): void
   /**

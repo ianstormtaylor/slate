@@ -63,13 +63,13 @@ export interface BaseEditor {
 
   /**
    * Check if a value is a read-only `Element` object.
-   * @see {@link EditorInterface.isElementReadOnly}
+   * @see {@link EditorInterface#isElementReadOnly} - A static version of this method.
    */
   isElementReadOnly(element: Element): boolean
 
   /**
    * Check if a value is a selectable `Element` object.
-   * @see {@link EditorInterface.isSelectable}
+   * @see {@link EditorInterface#isSelectable} - A static version of this method.
    */
   isSelectable(element: Element): boolean
 
@@ -82,7 +82,7 @@ export interface BaseEditor {
 
   /**
    * Normalize a node according to the schema.
-   * @see {@link EditorInterface.normalize}
+   * @see {@link EditorInterface#normalize} - A static version of this method.
    */
   normalizeNode(
     entry: NodeEntry,
@@ -97,7 +97,7 @@ export interface BaseEditor {
 
   /**
    * Override this method to prevent normalizing the editor.
-   * @see {@link EditorInterface.isNormalizing}
+   * @see {@link EditorInterface#isNormalizing} - A static version of this method.
    */
   shouldNormalize({
     iteration,
@@ -117,57 +117,57 @@ export interface BaseEditor {
    * nodes that `editor.markableVoid()` allows in the current selection. If the
    * selection is currently collapsed, the marks will be added to the
    * `editor.marks` property instead, and applied when text is inserted next.
-   * @see {@link EditorInterface.addMark}
+   * @see {@link EditorInterface#addMark} - A static version of this method.
    */
   addMark(key: string, value: any): void
 
   /**
    * Collapse the selection.
-   * @see {@link Transforms.collapse}
+   * @see {@link Transforms#collapse}
    */
   collapse(options?: SelectionCollapseOptions): void
 
   /**
    * Delete content in the editor.
-   * @see {@link Transforms.delete}
+   * @see {@link Transforms#delete}
    */
   delete(options?: TextDeleteOptions): void
 
   /**
    * Delete content in the editor backward from the current selection.
-   * @see {@link EditorInterface.deleteBackward}
+   * @see {@link EditorInterface#deleteBackward} - A static version of this method.
    */
   deleteBackward(unit: TextUnit): void
 
   /**
    * Delete content in the editor forward from the current selection.
-   * @see {@link EditorInterface.deleteForward}
+   * @see {@link EditorInterface#deleteForward} - A static version of this method.
    */
   deleteForward(unit: TextUnit): void
 
   /**
    * Delete the content of the current selection.
-   * @see {@link EditorInterface.deleteFragment}
+   * @see {@link EditorInterface#deleteFragment} - A static version of this method.
    */
   deleteFragment(options?: EditorFragmentDeletionOptions): void
 
   /**
    * Unset the selection.
-   * @see {@link Transforms.deselect}
+   * @see {@link Transforms#deselect}
    */
   deselect(): void
 
   /**
    * Insert a block break at the current selection. If the selection is
    * currently expanded, delete it first.
-   * @see {@link EditorInterface.insertBreak}
+   * @see {@link EditorInterface#insertBreak} - A static version of this method.
    */
   insertBreak(): void
 
   /**
    * Insert a fragment at the current selection. If the selection is currently
    * expanded, delete it first.
-   * @see {@link EditorInterface.insertFragment}
+   * @see {@link EditorInterface#insertFragment} - A static version of this method.
    */
   insertFragment(fragment: Node[], options?: TextInsertFragmentOptions): void
 
@@ -176,7 +176,7 @@ export interface BaseEditor {
    * expanded, delete it first.
    *
    * **WARNING**: Inserting a node that already exists in the document (or another active document) can cause problems with certain plugins like `slate-dom` and `slate-react` that expect each node to be a unique object.
-   * @see {@link EditorInterface.insertNode}
+   * @see {@link EditorInterface#insertNode} - A static version of this method.
    */
   insertNode<T extends Node>(
     node: Node,
@@ -188,7 +188,7 @@ export interface BaseEditor {
    * the current selection or (if not defined) the end of the document.
    *
    * **WARNING**: Inserting a node that already exists in the document (or another active document) can cause problems with certain plugins like `slate-dom` and `slate-react` that expect each node to be a unique object.
-   * @see {@link Transforms.insertNodes}
+   * @see {@link Transforms#insertNodes}
    */
   insertNodes<T extends Node>(
     nodes: Node | Node[],
@@ -198,21 +198,21 @@ export interface BaseEditor {
   /**
    * Insert a soft break at the current selection. If the selection is
    * currently expanded, delete it first.
-   * @see {@link EditorInterface.insertSoftBreak}
+   * @see {@link EditorInterface#insertSoftBreak} - A static version of this method.
    */
   insertSoftBreak(): void
 
   /**
    * Insert text at the current selection. If the selection is currently
    * expanded, delete it first.
-   * @see {@link EditorInterface.insertText}
+   * @see {@link EditorInterface#insertText} - A static version of this method.
    */
   insertText(text: string, options?: TextInsertTextOptions): void
 
   /**
    * Lift nodes at a specific location upwards in the document tree, splitting
    * their parent in two if necessary.
-   * @see {@link Transforms.liftNodes}
+   * @see {@link Transforms#liftNodes}
    */
   liftNodes<T extends Node>(options?: {
     at?: Location
@@ -224,7 +224,7 @@ export interface BaseEditor {
   /**
    * Merge a node at a location with the previous node of the same depth,
    * removing any empty containing nodes after the merge if necessary.
-   * @see {@link Transforms.mergeNodes}
+   * @see {@link Transforms#mergeNodes}
    */
   mergeNodes<T extends Node>(options?: {
     at?: Location
@@ -236,13 +236,13 @@ export interface BaseEditor {
 
   /**
    * Move the selection's point forward or backward.
-   * @see {@link Transforms.move}
+   * @see {@link Transforms#move}
    */
   move(options?: SelectionMoveOptions): void
 
   /**
    * Move the nodes at a location to a new location.
-   * @see {@link Transforms.moveNodes}
+   * @see {@link Transforms#moveNodes}
    */
   moveNodes<T extends Node>(options: {
     at?: Location
@@ -254,7 +254,7 @@ export interface BaseEditor {
 
   /**
    * Normalize any dirty objects in the editor.
-   * @see {@link EditorInterface.normalize}
+   * @see {@link EditorInterface#normalize} - A static version of this method.
    */
   normalize(options?: EditorNormalizeOptions): void
 
@@ -263,13 +263,13 @@ export interface BaseEditor {
    * or void nodes that `editor.markableVoid()` allows in the current
    * selection. If the selection is currently collapsed, the removal will be
    * stored on `editor.marks` and applied to the text inserted next.
-   * @see {@link EditorInterface.removeMark}
+   * @see {@link EditorInterface#removeMark} - A static version of this method.
    */
   removeMark(key: string): void
 
   /**
    * Remove the nodes at a specific location in the document.
-   * @see {@link Transforms.removeNodes}
+   * @see {@link Transforms#removeNodes}
    */
   removeNodes<T extends Node>(options?: {
     at?: Location
@@ -281,13 +281,13 @@ export interface BaseEditor {
 
   /**
    * Set the selection to a new value.
-   * @see {@link Transforms.select}
+   * @see {@link Transforms#select}
    */
   select(target: Location): void
 
   /**
    * Set new properties on the nodes at a location.
-   * @see {@link Transforms.setNodes}
+   * @see {@link Transforms#setNodes}
    */
   setNodes<T extends Node>(
     props: Partial<T>,
@@ -307,25 +307,25 @@ export interface BaseEditor {
    * Manually set if the editor should currently be normalizing.
    *
    * Note: Using this incorrectly can leave the editor in an invalid state.
-   * @see {@link EditorInterface.setNormalizing}
+   * @see {@link EditorInterface#setNormalizing} - A static version of this method.
    */
   setNormalizing(isNormalizing: boolean): void
 
   /**
    * Set new properties on one of the selection's points.
-   * @see {@link Transforms.setPoint}
+   * @see {@link Transforms#setPoint}
    */
   setPoint(props: Partial<Point>, options?: SelectionSetPointOptions): void
 
   /**
    * Set new properties on the selection.
-   * @see {@link Transforms.setSelection}
+   * @see {@link Transforms#setSelection}
    */
   setSelection(props: Partial<Range>): void
 
   /**
    * Split the nodes at a specific location.
-   * @see {@link Transforms.splitNodes}
+   * @see {@link Transforms#splitNodes}
    */
   splitNodes<T extends Node>(options?: {
     at?: Location
@@ -338,7 +338,7 @@ export interface BaseEditor {
 
   /**
    * Unset properties on the nodes at a location.
-   * @see {@link Transforms.unsetNodes}
+   * @see {@link Transforms#unsetNodes}
    */
   unsetNodes<T extends Node>(
     props: string | string[],
@@ -355,7 +355,7 @@ export interface BaseEditor {
   /**
    * Unwrap the nodes at a location from a parent node, splitting the parent
    * if necessary to ensure that only the content in the range is unwrapped.
-   * @see {@link Transforms.unwrapNodes}
+   * @see {@link Transforms#unwrapNodes}
    */
   unwrapNodes<T extends Node>(options?: {
     at?: Location
@@ -367,14 +367,14 @@ export interface BaseEditor {
 
   /**
    * Call a function, deferring normalization until after it completes.
-   * @see {@link EditorInterface.withoutNormalizing}
+   * @see {@link EditorInterface#withoutNormalizing} - A static version of this method.
    */
   withoutNormalizing(fn: () => void): void
 
   /**
    * Wrap the nodes at a location in a new container node, splitting the edges
    * of the range first to ensure that only the content in the range is wrapped.
-   * @see {@link Transforms.wrapNodes}
+   * @see {@link Transforms#wrapNodes}
    */
   wrapNodes<T extends Node>(
     element: Element,
@@ -391,7 +391,7 @@ export interface BaseEditor {
 
   /**
    * Get the ancestor above a location in the document.
-   * @see {@link EditorInterface.above}
+   * @see {@link EditorInterface#above} - A static version of this method.
    */
   above<T extends Ancestor>(
     options?: EditorAboveOptions<T>
@@ -399,25 +399,25 @@ export interface BaseEditor {
 
   /**
    * Get the point after a location.
-   * @see {@link EditorInterface.after}
+   * @see {@link EditorInterface#after} - A static version of this method.
    */
   after(at: Location, options?: EditorAfterOptions): Point | undefined
 
   /**
    * Get the point before a location.
-   * @see {@link EditorInterface.before}
+   * @see {@link EditorInterface#before} - A static version of this method.
    */
   before(at: Location, options?: EditorBeforeOptions): Point | undefined
 
   /**
    * Get the start and end points of a location.
-   * @see {@link EditorInterface.edges}
+   * @see {@link EditorInterface#edges} - A static version of this method.
    */
   edges(at: Location): [Point, Point]
 
   /**
    * Match a read-only element in the current branch of the editor.
-   * @see {@link EditorInterface.elementReadOnly}
+   * @see {@link EditorInterface#elementReadOnly} - A static version of this method.
    */
   elementReadOnly(
     options?: EditorElementReadOnlyOptions
@@ -425,114 +425,114 @@ export interface BaseEditor {
 
   /**
    * Get the end point of a location.
-   * @see {@link EditorInterface.end}
+   * @see {@link EditorInterface#end} - A static version of this method.
    */
   end(at: Location): Point
 
   /**
    * Get the first node at a location.
-   * @see {@link EditorInterface.first}
+   * @see {@link EditorInterface#first} - A static version of this method.
    */
   first(at: Location): NodeEntry
 
   /**
    * Get the fragment at a location.
-   * @see {@link EditorInterface.fragment}
+   * @see {@link EditorInterface#fragment} - A static version of this method.
    */
   fragment(at: Location): Descendant[]
 
   /**
    * Get the marks that would be added to text at the current selection.
-   * @see {@link EditorInterface.marks}
+   * @see {@link EditorInterface#marks} - A static version of this method.
    */
   getMarks(): Omit<Text, 'text'> | null
 
   /**
    * Check if a node has block children.
-   * @see {@link EditorInterface.hasBlocks}
+   * @see {@link EditorInterface#hasBlocks} - A static version of this method.
    */
   hasBlocks(element: Element): boolean
 
   /**
    * Check if a node has inline and text children.
-   * @see {@link EditorInterface.hasInlines}
+   * @see {@link EditorInterface#hasInlines} - A static version of this method.
    */
   hasInlines(element: Element): boolean
 
   /**
-   * @see {@link EditorInterface.hasPath}
+   * @see {@link EditorInterface#hasPath} - A static version of this method.
    */
   hasPath(path: Path): boolean
 
   /**
    * Check if a node has text children.
-   * @see {@link EditorInterface.hasTexts}
+   * @see {@link EditorInterface#hasTexts} - A static version of this method.
    */
   hasTexts(element: Element): boolean
 
   /**
    * Check if a value is a block `Element` object.
-   * @see {@link EditorInterface.isBlock}
+   * @see {@link EditorInterface#isBlock} - A static version of this method.
    */
   isBlock(value: Element): boolean
 
   /**
    * Check if a point is an edge of a location.
-   * @see {@link EditorInterface.isEdge}
+   * @see {@link EditorInterface#isEdge} - A static version of this method.
    */
   isEdge(point: Point, at: Location): boolean
 
   /**
    * Check if an element is empty, accounting for void nodes.
-   * @see {@link EditorInterface.isEmpty}
+   * @see {@link EditorInterface#isEmpty} - A static version of this method.
    */
   isEmpty(element: Element): boolean
 
   /**
    * Check if a point is the end point of a location.
-   * @see {@link EditorInterface.isEnd}
+   * @see {@link EditorInterface#isEnd} - A static version of this method.
    */
   isEnd(point: Point, at: Location): boolean
 
   /**
    * Check if a value is an inline `Element` object.
-   * @see {@link EditorInterface.isInline}
+   * @see {@link EditorInterface#isInline} - A static version of this method.
    */
   isInline(value: Element): boolean
 
   /**
    * Check if the editor is currently normalizing after each operation.
-   * @see {@link EditorInterface.isNormalizing}
+   * @see {@link EditorInterface#isNormalizing} - A static version of this method.
    */
   isNormalizing(): boolean
 
   /**
    * Check if a point is the start point of a location.
-   * @see {@link EditorInterface.isStart}
+   * @see {@link EditorInterface#isStart} - A static version of this method.
    */
   isStart(point: Point, at: Location): boolean
 
   /**
    * Check if a value is a void `Element` object.
-   * @see {@link EditorInterface.isVoid}
+   * @see {@link EditorInterface#isVoid} - A static version of this method.
    */
   isVoid(value: Element): boolean
 
   /**
    * Get the last node at a location.
-   * @see {@link EditorInterface.last}
+   * @see {@link EditorInterface#last} - A static version of this method.
    */
   last(at: Location): NodeEntry
 
   /**
    * Get the leaf text node at a location.
-   * @see {@link EditorInterface.leaf}
+   * @see {@link EditorInterface#leaf} - A static version of this method.
    */
   leaf(at: Location, options?: EditorLeafOptions): NodeEntry<Text>
 
   /**
    * Iterate through all of the levels at a location.
-   * @see {@link EditorInterface.levels}
+   * @see {@link EditorInterface#levels} - A static version of this method.
    */
   levels<T extends Node>(
     options?: EditorLevelsOptions<T>
@@ -540,7 +540,7 @@ export interface BaseEditor {
 
   /**
    * Get the matching node in the branch of the document after a location.
-   * @see {@link EditorInterface.next}
+   * @see {@link EditorInterface#next} - A static version of this method.
    */
   next<T extends Descendant>(
     options?: EditorNextOptions<T>
@@ -548,13 +548,13 @@ export interface BaseEditor {
 
   /**
    * Get the node at a location.
-   * @see {@link EditorInterface.node}
+   * @see {@link EditorInterface#node} - A static version of this method.
    */
   node(at: Location, options?: EditorNodeOptions): NodeEntry
 
   /**
    * Iterate through all of the nodes in the Editor.
-   * @see {@link EditorInterface.nodes}
+   * @see {@link EditorInterface#nodes} - A static version of this method.
    */
   nodes<T extends Node>(
     options?: EditorNodesOptions<T>
@@ -562,57 +562,57 @@ export interface BaseEditor {
 
   /**
    * Get the parent node of a location.
-   * @see {@link EditorInterface.parent}
+   * @see {@link EditorInterface#parent} - A static version of this method.
    */
   parent(at: Location, options?: EditorParentOptions): NodeEntry<Ancestor>
 
   /**
    * Get the path of a location.
-   * @see {@link EditorInterface.path}
+   * @see {@link EditorInterface#path} - A static version of this method.
    */
   path(at: Location, options?: EditorPathOptions): Path
 
   /**
    * Create a mutable ref for a `Path` object, which will stay in sync as new
    * operations are applied to the editor.
-   * @see {@link EditorInterface.pathRef}
+   * @see {@link EditorInterface#pathRef} - A static version of this method.
    */
   pathRef(path: Path, options?: EditorPathRefOptions): PathRef
 
   /**
    * Get the set of currently tracked path refs of the editor.
-   * @see {@link EditorInterface.pathRefs}
+   * @see {@link EditorInterface#pathRefs} - A static version of this method.
    */
   pathRefs(): Set<PathRef>
 
   /**
    * Get the start or end point of a location.
-   * @see {@link EditorInterface.point}
+   * @see {@link EditorInterface#point} - A static version of this method.
    */
   point(at: Location, options?: EditorPointOptions): Point
 
   /**
    * Create a mutable ref for a `Point` object, which will stay in sync as new
    * operations are applied to the editor.
-   * @see {@link EditorInterface.pointRef}
+   * @see {@link EditorInterface#pointRef} - A static version of this method.
    */
   pointRef(point: Point, options?: EditorPointRefOptions): PointRef
 
   /**
    * Get the set of currently tracked point refs of the editor.
-   * @see {@link EditorInterface.pointRefs}
+   * @see {@link EditorInterface#pointRefs} - A static version of this method.
    */
   pointRefs(): Set<PointRef>
 
   /**
    * Return all the positions in `at` range where a `Point` can be placed.
-   * @see {@link EditorInterface.positions}
+   * @see {@link EditorInterface#positions} - A static version of this method.
    */
   positions(options?: EditorPositionsOptions): Generator<Point, void, undefined>
 
   /**
    * Get the matching node in the branch of the document before a location.
-   * @see {@link EditorInterface.previous}
+   * @see {@link EditorInterface#previous} - A static version of this method.
    */
   previous<T extends Node>(
     options?: EditorPreviousOptions<T>
@@ -620,26 +620,26 @@ export interface BaseEditor {
 
   /**
    * Get a range of a location.
-   * @see {@link EditorInterface.range}
+   * @see {@link EditorInterface#range} - A static version of this method.
    */
   range(at: Location, to?: Location): Range
 
   /**
    * Create a mutable ref for a `Range` object, which will stay in sync as new
    * operations are applied to the editor.
-   * @see {@link EditorInterface.rangeRef}
+   * @see {@link EditorInterface#rangeRef} - A static version of this method.
    */
   rangeRef(range: Range, options?: EditorRangeRefOptions): RangeRef
 
   /**
    * Get the set of currently tracked range refs of the editor.
-   * @see {@link EditorInterface.rangeRefs}
+   * @see {@link EditorInterface#rangeRefs} - A static version of this method.
    */
   rangeRefs(): Set<RangeRef>
 
   /**
    * Get the start point of a location.
-   * @see {@link EditorInterface.start}
+   * @see {@link EditorInterface#start} - A static version of this method.
    */
   start(at: Location): Point
 
@@ -648,25 +648,25 @@ export interface BaseEditor {
    *
    * Note: by default the text of void nodes is considered to be an empty
    * string, regardless of content, unless you pass in true for the voids option.
-   * @see {@link EditorInterface.string}
+   * @see {@link EditorInterface#string} - A static version of this method.
    */
   string(at: Location, options?: EditorStringOptions): string
 
   /**
    * Convert a range into a non-hanging one.
-   * @see {@link EditorInterface.unhangRange}
+   * @see {@link EditorInterface#unhangRange} - A static version of this method.
    */
   unhangRange(range: Range, options?: EditorUnhangRangeOptions): Range
 
   /**
    * Match a void node in the current branch of the editor.
-   * @see {@link EditorInterface.void}
+   * @see {@link EditorInterface#void} - A static version of this method.
    */
   void(options?: EditorVoidOptions): NodeEntry<Element> | undefined
 
   /**
    * Determine whether or not to remove the previous node when merging.
-   * @see {@link EditorInterface.shouldMergeNodesRemovePrevNode}
+   * @see {@link EditorInterface#shouldMergeNodesRemovePrevNode} - A static version of this method.
    */
   shouldMergeNodesRemovePrevNode(
     prevNodeEntry: NodeEntry,
