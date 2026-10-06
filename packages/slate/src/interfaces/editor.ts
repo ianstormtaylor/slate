@@ -843,6 +843,7 @@ export interface EditorVoidOptions {
 export interface EditorInterface {
   /**
    * Get the ancestor above a location in the document.
+   * @category Relational
    */
   above<T extends Ancestor>(
     editor: Editor,
@@ -854,11 +855,13 @@ export interface EditorInterface {
    *
    * If the selection is currently collapsed, the marks will be added to the
    * `editor.marks` property instead, and applied when text is inserted next.
+   * @category Commands
    */
   addMark(editor: Editor, key: string, value: any): void
 
   /**
    * Get the point after a location.
+   * @category Relational
    */
   after(
     editor: Editor,
@@ -868,6 +871,7 @@ export interface EditorInterface {
 
   /**
    * Get the point before a location.
+   * @category Relational
    */
   before(
     editor: Editor,
@@ -877,26 +881,31 @@ export interface EditorInterface {
 
   /**
    * Delete content in the editor backward from the current selection.
+   * @category Commands
    */
   deleteBackward(editor: Editor, options?: EditorDirectedDeletionOptions): void
 
   /**
    * Delete content in the editor forward from the current selection.
+   * @category Commands
    */
   deleteForward(editor: Editor, options?: EditorDirectedDeletionOptions): void
 
   /**
    * Delete the content in the current selection.
+   * @category Commands
    */
   deleteFragment(editor: Editor, options?: EditorFragmentDeletionOptions): void
 
   /**
    * Get the start and end points of a location.
+   * @category Relational
    */
   edges(editor: Editor, at: Location): [Point, Point]
 
   /**
    * Match a read-only element in the current branch of the editor.
+   * @category Relational
    */
   elementReadOnly(
     editor: Editor,
@@ -905,33 +914,43 @@ export interface EditorInterface {
 
   /**
    * Get the end point of a location.
+   * @category Relational
    */
   end(editor: Editor, at: Location): Point
 
   /**
    * Get the first node at a location.
+   * @category Relational
    */
   first(editor: Editor, at: Location): NodeEntry
 
   /**
    * Get the fragment at a location.
+   * @category Queries
    */
   fragment(editor: Editor, at: Location): Descendant[]
 
   /**
    * Check if a node has block children.
+   * @category Queries
    */
   hasBlocks(editor: Editor, element: Element): boolean
 
   /**
    * Check if a node has inline and text children.
+   * @category Queries
    */
   hasInlines(editor: Editor, element: Element): boolean
 
+  /**
+   * Check if a descendant node exists at a specific path.
+   * @category Queries
+   */
   hasPath(editor: Editor, path: Path): boolean
 
   /**
    * Check if a node has text children.
+   * @category Queries
    */
   hasTexts(editor: Editor, element: Element): boolean
 
@@ -939,6 +958,7 @@ export interface EditorInterface {
    * Insert a block break at the current selection.
    *
    * If the selection is currently expanded, it will be deleted first.
+   * @category Commands
    */
   insertBreak(editor: Editor): void
 
@@ -947,6 +967,7 @@ export interface EditorInterface {
    * at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
    *
    * **WARNING**: Inserting a node that already exists in the document (or another active document) can cause problems with certain plugins like `slate-dom` and `slate-react` that expect each node to be a unique object.
+   * @category Commands
    */
   insertFragment(
     editor: Editor,
@@ -959,6 +980,7 @@ export interface EditorInterface {
    * at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
    *
    * **WARNING**: Inserting a node that already exists in the document (or another active document) can cause problems with certain plugins like `slate-dom` and `slate-react` that expect each node to be a unique object.
+   * @category Commands
    */
   insertNode<T extends Node>(
     editor: Editor,
@@ -970,12 +992,14 @@ export interface EditorInterface {
    * Insert a soft break at the current selection.
    *
    * If the selection is currently expanded, it will be deleted first.
+   * @category Commands
    */
   insertSoftBreak(editor: Editor): void
 
   /**
    * Insert a string of text
    * at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
+   * @category Commands
    */
   insertText(
     editor: Editor,
@@ -985,66 +1009,79 @@ export interface EditorInterface {
 
   /**
    * Check if a value is a block `Element` object.
+   * @category Queries
    */
   isBlock(editor: Editor, value: Element): boolean
 
   /**
    * Check if a point is an edge of a location.
+   * @category Queries
    */
   isEdge(editor: Editor, point: Point, at: Location): boolean
 
   /**
    * Check if a value is an `Editor` object.
+   * @category Queries
    */
   isEditor(value: any, options?: EditorIsEditorOptions): value is Editor
 
   /**
    * Check if a value is a read-only `Element` object.
+   * @category Queries
    */
   isElementReadOnly(editor: Editor, element: Element): boolean
 
   /**
    * Check if an element is empty, accounting for void nodes.
+   * @category Queries
    */
   isEmpty(editor: Editor, element: Element): boolean
 
   /**
    * Check if a point is the end point of a location.
+   * @category Queries
    */
   isEnd(editor: Editor, point: Point, at: Location): boolean
 
   /**
    * Check if a value is an inline `Element` object.
+   * @category Queries
    */
   isInline(editor: Editor, value: Element): boolean
 
   /**
    * Check if the editor is currently normalizing after each operation.
+   * @category Queries
    */
   isNormalizing(editor: Editor): boolean
 
   /**
    * Check if a value is a selectable `Element` object.
+   * @category Queries
    */
   isSelectable(editor: Editor, element: Element): boolean
 
   /**
    * Check if a point is the start point of a location.
+   * @category Queries
    */
   isStart(editor: Editor, point: Point, at: Location): boolean
 
   /**
    * Check if a value is a void `Element` object.
+   * @category Queries
    */
   isVoid(editor: Editor, value: Element): boolean
 
   /**
    * Get the last node at a location.
+   * @category Relational
    */
   last(editor: Editor, at: Location): NodeEntry
 
   /**
    * Get the leaf text node at a location.
+   * @category Retrieval
    */
   leaf(
     editor: Editor,
@@ -1054,6 +1091,7 @@ export interface EditorInterface {
 
   /**
    * Iterate through all of the levels at a location.
+   * @category Relational
    */
   levels<T extends Node>(
     editor: Editor,
@@ -1062,11 +1100,13 @@ export interface EditorInterface {
 
   /**
    * Get the marks that would be added to text at the current selection.
+   * @category Queries
    */
   marks(editor: Editor): Omit<Text, 'text'> | null
 
   /**
    * Get the matching node in the branch of the document after a location.
+   * @category Relational
    */
   next<T extends Descendant>(
     editor: Editor,
@@ -1080,6 +1120,7 @@ export interface EditorInterface {
 
   /**
    * Iterate through all of the nodes in the Editor.
+   * @category Relational
    */
   nodes<T extends Node>(
     editor: Editor,
@@ -1088,11 +1129,13 @@ export interface EditorInterface {
 
   /**
    * Normalize any dirty objects in the editor.
+   * @category Commands
    */
   normalize(editor: Editor, options?: EditorNormalizeOptions): void
 
   /**
    * Get the parent node of a location.
+   * @category Relational
    */
   parent(
     editor: Editor,
@@ -1102,28 +1145,33 @@ export interface EditorInterface {
 
   /**
    * Get the path of a location.
+   * @category Queries
    */
   path(editor: Editor, at: Location, options?: EditorPathOptions): Path
 
   /**
    * Create a mutable ref for a `Path` object, which will stay in sync as new
    * operations are applied to the editor.
+   * @category Create Ref
    */
   pathRef(editor: Editor, path: Path, options?: EditorPathRefOptions): PathRef
 
   /**
    * Get the set of currently tracked path refs of the editor.
+   * @category Queries
    */
   pathRefs(editor: Editor): Set<PathRef>
 
   /**
    * Get the start or end point of a location.
+   * @category Queries
    */
   point(editor: Editor, at: Location, options?: EditorPointOptions): Point
 
   /**
    * Create a mutable ref for a `Point` object, which will stay in sync as new
    * operations are applied to the editor.
+   * @category Create Ref
    */
   pointRef(
     editor: Editor,
@@ -1133,6 +1181,7 @@ export interface EditorInterface {
 
   /**
    * Get the set of currently tracked point refs of the editor.
+   * @category Queries
    */
   pointRefs(editor: Editor): Set<PointRef>
 
@@ -1155,6 +1204,7 @@ export interface EditorInterface {
 
   /**
    * Get the matching node in the branch of the document before a location.
+   * @category Relational
    */
   previous<T extends Node>(
     editor: Editor,
@@ -1163,12 +1213,14 @@ export interface EditorInterface {
 
   /**
    * Get a range of a location.
+   * @category Queries
    */
   range(editor: Editor, at: Location, to?: Location): Range
 
   /**
    * Create a mutable ref for a `Range` object, which will stay in sync as new
    * operations are applied to the editor.
+   * @category Create Ref
    */
   rangeRef(
     editor: Editor,
@@ -1178,6 +1230,7 @@ export interface EditorInterface {
 
   /**
    * Get the set of currently tracked range refs of the editor.
+   * @category Queries
    */
   rangeRefs(editor: Editor): Set<RangeRef>
 
@@ -1187,6 +1240,7 @@ export interface EditorInterface {
    *
    * If the selection is currently collapsed, the removal will be stored on
    * `editor.marks` and applied to the text inserted next.
+   * @category Commands
    */
   removeMark(editor: Editor, key: string): void
 
@@ -1200,6 +1254,7 @@ export interface EditorInterface {
 
   /**
    * Get the start point of a location.
+   * @category Relational
    */
   start(editor: Editor, at: Location): Point
 
@@ -1208,11 +1263,13 @@ export interface EditorInterface {
    *
    * Note: by default the text of void nodes is considered to be an empty
    * string, regardless of content, unless you pass in true for the voids option
+   * @category Queries
    */
   string(editor: Editor, at: Location, options?: EditorStringOptions): string
 
   /**
    * Convert a range into a non-hanging one.
+   * @category Selection Commands
    */
   unhangRange(
     editor: Editor,
@@ -1222,6 +1279,7 @@ export interface EditorInterface {
 
   /**
    * Match a void node in the current branch of the editor.
+   * @category Relational
    */
   void(
     editor: Editor,
@@ -1235,6 +1293,7 @@ export interface EditorInterface {
 
   /**
    *  Call a function, Determine whether or not remove the previous node when merge.
+   * @category Queries
    */
   shouldMergeNodesRemovePrevNode(
     editor: Editor,

@@ -13,6 +13,7 @@
   "expandParameters": true,
   "parametersFormat": "htmlTable",
   "propertiesFormat": "htmlTable",
+  "categorizeByGroup": true,
 
   "externalSymbolLinkMappings": {
     "global": {

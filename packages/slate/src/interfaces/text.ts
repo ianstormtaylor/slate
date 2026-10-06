@@ -41,21 +41,25 @@ export interface TextInterface {
    * used to check whether sibling text nodes can be merged.
    *
    * @param options.loose When `true`, it checks if the properties of the `Text` object are equal except for the `text` property (i.e. the `String` value of the `Text`). When `false` (default), checks all properties including `text`. Defaults to `false`.
+   * @category Queries
    */
   equals(text: Text, another: Text, options?: TextEqualsOptions): boolean
 
   /**
    * Check if a value implements the `Text` interface.
+   * @category Type Guards
    */
   isText(value: any): value is Text
 
   /**
    * Check if a value is a list of `Text` objects.
+   * @category Type Guards
    */
   isTextList(value: any): value is Text[]
 
   /**
    * Check if some props are a partial of Text.
+   * @category Type Guards
    */
   isTextProps(props: any): props is Partial<Text>
 
@@ -65,11 +69,13 @@ export interface TextInterface {
    * The way the check works is that it makes sure that (a) all the `props` exist in the `text`, and (b) if it exists, that it exactly matches the properties in the `text`.
    * If a `props.text` property is passed in, it will be ignored.
    * If there are properties in `text` that are not in `props`, those will be ignored when it comes to testing for a match.
+   * @category Queries
    */
   matches(text: Text, props: Partial<Text>): boolean
 
   /**
    * Get the leaves for a text node given decorations.
+   * @category Queries
    */
   decorations(
     node: Text,

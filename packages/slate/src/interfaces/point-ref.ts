@@ -29,7 +29,7 @@ export interface PointRef {
 
 export interface PointRefInterface {
   /**
-   * Transform the point ref's current value by an operation.
+   * Transform the point ref's current value by an operation. This is called automatically by the editor as operations are applied.
    */
   transform(ref: PointRef, op: Operation): void
 }

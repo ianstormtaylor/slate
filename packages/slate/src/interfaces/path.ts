@@ -36,11 +36,13 @@ export interface PathInterface {
    *
    * The paths are sorted from shallowest to deepest ancestor. However, if the
    * `reverse: true` option is passed, they are reversed.
+   * @category Relational
    */
   ancestors(path: Path, options?: PathAncestorsOptions): Path[]
 
   /**
    * Get the common ancestor path of two paths.
+   * @category Relational
    */
   common(path: Path, another: Path): Path
 
@@ -51,76 +53,91 @@ export interface PathInterface {
    * Note: Two paths of unequal length can still receive a `0` result if one is
    * directly above or below the other. If you want exact matching, use
    * {@link Path.equals} instead.
+   * @category Comparison
    */
   compare(path: Path, another: Path): -1 | 0 | 1
 
   /**
    * Check if a path ends after one of the indexes in another.
+   * @category Comparison
    */
   endsAfter(path: Path, another: Path): boolean
 
   /**
    * Check if a path ends at one of the indexes in another.
+   * @category Comparison
    */
   endsAt(path: Path, another: Path): boolean
 
   /**
    * Check if a path ends before one of the indexes in another.
+   * @category Comparison
    */
   endsBefore(path: Path, another: Path): boolean
 
   /**
    * Check if a path is exactly equal to another.
+   * @category Comparison
    */
   equals(path: Path, another: Path): boolean
 
   /**
    * Check if the path of previous sibling node exists
+   * @category Queries
    */
   hasPrevious(path: Path): boolean
 
   /**
    * Check if a path is after another.
+   * @category Comparison
    */
   isAfter(path: Path, another: Path): boolean
 
   /**
    * Check if a path is an ancestor of another.
+   * @category Comparison
    */
   isAncestor(path: Path, another: Path): boolean
 
   /**
    * Check if a path is before another.
+   * @category Comparison
    */
   isBefore(path: Path, another: Path): boolean
 
   /**
    * Check if a path is a child of another.
+   * @category Comparison
    */
   isChild(path: Path, another: Path): boolean
 
   /**
    * Check if a path is equal to or an ancestor of another.
+   * @category Comparison
    */
   isCommon(path: Path, another: Path): boolean
 
   /**
    * Check if a path is a descendant of another.
+   * @category Comparison
    */
   isDescendant(path: Path, another: Path): boolean
 
   /**
    * Check if a path is the parent of another.
+   * @category Comparison
    */
   isParent(path: Path, another: Path): boolean
 
   /**
    * Check is a value implements the `Path` interface.
+   * @category Type Guards
    */
   isPath(value: any): value is Path
 
   /**
    * Check if a path is a sibling of another.
+   * @category Comparison
    */
   isSibling(path: Path, another: Path): boolean
 
@@ -130,12 +147,14 @@ export interface PathInterface {
    *
    * The paths are sorted from shallowest to deepest. However, if the `reverse:
    * true` option is passed, they are reversed.
+   * @category Relational
    */
   levels(path: Path, options?: PathLevelsOptions): Path[]
 
   /**
    * Given a path, get the path to the next sibling node. The method does not
    * ensure that the returned `Path` is valid in the document.
+   * @category Relational
    */
   next(path: Path): Path
 
@@ -158,6 +177,7 @@ export interface PathInterface {
   /**
    * Given a path, return a new path referring to the parent node above it.
    * If the `path` argument is equal to `[]`, throws an error.
+   * @category Relational
    */
   parent(path: Path): Path
 
@@ -166,6 +186,7 @@ export interface PathInterface {
    * throw an error if there are no previous siblings (e.g. if the Path is
    * currently `[1, 0]`, the previous path would be `[1, -1]` which is illegal
    * and will throw an error).
+   * @category Relational
    */
   previous(path: Path): Path
 
@@ -174,11 +195,13 @@ export interface PathInterface {
    * relative path from the `ancestor` argument to the `path` argument. If the
    * `ancestor` path is not actually an ancestor or equal to the `path`
    * argument, throws an error.
+   * @category Relational
    */
   relative(path: Path, ancestor: Path): Path
 
   /**
    * Transform a path by an operation.
+   * @category Relational
    */
   transform(
     path: Path,

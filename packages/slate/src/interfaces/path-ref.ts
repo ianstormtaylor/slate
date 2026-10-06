@@ -28,7 +28,7 @@ export interface PathRef {
 
 export interface PathRefInterface {
   /**
-   * Transform a PathRef's current value by an operation.
+   * Transform a PathRef's current value by an operation. This is called automatically by the editor as operations are applied.
    */
   transform(ref: PathRef, op: Operation): void
 }

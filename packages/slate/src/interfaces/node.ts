@@ -65,6 +65,7 @@ export interface NodeTextsOptions {
 export interface NodeInterface {
   /**
    * Get the node at a specific path, asserting that it's an ancestor node. If the specified node is not an ancestor node, throw an error.
+   * @category Queries
    */
   ancestor(root: Node, path: Path): Ancestor
 
@@ -73,6 +74,7 @@ export interface NodeInterface {
    *
    * By default the order is top-down, from highest to lowest ancestor in
    * the tree, but you can pass the `reverse: true` option to go bottom-up.
+   * @category Relational
    */
   ancestors(
     root: Node,
@@ -82,11 +84,13 @@ export interface NodeInterface {
 
   /**
    * Get the child of a node at a specific index.
+   * @category Relational
    */
   child(root: Node, index: number): Descendant
 
   /**
    * Iterate over the children of a node at a specific path.
+   * @category Relational
    */
   children(
     root: Node,
@@ -97,16 +101,19 @@ export interface NodeInterface {
   /**
    * Get an entry for the common ancesetor of two paths.
    * In most cases this will be an Element node, but could the root Editor node if the paths have no other common ancestors, or a Text node if the paths are the same (or if they point to nodes that don't exist).
+   * @category Retrieval
    */
   common(root: Node, path: Path, another: Path): NodeEntry
 
   /**
    * Get the node at a specific path, asserting that it's a descendant node.
+   * @category Retrieval
    */
   descendant(root: Node, path: Path): Descendant
 
   /**
    * Return a generator of all the descendant node entries inside a root node.
+   * @category Retrieval
    */
   descendants(
     root: Node,
@@ -117,6 +124,7 @@ export interface NodeInterface {
    * Return a generator of all the element nodes inside a root node. Each iteration
    * will return an `ElementEntry` tuple consisting of `[Element, Path]`. If the
    * root node is an element it will be included in the iteration as well.
+   * @category Retrieval
    */
   elements(
     root: Node,
@@ -126,72 +134,86 @@ export interface NodeInterface {
   /**
    * Extract all properties from a Node except for its content-related fields (`children` for Element nodes and `text` for Text nodes).
    * @returns An object containing the extracted properties of the node.
+   * @category Queries
    */
   extractProps(node: Node): NodeProps
 
   /**
    * Get the first leaf node entry in a root node from a path.
+   * @category Retrieval
    */
   first(root: Node, path: Path): NodeEntry
 
   /**
    * Get the sliced fragment represented by a range inside a root node.
+   * @category Queries
    */
   fragment<T extends Ancestor = Editor>(root: T, range: Range): T['children']
 
   /**
    * Get the descendant node referred to by a specific path. If the path is an
    * empty array, it refers to the root node itself.
+   * @category Retrieval
    */
   get(root: Node, path: Path): Node
 
   /**
    * Get a descendant node at a specific path, returning `undefined` if the node does not exist. This is a safer alternative to `Node.get()` as it won't throw an error if the path is invalid.
+   * @category Retrieval
    */
   getIf(root: Node, path: Path): Node | undefined
 
   /**
    * Check if a descendant node exists at a specific path.
+   * @category Queries
    */
   has(root: Node, path: Path): boolean
 
   /**
    * Check if a node is an `Editor` or `Element` object.
+   * @category Type Guards
    */
   isAncestor(node: Node): node is Ancestor
 
   /**
    * Check if a node is an `Editor` object.
+   * @category Type Guards
    */
   isEditor(node: Node): node is Editor
 
   /**
    * Check if a node is an `Element` object.
+   * @category Type Guards
    */
   isElement(node: Node): node is Element
 
   /**
    * Check if a value implements the `Node` interface.
+   * @category Type Guards
    */
   isNode(value: any, options?: NodeIsNodeOptions): value is Node
 
   /**
    * Check if a value is a list of `Node` objects.
+   * @category Type Guards
    */
   isNodeList(value: any, options?: NodeIsNodeOptions): value is Node[]
 
   /**
    * Check if a node is an `Text` object.
+   * @category Type Guards
    */
   isText(node: Node): node is Text
 
   /**
    * Get the last leaf node entry in a root node from a path.
+   * @category Retrieval
    */
   last(root: Node, path: Path): NodeEntry
 
   /**
    * Get the node at a specific path, ensuring it's a leaf text node. If the node is not a leaf text node, throw an error.
+   * @category Retrieval
    */
   leaf(root: Node, path: Path): Text
 
@@ -200,6 +222,7 @@ export interface NodeInterface {
    *
    * By default the order is top-down, from highest to lowest node in the tree,
    * but you can pass the `reverse: true` option to go bottom-up.
+   * @category Retrieval
    */
   levels(
     root: Node,
@@ -209,6 +232,7 @@ export interface NodeInterface {
 
   /**
    * Check if a node matches a set of props.
+   * @category Queries
    */
   matches(node: Node, props: Partial<Node>): boolean
 
@@ -216,6 +240,7 @@ export interface NodeInterface {
    * Return a generator of all the node entries of a root node. Each entry is
    * returned as a `[Node, Path]` tuple, with the path referring to the node's
    * position inside the root node.
+   * @category Retrieval
    */
   nodes(
     root: Node,
@@ -224,6 +249,7 @@ export interface NodeInterface {
 
   /**
    * Get the parent of a node at a specific path.
+   * @category Retrieval
    */
   parent(root: Node, path: Path): Ancestor
 
@@ -233,11 +259,13 @@ export interface NodeInterface {
    * Note that this will not include spaces or line breaks between block nodes.
    * It is not a user-facing string, but a string for performing offset-related
    * computations for a node.
+   * @category Queries
    */
   string(node: Node): string
 
   /**
    * Return a generator of all leaf text nodes in a root node.
+   * @category Retrieval
    */
   texts(
     root: Node,

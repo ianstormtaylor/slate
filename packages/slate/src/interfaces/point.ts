@@ -27,31 +27,37 @@ export interface PointInterface {
   /**
    * Compare a point to another, returning an integer indicating whether the
    * point was before, at, or after the other.
+   * @category Comparison
    */
   compare(point: Point, another: Point): -1 | 0 | 1
 
   /**
    * Check if a point is after another.
+   * @category Comparison
    */
   isAfter(point: Point, another: Point): boolean
 
   /**
    * Check if a point is before another.
+   * @category Comparison
    */
   isBefore(point: Point, another: Point): boolean
 
   /**
    * Check if a point is exactly equal to another.
+   * @category Comparison
    */
   equals(point: Point, another: Point): boolean
 
   /**
    * Check if a value implements the `Point` interface.
+   * @category Type Guards
    */
   isPoint(value: any): value is Point
 
   /**
    * Transform a point by an operation.
+   * @category Relational
    */
   transform(
     point: Point,

@@ -28,16 +28,19 @@ export interface ElementIsElementOptions {
 export interface ElementInterface {
   /**
    * Check if a value implements the 'Ancestor' interface.
+   * @category Type Guards
    */
   isAncestor(value: any, options?: ElementIsElementOptions): value is Ancestor
 
   /**
    * Check if a value implements the `Element` interface.
+   * @category Type Guards
    */
   isElement(value: any, options?: ElementIsElementOptions): value is Element
 
   /**
    * Check if a value is an array of `Element` objects.
+   * @category Type Guards
    */
   isElementList(
     value: any,
@@ -46,12 +49,14 @@ export interface ElementInterface {
 
   /**
    * Check if a set of props is a partial of Element.
+   * @category Type Guards
    */
   isElementProps(props: any): props is Partial<Element>
 
   /**
    * Check if a value implements the `Element` interface and has elementKey with selected value.
    * Default it check to `type` key value
+   * @category Type Guards
    */
   isElementType<T extends Element>(
     value: any,
@@ -64,6 +69,7 @@ export interface ElementInterface {
    *
    * Note: this checks custom properties, and it does not ensure that any
    * children are equivalent.
+   * @category Queries
    */
   matches(element: Element, props: Partial<Element>): boolean
 }

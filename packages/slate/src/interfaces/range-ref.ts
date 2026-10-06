@@ -31,7 +31,7 @@ export interface RangeRef {
 
 export interface RangeRefInterface {
   /**
-   * Transform the range ref's current value by an operation.
+   * Transform the range ref's current value by an operation. This is called automatically by the editor as operations are applied.
    */
   transform(ref: RangeRef, op: Operation): void
 }

@@ -140,32 +140,38 @@ export type Operation = ExtendedType<'Operation', BaseOperation>
 export interface OperationInterface {
   /**
    * Check if a value is a `NodeOperation` object.
+   * @category Type Guards
    */
   isNodeOperation(value: any): value is NodeOperation
 
   /**
    * Check if a value is an `Operation` object.
+   * @category Type Guards
    */
   isOperation(value: any): value is Operation
 
   /**
    * Check if a value is a list of `Operation` objects.
+   * @category Type Guards
    */
   isOperationList(value: any): value is Operation[]
 
   /**
    * Check if a value is a `SelectionOperation` object.
+   * @category Type Guards
    */
   isSelectionOperation(value: any): value is SelectionOperation
 
   /**
    * Check if a value is a `TextOperation` object.
+   * @category Type Guards
    */
   isTextOperation(value: any): value is TextOperation
 
   /**
    * Invert an operation, returning a new operation that will exactly undo the
    * original when applied.
+   * @category Relational
    */
   inverse(op: Operation): Operation
 }

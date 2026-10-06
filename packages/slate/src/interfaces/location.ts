@@ -10,29 +10,37 @@ import { Path, Point, Range } from '..'
  */
 export type Location = Path | Point | Range
 
+/**
+ * A colleection of static helper methods for {@link Location} objects.
+ */
 export interface LocationInterface {
   /**
    * Check if a value implements the `Location` interface.
+   * @category Type Guards
    */
   isLocation(value: any): value is Location
 
   /**
    * Check if a location is a `Path`.
+   * @category Type Guards
    */
   isPath(at: Location): at is Path
 
   /**
    * Check if a location is a `Point`.
+   * @category Type Guards
    */
   isPoint(at: Location): at is Point
 
   /**
    * Check if a location is a `Range`.
+   * @category Type Guards
    */
   isRange(at: Location): at is Range
 
   /**
    * Differentiate between a normal `Location` and a `Span`.
+   * @category Type Guards
    */
   isSpan(at: Location | Span): at is Span
 }
@@ -69,6 +77,7 @@ export type Span = [Path, Path]
 export interface SpanInterface {
   /**
    * Check if a value implements the `Span` interface.
+   * @category Type Guards
    */
   isSpan(value: any): value is Span
 }
