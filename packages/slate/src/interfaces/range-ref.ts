@@ -1,4 +1,4 @@
-import { Operation, Range } from '..'
+import { Operation, Range, RangeDirection } from '..'
 
 /**
  * `RangeRef` objects keep a specific range in a document synced over time as new
@@ -20,7 +20,7 @@ export interface RangeRef {
    * same size when content is inserted at its edges, and `outward` means that
    * the `Range` tends to grow when content is inserted at its edges.
    */
-  affinity: 'forward' | 'backward' | 'outward' | 'inward' | null
+  affinity: RangeDirection | null
   /**
    * Free the resources used by the RangeRef. This should be called when you no
    * longer need to track the range. Returns the final range value before being

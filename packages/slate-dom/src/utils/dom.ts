@@ -1,21 +1,11 @@
 import { DOMEditor } from '../plugin/dom-editor'
-/**
- * Types.
- */
 
-/** @internal */
 export type DOMNode = globalThis.Node
-/** @internal */
 export type DOMComment = globalThis.Comment
-/** @internal */
 export type DOMElement = globalThis.Element
-/** @internal */
 export type DOMText = globalThis.Text
-/** @internal */
 export type DOMRange = globalThis.Range
-/** @internal */
 export type DOMSelection = globalThis.Selection
-/** @internal */
 export type DOMStaticRange = globalThis.StaticRange
 
 declare global {

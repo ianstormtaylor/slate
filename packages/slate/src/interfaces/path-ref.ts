@@ -1,9 +1,9 @@
-import { Editor, Operation, Path } from '..'
+import { Operation, Path, TextDirection } from '..'
 
 /**
  * `PathRef` objects keep a specific path in a document synced over time as new
  * operations are applied to the editor. It is created using the
- * {@link Editor#pathRef} method. You can access their property `current` at any time
+ * {@link BaseEditor#pathRef} method. You can access their property `current` at any time
  * for the up-to-date `Path` value. When you no longer need to track this
  * location, call `unref()` to free the resources.
  */
@@ -17,7 +17,7 @@ export interface PathRef {
    * The direction the `PathRef` will go when a user inserts content at the
    * current position of the `Path`.
    */
-  affinity: 'forward' | 'backward' | null
+  affinity: TextDirection | null
   /**
    * Free the resources used by the PathRef. This should be called when you no
    * longer need to track the path. Returns the final path value before being

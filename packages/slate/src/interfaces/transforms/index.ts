@@ -15,20 +15,13 @@ export {
   TextInsertTextOptions,
 } from './text'
 
-/**
- * @expandType GeneralTransforms
- * @expandType NodeTransforms
- * @expandType SelectionTransforms
- * @expandType TextTransforms
- */
-export interface Transforms
+export interface TransformsInterface
   extends GeneralTransforms,
     NodeTransforms,
     SelectionTransforms,
     TextTransforms {}
 
-// eslint-disable-next-line no-redeclare
-export const Transforms: Transforms = {
+export const Transforms: TransformsInterface = {
   ...GeneralTransforms,
   ...NodeTransforms,
   ...SelectionTransforms,

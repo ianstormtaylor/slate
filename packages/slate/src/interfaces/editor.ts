@@ -123,13 +123,13 @@ export interface BaseEditor {
 
   /**
    * Collapse the selection.
-   * @see {@link Transforms#collapse}
+   * @see {@link TransformsInterface#collapse} - A static version of this method.
    */
   collapse(options?: SelectionCollapseOptions): void
 
   /**
    * Delete content in the editor.
-   * @see {@link Transforms#delete}
+   * @see {@link TransformsInterface#delete} - A static version of this method.
    */
   delete(options?: TextDeleteOptions): void
 
@@ -153,7 +153,7 @@ export interface BaseEditor {
 
   /**
    * Unset the selection.
-   * @see {@link Transforms#deselect}
+   * @see {@link TransformsInterface#deselect} - A static version of this method.
    */
   deselect(): void
 
@@ -188,7 +188,7 @@ export interface BaseEditor {
    * the current selection or (if not defined) the end of the document.
    *
    * **WARNING**: Inserting a node that already exists in the document (or another active document) can cause problems with certain plugins like `slate-dom` and `slate-react` that expect each node to be a unique object.
-   * @see {@link Transforms#insertNodes}
+   * @see {@link TransformsInterface#insertNodes} - A static version of this method.
    */
   insertNodes<T extends Node>(
     nodes: Node | Node[],
@@ -212,7 +212,7 @@ export interface BaseEditor {
   /**
    * Lift nodes at a specific location upwards in the document tree, splitting
    * their parent in two if necessary.
-   * @see {@link Transforms#liftNodes}
+   * @see {@link TransformsInterface#liftNodes} - A static version of this method.
    */
   liftNodes<T extends Node>(options?: {
     at?: Location
@@ -224,7 +224,7 @@ export interface BaseEditor {
   /**
    * Merge a node at a location with the previous node of the same depth,
    * removing any empty containing nodes after the merge if necessary.
-   * @see {@link Transforms#mergeNodes}
+   * @see {@link TransformsInterface#mergeNodes} - A static version of this method.
    */
   mergeNodes<T extends Node>(options?: {
     at?: Location
@@ -236,13 +236,13 @@ export interface BaseEditor {
 
   /**
    * Move the selection's point forward or backward.
-   * @see {@link Transforms#move}
+   * @see {@link TransformsInterface#move} - A static version of this method.
    */
   move(options?: SelectionMoveOptions): void
 
   /**
    * Move the nodes at a location to a new location.
-   * @see {@link Transforms#moveNodes}
+   * @see {@link TransformsInterface#moveNodes} - A static version of this method.
    */
   moveNodes<T extends Node>(options: {
     at?: Location
@@ -269,7 +269,7 @@ export interface BaseEditor {
 
   /**
    * Remove the nodes at a specific location in the document.
-   * @see {@link Transforms#removeNodes}
+   * @see {@link TransformsInterface#removeNodes} - A static version of this method.
    */
   removeNodes<T extends Node>(options?: {
     at?: Location
@@ -281,13 +281,13 @@ export interface BaseEditor {
 
   /**
    * Set the selection to a new value.
-   * @see {@link Transforms#select}
+   * @see {@link TransformsInterface#select} - A static version of this method.
    */
   select(target: Location): void
 
   /**
    * Set new properties on the nodes at a location.
-   * @see {@link Transforms#setNodes}
+   * @see {@link TransformsInterface#setNodes} - A static version of this method.
    */
   setNodes<T extends Node>(
     props: Partial<T>,
@@ -313,19 +313,19 @@ export interface BaseEditor {
 
   /**
    * Set new properties on one of the selection's points.
-   * @see {@link Transforms#setPoint}
+   * @see {@link TransformsInterface#setPoint} - A static version of this method.
    */
   setPoint(props: Partial<Point>, options?: SelectionSetPointOptions): void
 
   /**
    * Set new properties on the selection.
-   * @see {@link Transforms#setSelection}
+   * @see {@link TransformsInterface#setSelection} - A static version of this method.
    */
   setSelection(props: Partial<Range>): void
 
   /**
    * Split the nodes at a specific location.
-   * @see {@link Transforms#splitNodes}
+   * @see {@link TransformsInterface#splitNodes} - A static version of this method.
    */
   splitNodes<T extends Node>(options?: {
     at?: Location
@@ -338,7 +338,7 @@ export interface BaseEditor {
 
   /**
    * Unset properties on the nodes at a location.
-   * @see {@link Transforms#unsetNodes}
+   * @see {@link TransformsInterface#unsetNodes} - A static version of this method.
    */
   unsetNodes<T extends Node>(
     props: string | string[],
@@ -355,7 +355,7 @@ export interface BaseEditor {
   /**
    * Unwrap the nodes at a location from a parent node, splitting the parent
    * if necessary to ensure that only the content in the range is unwrapped.
-   * @see {@link Transforms#unwrapNodes}
+   * @see {@link TransformsInterface#unwrapNodes} - A static version of this method.
    */
   unwrapNodes<T extends Node>(options?: {
     at?: Location
@@ -374,7 +374,7 @@ export interface BaseEditor {
   /**
    * Wrap the nodes at a location in a new container node, splitting the edges
    * of the range first to ensure that only the content in the range is wrapped.
-   * @see {@link Transforms#wrapNodes}
+   * @see {@link TransformsInterface#wrapNodes} - A static version of this method.
    */
   wrapNodes<T extends Node>(
     element: Element,

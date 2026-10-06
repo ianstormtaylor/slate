@@ -24,10 +24,7 @@ export { useFocused } from './hooks/use-focused'
 export { useReadOnly } from './hooks/use-read-only'
 export { useSelected } from './hooks/use-selected'
 export { useSlate, useSlateWithV } from './hooks/use-slate'
-export {
-  useSlateSelector,
-  SlateSelectorOptions,
-} from './hooks/use-slate-selector'
+export { useSlateSelector } from './hooks/use-slate-selector'
 export { useSlateSelection } from './hooks/use-slate-selection'
 
 // Plugin
