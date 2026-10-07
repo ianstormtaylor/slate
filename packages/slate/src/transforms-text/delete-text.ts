@@ -7,6 +7,53 @@ import { Transforms } from '../interfaces/transforms'
 import { Node, NodeEntry } from '../interfaces/node'
 import { Location } from '../interfaces'
 
+const isEmptyInline = (editor: Editor, node: Node) =>
+  Node.isElement(node) &&
+  Editor.isInline(editor, node) &&
+  !Editor.isVoid(editor, node) &&
+  Editor.isEmpty(editor, node)
+
+const findEmptyInlineToDelete = (
+  editor: Editor,
+  point: Point,
+  reverse: boolean
+): Path | undefined => {
+  const inlinePath = Path.parent(point.path)
+
+  if (
+    inlinePath.length > 0 &&
+    isEmptyInline(editor, Node.get(editor, inlinePath))
+  ) {
+    return inlinePath
+  }
+
+  const text = Node.get(editor, point.path)
+  const atEdge = reverse
+    ? point.offset === 0
+    : Node.isText(text) && point.offset === text.text.length
+
+  if (!atEdge) {
+    return undefined
+  }
+
+  if (reverse && !Path.hasPrevious(point.path)) {
+    return undefined
+  }
+
+  const siblingPath = reverse
+    ? Path.previous(point.path)
+    : Path.next(point.path)
+
+  if (
+    Node.has(editor, siblingPath) &&
+    isEmptyInline(editor, Node.get(editor, siblingPath))
+  ) {
+    return siblingPath
+  }
+
+  return undefined
+}
+
 export const deleteText: TextTransforms['delete'] = (editor, options = {}) => {
   Editor.withoutNormalizing(editor, () => {
     const {
@@ -30,9 +77,16 @@ export const deleteText: TextTransforms['delete'] = (editor, options = {}) => {
     if (Location.isPoint(at)) {
       const furthestVoid = Editor.void(editor, { at, mode: 'highest' })
 
+      const emptyInlinePath =
+        unit === 'character' && distance === 1
+          ? findEmptyInlineToDelete(editor, at, reverse)
+          : undefined
+
       if (!voids && furthestVoid) {
         const [, voidPath] = furthestVoid
         at = voidPath
+      } else if (emptyInlinePath) {
+        at = emptyInlinePath
       } else {
         const opts = { unit, distance }
         const target = reverse
