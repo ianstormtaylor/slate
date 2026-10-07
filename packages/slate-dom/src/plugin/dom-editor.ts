@@ -339,6 +339,10 @@ export const DOMEditor: DOMEditorInterface = {
       throw new Error(`Cannot resolve a Slate range from a DOM event: ${event}`)
     }
 
+    if (suppressThrow && !DOMEditor.hasTarget(editor, target)) {
+      return null as T extends true ? Range | null : Range
+    }
+
     const node = DOMEditor.toSlateNode(editor, event.target)
     const path = DOMEditor.findPath(editor, node)
 
