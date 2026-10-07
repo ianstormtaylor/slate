@@ -32,26 +32,7 @@
 
 ## API
 
-- [Transforms](api/transforms.md)
-- [Node Types](api/nodes/README.md)
-  - [Editor](api/nodes/editor.md)
-  - [Element](api/nodes/element.md)
-  - [Node](api/nodes/node.md)
-  - [NodeEntry](api/nodes/node-entry.md)
-  - [Text](api/nodes/text.md)
-- [Location Types](api/locations/README.md)
-  - [Location](api/locations/location.md)
-  - [Path](api/locations/path.md)
-  - [PathRef](api/locations/path-ref.md)
-  - [Point](api/locations/point.md)
-  - [PointEntry](api/locations/point-entry.md)
-  - [PointRef](api/locations/point-ref.md)
-  - [Range](api/locations/range.md)
-  - [RangeRef](api/locations/range-ref.md)
-  - [Span](api/locations/span.md)
-- [Operation Types](api/operations/README.md)
-  - [Operation](api/operations/operation.md)
-- [Scrubber](api/scrubber.md)
+<!-- API PAGES -->
 
 ## Libraries
 
