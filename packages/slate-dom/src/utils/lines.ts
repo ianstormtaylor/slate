@@ -16,8 +16,6 @@ const areRangesSameLine = (editor: DOMEditor, range1: Range, range2: Range) => {
     const domRange1 = DOMEditor.toDOMRange(editor, range1)
     const domRange2 = DOMEditor.toDOMRange(editor, range2)
 
-    if (!domRange1 || !domRange2) return false
-
     const rect1 = domRange1.getBoundingClientRect()
     const rect2 = domRange2.getBoundingClientRect()
 
