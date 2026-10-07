@@ -1,5 +1,13 @@
 # slate-react
 
+## 0.129.0
+
+### Patch Changes
+
+- [#6140](https://github.com/ianstormtaylor/slate/pull/6140) [`7119501`](https://github.com/ianstormtaylor/slate/commit/7119501cca7550174d74262b794840b236a91cc6) Thanks [@dylans](https://github.com/dylans)! - Stop dropping Android input that arrives before the editor re-renders. When the node map was stale, `beforeinput` events were ignored, so the browser's native insert was overwritten by the next render. That lost the first character typed into an emptied editor, or every other character when typing fast. They now resolve against the editor's selection instead of the stale DOM.
+
+- [#6130](https://github.com/ianstormtaylor/slate/pull/6130) [`ab50c3b`](https://github.com/ianstormtaylor/slate/commit/ab50c3bda1c963a45e96b0e188725f57869588e1) Thanks [@dylans](https://github.com/dylans)! - Initialize the editor from `initialValue` when a different `editor` is passed to an already mounted `<Slate>`, such as when React fast refresh re-runs the `useMemo` that creates it. Previously the new editor kept empty `children`, and the next operation threw "Cannot find a descendant at path [0]".
+
 ## 0.128.0
 
 ### Minor Changes
