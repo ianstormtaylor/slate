@@ -12,6 +12,17 @@ import { getChunkTreeForNode } from '../chunking'
  * this plugin.
  *
  * See https://docs.slatejs.org/concepts/11-typescript to learn how.
+ *
+ * @example
+ * When used with withHistory, withReact should be applied outside. For example:
+ * ```typescript
+ * const [editor] = useState(() => withReact(withHistory(createEditor())))
+ * ```
+ *
+ * @param editor Editor to modify.
+ * @param clipboardFormatKey The `clipboardFormatKey` option allows you to customize the `DataTransfer` type when Slate data is copied to the clipboard.
+ *
+ * This can be useful when a user copies from one Slate editor to a differently configured Slate editor. This could cause nodes to be inserted which are not correctly typed for the receiving editor, corrupting the document. By customizing the `clipboardFormatKey` one can ensure that the raw JSON data isn't copied between editors with different schemas.
  */
 export const withReact = <T extends BaseEditor>(
   editor: T,

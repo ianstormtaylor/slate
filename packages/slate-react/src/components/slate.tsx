@@ -10,20 +10,32 @@ import {
 import { EditorContext } from '../hooks/use-slate-static'
 import { ReactEditor } from '../plugin/react-editor'
 import { REACT_MAJOR_VERSION } from '../utils/environment'
+import { Editable } from './editable'
+
+/** @inline */
+interface SlateProps {
+  /** An instance of `ReactEditor`. */
+  editor: ReactEditor
+  /** The initial value of the Editor. */
+  initialValue: Descendant[]
+  /** The `children` which must contain an `Editable` component. */
+  children: React.ReactNode
+  /** An optional callback function which you can use to be notified of changes in the editor's selection and/or value. */
+  onChange?: (value: Descendant[]) => void
+  /** An optional callback function which you can use to be notified of changes in the editor's selection. */
+  onSelectionChange?: (selection: Selection) => void
+  /** An optional callback function which you can use to be notified of changes in the editor's value. */
+  onValueChange?: (value: Descendant[]) => void
+}
 
 /**
  * A wrapper around the provider to handle `onChange` events, because the editor
  * is a mutable singleton so it won't ever register as "changed" otherwise.
+ *
+ * The `Slate` component must include somewhere in its `children` the {@link Editable} component.
+ * @group Components
  */
-
-export const Slate = (props: {
-  editor: ReactEditor
-  initialValue: Descendant[]
-  children: React.ReactNode
-  onChange?: (value: Descendant[]) => void
-  onSelectionChange?: (selection: Selection) => void
-  onValueChange?: (value: Descendant[]) => void
-}) => {
+export const Slate = (props: SlateProps) => {
   const {
     editor,
     children,

@@ -160,8 +160,8 @@ const MemoizedElement = React.memo(Element, (prev, next) => {
 
 /**
  * The default element renderer.
+ * @group Components
  */
-
 export const DefaultElement = (props: RenderElementProps) => {
   const { attributes, children, element } = props
   const editor = useSlateStatic()

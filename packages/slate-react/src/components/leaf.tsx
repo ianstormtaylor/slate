@@ -177,7 +177,9 @@ const MemoizedLeaf = React.memo(Leaf, (prev, next) => {
     next.leaf[PLACEHOLDER_SYMBOL] === prev.leaf[PLACEHOLDER_SYMBOL]
   )
 })
-
+/**
+ * @group Components
+ */
 export const DefaultLeaf = (props: RenderLeafProps) => {
   const { attributes, children } = props
   return <span {...attributes}>{children}</span>

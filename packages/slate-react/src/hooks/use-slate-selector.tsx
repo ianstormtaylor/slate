@@ -20,7 +20,6 @@ export interface SlateSelectorOptions {
  * A React context for sharing the editor selector context in a way to control
  * re-renders.
  */
-
 export const SlateSelectorContext = createContext<{
   addEventListener: (
     callback: Callback,
@@ -41,11 +40,11 @@ const refEquality = (a: any, b: any) => a === b
  * If `selector` is memoized using `useCallback`, then it will only be called
  * when it or the editor state changes. Otherwise, `selector` will be called
  * every time the component renders.
+ * @group Hooks
  *
  * @example
  * const isSelectionActive = useSlateSelector(editor => Boolean(editor.selection))
  */
-
 export function useSlateSelector<T>(
   selector: (editor: Editor) => T,
   equalityFn: (a: T | null, b: T) => boolean = refEquality,

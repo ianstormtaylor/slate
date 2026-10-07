@@ -111,6 +111,9 @@ const MemoizedText = React.memo(Text, (prev, next) => {
   )
 })
 
+/**
+ * @group Components
+ */
 export const DefaultText = (props: RenderTextProps) => {
   const { attributes, children } = props
   return <span {...attributes}>{children}</span>

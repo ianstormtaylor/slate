@@ -1,3 +1,8 @@
+/**
+ * This sub-library contains the React-specific logic for Slate.
+ * @module
+ */
+
 // Components
 export {
   Editable,

@@ -10,6 +10,7 @@
   "includeVersion": false,
   "hideBreadcrumbs": true,
   "excludeInternal": true,
+  "excludeExternals": true,
   "expandObjects": true,
   "expandParameters": true,
   "parametersFormat": "htmlTable",
@@ -36,6 +37,9 @@
       "Selection": "https://developer.mozilla.org/en-US/docs/Web/API/Selection",
       "StaticRange": "https://developer.mozilla.org/en-US/docs/Web/API/StaticRange",
       "Text": "https://developer.mozilla.org/en-US/docs/Web/API/Text"
+    },
+    "@types/react": {
+      "React.TextareaHTMLAttributes": "https://react.dev/reference/react-dom/components/textarea"
     }
   },
   "blockTags": [

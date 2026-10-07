@@ -5,9 +5,9 @@ import { useSlateSelector } from './use-slate-selector'
 import { ReactEditor } from '../plugin/react-editor'
 
 /**
- * Get the current `selected` state of an element.
+ * Get the current `selected` state of an element. An element is selected if `editor.selection` exists and overlaps any part of the element.
+ * @group Hooks
  */
-
 export const useSelected = (): boolean => {
   const element = useElementIf()
 
