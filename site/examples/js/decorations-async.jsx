@@ -114,6 +114,7 @@ const Leaf = ({ attributes, children, leaf }) => {
   return (
     <span
       {...attributes}
+      {...(hLeaf.highlight && { 'data-cy': 'highlight' })}
       className={css`
         background-color: ${hLeaf.highlight ? '#ffe58f' : 'transparent'};
         border-radius: ${hLeaf.highlight ? '2px' : '0'};
