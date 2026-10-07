@@ -1,5 +1,15 @@
 # slate
 
+## 0.129.0
+
+### Minor Changes
+
+- [#6141](https://github.com/ianstormtaylor/slate/pull/6141) [`1604e5f`](https://github.com/ianstormtaylor/slate/commit/1604e5feee47145c2949da00791e614866f60563) Thanks [@dylans](https://github.com/dylans)! - Deleting a character or word from an empty block next to a block void now removes the empty block and selects the void, instead of deleting the void. This matches native editors. The previous behaviour deleted the image when pressing Backspace in an empty paragraph after it.
+
+### Patch Changes
+
+- [#6132](https://github.com/ianstormtaylor/slate/pull/6132) [`ff63fad`](https://github.com/ianstormtaylor/slate/commit/ff63fadcb0ff0fb641448ca1675c532374f650fd) Thanks [@dylans](https://github.com/dylans)! - Deleting a single character next to, or inside, an empty non-void inline now removes the inline, instead of skipping over it and deleting the character on its other side.
+
 ## 0.128.0
 
 ### Patch Changes

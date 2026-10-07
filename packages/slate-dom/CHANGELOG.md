@@ -1,5 +1,21 @@
 # slate-dom
 
+## 0.129.0
+
+### Minor Changes
+
+- [#6009](https://github.com/ianstormtaylor/slate/pull/6009) [`e885f88`](https://github.com/ianstormtaylor/slate/commit/e885f884d503e74ac2c12330040cbbf87b3216d9) Thanks [@gbalint](https://github.com/gbalint)! - Add `DOMEditor.isMounted(editor)` to check whether the editor has a DOM element, and use it in `focus` and `hasDOMNode`. `hasDOMNode` now returns `false` for an editor that is not mounted, instead of throwing.
+
+### Patch Changes
+
+- [#6139](https://github.com/ianstormtaylor/slate/pull/6139) [`b15d7dc`](https://github.com/ianstormtaylor/slate/commit/b15d7dcee3cc6a24fb1c4c27e2a54f8caaeb1fc5) Thanks [@dylans](https://github.com/dylans)! - Keep the editor's selection when `DOMEditor.focus` is called with a void, such as a mention, selected. The DOM selection is now applied after focusing the editable, because Chromium resets a caret placed inside non-editable content when focus arrives afterwards.
+
+- [#6136](https://github.com/ianstormtaylor/slate/pull/6136) [`96ceedb`](https://github.com/ianstormtaylor/slate/commit/96ceedb1a004e6b542277a26403c0eda46eb343c) Thanks [@dylans](https://github.com/dylans)! - Keep a forward DOM selection that ends inside a block void when converting it with `toSlateRange`, instead of unhanging it to the end of the previous block.
+
+- [#6131](https://github.com/ianstormtaylor/slate/pull/6131) [`6c7c452`](https://github.com/ianstormtaylor/slate/commit/6c7c4522e144b9bac00427527076e8a38e6bce6d) Thanks [@dylans](https://github.com/dylans)! - Resolve drop positions inside shadow DOM. `findEventRange` passes the editor's shadow root to `caretPositionFromPoint` where the browser supports it, instead of resolving to the shadow host and throwing "Cannot resolve a Slate point from DOM point".
+
+- [#6138](https://github.com/ianstormtaylor/slate/pull/6138) [`eb25ecd`](https://github.com/ianstormtaylor/slate/commit/eb25ecd984b9351477137b80b7f3e5ae93120035) Thanks [@dylans](https://github.com/dylans)! - Only read `data-slate-fragment` from an HTML attribute when pasting, so pasted text that happens to contain `data-slate-fragment="…"` no longer makes the paste fail.
+
 ## 0.128.1
 
 ### Patch Changes
