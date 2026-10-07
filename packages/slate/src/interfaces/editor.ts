@@ -987,7 +987,7 @@ export type NodeMatch<T extends Node> =
   | ((node: Node, path: Path) => boolean)
 
 export type PropsCompare = (prop: unknown, node: unknown) => boolean
-export type PropsMerge = (prop: unknown, node: unknown) => object
+export type PropsMerge = (prop: unknown, node: unknown) => unknown
 
 export type NullableProps<T> = {
   [K in keyof T]: undefined extends T[K] ? T[K] | null : T[K]
