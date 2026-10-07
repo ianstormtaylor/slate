@@ -2140,6 +2140,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@fontsource/roboto@npm:^5.3.0":
+  version: 5.3.0
+  resolution: "@fontsource/roboto@npm:5.3.0"
+  checksum: d9f968fb239a16acdd3976a106f1ec8b530a6577ea5b1437dbeab3f782b7c189468dbaabdad3b2e68b75d63316bb48e2e905f661dec59a9a9353846eec04d35d
+  languageName: node
+  linkType: hard
+
 "@gar/promise-retry@npm:^1.0.0, @gar/promise-retry@npm:^1.0.2":
   version: 1.0.3
   resolution: "@gar/promise-retry@npm:1.0.3"
@@ -14961,6 +14968,7 @@ __metadata:
     "@changesets/cli": "npm:^2.26.2"
     "@emotion/css": "npm:^11.11.2"
     "@faker-js/faker": "npm:^10.0.0"
+    "@fontsource/roboto": "npm:^5.3.0"
     "@playwright/test": "npm:^1.52.0"
     "@types/is-hotkey": "npm:^0.1.10"
     "@types/is-url": "npm:^1.2.32"
