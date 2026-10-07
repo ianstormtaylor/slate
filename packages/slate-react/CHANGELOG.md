@@ -1,5 +1,18 @@
 # slate-react
 
+## 0.128.0
+
+### Minor Changes
+
+- [#6117](https://github.com/ianstormtaylor/slate/pull/6117) [`4e8cf0aa`](https://github.com/ianstormtaylor/slate/commit/4e8cf0aa0aa98cad9da21dc03d54d9bf878d10f8) Thanks [@juliankrispel](https://github.com/juliankrispel)! - Ignore input, paste and drop events dispatched by script rather than by the user, so a script running on the page can no longer insert content without the user acting.
+
+  This breaks tests that simulate a paste by dispatching an event, such as `fireEvent.paste` or Cypress's `trigger('paste')`. Drive a real paste instead, with Playwright's keyboard or `cypress-real-events`, or call `editor.insertData` directly.
+
+### Patch Changes
+
+- [#6115](https://github.com/ianstormtaylor/slate/pull/6115) [`52f05bf8`](https://github.com/ianstormtaylor/slate/commit/52f05bf8b614407423fab40525862f044c51884b) Thanks [@giaBaoJS](https://github.com/giaBaoJS)! - - When deleting a void element backward from a cursor inside it, place the cursor before the removed void instead of moving it into the following node
+  - In Chrome and Safari, pressing Delete on a selected void now deletes forward instead of backward
+
 ## 0.127.1
 
 ### Patch Changes
