@@ -18,7 +18,7 @@ export interface BasePoint {
 
 export type Point = ExtendedType<'Point', BasePoint>
 
-/** @inline */
+/** @inline @internal */
 export interface PointTransformOptions {
   affinity?: TextDirection | null
 }
@@ -57,6 +57,7 @@ export interface PointInterface {
 
   /**
    * Transform a point by an operation.
+   * @param options Exported as `PointTransformOptions`
    * @category Relational
    */
   transform(

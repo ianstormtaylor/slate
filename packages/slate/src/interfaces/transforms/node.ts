@@ -2,7 +2,7 @@ import { Editor, Element, Location, Node, Path } from '../../index'
 import { NodeMatch, PropsCompare, PropsMerge } from '../editor'
 import { MaximizeMode, RangeMode } from '../../types/types'
 
-/** @inline */
+/** @inline @internal */
 export interface NodeInsertNodesOptions<T extends Node> {
   at?: Location
   match?: NodeMatch<T>

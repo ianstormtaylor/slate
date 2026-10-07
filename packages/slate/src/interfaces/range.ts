@@ -21,12 +21,12 @@ export interface BaseRange {
 
 export type Range = ExtendedType<'Range', BaseRange>
 
-/** @inline */
+/** @inline @internal */
 export interface RangeEdgesOptions {
   reverse?: boolean
 }
 
-/** @inline */
+/** @inline @internal */
 export interface RangeTransformOptions {
   affinity?: RangeDirection | null
 }
@@ -35,6 +35,7 @@ export interface RangeInterface {
   /**
    * Get the start and end points of a range, in the order in which they appear
    * in the document.
+   * @param options Exported as `RangeEdgesOptions`
    * @category Queries
    */
   edges(range: Range, options?: RangeEdgesOptions): [Point, Point]
@@ -126,6 +127,7 @@ export interface RangeInterface {
 
   /**
    * Transform a range by an operation.
+   * @param options Exported as `RangeTransformOptions`
    * @category Relational
    */
   transform(

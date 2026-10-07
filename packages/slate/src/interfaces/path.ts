@@ -15,17 +15,17 @@ import { TextDirection } from '../types/types'
  */
 export type Path = number[]
 
-/** @inline */
+/** @inline @internal */
 export interface PathAncestorsOptions {
   reverse?: boolean
 }
 
-/** @inline */
+/** @inline @internal */
 export interface PathLevelsOptions {
   reverse?: boolean
 }
 
-/** @inline */
+/** @inline @internal */
 export interface PathTransformOptions {
   affinity?: TextDirection | null
 }
@@ -36,6 +36,7 @@ export interface PathInterface {
    *
    * The paths are sorted from shallowest to deepest ancestor. However, if the
    * `reverse: true` option is passed, they are reversed.
+   * @param options Exported as `PathAncestorsOptions`
    * @category Relational
    */
   ancestors(path: Path, options?: PathAncestorsOptions): Path[]
@@ -147,6 +148,7 @@ export interface PathInterface {
    *
    * The paths are sorted from shallowest to deepest. However, if the `reverse:
    * true` option is passed, they are reversed.
+   * @param options Exported as `PathLevelsOptions`
    * @category Relational
    */
   levels(path: Path, options?: PathLevelsOptions): Path[]
@@ -201,6 +203,7 @@ export interface PathInterface {
 
   /**
    * Transform a path by an operation.
+   * @param options Exported as `PathTransformOptions`
    * @category Relational
    */
   transform(

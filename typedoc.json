@@ -10,6 +10,7 @@
   "includeVersion": false,
   "hideBreadcrumbs": true,
   "excludeInternal": true,
+  "expandObjects": true,
   "expandParameters": true,
   "parametersFormat": "htmlTable",
   "propertiesFormat": "htmlTable",

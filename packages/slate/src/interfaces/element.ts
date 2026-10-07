@@ -20,7 +20,7 @@ export interface BaseElement {
 
 export type Element = ExtendedType<'Element', BaseElement>
 
-/** @inline */
+/** @inline @internal */
 export interface ElementIsElementOptions {
   deep?: boolean
 }
@@ -28,18 +28,21 @@ export interface ElementIsElementOptions {
 export interface ElementInterface {
   /**
    * Check if a value implements the 'Ancestor' interface.
+   * @param options Exported as `ElementIsElementOptions`
    * @category Type Guards
    */
   isAncestor(value: any, options?: ElementIsElementOptions): value is Ancestor
 
   /**
    * Check if a value implements the `Element` interface.
+   * @param options Exported as `ElementIsElementOptions`
    * @category Type Guards
    */
   isElement(value: any, options?: ElementIsElementOptions): value is Element
 
   /**
    * Check if a value is an array of `Element` objects.
+   * @param options Exported as `ElementIsElementOptions`
    * @category Type Guards
    */
   isElementList(
