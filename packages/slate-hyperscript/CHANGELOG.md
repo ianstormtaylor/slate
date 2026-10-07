@@ -1,5 +1,11 @@
 # slate-hyperscript
 
+## 0.129.1
+
+### Patch Changes
+
+- [#6152](https://github.com/ianstormtaylor/slate/pull/6152) [`fde516b`](https://github.com/ianstormtaylor/slate/commit/fde516bca389d92f9c6fb99a65ba00fef85f9e6b) Thanks [@dylans](https://github.com/dylans)! - Type the tags added through `createHyperscript`'s `elements` and `creators` options, so `h('item')` for a custom shorthand type-checks instead of failing with TS2345.
+
 ## 0.127.0
 
 ### Minor Changes

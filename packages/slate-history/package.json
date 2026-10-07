@@ -19,7 +19,7 @@
     "@types/node": "^25.0.9",
     "lodash": "^4.17.21",
     "slate": "^0.129.0",
-    "slate-hyperscript": "^0.127.0",
+    "slate-hyperscript": "^0.129.1",
     "source-map-loader": "^4.0.1"
   },
   "peerDependencies": {
