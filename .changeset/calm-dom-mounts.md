@@ -1,5 +1,5 @@
 ---
-'slate-dom': patch
+'slate-dom': minor
 ---
 
-`DOMEditor.hasDOMNode` returns `false` when the editor is not mounted, instead of throwing. A target cannot be inside an editor that has no DOM element.
+Add `DOMEditor.isMounted(editor)` to check whether the editor has a DOM element, and use it in `focus` and `hasDOMNode`. `hasDOMNode` now returns `false` for an editor that is not mounted, instead of throwing.
