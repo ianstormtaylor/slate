@@ -1849,7 +1849,12 @@ export const Editable = forwardRef(
                                 Editor.isBlock(editor, currentNode))
                             ) {
                               event.preventDefault()
-                              Editor.deleteBackward(editor, { unit: 'block' })
+
+                              if (Hotkeys.isDeleteForward(nativeEvent)) {
+                                Editor.deleteForward(editor, { unit: 'block' })
+                              } else {
+                                Editor.deleteBackward(editor, { unit: 'block' })
+                              }
 
                               return
                             }
