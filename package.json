@@ -56,6 +56,7 @@
     "@changesets/cli": "^2.29.8",
     "@emotion/css": "^11.11.2",
     "@faker-js/faker": "^10.0.0",
+    "@fontsource/material-icons": "^5.3.0",
     "@fontsource/roboto": "^5.3.0",
     "@playwright/test": "^1.62.1",
     "@types/is-hotkey": "^0.1.10",

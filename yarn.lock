@@ -2219,6 +2219,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@fontsource/material-icons@npm:^5.3.0":
+  version: 5.3.0
+  resolution: "@fontsource/material-icons@npm:5.3.0"
+  checksum: 10/b4387173cf00ee562fe8ebfea706f7095dbc0544b9dc736809ab8b64f3c9d0134648f9e919b8b306e9b4302cd08b2a2b8fccca8d28e0799b70ddcf4c73f0c0fa
+  languageName: node
+  linkType: hard
+
 "@fontsource/roboto@npm:^5.3.0":
   version: 5.3.0
   resolution: "@fontsource/roboto@npm:5.3.0"
@@ -10350,6 +10357,7 @@ __metadata:
     "@changesets/cli": "npm:^2.29.8"
     "@emotion/css": "npm:^11.11.2"
     "@faker-js/faker": "npm:^10.0.0"
+    "@fontsource/material-icons": "npm:^5.3.0"
     "@fontsource/roboto": "npm:^5.3.0"
     "@playwright/test": "npm:^1.62.1"
     "@types/is-hotkey": "npm:^0.1.10"
