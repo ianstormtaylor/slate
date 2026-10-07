@@ -1,6 +1,6 @@
 import { css } from '@emotion/css'
 import React, { useCallback, useMemo } from 'react'
-import { Transforms, createEditor } from 'slate'
+import { Node, Transforms, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
 import { jsx } from 'slate-hyperscript'
 import {
@@ -36,6 +36,15 @@ const TEXT_TAGS = {
   STRONG: () => ({ bold: true }),
   U: () => ({ underline: true }),
 }
+const applyTextAttributes = (child, attrs) =>
+  Node.isElement(child)
+    ? {
+        ...child,
+        children: child.children.map(grandchild =>
+          applyTextAttributes(grandchild, attrs)
+        ),
+      }
+    : jsx('text', attrs, child)
 export const deserialize = el => {
   if (el.nodeType === 3) {
     return el.textContent
@@ -66,7 +75,7 @@ export const deserialize = el => {
   }
   if (TEXT_TAGS[nodeName]) {
     const attrs = TEXT_TAGS[nodeName]()
-    return children.map(child => jsx('text', attrs, child))
+    return children.map(child => applyTextAttributes(child, attrs))
   }
   return children
 }

@@ -34,6 +34,25 @@ test.describe('paste html example', () => {
     expect(await page.locator('strong').textContent()).toContain('Hello')
   })
 
+  test('pasted link inside bold keeps the link and the bold', async ({
+    page,
+  }) => {
+    const errors: string[] = []
+    page.on('pageerror', error => errors.push(error.message))
+
+    await pasteHtml(
+      page,
+      '<strong><a href="https://example.com">bold link</a></strong>'
+    )
+
+    const link = page
+      .getByRole('textbox')
+      .locator('a[href^="https://example.com"]')
+    await expect(link).toHaveCount(1)
+    expect(await link.locator('strong').textContent()).toContain('bold link')
+    expect(errors).toEqual([])
+  })
+
   test('pasted code uses <code>', async ({ page }) => {
     await pasteHtml(page, '<code>console.log("hello from slate!")</code>')
     expect(await page.locator('code').textContent()).toContain('slate!')
