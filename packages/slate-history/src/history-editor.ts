@@ -1,22 +1,27 @@
 import { BaseEditor, Editor } from 'slate'
 import { History } from './history'
+import { withHistory } from './with-history'
 
-/**
- * Weakmaps for attaching state to the editor.
- */
+// Weakmaps for attaching state to the editor.
 
 export const SAVING = new WeakMap<Editor, boolean | undefined>()
 export const MERGING = new WeakMap<Editor, boolean | undefined>()
 export const SPLITTING_ONCE = new WeakMap<Editor, boolean | undefined>()
 
 /**
- * `HistoryEditor` contains helpers for history-enabled editors.
+ * The `HistoryEditor` interface is added to the `Editor` when it is instantiated using the {@link withHistory} method.
  * @noInheritDoc
  */
 export interface HistoryEditor extends BaseEditor {
   history: History
+
+  /** Undo to the previous saved state. */
   undo(): void
+
+  /** Redo to the next saved state. */
   redo(): void
+
+  /** Push a batch of operations as either `undos` or `redos` onto `editor.history.undos` or `editor.history.redos` */
   writeHistory(stack: 'undos' | 'redos', batch: any): void
 }
 
@@ -25,7 +30,6 @@ export const HistoryEditor = {
   /**
    * Check if a value is a `HistoryEditor` object.
    */
-
   isHistoryEditor(value: any): value is HistoryEditor {
     return History.isHistory(value.history) && Editor.isEditor(value)
   },
@@ -33,7 +37,6 @@ export const HistoryEditor = {
   /**
    * Get the merge flag's current value.
    */
-
   isMerging(editor: HistoryEditor): boolean | undefined {
     return MERGING.get(editor)
   },
@@ -41,7 +44,6 @@ export const HistoryEditor = {
   /**
    * Get the splitting once flag's current value.
    */
-
   isSplittingOnce(editor: HistoryEditor): boolean | undefined {
     return SPLITTING_ONCE.get(editor)
   },
@@ -53,7 +55,6 @@ export const HistoryEditor = {
   /**
    * Get the saving flag's current value.
    */
-
   isSaving(editor: HistoryEditor): boolean | undefined {
     return SAVING.get(editor)
   },
@@ -61,7 +62,6 @@ export const HistoryEditor = {
   /**
    * Redo to the previous saved state.
    */
-
   redo(editor: HistoryEditor): void {
     editor.redo()
   },
@@ -69,7 +69,6 @@ export const HistoryEditor = {
   /**
    * Undo to the previous saved state.
    */
-
   undo(editor: HistoryEditor): void {
     editor.undo()
   },
@@ -103,7 +102,6 @@ export const HistoryEditor = {
    * Apply a series of changes inside a synchronous `fn`, without merging any of
    * the new operations into previous save point in the history.
    */
-
   withoutMerging(editor: HistoryEditor, fn: () => void): void {
     const prev = HistoryEditor.isMerging(editor)
     MERGING.set(editor, false)
@@ -115,7 +113,6 @@ export const HistoryEditor = {
    * Apply a series of changes inside a synchronous `fn`, without saving any of
    * their operations into the history.
    */
-
   withoutSaving(editor: HistoryEditor, fn: () => void): void {
     const prev = HistoryEditor.isSaving(editor)
     SAVING.set(editor, false)
