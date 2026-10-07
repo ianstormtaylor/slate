@@ -7,6 +7,53 @@ import { Transforms } from '../interfaces/transforms'
 import { Node, NodeEntry } from '../interfaces/node'
 import { Location } from '../interfaces'
 
+const findEmptyBlockNextToVoid = (
+  editor: Editor,
+  point: Point,
+  reverse: boolean
+): [Path, Path] | undefined => {
+  const blockEntry = Editor.above(editor, {
+    at: point,
+    match: n => Node.isElement(n) && Editor.isBlock(editor, n),
+  })
+
+  if (!blockEntry) {
+    return undefined
+  }
+
+  const [block, blockPath] = blockEntry
+
+  if (
+    !Node.isElement(block) ||
+    Editor.isVoid(editor, block) ||
+    !Editor.isEmpty(editor, block)
+  ) {
+    return undefined
+  }
+
+  if (reverse && !Path.hasPrevious(blockPath)) {
+    return undefined
+  }
+
+  const siblingPath = reverse ? Path.previous(blockPath) : Path.next(blockPath)
+
+  if (!Node.has(editor, siblingPath)) {
+    return undefined
+  }
+
+  const sibling = Node.get(editor, siblingPath)
+
+  if (
+    !Node.isElement(sibling) ||
+    !Editor.isBlock(editor, sibling) ||
+    !Editor.isVoid(editor, sibling)
+  ) {
+    return undefined
+  }
+
+  return [blockPath, siblingPath]
+}
+
 const isEmptyInline = (editor: Editor, node: Node) =>
   Node.isElement(node) &&
   Editor.isInline(editor, node) &&
@@ -75,6 +122,27 @@ export const deleteText: TextTransforms['delete'] = (editor, options = {}) => {
     }
 
     if (Location.isPoint(at)) {
+      const emptyBlockNextToVoid =
+        !voids && (unit === 'character' || unit === 'word') && distance === 1
+          ? findEmptyBlockNextToVoid(editor, at, reverse)
+          : undefined
+
+      if (emptyBlockNextToVoid) {
+        const [blockPath, voidPath] = emptyBlockNextToVoid
+        const voidRef = Editor.pathRef(editor, voidPath)
+        Transforms.removeNodes(editor, { at: blockPath })
+        const target = voidRef.unref()
+
+        if (target && options.at == null) {
+          Transforms.select(
+            editor,
+            reverse ? Editor.end(editor, target) : Editor.start(editor, target)
+          )
+        }
+
+        return
+      }
+
       const furthestVoid = Editor.void(editor, { at, mode: 'highest' })
 
       const emptyInlinePath =
