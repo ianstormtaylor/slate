@@ -460,13 +460,10 @@ export const DOMEditor: DOMEditorInterface = {
     const el = DOMEditor.toDOMNode(editor, editor)
     const root = DOMEditor.findDocumentOrShadowRoot(editor)
     if (root.activeElement !== el) {
-      // Ensure that the DOM selection state is set to the editor's selection
-      if (editor.selection && root instanceof Document) {
-        const domSelection = getSelection(root)
-        const domRange = DOMEditor.toDOMRange(editor, editor.selection)
-        domSelection?.removeAllRanges()
-        domSelection?.addRange(domRange)
-      }
+      const domRange =
+        editor.selection && root instanceof Document
+          ? DOMEditor.toDOMRange(editor, editor.selection)
+          : null
       // Create a new selection in the top of the document if missing
       if (!editor.selection) {
         Transforms.select(editor, Editor.start(editor, []))
@@ -475,6 +472,12 @@ export const DOMEditor: DOMEditorInterface = {
       // FocusedContext is updated to the correct value
       IS_FOCUSED.set(editor, true)
       el.focus({ preventScroll: true })
+      // Ensure that the DOM selection state is set to the editor's selection
+      if (domRange) {
+        const domSelection = getSelection(root as Document)
+        domSelection?.removeAllRanges()
+        domSelection?.addRange(domRange)
+      }
     }
   },
 
