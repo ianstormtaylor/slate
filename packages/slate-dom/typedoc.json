@@ -3,5 +3,5 @@
   "entryPointStrategy": "resolve",
   "entryPoints": ["src/index.ts"],
   "name": "slate-dom",
-  "readme": "none",
+  "readme": "none"
 }

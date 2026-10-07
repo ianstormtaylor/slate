@@ -24,7 +24,7 @@
       "Range": "https://developer.mozilla.org/en-US/docs/Web/API/Range",
       "Selection": "https://developer.mozilla.org/en-US/docs/Web/API/Selection",
       "StaticRange": "https://developer.mozilla.org/en-US/docs/Web/API/StaticRange",
-      "Text": "https://developer.mozilla.org/en-US/docs/Web/API/Text",
+      "Text": "https://developer.mozilla.org/en-US/docs/Web/API/Text"
     },
     "typescript": {
       "Comment": "https://developer.mozilla.org/en-US/docs/Web/API/Comment",
@@ -34,7 +34,7 @@
       "Range": "https://developer.mozilla.org/en-US/docs/Web/API/Range",
       "Selection": "https://developer.mozilla.org/en-US/docs/Web/API/Selection",
       "StaticRange": "https://developer.mozilla.org/en-US/docs/Web/API/StaticRange",
-      "Text": "https://developer.mozilla.org/en-US/docs/Web/API/Text",
+      "Text": "https://developer.mozilla.org/en-US/docs/Web/API/Text"
     }
   },
   "blockTags": [
@@ -85,6 +85,6 @@
     "@satisfies",
     "@callback",
 
-    "@noInheritDoc",
+    "@noInheritDoc"
   ]
 }

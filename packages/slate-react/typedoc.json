@@ -3,5 +3,5 @@
   "entryPointStrategy": "resolve",
   "entryPoints": ["src/index.ts"],
   "name": "slate-react",
-  "readme": "none",
+  "readme": "none"
 }
