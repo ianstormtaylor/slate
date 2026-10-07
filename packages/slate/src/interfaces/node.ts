@@ -87,7 +87,7 @@ export interface NodeInterface {
   ) => Generator<NodeEntry<Descendant>, void, undefined>
 
   /**
-   * Get an entry for the common ancesetor node of two paths.
+   * Get an entry for the common ancestor node of two paths.
    */
   common: (root: Node, path: Path, another: Path) => NodeEntry
 
