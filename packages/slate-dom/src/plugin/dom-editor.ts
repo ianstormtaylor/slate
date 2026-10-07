@@ -191,6 +191,8 @@ export interface DOMEditorInterface {
    */
   isFocused: (editor: DOMEditor) => boolean
 
+  isMounted: (editor: DOMEditor) => boolean
+
   /**
    * Check if the editor is in read-only mode.
    */
@@ -436,7 +438,7 @@ export const DOMEditor: DOMEditorInterface = {
 
     // Return if no dom node is associated with the editor, which means the editor is not yet mounted
     // or has been unmounted. This can happen especially, while retrying to focus the editor.
-    if (!EDITOR_TO_ELEMENT.get(editor)) {
+    if (!DOMEditor.isMounted(editor)) {
       return
     }
 
@@ -486,7 +488,13 @@ export const DOMEditor: DOMEditorInterface = {
 
   hasDOMNode: (editor, target, options = {}) => {
     const { editable = false } = options
+
+    if (!DOMEditor.isMounted(editor)) {
+      return false
+    }
+
     const editorEl = DOMEditor.toDOMNode(editor, editor)
+
     let targetEl
 
     // COMPAT: In Firefox, reading `target.nodeType` will throw an error if
@@ -553,6 +561,8 @@ export const DOMEditor: DOMEditorInterface = {
   },
 
   isFocused: editor => !!IS_FOCUSED.get(editor),
+
+  isMounted: editor => !!EDITOR_TO_ELEMENT.get(editor),
 
   isReadOnly: editor => !!IS_READ_ONLY.get(editor),
 
