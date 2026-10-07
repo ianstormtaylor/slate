@@ -1,6 +1,6 @@
 import { SelectionTransforms } from '../interfaces/transforms/selection'
-import { Range } from '../interfaces/range'
 import { Point } from '../interfaces/point'
+import { Selection } from '../interfaces'
 import { NON_SETTABLE_SELECTION_PROPERTIES } from '../interfaces/transforms/general'
 
 export const setSelection: SelectionTransforms['setSelection'] = (
@@ -8,8 +8,8 @@ export const setSelection: SelectionTransforms['setSelection'] = (
   props
 ) => {
   const { selection } = editor
-  const oldProps: Partial<Range> = {}
-  const newProps: Partial<Range> = {}
+  const oldProps: Partial<Selection> = {}
+  const newProps: Partial<Selection> = {}
 
   if (!selection) {
     return
@@ -21,14 +21,14 @@ export const setSelection: SelectionTransforms['setSelection'] = (
     }
 
     const value = Object.hasOwn(selection, k)
-      ? selection[<keyof Range>k]
+      ? selection[<keyof Selection>k]
       : undefined
 
-    const newValue = props[<keyof Range>k]
+    const newValue = props[<keyof Selection>k]
 
-    if (compareSelectionProps(<keyof Range>k, value, newValue)) {
-      oldProps[<keyof Range>k] = selection[<keyof Range>k]
-      newProps[<keyof Range>k] = props[<keyof Range>k]
+    if (compareSelectionProps(<keyof Selection>k, value, newValue)) {
+      oldProps[<keyof Selection>k] = selection[<keyof Selection>k]
+      newProps[<keyof Selection>k] = props[<keyof Selection>k]
     }
   }
 
@@ -42,7 +42,7 @@ export const setSelection: SelectionTransforms['setSelection'] = (
 }
 
 function compareSelectionProps(
-  key: keyof Range,
+  key: keyof Selection,
   value: unknown,
   newValue: unknown
 ) {

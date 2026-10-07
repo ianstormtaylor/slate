@@ -2,7 +2,7 @@ import { Path } from 'slate'
 
 const path = [0, 1]
 const op = {
-  type: 'move_node',
+  type: 'move_node' as const,
   path: [0, 0],
   newPath: [0, 1],
 }

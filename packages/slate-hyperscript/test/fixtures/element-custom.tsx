@@ -1,6 +1,12 @@
 /** @jsx jsx */
 import { createHyperscript } from 'slate-hyperscript'
 
+declare namespace jsx.JSX {
+  interface IntrinsicElements {
+    paragraph: {}
+  }
+}
+
 const jsx = createHyperscript({
   elements: {
     paragraph: { type: 'paragraph' },

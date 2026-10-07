@@ -1,6 +1,6 @@
 /** @jsx jsx  */
 import { Node } from 'slate'
-import { jsx } from 'slate-hyperscript'
+import { jsx } from '../../..'
 
 export const input = (
   <element>
@@ -9,6 +9,6 @@ export const input = (
   </element>
 )
 export const test = value => {
-  return Node.string(value, [1])
+  return Node.string(value)
 }
 export const output = `onetwo`

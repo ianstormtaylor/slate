@@ -13,7 +13,7 @@ export const test = value => {
   try {
     return Node.getIf(value, ['__proto__' as any])
   } catch (error) {
-    return error.message
+    return (error as Error).message
   }
 }
 export const output = 'Got non-numeric path index'

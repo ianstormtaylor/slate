@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noImplicitAny": false,
+    "rootDir": "../..",
+    "jsxFactory": "jsx",
+    "noEmit": true
+  }
+}
