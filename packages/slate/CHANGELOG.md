@@ -1,5 +1,15 @@
 # slate
 
+## 0.128.0
+
+### Patch Changes
+
+- [#6115](https://github.com/ianstormtaylor/slate/pull/6115) [`52f05bf8`](https://github.com/ianstormtaylor/slate/commit/52f05bf8b614407423fab40525862f044c51884b) Thanks [@giaBaoJS](https://github.com/giaBaoJS)! - - When deleting a void element backward from a cursor inside it, place the cursor before the removed void instead of moving it into the following node
+
+  - In Chrome and Safari, pressing Delete on a selected void now deletes forward instead of backward
+
+- [#6003](https://github.com/ianstormtaylor/slate/pull/6003) [`50cdf5e9`](https://github.com/ianstormtaylor/slate/commit/50cdf5e940ed474c8b57acceecde9d47c66dfaa0) Thanks [@nabbydude](https://github.com/nabbydude)! - Changed type signature of `Editor#setSelection` to allow non-Range properties of Selections (functionality unchanged)
+
 ## 0.126.2
 
 ### Patch Changes
