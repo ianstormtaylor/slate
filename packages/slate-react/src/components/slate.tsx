@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Descendant, Editor, Node, Operation, Scrubber, Selection } from 'slate'
 import { EDITOR_TO_ON_CHANGE } from 'slate-dom'
 import { FocusedContext } from '../hooks/use-focused'
@@ -34,8 +34,9 @@ export const Slate = (props: {
     ...rest
   } = props
 
-  // Run once on first mount, but before `useEffect` or render
-  React.useState(() => {
+  const initializedEditor = useRef<ReactEditor | null>(null)
+
+  if (initializedEditor.current !== editor) {
     if (!Node.isNodeList(initialValue)) {
       throw new Error(
         `[Slate] initialValue is invalid! Expected a list of elements but got: ${Scrubber.stringify(
@@ -52,7 +53,8 @@ export const Slate = (props: {
 
     editor.children = initialValue
     Object.assign(editor, rest)
-  })
+    initializedEditor.current = editor
+  }
 
   const { selectorContext, onChange: handleSelectorChange } =
     useSelectorContext()
