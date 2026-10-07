@@ -37,7 +37,9 @@ describe('Slate initialValue', () => {
       ;({ rerender } = render(<App editor={editor} />))
     })
     act(() => {
-      Transforms.insertText(editor, ' world', { at: { path: [0, 0], offset: 5 } })
+      Transforms.insertText(editor, ' world', {
+        at: { path: [0, 0], offset: 5 },
+      })
     })
     act(() => {
       rerender(<App editor={editor} />)
