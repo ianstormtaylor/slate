@@ -1,5 +1,11 @@
 # slate-dom
 
+## 0.128.1
+
+### Patch Changes
+
+- [#6055](https://github.com/ianstormtaylor/slate/pull/6055) [`4776b093`](https://github.com/ianstormtaylor/slate/commit/4776b093f61b1c47d2b7f42f4351d076baf0890d) Thanks [@ckale-scorpio](https://github.com/ckale-scorpio)! - Stop `deleteBackward('line')` from throwing when a line boundary cannot be measured against the DOM, such as when the editor's DOM is stale or not mounted. The line check now treats an unmeasurable range as being on a different line.
+
 ## 0.126.0
 
 ### Patch Changes
