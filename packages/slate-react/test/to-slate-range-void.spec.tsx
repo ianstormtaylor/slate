@@ -3,10 +3,10 @@ import { createEditor, Descendant, Editor } from 'slate'
 import { act, render } from '@testing-library/react'
 import { Editable, ReactEditor, Slate, withReact } from '../src'
 
-const initialValue = [
-  { type: 'paragraph', children: [{ text: 'before the void' }] },
-  { type: 'image', children: [{ text: '' }] },
-] as Descendant[]
+const initialValue: Descendant[] = [
+  { type: 'paragraph', children: [{ text: 'before the void' }] } as Descendant,
+  { type: 'image', children: [{ text: '' }] } as Descendant,
+]
 
 const renderEditor = () => {
   const editor = withReact(createEditor())
