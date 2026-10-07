@@ -18,7 +18,7 @@ const EXAMPLES: ExampleTuple[] = EXAMPLE_NAMES_AND_PATHS.map(([name, path]) => [
     ? dynamic(() => import('../../examples/ts/huge-document'), {
         loading: HugeDocumentLoader,
       })
-    : dynamic(() => import(`../../examples/ts/${path}`), {
+    : dynamic(() => import(`../../examples/ts/${path}.tsx`), {
         loading: ComponentLoader,
       }),
   path,
