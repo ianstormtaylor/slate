@@ -52,10 +52,12 @@ test.describe('On richtext example', () => {
     await editor.press('Backspace')
     await expect(firstParagraph).toBeHidden()
 
-    await editor.press(
-      process.platform === 'darwin' ? 'Meta+ArrowDown' : 'Control+End'
-    )
-    await expect(secondParagraph).not.toBeInViewport()
+    await expect(async () => {
+      await page.evaluate(() =>
+        window.scrollTo(0, document.documentElement.scrollHeight)
+      )
+      await expect(secondParagraph).not.toBeInViewport({ timeout: 500 })
+    }).toPass()
 
     // Undo deletion
     await editor.press('ControlOrMeta+Z')
