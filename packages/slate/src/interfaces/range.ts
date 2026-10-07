@@ -21,12 +21,12 @@ export interface BaseRange {
 
 export type Range = ExtendedType<'Range', BaseRange>
 
-/** @inline @internal */
+/** @hidden @inline */
 export interface RangeEdgesOptions {
   reverse?: boolean
 }
 
-/** @inline @internal */
+/** @hidden @inline */
 export interface RangeTransformOptions {
   affinity?: RangeDirection | null
 }

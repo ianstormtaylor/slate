@@ -2,7 +2,7 @@ import { Editor, Location, Node, Range, Transforms } from '../../index'
 import { TextUnit } from '../../types/types'
 import { getDefaultInsertLocation } from '../../utils'
 
-/** @inline @internal */
+/** @hidden @inline */
 export interface TextDeleteOptions {
   /**
    * The location to delete content from. Defaults to the current selection. If there is no selection, nothing is deleted.
@@ -15,7 +15,7 @@ export interface TextDeleteOptions {
   voids?: boolean
 }
 
-/** @inline @internal */
+/** @hidden @inline */
 export interface TextInsertFragmentOptions {
   /**
    * The location to insert the fragment.
@@ -27,7 +27,7 @@ export interface TextInsertFragmentOptions {
   batchDirty?: boolean
 }
 
-/** @inline @internal */
+/** @hidden @inline */
 export interface TextInsertTextOptions {
   at?: Location
   voids?: boolean

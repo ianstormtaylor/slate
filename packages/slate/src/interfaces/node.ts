@@ -10,17 +10,17 @@ import { modifyChildren, modifyLeaf, removeChildren } from '../utils/modify'
 export type BaseNode = Editor | Element | Text
 export type Node = Editor | Element | Text
 
-/** @inline @internal */
+/** @hidden @inline */
 export interface NodeAncestorsOptions {
   reverse?: boolean
 }
 
-/** @inline @internal */
+/** @hidden @inline */
 export interface NodeChildrenOptions {
   reverse?: boolean
 }
 
-/** @inline @internal */
+/** @hidden @inline */
 export interface NodeDescendantsOptions {
   from?: Path
   to?: Path
@@ -28,7 +28,7 @@ export interface NodeDescendantsOptions {
   pass?: (node: NodeEntry) => boolean
 }
 
-/** @inline @internal */
+/** @hidden @inline */
 export interface NodeElementsOptions {
   from?: Path
   to?: Path
@@ -36,17 +36,17 @@ export interface NodeElementsOptions {
   pass?: (node: NodeEntry) => boolean
 }
 
-/** @inline @internal */
+/** @hidden @inline */
 export interface NodeIsNodeOptions {
   deep?: boolean
 }
 
-/** @inline @internal */
+/** @hidden @inline */
 export interface NodeLevelsOptions {
   reverse?: boolean
 }
 
-/** @inline @internal */
+/** @hidden @inline */
 export interface NodeNodesOptions {
   from?: Path
   to?: Path
@@ -54,7 +54,7 @@ export interface NodeNodesOptions {
   pass?: (entry: NodeEntry) => boolean
 }
 
-/** @inline @internal */
+/** @hidden @inline */
 export interface NodeTextsOptions {
   from?: Path
   to?: Path

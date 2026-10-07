@@ -15,17 +15,17 @@ import { TextDirection } from '../types/types'
  */
 export type Path = number[]
 
-/** @inline @internal */
+/** @hidden @inline */
 export interface PathAncestorsOptions {
   reverse?: boolean
 }
 
-/** @inline @internal */
+/** @hidden @inline */
 export interface PathLevelsOptions {
   reverse?: boolean
 }
 
-/** @inline @internal */
+/** @hidden @inline */
 export interface PathTransformOptions {
   affinity?: TextDirection | null
 }

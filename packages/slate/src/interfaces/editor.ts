@@ -712,7 +712,7 @@ export type Selection = ExtendedType<'Selection', BaseSelection>
 
 export type EditorMarks = Omit<Text, 'text'>
 
-/** @inline @internal */
+/** @hidden @inline */
 export interface EditorAboveOptions<T extends Ancestor> {
   at?: Location
   match?: NodeMatch<T>
@@ -720,49 +720,49 @@ export interface EditorAboveOptions<T extends Ancestor> {
   voids?: boolean
 }
 
-/** @inline @internal */
+/** @hidden @inline */
 export interface EditorAfterOptions {
   distance?: number
   unit?: TextUnitAdjustment
   voids?: boolean
 }
 
-/** @inline @internal */
+/** @hidden @inline */
 export interface EditorBeforeOptions {
   distance?: number
   unit?: TextUnitAdjustment
   voids?: boolean
 }
 
-/** @inline @internal */
+/** @hidden @inline */
 export interface EditorDirectedDeletionOptions {
   unit?: TextUnit
 }
 
-/** @inline @internal */
+/** @hidden @inline */
 export interface EditorElementReadOnlyOptions {
   at?: Location
   mode?: MaximizeMode
   voids?: boolean
 }
 
-/** @inline @internal */
+/** @hidden @inline */
 export interface EditorFragmentDeletionOptions {
   direction?: TextDirection
 }
 
-/** @inline @internal */
+/** @hidden @inline */
 export interface EditorIsEditorOptions {
   deep?: boolean
 }
 
-/** @inline @internal */
+/** @hidden @inline */
 export interface EditorLeafOptions {
   depth?: number
   edge?: LeafEdge
 }
 
-/** @inline @internal */
+/** @hidden @inline */
 export interface EditorLevelsOptions<T extends Node> {
   at?: Location
   match?: NodeMatch<T>
@@ -770,7 +770,7 @@ export interface EditorLevelsOptions<T extends Node> {
   voids?: boolean
 }
 
-/** @inline @internal */
+/** @hidden @inline */
 export interface EditorNextOptions<T extends Descendant> {
   at?: Location
   match?: NodeMatch<T>
@@ -778,13 +778,13 @@ export interface EditorNextOptions<T extends Descendant> {
   voids?: boolean
 }
 
-/** @inline @internal */
+/** @hidden @inline */
 export interface EditorNodeOptions {
   depth?: number
   edge?: LeafEdge
 }
 
-/** @inline @internal */
+/** @hidden @inline */
 export interface EditorNodesOptions<T extends Node> {
   /**
    * The location to iterate over.
@@ -806,40 +806,40 @@ export interface EditorNodesOptions<T extends Node> {
   pass?: (entry: NodeEntry) => boolean
 }
 
-/** @inline @internal */
+/** @hidden @inline */
 export interface EditorNormalizeOptions {
   force?: boolean
   operation?: Operation
 }
 
-/** @inline @internal */
+/** @hidden @inline */
 export interface EditorParentOptions {
   depth?: number
   edge?: LeafEdge
 }
 
-/** @inline @internal */
+/** @hidden @inline */
 export interface EditorPathOptions {
   depth?: number
   edge?: LeafEdge
 }
 
-/** @inline @internal */
+/** @hidden @inline */
 export interface EditorPathRefOptions {
   affinity?: TextDirection | null
 }
 
-/** @inline @internal */
+/** @hidden @inline */
 export interface EditorPointOptions {
   edge?: LeafEdge
 }
 
-/** @inline @internal */
+/** @hidden @inline */
 export interface EditorPointRefOptions {
   affinity?: TextDirection | null
 }
 
-/** @inline @internal */
+/** @hidden @inline */
 export interface EditorPositionsOptions {
   /** The `Location` in which to iterate the positions of. */
   at?: Location
@@ -866,7 +866,7 @@ export interface EditorPositionsOptions {
   voids?: boolean
 }
 
-/** @inline @internal */
+/** @hidden @inline */
 export interface EditorPreviousOptions<T extends Node> {
   at?: Location
   match?: NodeMatch<T>
@@ -874,17 +874,17 @@ export interface EditorPreviousOptions<T extends Node> {
   voids?: boolean
 }
 
-/** @inline @internal */
+/** @hidden @inline */
 export interface EditorRangeRefOptions {
   affinity?: RangeDirection | null
 }
 
-/** @inline @internal */
+/** @hidden @inline */
 export interface EditorStringOptions {
   voids?: boolean
 }
 
-/** @inline @internal */
+/** @hidden @inline */
 export interface EditorUnhangRangeOptions {
   /**
    * Allow placing the end of the selection in a void node.
@@ -893,7 +893,7 @@ export interface EditorUnhangRangeOptions {
   voids?: boolean
 }
 
-/** @inline @internal */
+/** @hidden @inline */
 export interface EditorVoidOptions {
   at?: Location
   mode?: MaximizeMode
