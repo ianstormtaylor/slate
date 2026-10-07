@@ -1,5 +1,5 @@
 ---
-'slate-react': major
+'slate-react': minor
 ---
 
 Ignore input, paste and drop events dispatched by script rather than by the user, so a script running on the page can no longer insert content without the user acting.
