@@ -74,7 +74,7 @@ export interface NodeInterface {
    *
    * By default the order is top-down, from highest to lowest ancestor in
    * the tree, but you can pass the `reverse: true` option to go bottom-up.
-   * @param options Exported as `NodeAncestorsOptions`
+   * @param options Type also exported as `NodeAncestorsOptions`
    * @category Relational
    */
   ancestors(
@@ -91,7 +91,7 @@ export interface NodeInterface {
 
   /**
    * Iterate over the children of a node at a specific path.
-   * @param options Exported as `NodeChildrenOptions`
+   * @param options Type also exported as `NodeChildrenOptions`
    * @category Relational
    */
   children(
@@ -115,7 +115,7 @@ export interface NodeInterface {
 
   /**
    * Return a generator of all the descendant node entries inside a root node.
-   * @param options Exported as `NodeDescendantsOptions`
+   * @param options Type also exported as `NodeDescendantsOptions`
    * @category Retrieval
    */
   descendants(
@@ -127,7 +127,7 @@ export interface NodeInterface {
    * Return a generator of all the element nodes inside a root node. Each iteration
    * will return an `ElementEntry` tuple consisting of `[Element, Path]`. If the
    * root node is an element it will be included in the iteration as well.
-   * @param options Exported as `NodeElementsOptions`
+   * @param options Type also exported as `NodeElementsOptions`
    * @category Retrieval
    */
   elements(
@@ -220,14 +220,14 @@ export interface NodeInterface {
 
   /**
    * Check if a value implements the `Node` interface.
-   * @param options Exported as `NodeIsNodeOptions`
+   * @param options Type also exported as `NodeIsNodeOptions`
    * @category Type Guards
    */
   isNode(value: any, options?: NodeIsNodeOptions): value is Node
 
   /**
    * Check if a value is a list of `Node` objects.
-   * @param options Exported as `NodeIsNodeOptions`
+   * @param options Type also exported as `NodeIsNodeOptions`
    * @category Type Guards
    */
   isNodeList(value: any, options?: NodeIsNodeOptions): value is Node[]
@@ -255,7 +255,7 @@ export interface NodeInterface {
    *
    * By default the order is top-down, from highest to lowest node in the tree,
    * but you can pass the `reverse: true` option to go bottom-up.
-   * @param options Exported as `NodeLevelsOptions`
+   * @param options Type also exported as `NodeLevelsOptions`
    * @category Retrieval
    */
   levels(
@@ -274,7 +274,7 @@ export interface NodeInterface {
    * Return a generator of all the node entries of a root node. Each entry is
    * returned as a `[Node, Path]` tuple, with the path referring to the node's
    * position inside the root node.
-   * @param options Exported as `NodeNodesOptions`
+   * @param options Type also exported as `NodeNodesOptions`
    * @category Retrieval
    */
   nodes(
@@ -300,7 +300,7 @@ export interface NodeInterface {
 
   /**
    * Return a generator of all leaf text nodes in a root node.
-   * @param options Exported as `NodeTextsOptions`
+   * @param options Type also exported as `NodeTextsOptions`
    * @category Retrieval
    */
   texts(

@@ -36,7 +36,7 @@ export interface PathInterface {
    *
    * The paths are sorted from shallowest to deepest ancestor. However, if the
    * `reverse: true` option is passed, they are reversed.
-   * @param options Exported as `PathAncestorsOptions`
+   * @param options Type also exported as `PathAncestorsOptions`
    * @category Relational
    */
   ancestors(path: Path, options?: PathAncestorsOptions): Path[]
@@ -148,7 +148,7 @@ export interface PathInterface {
    *
    * The paths are sorted from shallowest to deepest. However, if the `reverse:
    * true` option is passed, they are reversed.
-   * @param options Exported as `PathLevelsOptions`
+   * @param options Type also exported as `PathLevelsOptions`
    * @category Relational
    */
   levels(path: Path, options?: PathLevelsOptions): Path[]
@@ -203,7 +203,7 @@ export interface PathInterface {
 
   /**
    * Transform a path by an operation.
-   * @param options Exported as `PathTransformOptions`
+   * @param options Type also exported as `PathTransformOptions`
    * @category Relational
    */
   transform(

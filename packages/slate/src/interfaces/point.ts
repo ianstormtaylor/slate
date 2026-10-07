@@ -57,7 +57,7 @@ export interface PointInterface {
 
   /**
    * Transform a point by an operation.
-   * @param options Exported as `PointTransformOptions`
+   * @param options Type also exported as `PointTransformOptions`
    * @category Relational
    */
   transform(

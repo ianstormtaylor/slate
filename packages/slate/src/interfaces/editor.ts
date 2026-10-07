@@ -123,14 +123,14 @@ export interface BaseEditor {
 
   /**
    * Collapse the selection.
-   * @param options Exported as `SelectionCollapseOptions`
+   * @param options Type also exported as `SelectionCollapseOptions`
    * @see {@link TransformsInterface#collapse} - A static version of this method.
    */
   collapse(options?: SelectionCollapseOptions): void
 
   /**
    * Delete content in the editor.
-   * @param options Exported as `TextDeleteOptions`
+   * @param options Type also exported as `TextDeleteOptions`
    * @see {@link TransformsInterface#delete} - A static version of this method.
    */
   delete(options?: TextDeleteOptions): void
@@ -149,7 +149,7 @@ export interface BaseEditor {
 
   /**
    * Delete the content of the current selection.
-   * @param options Exported as `EditorFragmentDeletionOptions`
+   * @param options Type also exported as `EditorFragmentDeletionOptions`
    * @see {@link EditorInterface#deleteFragment} - A static version of this method.
    */
   deleteFragment(options?: EditorFragmentDeletionOptions): void
@@ -170,7 +170,7 @@ export interface BaseEditor {
   /**
    * Insert a fragment at the current selection. If the selection is currently
    * expanded, delete it first.
-   * @param options Exported as `TextInsertFragmentOptions`
+   * @param options Type also exported as `TextInsertFragmentOptions`
    * @see {@link EditorInterface#insertFragment} - A static version of this method.
    */
   insertFragment(fragment: Node[], options?: TextInsertFragmentOptions): void
@@ -180,7 +180,7 @@ export interface BaseEditor {
    * expanded, delete it first.
    *
    * **WARNING**: Inserting a node that already exists in the document (or another active document) can cause problems with certain plugins like `slate-dom` and `slate-react` that expect each node to be a unique object.
-   * @param options Exported as `NodeInsertNodesOptions<T>`
+   * @param options Type also exported as `NodeInsertNodesOptions<T>`
    * @see {@link EditorInterface#insertNode} - A static version of this method.
    */
   insertNode<T extends Node>(
@@ -193,7 +193,7 @@ export interface BaseEditor {
    * the current selection or (if not defined) the end of the document.
    *
    * **WARNING**: Inserting a node that already exists in the document (or another active document) can cause problems with certain plugins like `slate-dom` and `slate-react` that expect each node to be a unique object.
-   * @param options Exported as `NodeInsertNodesOptions<T>`
+   * @param options Type also exported as `NodeInsertNodesOptions<T>`
    * @see {@link TransformsInterface#insertNodes} - A static version of this method.
    */
   insertNodes<T extends Node>(
@@ -211,7 +211,7 @@ export interface BaseEditor {
   /**
    * Insert text at the current selection. If the selection is currently
    * expanded, delete it first.
-   * @param options Exported as `TextInsertTextOptions`
+   * @param options Type also exported as `TextInsertTextOptions`
    * @see {@link EditorInterface#insertText} - A static version of this method.
    */
   insertText(text: string, options?: TextInsertTextOptions): void
@@ -243,7 +243,7 @@ export interface BaseEditor {
 
   /**
    * Move the selection's point forward or backward.
-   * @param options Exported as `SelectionMoveOptions`
+   * @param options Type also exported as `SelectionMoveOptions`
    * @see {@link TransformsInterface#move} - A static version of this method.
    */
   move(options?: SelectionMoveOptions): void
@@ -262,7 +262,7 @@ export interface BaseEditor {
 
   /**
    * Normalize any dirty objects in the editor.
-   * @param options Exported as `EditorNormalizeOptions`
+   * @param options Type also exported as `EditorNormalizeOptions`
    * @see {@link EditorInterface#normalize} - A static version of this method.
    */
   normalize(options?: EditorNormalizeOptions): void
@@ -322,7 +322,7 @@ export interface BaseEditor {
 
   /**
    * Set new properties on one of the selection's points.
-   * @param options Exported as `SelectionSetPointOptions`
+   * @param options Type also exported as `SelectionSetPointOptions`
    * @see {@link TransformsInterface#setPoint} - A static version of this method.
    */
   setPoint(props: Partial<Point>, options?: SelectionSetPointOptions): void
@@ -401,7 +401,7 @@ export interface BaseEditor {
 
   /**
    * Get the ancestor above a location in the document.
-   * @param options Exported as `EditorAboveOptions<T>`
+   * @param options Type also exported as `EditorAboveOptions<T>`
    * @see {@link EditorInterface#above} - A static version of this method.
    */
   above<T extends Ancestor>(
@@ -410,14 +410,14 @@ export interface BaseEditor {
 
   /**
    * Get the point after a location.
-   * @param options Exported as `EditorAfterOptions`
+   * @param options Type also exported as `EditorAfterOptions`
    * @see {@link EditorInterface#after} - A static version of this method.
    */
   after(at: Location, options?: EditorAfterOptions): Point | undefined
 
   /**
    * Get the point before a location.
-   * @param options Exported as `EditorBeforeOptions`
+   * @param options Type also exported as `EditorBeforeOptions`
    * @see {@link EditorInterface#before} - A static version of this method.
    */
   before(at: Location, options?: EditorBeforeOptions): Point | undefined
@@ -430,7 +430,7 @@ export interface BaseEditor {
 
   /**
    * Match a read-only element in the current branch of the editor.
-   * @param options Exported as `EditorElementReadOnlyOptions`
+   * @param options Type also exported as `EditorElementReadOnlyOptions`
    * @see {@link EditorInterface#elementReadOnly} - A static version of this method.
    */
   elementReadOnly(
@@ -540,14 +540,14 @@ export interface BaseEditor {
 
   /**
    * Get the leaf text node at a location.
-   * @param options Exported as `EditorLeafOptions`
+   * @param options Type also exported as `EditorLeafOptions`
    * @see {@link EditorInterface#leaf} - A static version of this method.
    */
   leaf(at: Location, options?: EditorLeafOptions): NodeEntry<Text>
 
   /**
    * Iterate through all of the levels at a location.
-   * @param options Exported as `EditorLevelsOptions<T>`
+   * @param options Type also exported as `EditorLevelsOptions<T>`
    * @see {@link EditorInterface#levels} - A static version of this method.
    */
   levels<T extends Node>(
@@ -556,7 +556,7 @@ export interface BaseEditor {
 
   /**
    * Get the matching node in the branch of the document after a location.
-   * @param options Exported as `EditorNextOptions<T>`
+   * @param options Type also exported as `EditorNextOptions<T>`
    * @see {@link EditorInterface#next} - A static version of this method.
    */
   next<T extends Descendant>(
@@ -565,14 +565,14 @@ export interface BaseEditor {
 
   /**
    * Get the node at a location.
-   * @param options Exported as `EditorNodeOptions`
+   * @param options Type also exported as `EditorNodeOptions`
    * @see {@link EditorInterface#node} - A static version of this method.
    */
   node(at: Location, options?: EditorNodeOptions): NodeEntry
 
   /**
    * Iterate through all of the nodes in the Editor.
-   * @param options Exported as `EditorNodesOptions<T>`
+   * @param options Type also exported as `EditorNodesOptions<T>`
    * @see {@link EditorInterface#nodes} - A static version of this method.
    */
   nodes<T extends Node>(
@@ -581,14 +581,14 @@ export interface BaseEditor {
 
   /**
    * Get the parent node of a location.
-   * @param options Exported as `EditorParentOptions`
+   * @param options Type also exported as `EditorParentOptions`
    * @see {@link EditorInterface#parent} - A static version of this method.
    */
   parent(at: Location, options?: EditorParentOptions): NodeEntry<Ancestor>
 
   /**
    * Get the path of a location.
-   * @param options Exported as `EditorPathOptions`
+   * @param options Type also exported as `EditorPathOptions`
    * @see {@link EditorInterface#path} - A static version of this method.
    */
   path(at: Location, options?: EditorPathOptions): Path
@@ -596,7 +596,7 @@ export interface BaseEditor {
   /**
    * Create a mutable ref for a `Path` object, which will stay in sync as new
    * operations are applied to the editor.
-   * @param options Exported as `EditorPathRefOptions`
+   * @param options Type also exported as `EditorPathRefOptions`
    * @see {@link EditorInterface#pathRef} - A static version of this method.
    */
   pathRef(path: Path, options?: EditorPathRefOptions): PathRef
@@ -609,7 +609,7 @@ export interface BaseEditor {
 
   /**
    * Get the start or end point of a location.
-   * @param options Exported as `EditorPointOptions`
+   * @param options Type also exported as `EditorPointOptions`
    * @see {@link EditorInterface#point} - A static version of this method.
    */
   point(at: Location, options?: EditorPointOptions): Point
@@ -617,7 +617,7 @@ export interface BaseEditor {
   /**
    * Create a mutable ref for a `Point` object, which will stay in sync as new
    * operations are applied to the editor.
-   * @param options Exported as `EditorPointRefOptions`
+   * @param options Type also exported as `EditorPointRefOptions`
    * @see {@link EditorInterface#pointRef} - A static version of this method.
    */
   pointRef(point: Point, options?: EditorPointRefOptions): PointRef
@@ -630,14 +630,14 @@ export interface BaseEditor {
 
   /**
    * Return all the positions in `at` range where a `Point` can be placed.
-   * @param options Exported as `EditorPositionsOptions`
+   * @param options Type also exported as `EditorPositionsOptions`
    * @see {@link EditorInterface#positions} - A static version of this method.
    */
   positions(options?: EditorPositionsOptions): Generator<Point, void, undefined>
 
   /**
    * Get the matching node in the branch of the document before a location.
-   * @param options Exported as `EditorPreviousOptions<T>`
+   * @param options Type also exported as `EditorPreviousOptions<T>`
    * @see {@link EditorInterface#previous} - A static version of this method.
    */
   previous<T extends Node>(
@@ -653,7 +653,7 @@ export interface BaseEditor {
   /**
    * Create a mutable ref for a `Range` object, which will stay in sync as new
    * operations are applied to the editor.
-   * @param options Exported as `EditorRangeRefOptions`
+   * @param options Type also exported as `EditorRangeRefOptions`
    * @see {@link EditorInterface#rangeRef} - A static version of this method.
    */
   rangeRef(range: Range, options?: EditorRangeRefOptions): RangeRef
@@ -675,21 +675,21 @@ export interface BaseEditor {
    *
    * Note: by default the text of void nodes is considered to be an empty
    * string, regardless of content, unless you pass in true for the voids option.
-   * @param options Exported as `EditorStringOptions`
+   * @param options Type also exported as `EditorStringOptions`
    * @see {@link EditorInterface#string} - A static version of this method.
    */
   string(at: Location, options?: EditorStringOptions): string
 
   /**
    * Convert a range into a non-hanging one.
-   * @param options Exported as `EditorUnhangRangeOptions`
+   * @param options Type also exported as `EditorUnhangRangeOptions`
    * @see {@link EditorInterface#unhangRange} - A static version of this method.
    */
   unhangRange(range: Range, options?: EditorUnhangRangeOptions): Range
 
   /**
    * Match a void node in the current branch of the editor.
-   * @param options Exported as `EditorVoidOptions`
+   * @param options Type also exported as `EditorVoidOptions`
    * @see {@link EditorInterface#void} - A static version of this method.
    */
   void(options?: EditorVoidOptions): NodeEntry<Element> | undefined
@@ -903,8 +903,8 @@ export interface EditorVoidOptions {
 export interface EditorInterface {
   /**
    * Get the ancestor above a location in the document.
-   * @param options Exported as `EditorAboveOptions<T extends Ancestor>`
-   * @param options Exported as `EditorAboveOptions<T>`
+   * @param options Type also exported as `EditorAboveOptions<T extends Ancestor>`
+   * @param options Type also exported as `EditorAboveOptions<T>`
    * @category Relational
    */
   above<T extends Ancestor>(
@@ -923,7 +923,7 @@ export interface EditorInterface {
 
   /**
    * Get the point after a location.
-   * @param options Exported as `EditorAfterOptions`
+   * @param options Type also exported as `EditorAfterOptions`
    * @category Relational
    */
   after(
@@ -934,7 +934,7 @@ export interface EditorInterface {
 
   /**
    * Get the point before a location.
-   * @param options Exported as `EditorBeforeOptions`
+   * @param options Type also exported as `EditorBeforeOptions`
    * @category Relational
    */
   before(
@@ -945,21 +945,21 @@ export interface EditorInterface {
 
   /**
    * Delete content in the editor backward from the current selection.
-   * @param options Exported as `EditorDirectedDeletionOptions`
+   * @param options Type also exported as `EditorDirectedDeletionOptions`
    * @category Commands
    */
   deleteBackward(editor: Editor, options?: EditorDirectedDeletionOptions): void
 
   /**
    * Delete content in the editor forward from the current selection.
-   * @param options Exported as `EditorDirectedDeletionOptions`
+   * @param options Type also exported as `EditorDirectedDeletionOptions`
    * @category Commands
    */
   deleteForward(editor: Editor, options?: EditorDirectedDeletionOptions): void
 
   /**
    * Delete the content in the current selection.
-   * @param options Exported as `EditorFragmentDeletionOptions`
+   * @param options Type also exported as `EditorFragmentDeletionOptions`
    * @category Commands
    */
   deleteFragment(editor: Editor, options?: EditorFragmentDeletionOptions): void
@@ -972,7 +972,7 @@ export interface EditorInterface {
 
   /**
    * Match a read-only element in the current branch of the editor.
-   * @param options Exported as `EditorElementReadOnlyOptions`
+   * @param options Type also exported as `EditorElementReadOnlyOptions`
    * @category Relational
    */
   elementReadOnly(
@@ -1035,7 +1035,7 @@ export interface EditorInterface {
    * at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
    *
    * **WARNING**: Inserting a node that already exists in the document (or another active document) can cause problems with certain plugins like `slate-dom` and `slate-react` that expect each node to be a unique object.
-   * @param options Exported as `TextInsertFragmentOptions`
+   * @param options Type also exported as `TextInsertFragmentOptions`
    * @category Commands
    */
   insertFragment(
@@ -1049,7 +1049,7 @@ export interface EditorInterface {
    * at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
    *
    * **WARNING**: Inserting a node that already exists in the document (or another active document) can cause problems with certain plugins like `slate-dom` and `slate-react` that expect each node to be a unique object.
-   * @param options Exported as `NodeInsertNodesOptions<T>`
+   * @param options Type also exported as `NodeInsertNodesOptions<T>`
    * @category Commands
    */
   insertNode<T extends Node>(
@@ -1069,7 +1069,7 @@ export interface EditorInterface {
   /**
    * Insert a string of text
    * at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
-   * @param options Exported as `TextInsertTextOptions`
+   * @param options Type also exported as `TextInsertTextOptions`
    * @category Commands
    */
   insertText(
@@ -1092,7 +1092,7 @@ export interface EditorInterface {
 
   /**
    * Check if a value is an `Editor` object.
-   * @param options Exported as `EditorIsEditorOptions`
+   * @param options Type also exported as `EditorIsEditorOptions`
    * @category Queries
    */
   isEditor(value: any, options?: EditorIsEditorOptions): value is Editor
@@ -1153,7 +1153,7 @@ export interface EditorInterface {
 
   /**
    * Get the leaf text node at a location.
-   * @param options Exported as `EditorLeafOptions`
+   * @param options Type also exported as `EditorLeafOptions`
    * @category Retrieval
    */
   leaf(
@@ -1164,7 +1164,7 @@ export interface EditorInterface {
 
   /**
    * Iterate through all of the levels at a location.
-   * @param options Exported as `EditorLevelsOptions<T>`
+   * @param options Type also exported as `EditorLevelsOptions<T>`
    * @category Relational
    */
   levels<T extends Node>(
@@ -1180,7 +1180,7 @@ export interface EditorInterface {
 
   /**
    * Get the matching node in the branch of the document after a location.
-   * @param options Exported as `EditorNextOptions<T>`
+   * @param options Type also exported as `EditorNextOptions<T>`
    * @category Relational
    */
   next<T extends Descendant>(
@@ -1195,7 +1195,7 @@ export interface EditorInterface {
 
   /**
    * Iterate through all of the nodes in the Editor.
-   * @param options Exported as `EditorNodesOptions<T>`
+   * @param options Type also exported as `EditorNodesOptions<T>`
    * @category Relational
    */
   nodes<T extends Node>(
@@ -1205,14 +1205,14 @@ export interface EditorInterface {
 
   /**
    * Normalize any dirty objects in the editor.
-   * @param options Exported as `EditorNormalizeOptions`
+   * @param options Type also exported as `EditorNormalizeOptions`
    * @category Commands
    */
   normalize(editor: Editor, options?: EditorNormalizeOptions): void
 
   /**
    * Get the parent node of a location.
-   * @param options Exported as `EditorParentOptions`
+   * @param options Type also exported as `EditorParentOptions`
    * @category Relational
    */
   parent(
@@ -1223,7 +1223,7 @@ export interface EditorInterface {
 
   /**
    * Get the path of a location.
-   * @param options Exported as `EditorPathOptions`
+   * @param options Type also exported as `EditorPathOptions`
    * @category Queries
    */
   path(editor: Editor, at: Location, options?: EditorPathOptions): Path
@@ -1231,7 +1231,7 @@ export interface EditorInterface {
   /**
    * Create a mutable ref for a `Path` object, which will stay in sync as new
    * operations are applied to the editor.
-   * @param options Exported as `EditorPathRefOptions`
+   * @param options Type also exported as `EditorPathRefOptions`
    * @category Create Ref
    */
   pathRef(editor: Editor, path: Path, options?: EditorPathRefOptions): PathRef
@@ -1244,7 +1244,7 @@ export interface EditorInterface {
 
   /**
    * Get the start or end point of a location.
-   * @param options Exported as `EditorPointOptions`
+   * @param options Type also exported as `EditorPointOptions`
    * @category Queries
    */
   point(editor: Editor, at: Location, options?: EditorPointOptions): Point
@@ -1252,7 +1252,7 @@ export interface EditorInterface {
   /**
    * Create a mutable ref for a `Point` object, which will stay in sync as new
    * operations are applied to the editor.
-   * @param options Exported as `EditorPointRefOptions`
+   * @param options Type also exported as `EditorPointRefOptions`
    * @category Create Ref
    */
   pointRef(
@@ -1286,7 +1286,7 @@ export interface EditorInterface {
 
   /**
    * Get the matching node in the branch of the document before a location.
-   * @param options Exported as `EditorPreviousOptions<T>`
+   * @param options Type also exported as `EditorPreviousOptions<T>`
    * @category Relational
    */
   previous<T extends Node>(
@@ -1303,7 +1303,7 @@ export interface EditorInterface {
   /**
    * Create a mutable ref for a `Range` object, which will stay in sync as new
    * operations are applied to the editor.
-   * @param options Exported as `EditorRangeRefOptions`
+   * @param options Type also exported as `EditorRangeRefOptions`
    * @category Create Ref
    */
   rangeRef(
@@ -1347,7 +1347,7 @@ export interface EditorInterface {
    *
    * Note: by default the text of void nodes is considered to be an empty
    * string, regardless of content, unless you pass in true for the voids option
-   * @param options Exported as `EditorStringOptions`
+   * @param options Type also exported as `EditorStringOptions`
    * @category Queries
    */
   string(editor: Editor, at: Location, options?: EditorStringOptions): string
@@ -1361,7 +1361,7 @@ export interface EditorInterface {
    *
    * - It does not modify the start of the range; only the end. For example, it does not "unhang" a selection that starts at the end of a previous block.
    * - It only does anything if the start block is fully selected. For example, it does not handle ranges created by double-clicking the end of a paragraph (which browsers treat by selecting from the end of that paragraph to the start of the next).
-   * @param options Exported as `EditorUnhangRangeOptions`
+   * @param options Type also exported as `EditorUnhangRangeOptions`
    * @category Selection Commands
    */
   unhangRange(
@@ -1372,7 +1372,7 @@ export interface EditorInterface {
 
   /**
    * Match a void node in the current branch of the editor.
-   * @param options Exported as `EditorVoidOptions`
+   * @param options Type also exported as `EditorVoidOptions`
    * @category Relational
    */
   void(

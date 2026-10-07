@@ -41,7 +41,7 @@ export interface TextInterface {
    * used to check whether sibling text nodes can be merged.
    *
    * @param options.loose When `true`, it checks if the properties of the `Text` object are equal except for the `text` property (i.e. the `String` value of the `Text`). When `false` (default), checks all properties including `text`. Defaults to `false`.
-   * @param options Exported as `TextEqualsOptions`
+   * @param options Type also exported as `TextEqualsOptions`
    * @category Queries
    */
   equals(text: Text, another: Text, options?: TextEqualsOptions): boolean

@@ -35,7 +35,7 @@ export interface RangeInterface {
   /**
    * Get the start and end points of a range, in the order in which they appear
    * in the document.
-   * @param options Exported as `RangeEdgesOptions`
+   * @param options Type also exported as `RangeEdgesOptions`
    * @category Queries
    */
   edges(range: Range, options?: RangeEdgesOptions): [Point, Point]
@@ -127,7 +127,7 @@ export interface RangeInterface {
 
   /**
    * Transform a range by an operation.
-   * @param options Exported as `RangeTransformOptions`
+   * @param options Type also exported as `RangeTransformOptions`
    * @category Relational
    */
   transform(
