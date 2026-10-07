@@ -4,6 +4,11 @@
   "workspaces": [
     "packages/*"
   ],
+  "resolutions": {
+    "postcss": "^8.5.26",
+    "serialize-javascript": "^7.1.0",
+    "levelup/bl": "^1.2.3"
+  },
   "scripts": {
     "build": "yarn build:rollup && yarn build:next",
     "build:next": "cd ./site && next build",
@@ -48,8 +53,8 @@
     "@babel/preset-typescript": "^7.23.2",
     "@babel/register": "^7.22.15",
     "@babel/runtime": "^7.23.2",
-    "@changesets/changelog-github": "^0.4.8",
-    "@changesets/cli": "^2.26.2",
+    "@changesets/changelog-github": "^0.5.2",
+    "@changesets/cli": "^2.29.8",
     "@emotion/css": "^11.11.2",
     "@faker-js/faker": "^10.0.0",
     "@fontsource/roboto": "^5.3.0",

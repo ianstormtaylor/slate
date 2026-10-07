@@ -45,6 +45,7 @@ function configure(pkg, env, target) {
 
     typescript({
       abortOnError: false,
+      include: ['*.ts', '**/*.ts', '*.tsx', '**/*.tsx'],
       tsconfig: `./packages/${pkg.name}/tsconfig.json`,
       // COMPAT: Without this flag sometimes the declarations are not updated.
       // clean: isProd ? true : false,
