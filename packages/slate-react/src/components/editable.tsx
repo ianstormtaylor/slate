@@ -82,6 +82,23 @@ import { useFlushDeferredSelectorsOnRender } from '../hooks/use-slate-selector'
 
 type DeferredOperation = () => void
 
+const isSameCaretPosition = (editor: Editor, a: Range, b: Range) => {
+  if (!Range.isCollapsed(a) || !Range.isCollapsed(b)) {
+    return false
+  }
+
+  const [first, second] = Path.isBefore(a.anchor.path, b.anchor.path)
+    ? [a.anchor, b.anchor]
+    : [b.anchor, a.anchor]
+
+  if (second.offset !== 0 || !Path.equals(Path.next(first.path), second.path)) {
+    return false
+  }
+
+  const node = Node.get(editor, first.path)
+  return Node.isText(node) && first.offset === node.text.length
+}
+
 const Children = (props: Parameters<typeof useChildren>[0]) => (
   <React.Fragment>{useChildren(props)}</React.Fragment>
 )
@@ -711,6 +728,7 @@ export const Editable = forwardRef(
                 const selectionRef =
                   !isCompositionChange &&
                   editor.selection &&
+                  !isSameCaretPosition(editor, editor.selection, range) &&
                   Editor.rangeRef(editor, editor.selection)
 
                 Transforms.select(editor, range)
