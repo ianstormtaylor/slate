@@ -29,15 +29,12 @@
 - [Normalizing](concepts/11-normalizing.md)
 - [TypeScript](concepts/12-typescript.md)
 - [Migrating](concepts/xx-migrating.md)
+- Slate React
+  - [Event Handling](concepts/slate-react/01-event-handling.md)
 
 ## API
 
 <!-- API PAGES -->
-
-## Libraries
-
-- Slate React
-  - [Event Handling](libraries/slate-react/event-handling.md)
 
 ## General
 
