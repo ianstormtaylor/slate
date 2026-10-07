@@ -435,10 +435,7 @@ export function createAndroidInputManager({
       flushTimeoutId = null
     }
 
-    if (IS_NODE_MAP_DIRTY.get(editor)) {
-      return
-    }
-
+    const isNodeMapDirty = IS_NODE_MAP_DIRTY.get(editor)
     const { inputType: type } = event
 
     if (type === 'insertCompositionText' || type === 'deleteCompositionText') {
@@ -485,7 +482,7 @@ export function createAndroidInputManager({
     }
 
     let [nativeTargetRange] = (event as any).getTargetRanges()
-    if (nativeTargetRange) {
+    if (nativeTargetRange && !isNodeMapDirty) {
       targetRange = ReactEditor.toSlateRange(editor, nativeTargetRange, {
         exactMatch: false,
         suppressThrow: true,
@@ -496,7 +493,7 @@ export function createAndroidInputManager({
     // have to manually get the selection here to ensure it's up-to-date.
     const window = ReactEditor.getWindow(editor)
     const domSelection = window.getSelection()
-    if (!targetRange && domSelection) {
+    if (!targetRange && domSelection && !isNodeMapDirty) {
       nativeTargetRange = domSelection
       targetRange = ReactEditor.toSlateRange(editor, domSelection, {
         exactMatch: false,
