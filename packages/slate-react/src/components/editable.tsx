@@ -19,6 +19,7 @@ import {
   Node,
   NodeEntry,
   Path,
+  Point,
   Range,
   Text,
   Transforms,
@@ -1294,6 +1295,15 @@ export const Editable = forwardRef(
                         endVoid &&
                         Path.equals(startVoid[1], endVoid[1])
                       ) {
+                        if (event.shiftKey && editor.selection) {
+                          const { anchor } = editor.selection
+                          const focus = Point.isBefore(anchor, start)
+                            ? end
+                            : start
+                          Transforms.select(editor, { anchor, focus })
+                          return
+                        }
+
                         const range = Editor.range(editor, start)
                         Transforms.select(editor, range)
                       }
