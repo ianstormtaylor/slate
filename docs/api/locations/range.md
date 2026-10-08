@@ -18,6 +18,10 @@ interface Range {
 
 ### Retrieval methods
 
+#### `Range.direction(range: Range) => 'forward' | 'backward' | 'collapsed'`
+
+Get the direction of a `range`: `'forward'` when the focus point comes after the anchor point, `'backward'` when it comes before, and `'collapsed'` when they're at the same position.
+
 #### `Range.edges(range: Range, options?) => [Point, Point]`
 
 Get the start and end points of a `range`, in the order in which they appear in the document.
@@ -60,7 +64,7 @@ Check if a `range` includes another range.
 
 #### `Range.isBackward(range: Range) => boolean`
 
-Check if a `range` is backward, meaning that its anchor point appears _after_ its focus point in the document.
+Check if a `range` is backward, meaning that its anchor point appears _after_ its focus point in the document. A collapsed range is not backward.
 
 #### `Range.isCollapsed(range: Range) => boolean`
 
@@ -72,7 +76,7 @@ Check if a `range` is expanded. This is the opposite of `Range.isCollapsed` and 
 
 #### `Range.isForward(range: Range) => boolean`
 
-Check if a `range` is forward. This is the opposite of `Range.isBackward` and is provided for legibility.
+Check if a `range` is forward. This is the opposite of `Range.isBackward` and is provided for legibility, so a collapsed range counts as forward. Use `Range.direction` to tell collapsed ranges apart.
 
 #### `Range.isRange(value: any) => value is Range`
 
