@@ -327,9 +327,25 @@ describe('slate-react', () => {
           value: makeDataTransfer(text),
         })
 
-        await act(async () => {
-          ReactEditor.toDOMNode(editor, editor).dispatchEvent(event)
-        })
+        // `<Editable>` ignores events dispatched by script, and `dispatchEvent`
+        // marks every event as such. jsdom's `isTrusted` is a non-configurable
+        // getter over its internal event, so a listener ahead of React flags
+        // the event as trusted there.
+        const markTrusted = (dispatched: Event) => {
+          const impl = Object.getOwnPropertySymbols(dispatched).find(
+            symbol => symbol.description === 'impl'
+          )!
+          ;(dispatched as any)[impl].isTrusted = true
+        }
+        window.addEventListener(type, markTrusted, { capture: true })
+
+        try {
+          await act(async () => {
+            ReactEditor.toDOMNode(editor, editor).dispatchEvent(event)
+          })
+        } finally {
+          window.removeEventListener(type, markTrusted, { capture: true })
+        }
       }
 
       const resolveDropPositionTo = (node: Node, offset: number) => {
@@ -412,9 +428,12 @@ describe('slate-react', () => {
           })
         })
         await dispatch(editor, 'dragstart', 'te')
+        // Re-inserting the dragged text over itself would leave the same content
+        const insertData = jest.spyOn(editor, 'insertData')
 
         await dispatch(editor, 'drop', 'te')
 
+        expect(insertData).not.toHaveBeenCalled()
         expect(editor.children).toEqual(initialValue)
       })
     })
