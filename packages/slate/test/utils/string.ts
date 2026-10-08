@@ -3,7 +3,7 @@ import {
   codepointsIteratorRTL,
   getCharacterDistance,
   getWordDistance,
-} from '../../src/utils/string'
+} from 'slate/src/utils/string'
 
 const codepoints = [
   ['a', 1],
@@ -95,8 +95,8 @@ const sampleStrings = {
   '20': ['👶🏿̈\u200d👶🏿'],
   '21': ['🛑\u200d🛑'],
   '22': ['a\u200d', '🛑'],
-  '23': ['✁\u200d✁'],
-  '24': ['a\u200d', '✁'],
+  '23': ['✂\u200d✂'],
+  '24': ['a\u200d', '✂'],
   // GB9c: do not break within an Indic conjunct cluster, i.e.
   // Consonant + (Extend | Linker)* + Linker + (Extend | Linker)* + Consonant.
   '25': ['\u0915\u094d\u0924'], // KA, VIRAMA, TA

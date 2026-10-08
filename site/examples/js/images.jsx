@@ -111,6 +111,9 @@ const Image = ({ attributes, children, element }) => {
         />
         <Button
           active
+          onPointerDown={event => {
+            event.preventDefault()
+          }}
           onClick={() => Transforms.removeNodes(editor, { at: path })}
           className={css`
             display: ${selected && focused ? 'inline' : 'none'};
@@ -130,8 +133,8 @@ const InsertImageButton = () => {
   const editor = useSlateStatic()
   return (
     <Button
-      onMouseDown={event => {
-        event.preventDefault()
+      onPointerDown={event => event.preventDefault()}
+      onClick={() => {
         const url = window.prompt('Enter the URL of the image:')
         if (url && !isImageUrl(url)) {
           alert('URL is not an image')

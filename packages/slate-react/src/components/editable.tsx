@@ -19,6 +19,7 @@ import {
   Node,
   NodeEntry,
   Path,
+  Point,
   Range,
   Text,
   Transforms,
@@ -33,6 +34,7 @@ import { ReadOnlyContext } from '../hooks/use-read-only'
 import { useSlate } from '../hooks/use-slate'
 import { useTrackUserInput } from '../hooks/use-track-user-input'
 import { ReactEditor } from '../plugin/react-editor'
+import { deleteMovedRange, getMovableRange } from '../utils/move-range'
 import { TRIPLE_CLICK } from 'slate-dom'
 import {
   containsShadowAware,
@@ -81,6 +83,23 @@ import { ComposingContext } from '../hooks/use-composing'
 import { useFlushDeferredSelectorsOnRender } from '../hooks/use-slate-selector'
 
 type DeferredOperation = () => void
+
+const isSameCaretPosition = (editor: Editor, a: Range, b: Range) => {
+  if (!Range.isCollapsed(a) || !Range.isCollapsed(b)) {
+    return false
+  }
+
+  const [first, second] = Path.isBefore(a.anchor.path, b.anchor.path)
+    ? [a.anchor, b.anchor]
+    : [b.anchor, a.anchor]
+
+  if (second.offset !== 0 || !Path.equals(Path.next(first.path), second.path)) {
+    return false
+  }
+
+  const node = Node.get(editor, first.path)
+  return Node.isText(node) && first.offset === node.text.length
+}
 
 const Children = (props: Parameters<typeof useChildren>[0]) => (
   <React.Fragment>{useChildren(props)}</React.Fragment>
@@ -552,6 +571,10 @@ export const Editable = forwardRef(
     // https://github.com/facebook/react/issues/11211
     const onDOMBeforeInput = useCallback(
       (event: InputEvent) => {
+        if (!event.isTrusted) {
+          return
+        }
+
         handleNativeHistoryEvents(editor, event)
         const el = ReactEditor.toDOMNode(editor, editor)
         const root = el.getRootNode()
@@ -707,6 +730,7 @@ export const Editable = forwardRef(
                 const selectionRef =
                   !isCompositionChange &&
                   editor.selection &&
+                  !isSameCaretPosition(editor, editor.selection, range) &&
                   Editor.rangeRef(editor, editor.selection)
 
                 Transforms.select(editor, range)
@@ -1272,6 +1296,15 @@ export const Editable = forwardRef(
                         endVoid &&
                         Path.equals(startVoid[1], endVoid[1])
                       ) {
+                        if (event.shiftKey && editor.selection) {
+                          const { anchor } = editor.selection
+                          const focus = Point.isBefore(anchor, start)
+                            ? end
+                            : start
+                          Transforms.select(editor, { anchor, focus })
+                          return
+                        }
+
                         const range = Editor.range(editor, start)
                         Transforms.select(editor, range)
                       }
@@ -1406,6 +1439,7 @@ export const Editable = forwardRef(
                       !isDOMEventTargetInput(event)
                     ) {
                       event.preventDefault()
+                      selectMovableRange(editor)
                       ReactEditor.setFragmentData(
                         editor,
                         event.clipboardData,
@@ -1415,7 +1449,7 @@ export const Editable = forwardRef(
 
                       if (selection) {
                         if (Range.isExpanded(selection)) {
-                          Editor.deleteFragment(editor)
+                          deleteMovedRange(editor, selection)
                         } else {
                           const node = Node.parent(
                             editor,
@@ -1468,6 +1502,7 @@ export const Editable = forwardRef(
                         Transforms.select(editor, range)
                       }
 
+                      selectMovableRange(editor)
                       state.isDraggingInternally = true
 
                       ReactEditor.setFragmentData(
@@ -1483,6 +1518,7 @@ export const Editable = forwardRef(
                   (event: React.DragEvent<HTMLDivElement>) => {
                     if (
                       !readOnly &&
+                      event.isTrusted &&
                       ReactEditor.hasTarget(editor, event.target) &&
                       !isEventHandled(event, attributes.onDrop)
                     ) {
@@ -1509,15 +1545,21 @@ export const Editable = forwardRef(
                       if (range) {
                         Transforms.select(editor, range)
 
-                        if (state.isDraggingInternally) {
+                        if (state.isDraggingInternally && draggedRange) {
+                          if (Range.includes(draggedRange, range.anchor)) {
+                            return
+                          }
+
                           if (
-                            draggedRange &&
-                            !Range.equals(draggedRange, range) &&
                             !Editor.void(editor, { at: range, voids: true })
                           ) {
-                            Transforms.delete(editor, {
-                              at: draggedRange,
-                            })
+                            const dropRef = Editor.rangeRef(editor, range)
+                            deleteMovedRange(editor, draggedRange)
+                            const dropRange = dropRef.unref()
+
+                            if (dropRange) {
+                              Transforms.select(editor, dropRange)
+                            }
                           }
                         }
                       } else if (
@@ -1864,7 +1906,12 @@ export const Editable = forwardRef(
                                 Editor.isBlock(editor, currentNode))
                             ) {
                               event.preventDefault()
-                              Editor.deleteBackward(editor, { unit: 'block' })
+
+                              if (Hotkeys.isDeleteForward(nativeEvent)) {
+                                Editor.deleteForward(editor, { unit: 'block' })
+                              } else {
+                                Editor.deleteBackward(editor, { unit: 'block' })
+                              }
 
                               return
                             }
@@ -1879,6 +1926,7 @@ export const Editable = forwardRef(
                   (event: React.ClipboardEvent<HTMLDivElement>) => {
                     if (
                       !readOnly &&
+                      event.isTrusted &&
                       ReactEditor.hasEditableTarget(editor, event.target) &&
                       !isEventHandled(event, attributes.onPaste)
                     ) {
@@ -1937,6 +1985,18 @@ export type RenderPlaceholderProps = {
 /**
  * The default placeholder element
  */
+
+const selectMovableRange = (editor: ReactEditor) => {
+  const { selection } = editor
+
+  if (selection && Range.isExpanded(selection)) {
+    const movableRange = getMovableRange(editor, selection)
+
+    if (!Range.equals(movableRange, selection)) {
+      Transforms.select(editor, movableRange)
+    }
+  }
+}
 
 export const DefaultPlaceholder = ({
   attributes,

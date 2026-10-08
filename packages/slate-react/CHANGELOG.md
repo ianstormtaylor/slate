@@ -1,5 +1,46 @@
 # slate-react
 
+## 0.130.1
+
+### Patch Changes
+
+- [#6167](https://github.com/ianstormtaylor/slate/pull/6167) [`eb9dc9b`](https://github.com/ianstormtaylor/slate/commit/eb9dc9b81f5ff3bf22087f57b8cb369bb9b0b559) Thanks [@dylans](https://github.com/dylans)! - Add `-webkit-user-select: none` to the default placeholder style so iOS Safari can't partially select the placeholder text.
+
+- [#6166](https://github.com/ianstormtaylor/slate/pull/6166) [`a0bcfaa`](https://github.com/ianstormtaylor/slate/commit/a0bcfaaba0fcf028d6f483d9bf5840c1a171a812) Thanks [@dylans](https://github.com/dylans)! - Shift-clicking a void element now extends the selection to it instead of collapsing the selection onto the void.
+
+## 0.130.0
+
+### Patch Changes
+
+- [#6164](https://github.com/ianstormtaylor/slate/pull/6164) [`209c334`](https://github.com/ianstormtaylor/slate/commit/209c33497c34e90dfef79d2b31e23f1c45715f98) Thanks [@dylans](https://github.com/dylans)! - Fix typed text coming out reversed after a soft break at the end of a leaf in Chrome. Chrome reports the caret after a trailing `\n` as the start of the next text node, and Slate restored its own selection after each insert, so every character landed in front of the last.
+
+## 0.129.0
+
+### Patch Changes
+
+- [#6140](https://github.com/ianstormtaylor/slate/pull/6140) [`7119501`](https://github.com/ianstormtaylor/slate/commit/7119501cca7550174d74262b794840b236a91cc6) Thanks [@dylans](https://github.com/dylans)! - Stop dropping Android input that arrives before the editor re-renders. When the node map was stale, `beforeinput` events were ignored, so the browser's native insert was overwritten by the next render. That lost the first character typed into an emptied editor, or every other character when typing fast. They now resolve against the editor's selection instead of the stale DOM.
+
+- [#6130](https://github.com/ianstormtaylor/slate/pull/6130) [`ab50c3b`](https://github.com/ianstormtaylor/slate/commit/ab50c3bda1c963a45e96b0e188725f57869588e1) Thanks [@dylans](https://github.com/dylans)! - Initialize the editor from `initialValue` when a different `editor` is passed to an already mounted `<Slate>`, such as when React fast refresh re-runs the `useMemo` that creates it. Previously the new editor kept empty `children`, and the next operation threw "Cannot find a descendant at path [0]".
+
+## 0.128.0
+
+### Minor Changes
+
+- [#6117](https://github.com/ianstormtaylor/slate/pull/6117) [`4e8cf0aa`](https://github.com/ianstormtaylor/slate/commit/4e8cf0aa0aa98cad9da21dc03d54d9bf878d10f8) Thanks [@juliankrispel](https://github.com/juliankrispel)! - Ignore input, paste and drop events dispatched by script rather than by the user, so a script running on the page can no longer insert content without the user acting.
+
+  This breaks tests that simulate a paste by dispatching an event, such as `fireEvent.paste` or Cypress's `trigger('paste')`. Drive a real paste instead, with Playwright's keyboard or `cypress-real-events`, or call `editor.insertData` directly.
+
+### Patch Changes
+
+- [#6115](https://github.com/ianstormtaylor/slate/pull/6115) [`52f05bf8`](https://github.com/ianstormtaylor/slate/commit/52f05bf8b614407423fab40525862f044c51884b) Thanks [@giaBaoJS](https://github.com/giaBaoJS)! - - When deleting a void element backward from a cursor inside it, place the cursor before the removed void instead of moving it into the following node
+  - In Chrome and Safari, pressing Delete on a selected void now deletes forward instead of backward
+
+## 0.127.1
+
+### Patch Changes
+
+- [#6110](https://github.com/ianstormtaylor/slate/pull/6110) [`fbe8e50b`](https://github.com/ianstormtaylor/slate/commit/fbe8e50befd728ecff7117d2ae3a4b45e0a79d7c) Thanks [@unrevised6419](https://github.com/unrevised6419)! - Declare `@types/react` (`>=18.0.0`) and `@types/lodash` (`^4.14.0`) as optional peer dependencies. The shipped type declarations import from `react` and `lodash` in type positions, but the typings packages were only listed in `devDependencies`. Under a hoisted `node_modules` layout that resolves by accident; under pnpm's isolated linker with a global virtual store it does not, and consumers get `TS7016` implicit-any errors (or silently degraded `any` props) for the editor components. Both entries are optional, so JavaScript-only consumers do not get unmet-peer warnings.
+
 ## 0.126.4
 
 ### Patch Changes

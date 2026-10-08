@@ -1,5 +1,11 @@
 # slate-history
 
+## 0.128.1
+
+### Patch Changes
+
+- [#6063](https://github.com/ianstormtaylor/slate/pull/6063) [`6ec6ab5c`](https://github.com/ianstormtaylor/slate/commit/6ec6ab5c7a8cf7771990c40eab8b1a99532c2b88) Thanks [@suyash-vyas](https://github.com/suyash-vyas)! - Fix `HistoryEditor.withMerging`, `HistoryEditor.withNewBatch` and `HistoryEditor.withoutMerging` leaving the history flags corrupted when `fn` throws, and a nested `withNewBatch` that applies no operation clearing the pending split of the enclosing `withNewBatch`.
+
 ## 0.115.0
 
 ### Patch Changes

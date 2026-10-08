@@ -12,4 +12,10 @@ export const input = (
     </block>
   </editor>
 )
-export const output = <editor />
+export const output = (
+  <editor>
+    <block>
+      <cursor />
+    </block>
+  </editor>
+)

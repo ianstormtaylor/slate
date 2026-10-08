@@ -131,6 +131,7 @@ const Leaf = (props: {
           display: 'block',
           opacity: '0.333',
           userSelect: 'none',
+          WebkitUserSelect: 'none',
           textDecoration: 'none',
           // Fixes https://github.com/udecode/plate/issues/2315
           WebkitUserModify: IS_WEBKIT ? 'inherit' : undefined,

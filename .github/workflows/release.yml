@@ -32,7 +32,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v6
         with:
-          node-version: 22.17
+          node-version: 24
           cache: yarn
 
       - name: Enable Corepack (Yarn)
@@ -120,6 +120,18 @@ jobs:
       - name: Release to @dev channel
         if: matrix.channel == 'dev'
         run: |
+          set -euo pipefail
+
+          for manifest in packages/*/package.json; do
+            name="$(node -p "require('./$manifest').name")"
+            version="$(node -p "require('./$manifest').version")"
+
+            if ! npm view "$name@$version" version > /dev/null 2>&1; then
+              echo "::warning::$name@$version is not on npm yet, so skipping the dev release to keep it off the dev tag"
+              exit 0
+            fi
+          done
+
           yarn changeset version --snapshot
           yarn changeset publish --tag dev
         env:

@@ -55,26 +55,24 @@ const TabButton = (props: React.HTMLAttributes<HTMLSpanElement>) => (
   />
 )
 
-const Tab = React.forwardRef(
-  (
-    {
-      active,
-      href,
-      ...props
-    }: React.AnchorHTMLAttributes<HTMLAnchorElement> & {
-      active: boolean
-    },
-    ref: React.Ref<HTMLAnchorElement>
-  ) => (
-    <a
-      ref={ref}
-      href={href}
-      role="menuitem"
-      aria-current={active ? 'page' : undefined}
-      {...props}
-      className={`example-tab ${active ? 'active' : ''}`}
-    />
-  )
+const Tab = ({
+  active,
+  href,
+  as,
+  ...props
+}: React.AnchorHTMLAttributes<HTMLAnchorElement> & {
+  active: boolean
+  href: string
+  as: string
+}) => (
+  <Link
+    href={href}
+    as={as}
+    role="menuitem"
+    aria-current={active ? 'page' : undefined}
+    {...props}
+    className={`example-tab ${active ? 'active' : ''}`}
+  />
 )
 
 const ExampleHeader = (props: React.HTMLAttributes<HTMLDivElement>) => (
@@ -154,25 +152,20 @@ export function ExampleLayout({
 
       <TabList isVisible={showTabs}>
         {NON_HIDDEN_EXAMPLES.map(([n, p]) => (
-          <Link
+          <Tab
             key={p as string}
             href="/examples/[example]"
             as={`/examples/${p}`}
-            legacyBehavior
-            passHref
+            onClick={() => setShowTabs(false)}
+            active={p === examplePath}
+            onKeyDown={(e: React.KeyboardEvent) => {
+              if (e.key === 'Escape') {
+                setShowTabs(false)
+              }
+            }}
           >
-            <Tab
-              onClick={() => setShowTabs(false)}
-              active={p === examplePath}
-              onKeyDown={(e: React.KeyboardEvent) => {
-                if (e.key === 'Escape') {
-                  setShowTabs(false)
-                }
-              }}
-            >
-              {n}
-            </Tab>
-          </Link>
+            {n}
+          </Tab>
         ))}
       </TabList>
 

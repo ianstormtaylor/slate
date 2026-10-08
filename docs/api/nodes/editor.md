@@ -305,9 +305,9 @@ Check if a node has inline and text children.
 
 Check if a node has text children.
 
-#### `Editor.isBlock(editor: Editor, value: any) => value is Element`
+#### `Editor.isBlock(editor: Editor, element: Element) => boolean`
 
-Check if a value is a block `Element` object.
+Check if an element is a block element. It only accepts an `Element`, so check other values with `Element.isElement` first.
 
 #### `Editor.isEditor(value: any) => value is Editor`
 
@@ -325,9 +325,9 @@ Check if a point is an edge of a location.
 
 Check if an element is empty, accounting for void nodes.
 
-#### `Editor.isInline(editor: Editor, value: any) => value is Element`
+#### `Editor.isInline(editor: Editor, element: Element) => boolean`
 
-Check if a value is an inline `Element` object.
+Check if an element is an inline element. It only accepts an `Element`, so check other values with `Element.isElement` first.
 
 #### `Editor.isNormalizing(editor: Editor) => boolean`
 
@@ -337,9 +337,9 @@ Check if the editor is currently normalizing after each operation.
 
 Check if a point is the start point of a location.
 
-#### `Editor.isVoid(editor: Editor, value: any) => value is Element`
+#### `Editor.isVoid(editor: Editor, element: Element) => boolean`
 
-Check if a value is a void `Element` object.
+Check if an element is a void element. It only accepts an `Element`, so check other values with `Element.isElement` first.
 
 ### Normalization methods
 

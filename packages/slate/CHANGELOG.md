@@ -1,5 +1,37 @@
 # slate
 
+## 0.130.1
+
+### Patch Changes
+
+- [#6165](https://github.com/ianstormtaylor/slate/pull/6165) [`4a96e69`](https://github.com/ianstormtaylor/slate/commit/4a96e690d43e2443a23c5ecbf8e57860bb088b53) Thanks [@dylans](https://github.com/dylans)! - Make `Node.fragment` only walk the top-level blocks the range covers, so copying or cutting in a large document no longer takes time proportional to the whole document.
+
+## 0.130.0
+
+### Minor Changes
+
+- [#6158](https://github.com/ianstormtaylor/slate/pull/6158) [`c760f06`](https://github.com/ianstormtaylor/slate/commit/c760f06381181e30e39816abdef8fcd6fc1efd84) Thanks [@dylans](https://github.com/dylans)! - Deleting the only node in the editor, such as a lone image, now leaves an empty block instead of an editor with no children. An empty editor had no start point, so focusing or typing threw "Cannot get the start point in the node at path [] because it has no start text node".
+
+## 0.129.0
+
+### Minor Changes
+
+- [#6141](https://github.com/ianstormtaylor/slate/pull/6141) [`1604e5f`](https://github.com/ianstormtaylor/slate/commit/1604e5feee47145c2949da00791e614866f60563) Thanks [@dylans](https://github.com/dylans)! - Deleting a character or word from an empty block next to a block void now removes the empty block and selects the void, instead of deleting the void. This matches native editors. The previous behaviour deleted the image when pressing Backspace in an empty paragraph after it.
+
+### Patch Changes
+
+- [#6132](https://github.com/ianstormtaylor/slate/pull/6132) [`ff63fad`](https://github.com/ianstormtaylor/slate/commit/ff63fadcb0ff0fb641448ca1675c532374f650fd) Thanks [@dylans](https://github.com/dylans)! - Deleting a single character next to, or inside, an empty non-void inline now removes the inline, instead of skipping over it and deleting the character on its other side.
+
+## 0.128.0
+
+### Patch Changes
+
+- [#6115](https://github.com/ianstormtaylor/slate/pull/6115) [`52f05bf8`](https://github.com/ianstormtaylor/slate/commit/52f05bf8b614407423fab40525862f044c51884b) Thanks [@giaBaoJS](https://github.com/giaBaoJS)! - - When deleting a void element backward from a cursor inside it, place the cursor before the removed void instead of moving it into the following node
+
+  - In Chrome and Safari, pressing Delete on a selected void now deletes forward instead of backward
+
+- [#6003](https://github.com/ianstormtaylor/slate/pull/6003) [`50cdf5e9`](https://github.com/ianstormtaylor/slate/commit/50cdf5e940ed474c8b57acceecde9d47c66dfaa0) Thanks [@nabbydude](https://github.com/nabbydude)! - Changed type signature of `Editor#setSelection` to allow non-Range properties of Selections (functionality unchanged)
+
 ## 0.126.2
 
 ### Patch Changes

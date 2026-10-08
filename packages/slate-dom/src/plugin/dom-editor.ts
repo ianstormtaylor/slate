@@ -199,6 +199,8 @@ export interface DOMEditorInterface {
    */
   isFocused: (editor: DOMEditor) => boolean
 
+  isMounted: (editor: DOMEditor) => boolean
+
   /**
    * Check if the editor is in read-only mode.
    */
@@ -371,18 +373,29 @@ export const DOMEditor: DOMEditorInterface = {
     // Else resolve a range from the caret position where the drop occured.
     let domRange
     const { document } = DOMEditor.getWindow(editor)
+    const root = DOMEditor.findDocumentOrShadowRoot(editor)
+    const shadowRoot = root === document ? null : (root as ShadowRoot)
 
-    // COMPAT: In Firefox, `caretRangeFromPoint` doesn't exist. (2016/07/25)
-    if (document.caretRangeFromPoint) {
+    const rangeFromCaretPosition = (position: CaretPosition | null) => {
+      if (!position) {
+        return null
+      }
+
+      const range = document.createRange()
+      range.setStart(position.offsetNode, position.offset)
+      range.setEnd(position.offsetNode, position.offset)
+      return range
+    }
+
+    if (shadowRoot && document.caretPositionFromPoint) {
+      domRange = rangeFromCaretPosition(
+        document.caretPositionFromPoint(x, y, { shadowRoots: [shadowRoot] })
+      )
+    } else if (document.caretRangeFromPoint) {
+      // COMPAT: In Firefox, `caretRangeFromPoint` doesn't exist. (2016/07/25)
       domRange = document.caretRangeFromPoint(x, y)
     } else {
-      const position = document.caretPositionFromPoint(x, y)
-
-      if (position) {
-        domRange = document.createRange()
-        domRange.setStart(position.offsetNode, position.offset)
-        domRange.setEnd(position.offsetNode, position.offset)
-      }
+      domRange = rangeFromCaretPosition(document.caretPositionFromPoint(x, y))
     }
 
     if (!domRange) {
@@ -449,7 +462,7 @@ export const DOMEditor: DOMEditorInterface = {
 
     // Return if no dom node is associated with the editor, which means the editor is not yet mounted
     // or has been unmounted. This can happen especially, while retrying to focus the editor.
-    if (!EDITOR_TO_ELEMENT.get(editor)) {
+    if (!DOMEditor.isMounted(editor)) {
       return
     }
 
@@ -471,13 +484,10 @@ export const DOMEditor: DOMEditorInterface = {
     const el = DOMEditor.toDOMNode(editor, editor)
     const root = DOMEditor.findDocumentOrShadowRoot(editor)
     if (root.activeElement !== el) {
-      // Ensure that the DOM selection state is set to the editor's selection
-      if (editor.selection && root instanceof Document) {
-        const domSelection = getSelection(root)
-        const domRange = DOMEditor.toDOMRange(editor, editor.selection)
-        domSelection?.removeAllRanges()
-        domSelection?.addRange(domRange)
-      }
+      const domRange =
+        editor.selection && root instanceof Document
+          ? DOMEditor.toDOMRange(editor, editor.selection)
+          : null
       // Create a new selection in the top of the document if missing
       if (!editor.selection) {
         Transforms.select(editor, Editor.start(editor, []))
@@ -486,6 +496,12 @@ export const DOMEditor: DOMEditorInterface = {
       // FocusedContext is updated to the correct value
       IS_FOCUSED.set(editor, true)
       el.focus({ preventScroll: true })
+      // Ensure that the DOM selection state is set to the editor's selection
+      if (domRange) {
+        const domSelection = getSelection(root as Document)
+        domSelection?.removeAllRanges()
+        domSelection?.addRange(domRange)
+      }
     }
   },
 
@@ -499,7 +515,13 @@ export const DOMEditor: DOMEditorInterface = {
 
   hasDOMNode: (editor, target, options = {}) => {
     const { editable = false } = options
+
+    if (!DOMEditor.isMounted(editor)) {
+      return false
+    }
+
     const editorEl = DOMEditor.toDOMNode(editor, editor)
+
     let targetEl
 
     // COMPAT: In Firefox, reading `target.nodeType` will throw an error if
@@ -566,6 +588,8 @@ export const DOMEditor: DOMEditorInterface = {
   },
 
   isFocused: editor => !!IS_FOCUSED.get(editor),
+
+  isMounted: editor => !!EDITOR_TO_ELEMENT.get(editor),
 
   isReadOnly: editor => !!IS_READ_ONLY.get(editor),
 
@@ -1134,6 +1158,7 @@ export const DOMEditor: DOMEditorInterface = {
       Range.isExpanded(range) &&
       Range.isForward(range) &&
       isDOMElement(focusNode) &&
+      !focusNode.closest('[data-slate-void="true"]') &&
       Editor.void(editor, { at: range.focus, mode: 'highest' })
     ) {
       range = Editor.unhangRange(editor, range, { voids: true })

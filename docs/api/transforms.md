@@ -44,7 +44,7 @@ Options: `{at?: Location, hanging?: boolean, voids?: boolean}`
 
 #### `Transforms.insertNodes(editor: Editor, nodes: Node | Node[], options?)`
 
-Atomically inserts `nodes` at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
+Atomically insert `nodes` at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
 
 Options supported: `NodeOptions & {hanging?: boolean, select?: boolean}`.
 
@@ -97,6 +97,8 @@ Set properties of nodes at the specified location. If no location is specified, 
 
 If `props` contains `undefined` values, the node's corresponding property will also be set to `undefined` as opposed to ignored.
 
+`children` and `text` in `props` are ignored, since they hold a node's content rather than its properties. To change content, use `insertNodes`, `removeNodes` or the text transforms.
+
 Options supported: `NodeOptions & {hanging?: boolean, split?: boolean}`. For `options.mode`, `'all'` is also supported.
 
 #### `Transforms.unsetNodes(editor: Editor, props: string | string[], options?)`
@@ -114,6 +116,8 @@ Options supported: `NodeOptions`. For `options.mode`, `'all'` is also supported.
 #### `Transforms.moveNodes(editor: Editor, options)`
 
 Move the nodes from an origin to a destination. A destination must be specified in the `options`. If no origin is specified, move the selection.
+
+`to` is the path the node ends up at once the move is done, not the path it is inserted before. For example, with four blocks `1 2 3 4`, moving `[0]` to `[2]` gives `2 3 1 4`. When `match` selects several nodes, they are moved one at a time, each to `to`.
 
 Options supported: `NodeOptions & {to: Path}`. For `options.mode`, `'all'` is also supported.
 

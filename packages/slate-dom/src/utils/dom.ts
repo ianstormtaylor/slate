@@ -247,7 +247,7 @@ export const getPlainText = (domNode: DOMNode) => {
 /**
  * Get x-slate-fragment attribute from data-slate-fragment
  */
-const catchSlateFragment = /data-slate-fragment="(.+?)"/m
+const catchSlateFragment = /<[^>]*\sdata-slate-fragment="([^"]+)"/m
 export const getSlateFragmentAttribute = (
   dataTransfer: DataTransfer
 ): string | void => {

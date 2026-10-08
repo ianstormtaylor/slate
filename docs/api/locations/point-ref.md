@@ -21,6 +21,8 @@ interface PointRef {
 Call this when you no longer need to sync this point.
 It also returns the current value.
 
+This removes the ref from `Editor.pointRefs(editor)` and sets `current` to `null`. If an operation removes the node containing the point, the editor releases the ref automatically. Calling `unref()` again returns `null`.
+
 ## Static methods
 
 ### Transform methods

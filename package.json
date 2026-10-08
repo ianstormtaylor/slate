@@ -4,6 +4,10 @@
   "workspaces": [
     "packages/*"
   ],
+  "resolutions": {
+    "postcss": "^8.5.26",
+    "serialize-javascript": "^7.1.0"
+  },
   "scripts": {
     "build": "yarn build:rollup && yarn build:next",
     "build:next": "cd ./site && next build",
@@ -19,12 +23,6 @@
     "lint:typescript": "tsc --build ./ --force",
     "open": "open http://localhost:3000",
     "prerelease": "NODE_ENV=production yarn build:rollup && yarn test && yarn lint",
-    "release:publish:latext": "lerna publish --force-publish",
-    "release:publish:next": "lerna publish --dist-tag next --force-publish",
-    "release:publish:experimental": "lerna publish --dist-tag experimental",
-    "release:latest": "yarn prerelease && lerna publish --force-publish",
-    "release:next": "yarn prerelease && lerna publish --dist-tag next --force-publish",
-    "release:experimental": "yarn prerelease && lerna publish --dist-tag experimental",
     "internal:release:next": "yarn prerelease && yarn changeset publish --tag next",
     "serve": "cd ./site && next",
     "start": "npm-run-all --parallel --print-label watch serve",
@@ -54,11 +52,13 @@
     "@babel/preset-typescript": "^7.23.2",
     "@babel/register": "^7.22.15",
     "@babel/runtime": "^7.23.2",
-    "@changesets/changelog-github": "^0.4.8",
-    "@changesets/cli": "^2.26.2",
+    "@changesets/changelog-github": "^0.5.2",
+    "@changesets/cli": "^2.29.8",
     "@emotion/css": "^11.11.2",
     "@faker-js/faker": "^10.0.0",
-    "@playwright/test": "^1.52.0",
+    "@fontsource/material-icons": "^5.3.0",
+    "@fontsource/roboto": "^5.3.0",
+    "@playwright/test": "^1.62.1",
     "@types/is-hotkey": "^0.1.10",
     "@types/is-url": "^1.2.32",
     "@types/jest": "29.5.6",
@@ -85,27 +85,22 @@
     "is-url": "^1.2.4",
     "jest": "29.7.0",
     "jest-environment-jsdom": "29.7.0",
-    "lerna": "^9.0.7",
     "lint-staged": "^15.0.1",
     "lodash": "^4.17.21",
-    "mocha": "^10.2.0",
-    "next": "^14.2.32",
+    "mocha": "^11.8.0",
+    "next": "^15.5.24",
     "npm-run-all": "^4.1.5",
-    "nx": "^22.7.6",
     "prettier": "^3.0.3",
     "prismjs": "^1.29.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-error-boundary": "^4.0.11",
-    "react-router-dom": "^6.17.0",
     "react-values": "^0.3.3",
     "rimraf": "^5.0.5",
     "rollup": "^4.1.4",
     "rollup-plugin-babel": "^4.4.0",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-json": "^4.0.0",
-    "rollup-plugin-node-builtins": "^2.1.2",
-    "rollup-plugin-node-globals": "^1.4.0",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-replace": "^2.2.0",
     "rollup-plugin-terser": "^7.0.2",
@@ -130,5 +125,5 @@
       "eslint --fix"
     ]
   },
-  "packageManager": "yarn@4.0.2"
+  "packageManager": "yarn@4.18.0"
 }

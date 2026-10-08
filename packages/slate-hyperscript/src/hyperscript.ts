@@ -49,18 +49,24 @@ type HyperscriptShorthands = Record<string, Record<string, any>>
  * Create a Slate hyperscript function with `options`.
  */
 
-const createHyperscript = (
+const createHyperscript = <
+  E extends HyperscriptShorthands = {},
+  C extends HyperscriptCreators = {},
+>(
   options: {
-    creators?: HyperscriptCreators
-    elements?: HyperscriptShorthands
+    creators?: C
+    elements?: E
   } = {}
 ) => {
-  const { elements = {} } = options
-  const elementCreators = normalizeElements(elements)
+  const { elements = {} as E } = options
+  const elementCreators = normalizeElements(elements) as Record<
+    keyof E,
+    HyperscriptCreators<Element>[string]
+  >
   const creators = {
     ...DEFAULT_CREATORS,
     ...elementCreators,
-    ...options.creators,
+    ...(options.creators as C),
   }
 
   const jsx = createFactory(creators)
