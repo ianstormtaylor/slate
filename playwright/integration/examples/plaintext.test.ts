@@ -1,4 +1,25 @@
-import { test, expect } from '@playwright/test'
+import { test, expect, Page } from '@playwright/test'
+import {
+  blockTexts,
+  cutWithShortcut,
+  dragSelection,
+  selectStrings,
+} from '../support/move-text'
+
+const typeLines = async (page: Page, lines: string[]) => {
+  const textbox = page.getByRole('textbox')
+  await textbox.click()
+  await textbox.selectText()
+  await textbox.press('Backspace')
+  for (const [index, line] of lines.entries()) {
+    if (index > 0) {
+      await textbox.press('Enter')
+    }
+    await textbox.pressSequentially(line)
+  }
+  await expect.poll(() => blockTexts(page)).toEqual(lines)
+  await page.waitForTimeout(250)
+}
 
 test.describe('plaintext example', () => {
   test.beforeEach(
@@ -14,51 +35,53 @@ test.describe('plaintext example', () => {
     )
   })
 
-  test('dragging whole lines keeps the line breaks they carry', async ({
-    page,
-    browserName,
-  }) => {
-    test.skip(
-      browserName !== 'firefox',
-      'Only Firefox performs native drags of a text selection under Playwright'
-    )
-    const textbox = page.getByRole('textbox')
-    await textbox.click()
-    await textbox.selectText()
-    await textbox.press('Backspace')
-    await textbox.pressSequentially('one')
-    await textbox.press('Enter')
-    await textbox.pressSequentially('two')
-    await textbox.press('Enter')
-    await textbox.pressSequentially('three')
-
-    const lines = page.locator('[data-slate-node="element"]')
-    const strings = page.locator('[data-slate-string]')
-    await page.evaluate(() => {
-      const [, two, three] = document.querySelectorAll('[data-slate-string]')
-      window
-        .getSelection()!
-        .setBaseAndExtent(two.firstChild!, 0, three.firstChild!, 0)
-    })
-    await expect
-      .poll(() => page.evaluate(() => window.getSelection()!.toString()))
-      .toBe('two\n')
-
-    const two = (await strings.nth(1).boundingBox())!
-    const one = (await strings.nth(0).boundingBox())!
-    const twoY = two.y + two.height / 2
-    const oneY = one.y + one.height / 2
-    await page.mouse.move(two.x + 8, twoY)
-    await page.mouse.down()
-    await page.mouse.move(two.x + 12, twoY, { steps: 3 })
-    await page.mouse.move(one.x + one.width + 2, oneY, { steps: 15 })
-    await page.mouse.move(one.x + one.width - 1, oneY, { steps: 5 })
-    await page.mouse.up()
-
-    await expect
-      .poll(async () =>
-        (await lines.allTextContents()).map(text => text.replace(/\uFEFF/g, ''))
+  test.describe('moving whole lines', () => {
+    test('dragging a line keeps the line count', async ({
+      page,
+      browserName,
+    }) => {
+      test.skip(browserName !== 'firefox', 'Native text drags need Firefox')
+      await typeLines(page, ['one', 'two', 'three'])
+      await selectStrings(
+        page,
+        { text: 'two', offset: 0 },
+        { text: 'three', offset: 0 }
       )
-      .toEqual(['onetwo', '', 'three'])
+      await dragSelection(page, 'two', { text: 'one', edge: 'end' })
+      await expect.poll(() => blockTexts(page)).toEqual(['onetwo', '', 'three'])
+    })
+
+    test('dropping onto the dragged text changes nothing', async ({
+      page,
+      browserName,
+    }) => {
+      test.skip(browserName !== 'firefox', 'Native text drags need Firefox')
+      await typeLines(page, ['one', 'two', 'three'])
+      await selectStrings(
+        page,
+        { text: 'two', offset: 0 },
+        { text: 'three', offset: 0 }
+      )
+      await dragSelection(page, 'two', { text: 'two', edge: 'end' })
+      await page.waitForTimeout(300)
+      expect(await blockTexts(page)).toEqual(['one', 'two', 'three'])
+    })
+
+    test('cutting a line removes it and copies its line break', async ({
+      page,
+    }) => {
+      await typeLines(page, ['one', 'two', 'three'])
+      await selectStrings(
+        page,
+        { text: 'two', offset: 0 },
+        { text: 'three', offset: 0 }
+      )
+      const fragment = await cutWithShortcut(page)
+      expect(fragment).toEqual([
+        { type: 'paragraph', children: [{ text: 'two' }] },
+        { type: 'paragraph', children: [{ text: '' }] },
+      ])
+      await expect.poll(() => blockTexts(page)).toEqual(['one', 'three'])
+    })
   })
 })
