@@ -177,12 +177,12 @@ export const deleteText: TextTransforms['delete'] = (editor, options = {}) => {
 
       Transforms.removeNodes(editor, { at, voids })
 
-      if (editor.children.length === 0) {
+      if (editor.children.length === 0 && options.at == null) {
         beforeRef?.unref()
         Transforms.insertNodes(
           editor,
           { children: [{ text: '' }] },
-          { at: [0], select: options.at == null }
+          { at: [0], select: true }
         )
         return
       }
