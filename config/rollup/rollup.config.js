@@ -88,6 +88,7 @@ function configure(pkg, env, target) {
                   '@babel/plugin-transform-regenerator',
                   '@babel/transform-async-to-generator',
                 ],
+                bugfixes: true,
                 modules: false,
                 targets: {
                   esmodules: isModule,
