@@ -1,5 +1,11 @@
 # slate-dom
 
+## 0.132.0
+
+### Patch Changes
+
+- [#6191](https://github.com/ianstormtaylor/slate/pull/6191) [`edda8d0`](https://github.com/ianstormtaylor/slate/commit/edda8d08a38f0f6c56f45ff87c08506135745103) Thanks [@dylans](https://github.com/dylans)! - Copying text that contains inline voids, such as mentions, no longer puts each void on its own line in plain text.
+
 ## 0.131.0
 
 ### Patch Changes
