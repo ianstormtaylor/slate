@@ -153,6 +153,8 @@ Options: `{at?: Location | Span, match?: NodeMatch, mode?: 'all' | 'highest' | '
 
 `options.pass`: Skip the descendants of certain nodes (but not the nodes themselves).
 
+`options.reverse`: Walk siblings from last to first. Ancestors still come before their descendants, so this isn't the forward order reversed: for `[block[text a, text b], block[text c]]` the forward order is `editor, 0, 0.0, 0.1, 1, 1.0` and the reverse order is `editor, 1, 1.0, 0, 0.1, 0.0`. To get the exact reverse, collect the forward entries and reverse the array.
+
 #### `Editor.parent(editor: Editor, at: Location, options?) => NodeEntry<Ancestor>`
 
 Get the parent node of a location.
