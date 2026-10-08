@@ -185,7 +185,7 @@ export type EditableProps = {
   scrollSelectionIntoView?: (editor: ReactEditor, domRange: DOMRange) => void
   as?: React.ElementType
   disableDefaultStyles?: boolean
-} & React.TextareaHTMLAttributes<HTMLDivElement>
+} & React.HTMLAttributes<HTMLDivElement>
 
 /**
  * Editable.
