@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.130.0
+
+### Patch Changes
+
+- [#6164](https://github.com/ianstormtaylor/slate/pull/6164) [`209c334`](https://github.com/ianstormtaylor/slate/commit/209c33497c34e90dfef79d2b31e23f1c45715f98) Thanks [@dylans](https://github.com/dylans)! - Fix typed text coming out reversed after a soft break at the end of a leaf in Chrome. Chrome reports the caret after a trailing `\n` as the start of the next text node, and Slate restored its own selection after each insert, so every character landed in front of the last.
+
 ## 0.129.0
 
 ### Patch Changes

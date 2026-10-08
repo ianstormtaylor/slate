@@ -1,5 +1,11 @@
 # slate-dom
 
+## 0.130.0
+
+### Patch Changes
+
+- [#6159](https://github.com/ianstormtaylor/slate/pull/6159) [`6b7a233`](https://github.com/ianstormtaylor/slate/commit/6b7a233a26c36b7991ce5d4992a7e2479e5ec2b4) Thanks [@dylans](https://github.com/dylans)! - Copy node objects passed to `insertNodes` that are already in a document, or that were inserted before, so each position gets its own object. Reusing an object, such as a template node inserted twice, made two nodes share one key and one parent entry, which broke rendering, selection and `findPath`. A node's first insertion keeps its object identity.
+
 ## 0.129.0
 
 ### Minor Changes
