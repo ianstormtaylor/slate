@@ -1,5 +1,19 @@
 # slate
 
+## 0.131.0
+
+### Minor Changes
+
+- [#6173](https://github.com/ianstormtaylor/slate/pull/6173) [`7850c31`](https://github.com/ianstormtaylor/slate/commit/7850c312a65c3557687605529e148223e3fae8ac) Thanks [@dylans](https://github.com/dylans)! - `Transforms.wrapNodes` and `Transforms.unwrapNodes` now unhang a range by default and accept `hanging`, like `setNodes`, `insertNodes`, `mergeNodes` and `removeNodes`. A selection that ends at the start of the next block no longer wraps or unwraps that block. Pass `hanging: true` to keep the old behavior.
+
+### Patch Changes
+
+- [#6177](https://github.com/ianstormtaylor/slate/pull/6177) [`fdc3dac`](https://github.com/ianstormtaylor/slate/commit/fdc3dacd3dc8d269237d6d2002f0dd2c8e7c314e) Thanks [@dylans](https://github.com/dylans)! - Only refill an emptied editor when a delete runs at the selection. In 0.130, `Transforms.delete(editor, { at: path })` also inserted an untyped empty block when it removed the last node, which left an extra block behind in code that deletes every block and then inserts new content. Programmatic deletes with an explicit `at` now act like `removeNodes` again.
+
+- [#6176](https://github.com/ianstormtaylor/slate/pull/6176) [`22cf872`](https://github.com/ianstormtaylor/slate/commit/22cf8729384cb0085ceb0448c2dc1c29196dc07d) Thanks [@dylans](https://github.com/dylans)! - Fix `insertFragment` into an editor whose only block is empty, which left an extra untyped empty block before the inserted content (a regression in 0.130).
+
+- [#6181](https://github.com/ianstormtaylor/slate/pull/6181) [`ec75af0`](https://github.com/ianstormtaylor/slate/commit/ec75af0f56be3046179af7723e8b187eb3d42235) Thanks [@dylans](https://github.com/dylans)! - Backspace at the start of a block that follows a list or table no longer pulls that block into the list or table. An empty previous block is now only removed in place of the merge when it's a sibling; otherwise the block merges into it as usual.
+
 ## 0.130.1
 
 ### Patch Changes
