@@ -51,7 +51,10 @@ export const Slate = (props: {
       )
     }
 
-    editor.children = initialValue
+    editor.children =
+      initialValue.length > 0
+        ? initialValue
+        : [{ children: [{ text: '' }] } as Descendant]
     Object.assign(editor, rest)
     initializedEditor.current = editor
   }
