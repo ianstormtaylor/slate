@@ -16,8 +16,11 @@ import {
   transformTextDiff,
 } from '../utils/diff-text'
 import {
+  DOMElement,
+  DOMNode,
   getPlainText,
   getSlateFragmentAttribute,
+  isDOMElement,
   isDOMText,
 } from '../utils/dom'
 import { Key } from '../utils/key'
@@ -66,6 +69,32 @@ const markInserted = (node: Node) => {
  *
  * See https://docs.slatejs.org/concepts/11-typescript to learn how.
  */
+
+const wrapInInlineAncestors = (
+  contents: DocumentFragment,
+  start: DOMNode,
+  editorElement: DOMElement
+): DocumentFragment => {
+  let wrapped = contents
+
+  for (
+    let ancestor = isDOMElement(start) ? start : start.parentElement;
+    ancestor && ancestor !== editorElement;
+    ancestor = ancestor.parentElement
+  ) {
+    if (
+      ancestor.getAttribute('data-slate-inline') === 'true' &&
+      !ancestor.hasAttribute('data-slate-void')
+    ) {
+      const shell = ancestor.cloneNode(false)
+      shell.appendChild(wrapped)
+      wrapped = ancestor.ownerDocument.createDocumentFragment()
+      wrapped.appendChild(shell)
+    }
+  }
+
+  return wrapped
+}
 
 export const withDOM = <T extends BaseEditor>(
   editor: T,
@@ -346,6 +375,14 @@ export const withDOM = <T extends BaseEditor>(
     const encoded = window.btoa(encodeURIComponent(string))
     attach.setAttribute('data-slate-fragment', encoded)
     data.setData(`application/${clipboardFormatKey}`, encoded)
+
+    if (!startVoid && !endVoid) {
+      contents = wrapInInlineAncestors(
+        contents,
+        domRange.commonAncestorContainer,
+        DOMEditor.toDOMNode(e, e)
+      )
+    }
 
     // Add the content to a <div> so that we can get its inner HTML.
     const div = contents.ownerDocument.createElement('div')
