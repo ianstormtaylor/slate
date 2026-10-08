@@ -85,4 +85,43 @@ test.describe('On richtext example', () => {
       textbox.locator('p', { hasText: 'Try it out for yourself!' })
     ).toHaveCount(1)
   })
+
+  test('arrow keys scroll just enough to reveal the caret', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 800, height: 600 })
+    await page.getByRole('textbox').click()
+    await page.evaluate(() => {
+      const element = document.querySelector('[data-slate-editor]')!
+      const fiberKey = Object.keys(element).find(key =>
+        key.startsWith('__reactFiber$')
+      )!
+      let fiber = (element as any)[fiberKey]
+      while (fiber && !fiber.memoizedProps?.editor) {
+        fiber = fiber.return
+      }
+      const editor = fiber.memoizedProps.editor
+      const lines = Array.from({ length: 60 }, (_, index) => ({
+        type: 'paragraph',
+        children: [{ text: `Line ${index}` }],
+      }))
+      editor.insertNodes(lines, { at: [editor.children.length] })
+      const target = editor.children.length - 30
+      editor.select({ path: [target, 0], offset: 0 })
+    })
+    await page.waitForTimeout(300)
+
+    const before = await page.evaluate(() => {
+      const caretLine = window.getSelection()!.anchorNode!.parentElement!
+      window.scrollBy(0, caretLine.getBoundingClientRect().top - 2)
+      return window.scrollY
+    })
+    await page.waitForTimeout(300)
+    await page.keyboard.press('ArrowLeft')
+    await page.waitForTimeout(300)
+    const after = await page.evaluate(() => window.scrollY)
+
+    expect(before - after).toBeGreaterThan(0)
+    expect(before - after).toBeLessThan(120)
+  })
 })
