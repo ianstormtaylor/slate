@@ -1,5 +1,11 @@
 # slate
 
+## 0.130.0
+
+### Minor Changes
+
+- [#6158](https://github.com/ianstormtaylor/slate/pull/6158) [`c760f06`](https://github.com/ianstormtaylor/slate/commit/c760f06381181e30e39816abdef8fcd6fc1efd84) Thanks [@dylans](https://github.com/dylans)! - Deleting the only node in the editor, such as a lone image, now leaves an empty block instead of an editor with no children. An empty editor had no start point, so focusing or typing threw "Cannot get the start point in the node at path [] because it has no start text node".
+
 ## 0.129.0
 
 ### Minor Changes
