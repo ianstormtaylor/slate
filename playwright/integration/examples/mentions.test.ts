@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect, Page } from '@playwright/test'
 
 test.describe('mentions example', () => {
   test.beforeEach(
@@ -38,5 +38,52 @@ test.describe('mentions example', () => {
       window.getSelection()!.toString()
     )
     expect(selected).toContain('mentioning characters, like')
+  })
+
+  test('the void spacer is not selectable, so it does not show in a selection', async ({
+    page,
+  }) => {
+    const spacer = page.locator('[data-slate-spacer]').first()
+    await expect(spacer).toHaveCSS('user-select', 'none')
+  })
+
+  const mentionLine = (page: Page) =>
+    page.evaluate(() =>
+      Array.from(document.querySelectorAll('[data-slate-node="element"]'))
+        .find(e => e.textContent?.includes('Try mentioning'))!
+        .textContent!.replace(/\uFEFF/g, '')
+    )
+
+  const placeCaret = async (page: Page, at: 'end-of-like' | 'start-of-or') => {
+    await page.getByRole('textbox').click()
+    await page.evaluate(at => {
+      const strings = Array.from(
+        document.querySelectorAll('[data-slate-string]')
+      )
+      const node =
+        at === 'end-of-like'
+          ? strings.find(e => e.textContent?.startsWith('Try mentioning'))!
+              .firstChild!
+          : strings.find(e => e.textContent === ' or ')!.firstChild!
+      const offset = at === 'end-of-like' ? node.textContent!.length : 0
+      window.getSelection()!.setBaseAndExtent(node, offset, node, offset)
+    }, at)
+    await page.waitForTimeout(200)
+  }
+
+  test('arrow keys move forward across a mention', async ({ page }) => {
+    await placeCaret(page, 'end-of-like')
+    await page.keyboard.press('ArrowRight')
+    await page.keyboard.press('ArrowRight')
+    await page.keyboard.type('X')
+    await expect.poll(() => mentionLine(page)).toContain('@R2-D2X or')
+  })
+
+  test('arrow keys move back across a mention', async ({ page }) => {
+    await placeCaret(page, 'start-of-or')
+    await page.keyboard.press('ArrowLeft')
+    await page.keyboard.press('ArrowLeft')
+    await page.keyboard.type('X')
+    await expect.poll(() => mentionLine(page)).toContain('like X@R2-D2')
   })
 })

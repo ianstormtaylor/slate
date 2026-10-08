@@ -127,6 +127,8 @@ const Element = (props: {
           color: 'transparent',
           outline: 'none',
           position: 'absolute',
+          userSelect: 'none',
+          WebkitUserSelect: 'none',
         }}
       >
         <Text
