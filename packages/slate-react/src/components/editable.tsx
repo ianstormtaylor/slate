@@ -236,6 +236,10 @@ export const Editable = forwardRef(
     const state = useMemo(
       () => ({
         isDraggingInternally: false,
+        pendingSelection: null as {
+          range: Range
+          basedOn: Range | null
+        } | null,
         isUpdatingSelection: false,
         latestElement: null as DOMElement | null,
         hasMarkPlaceholder: false,
@@ -284,6 +288,8 @@ export const Editable = forwardRef(
             onDOMSelectionChange()
             return
           }
+
+          state.pendingSelection = null
 
           const el = ReactEditor.toDOMNode(editor, editor)
           const root = el.getRootNode()
@@ -476,6 +482,19 @@ export const Editable = forwardRef(
             exactMatch: false,
             suppressThrow: true,
           })
+          return
+        }
+
+        const pending = state.pendingSelection
+        state.pendingSelection = null
+
+        if (
+          pending &&
+          !forceChange &&
+          pending.basedOn === selection &&
+          !(selection && Range.equals(pending.range, selection))
+        ) {
+          Transforms.select(editor, pending.range)
           return
         }
 
@@ -942,12 +961,53 @@ export const Editable = forwardRef(
       // <textarea> elements are appended to the DOM, causing
       // `editor.selection` to be overwritten in some circumstances.
       // (2025/01/16) https://issues.chromium.org/issues/389368412
+      const readUnsyncedSelection = () => {
+        const androidInputManager = androidInputManagerRef.current
+
+        if (
+          state.isUpdatingSelection ||
+          state.isDraggingInternally ||
+          ReactEditor.isComposing(editor) ||
+          androidInputManager?.hasPendingChanges() ||
+          androidInputManager?.isFlushing() ||
+          IS_NODE_MAP_DIRTY.get(editor)
+        ) {
+          return null
+        }
+
+        const domSelection = getSelection(
+          ReactEditor.findDocumentOrShadowRoot(editor)
+        )
+
+        if (
+          !domSelection ||
+          !(
+            ReactEditor.hasEditableTarget(editor, domSelection.anchorNode) ||
+            ReactEditor.isTargetInsideNonReadonlyVoid(
+              editor,
+              domSelection.anchorNode
+            )
+          ) ||
+          !ReactEditor.hasTarget(editor, domSelection.focusNode)
+        ) {
+          return null
+        }
+
+        const range = ReactEditor.toSlateRange(editor, domSelection, {
+          exactMatch: false,
+          suppressThrow: true,
+        })
+
+        return range ? { range, basedOn: editor.selection } : null
+      }
+
       const onSelectionChange = ({ target }: Event) => {
         const targetElement = target instanceof HTMLElement ? target : null
         const targetTagName = targetElement?.tagName
         if (targetTagName === 'INPUT' || targetTagName === 'TEXTAREA') {
           return
         }
+        state.pendingSelection = readUnsyncedSelection()
         scheduleOnDOMSelectionChange()
       }
 
@@ -975,7 +1035,7 @@ export const Editable = forwardRef(
         window.document.removeEventListener('dragend', stoppedDragging)
         window.document.removeEventListener('drop', stoppedDragging)
       }
-    }, [scheduleOnDOMSelectionChange, state])
+    }, [editor, scheduleOnDOMSelectionChange, state])
 
     const decorations = decorate([editor, []])
     const decorateContext = useDecorateContext(decorate)
