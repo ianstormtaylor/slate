@@ -338,8 +338,14 @@ export const Editable = forwardRef(
               ReactEditor.isTargetInsideNonReadonlyVoid(editor, anchorNode)
 
             const focusNodeInEditor = ReactEditor.hasTarget(editor, focusNode)
+            const isFocusInEditor =
+              isDOMNode(activeElement) && el.contains(activeElement)
 
-            if (anchorNodeSelectable && focusNodeInEditor) {
+            if (
+              anchorNodeSelectable &&
+              focusNodeInEditor &&
+              (readOnly || isFocusInEditor)
+            ) {
               const range = ReactEditor.toSlateRange(editor, domSelection, {
                 exactMatch: false,
                 suppressThrow: true,
