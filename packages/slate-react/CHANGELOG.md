@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.130.2
+
+### Patch Changes
+
+- [#6171](https://github.com/ianstormtaylor/slate/pull/6171) [`7843bd5`](https://github.com/ianstormtaylor/slate/commit/7843bd5d32590835c58808e9f04b21667a9a3d96) Thanks [@dylans](https://github.com/dylans)! - Moving whole lines by dragging or cutting no longer adds an empty line. Whole top-level blocks are now moved as blocks. Nested content, like list items and table cells, is moved without its trailing line break, so no containers get merged. Dropping text back onto its own selection is now a no-op, and drag-and-drop deletes through `editor.deleteFragment`, like cut does, so plugins that guard deletion apply to both.
+
 ## 0.130.1
 
 ### Patch Changes
