@@ -224,7 +224,7 @@ export const insertFragment: TextTransforms['insertFragment'] = (
     })
 
     if (isBlockEmpty && !starts.length && middles.length && !ends.length) {
-      Transforms.delete(editor, { at: blockPath, voids })
+      Transforms.removeNodes(editor, { at: blockPath, voids })
     }
 
     Transforms.insertNodes(editor, middles, {
