@@ -321,7 +321,10 @@ export const withDOM = <T extends BaseEditor>(
     Array.from(contents.querySelectorAll('[data-slate-zero-width]')).forEach(
       zw => {
         const isNewline = zw.getAttribute('data-slate-zero-width') === 'n'
-        zw.textContent = isNewline ? '\n' : ''
+        zw.textContent = ''
+        if (isNewline) {
+          zw.appendChild(zw.ownerDocument.createElement('br'))
+        }
       }
     )
 
