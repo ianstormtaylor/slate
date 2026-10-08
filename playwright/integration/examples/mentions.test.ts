@@ -27,4 +27,16 @@ test.describe('mentions example', () => {
     await page.getByRole('textbox').press('Enter')
     await expect(page.locator('[data-cy="mention-Jabba"]')).toHaveCount(1)
   })
+
+  test('shift-click on a mention extends the selection', async ({ page }) => {
+    const text = page.getByText('Try mentioning characters, like')
+    await text.click({ position: { x: 2, y: 5 } })
+    await page
+      .locator('[data-cy="mention-Mace-Windu"]')
+      .click({ modifiers: ['Shift'] })
+    const selected = await page.evaluate(() =>
+      window.getSelection()!.toString()
+    )
+    expect(selected).toContain('mentioning characters, like')
+  })
 })
