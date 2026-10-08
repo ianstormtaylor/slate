@@ -1,4 +1,4 @@
-import { Editor, Path, Range, Scrubber, Text } from '..'
+import { Editor, Path, Point, Range, Scrubber, Text } from '..'
 import { Element, ElementEntry } from './element'
 import { modifyChildren, modifyLeaf, removeChildren } from '../utils/modify'
 
@@ -381,16 +381,26 @@ export const Node: NodeInterface = {
   },
 
   fragment<T extends Ancestor = Editor>(root: T, range: Range): T['children'] {
-    const newRoot = { children: root.children }
+    const [rootStart, rootEnd] = Range.edges(range)
+    const firstIndex = rootStart.path[0]
+    const newRoot = {
+      children: root.children.slice(firstIndex, rootEnd.path[0] + 1),
+    }
+    const toSlicedPoint = (point: Point): Point => ({
+      ...point,
+      path: [point.path[0] - firstIndex, ...point.path.slice(1)],
+    })
+    const start = toSlicedPoint(rootStart)
+    const end = toSlicedPoint(rootEnd)
+    const slicedRange = { anchor: start, focus: end }
 
-    const [start, end] = Range.edges(range)
     const nodeEntries = Node.nodes(newRoot, {
       reverse: true,
-      pass: ([, path]) => !Range.includes(range, path),
+      pass: ([, path]) => !Range.includes(slicedRange, path),
     })
 
     for (const [, path] of nodeEntries) {
-      if (!Range.includes(range, path)) {
+      if (!Range.includes(slicedRange, path)) {
         const index = path[path.length - 1]
 
         modifyChildren(newRoot, Path.parent(path), children =>
