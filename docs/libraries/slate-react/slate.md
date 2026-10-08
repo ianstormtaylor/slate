@@ -21,9 +21,11 @@ type SlateProps = {
 
 An instance of `ReactEditor`
 
-#### `props.initialValue: Descendant[]`
+#### `props.initialValue?: Descendant[]`
 
 The initial value of the editor. It is loaded into the editor when `Slate` mounts, and again if a different `editor` is passed.
+
+If you leave it out, the editor's existing `editor.children` are used, which suits editors you create and fill ahead of rendering. Leaving it out when `editor.children` is empty throws, since that is usually a forgotten setup step; pass `initialValue={[]}` if an empty editor is intended.
 
 An editor needs at least one block to hold the cursor, so an empty array is loaded as one empty block, `{ children: [{ text: '' }] }`. The block has no `type`, so if your schema requires one, pass your own empty block instead, for example `[{ type: 'paragraph', children: [{ text: '' }] }]`.
 

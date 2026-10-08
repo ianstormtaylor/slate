@@ -18,7 +18,7 @@ import { REACT_MAJOR_VERSION } from '../utils/environment'
 
 export const Slate = (props: {
   editor: ReactEditor
-  initialValue: Descendant[]
+  initialValue?: Descendant[]
   children: React.ReactNode
   onChange?: (value: Descendant[]) => void
   onSelectionChange?: (selection: Selection) => void
@@ -37,24 +37,30 @@ export const Slate = (props: {
   const initializedEditor = useRef<ReactEditor | null>(null)
 
   if (initializedEditor.current !== editor) {
-    if (!Node.isNodeList(initialValue)) {
-      throw new Error(
-        `[Slate] initialValue is invalid! Expected a list of elements but got: ${Scrubber.stringify(
-          initialValue
-        )}`
-      )
-    }
-
     if (!Editor.isEditor(editor)) {
       throw new Error(
         `[Slate] editor is invalid! You passed: ${Scrubber.stringify(editor)}`
       )
     }
 
+    if (initialValue === undefined && editor.children.length === 0) {
+      throw new Error(
+        '[Slate] editor.children is empty and no initialValue was provided. If this is intentional, pass initialValue={[]} to the Slate component.'
+      )
+    }
+
+    const value = initialValue ?? editor.children
+
+    if (!Node.isNodeList(value)) {
+      throw new Error(
+        `[Slate] initialValue is invalid! Expected a list of elements but got: ${Scrubber.stringify(
+          value
+        )}`
+      )
+    }
+
     editor.children =
-      initialValue.length > 0
-        ? initialValue
-        : [{ children: [{ text: '' }] } as Descendant]
+      value.length > 0 ? value : [{ children: [{ text: '' }] } as Descendant]
     Object.assign(editor, rest)
     initializedEditor.current = editor
   }
