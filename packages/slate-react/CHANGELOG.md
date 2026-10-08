@@ -1,5 +1,25 @@
 # slate-react
 
+## 0.131.0
+
+### Minor Changes
+
+- [#6183](https://github.com/ianstormtaylor/slate/pull/6183) [`35830d7`](https://github.com/ianstormtaylor/slate/commit/35830d78687e61bb56b2d31aeef4713eb42c5cbf) Thanks [@dylans](https://github.com/dylans)! - `initialValue` on `<Slate>` is now optional. When it's left out, the editor's existing `editor.children` are used, for editors created and filled ahead of rendering. Leaving it out while `editor.children` is empty throws with a hint to pass `initialValue={[]}` if an empty editor is intended.
+
+### Patch Changes
+
+- [#6174](https://github.com/ianstormtaylor/slate/pull/6174) [`ae5dc30`](https://github.com/ianstormtaylor/slate/commit/ae5dc3044a88aa9aaeaae58ce1fb6e3c73e1752f) Thanks [@dylans](https://github.com/dylans)! - `autoFocus` now focuses through `ReactEditor.focus`, which selects the start of the document when there's no selection, so you can type right away. Before, Firefox and Safari could end up focused with no selection, especially under React strict mode.
+
+- [#6182](https://github.com/ianstormtaylor/slate/pull/6182) [`835e185`](https://github.com/ianstormtaylor/slate/commit/835e18599d5313743a758a2b04a77c2a922e6c3a) Thanks [@dylans](https://github.com/dylans)! - Ignore DOM selection changes while focus is outside the editor (unless it's read-only). Firefox moves the DOM selection of a blurred editor when its content changes, so inserting text from outside the editor, such as from a toolbar button, used to jump the selection to the start.
+
+- [#6184](https://github.com/ianstormtaylor/slate/pull/6184) [`7a4e15c`](https://github.com/ianstormtaylor/slate/commit/7a4e15c4561e9463355c5071358c4cbb08ce1f97) Thanks [@dylans](https://github.com/dylans)! - Keep the caret in the editor's text when the browser moves it to a spot Slate can't represent, such as below a table that ends the document after pressing ArrowDown. Typing there used to insert the character twice: once in the last cell and once as stray text outside the table.
+
+- [#6175](https://github.com/ianstormtaylor/slate/pull/6175) [`46cd8f9`](https://github.com/ianstormtaylor/slate/commit/46cd8f977c6c509d6160b6b9492530151bab11eb) Thanks [@dylans](https://github.com/dylans)! - An empty `initialValue` is now loaded as one empty block, so the editor has somewhere to put the cursor instead of breaking.
+
+- [#6179](https://github.com/ianstormtaylor/slate/pull/6179) [`25f6353`](https://github.com/ianstormtaylor/slate/commit/25f6353b81292e4ced81b3e5cf6c6f2fa1b6851b) Thanks [@dylans](https://github.com/dylans)! - Fix clicks occasionally being undone when the editor re-renders right after them. A render inside the 100 ms selection-change throttle used to write the previous selection back to the DOM; it now applies the clicked selection instead.
+
+- [#6180](https://github.com/ianstormtaylor/slate/pull/6180) [`13d7c12`](https://github.com/ianstormtaylor/slate/commit/13d7c12aa4ed686ddaf117e865405cb5f415cbb2) Thanks [@dylans](https://github.com/dylans)! - Make the void spacer unselectable (`user-select: none`), so a selection that includes a void element no longer shows a darker band at its edge in Chromium.
+
 ## 0.130.2
 
 ### Patch Changes

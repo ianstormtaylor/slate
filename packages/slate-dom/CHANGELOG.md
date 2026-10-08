@@ -1,5 +1,13 @@
 # slate-dom
 
+## 0.131.0
+
+### Patch Changes
+
+- [#6186](https://github.com/ianstormtaylor/slate/pull/6186) [`843bfaa`](https://github.com/ianstormtaylor/slate/commit/843bfaa3bcbe2051264b63ac846d5c5375b15e02) Thanks [@dylans](https://github.com/dylans)! - Copying text inside an inline element, such as a link, now keeps that element in the copied HTML, so pasting into other apps (or HTML-based paste handlers) keeps the link.
+
+- [#6185](https://github.com/ianstormtaylor/slate/pull/6185) [`8cd5101`](https://github.com/ianstormtaylor/slate/commit/8cd5101da644eb99f7cf87e9a2f1acde23edc025) Thanks [@dylans](https://github.com/dylans)! - Copying an empty line now gives one blank line in plain text instead of two.
+
 ## 0.130.1
 
 ### Patch Changes
