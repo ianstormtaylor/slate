@@ -251,10 +251,16 @@ export const Editable = forwardRef(
     // set by `useIsomorphicLayoutEffect` before `onDOMSelectionChange` updates
     // `editor.selection`, the DOM selection can be removed accidentally.
     useEffect(() => {
-      if (ref.current && autoFocus) {
+      if (!ref.current || !autoFocus) {
+        return
+      }
+
+      if (editor.children.length > 0) {
+        ReactEditor.focus(editor)
+      } else {
         ref.current.focus()
       }
-    }, [autoFocus])
+    }, [autoFocus, editor])
 
     /**
      * The AndroidInputManager object has a cyclical dependency on onDOMSelectionChange
