@@ -1538,6 +1538,7 @@ export const Editable = forwardRef(
                         ) {
                           Transforms.delete(editor, {
                             at: draggedRange,
+                            hanging: true,
                           })
                         }
                       }
