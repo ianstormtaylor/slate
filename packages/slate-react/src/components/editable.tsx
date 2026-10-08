@@ -34,6 +34,7 @@ import { ReadOnlyContext } from '../hooks/use-read-only'
 import { useSlate } from '../hooks/use-slate'
 import { useTrackUserInput } from '../hooks/use-track-user-input'
 import { ReactEditor } from '../plugin/react-editor'
+import { deleteMovedRange, getMovableRange } from '../utils/move-range'
 import { TRIPLE_CLICK } from 'slate-dom'
 import {
   containsShadowAware,
@@ -1438,6 +1439,7 @@ export const Editable = forwardRef(
                       !isDOMEventTargetInput(event)
                     ) {
                       event.preventDefault()
+                      selectMovableRange(editor)
                       ReactEditor.setFragmentData(
                         editor,
                         event.clipboardData,
@@ -1447,7 +1449,7 @@ export const Editable = forwardRef(
 
                       if (selection) {
                         if (Range.isExpanded(selection)) {
-                          Editor.deleteFragment(editor)
+                          deleteMovedRange(editor, selection)
                         } else {
                           const node = Node.parent(
                             editor,
@@ -1500,6 +1502,7 @@ export const Editable = forwardRef(
                         Transforms.select(editor, range)
                       }
 
+                      selectMovableRange(editor)
                       state.isDraggingInternally = true
 
                       ReactEditor.setFragmentData(
@@ -1530,15 +1533,19 @@ export const Editable = forwardRef(
 
                       Transforms.select(editor, range)
 
-                      if (state.isDraggingInternally) {
-                        if (
-                          draggedRange &&
-                          !Range.equals(draggedRange, range) &&
-                          !Editor.void(editor, { at: range, voids: true })
-                        ) {
-                          Transforms.delete(editor, {
-                            at: draggedRange,
-                          })
+                      if (state.isDraggingInternally && draggedRange) {
+                        if (Range.includes(draggedRange, range.anchor)) {
+                          return
+                        }
+
+                        if (!Editor.void(editor, { at: range, voids: true })) {
+                          const dropRef = Editor.rangeRef(editor, range)
+                          deleteMovedRange(editor, draggedRange)
+                          const dropRange = dropRef.unref()
+
+                          if (dropRange) {
+                            Transforms.select(editor, dropRange)
+                          }
                         }
                       }
 
@@ -1956,6 +1963,18 @@ export type RenderPlaceholderProps = {
 /**
  * The default placeholder element
  */
+
+const selectMovableRange = (editor: ReactEditor) => {
+  const { selection } = editor
+
+  if (selection && Range.isExpanded(selection)) {
+    const movableRange = getMovableRange(editor, selection)
+
+    if (!Range.equals(movableRange, selection)) {
+      Transforms.select(editor, movableRange)
+    }
+  }
+}
 
 export const DefaultPlaceholder = ({
   attributes,

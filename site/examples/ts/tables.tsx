@@ -1,5 +1,13 @@
 import React, { useCallback, useMemo } from 'react'
-import { Descendant, Editor, Node, Point, Range, createEditor } from 'slate'
+import {
+  Descendant,
+  Editor,
+  Node,
+  Point,
+  Range,
+  Transforms,
+  createEditor,
+} from 'slate'
 import { withHistory } from 'slate-history'
 import {
   Editable,
@@ -32,7 +40,7 @@ const TablesExample = () => {
 }
 
 const withTables = (editor: CustomEditor) => {
-  const { deleteBackward, deleteForward, insertBreak } = editor
+  const { deleteBackward, deleteForward, deleteFragment, insertBreak } = editor
 
   editor.deleteBackward = (unit: 'character' | 'word' | 'line' | 'block') => {
     const { selection } = editor
@@ -74,6 +82,39 @@ const withTables = (editor: CustomEditor) => {
     }
 
     deleteForward(unit)
+  }
+
+  editor.deleteFragment = options => {
+    const { selection } = editor
+    const isCell = (n: Node) => Node.isElement(n) && n.type === 'table-cell'
+
+    if (
+      selection &&
+      Range.isExpanded(selection) &&
+      Editor.above(editor, { at: selection.anchor, match: isCell }) &&
+      Editor.above(editor, { at: selection.focus, match: isCell })
+    ) {
+      const cells = Array.from(Editor.nodes(editor, { match: isCell }))
+
+      if (cells.length > 1) {
+        Editor.withoutNormalizing(editor, () => {
+          for (const [, cellPath] of cells) {
+            const covered = Range.intersection(
+              selection,
+              Editor.range(editor, cellPath)
+            )
+
+            if (covered && Range.isExpanded(covered)) {
+              Transforms.delete(editor, { at: covered })
+            }
+          }
+        })
+        Transforms.collapse(editor, { edge: 'start' })
+        return
+      }
+    }
+
+    deleteFragment(options)
   }
 
   editor.insertBreak = () => {
