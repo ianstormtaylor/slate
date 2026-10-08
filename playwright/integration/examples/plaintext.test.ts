@@ -84,4 +84,47 @@ test.describe('plaintext example', () => {
       await expect.poll(() => blockTexts(page)).toEqual(['one', 'three'])
     })
   })
+
+  test('inserting while blurred keeps the selection where it was', async ({
+    page,
+  }) => {
+    const textbox = page.getByRole('textbox')
+    await textbox.click()
+    const lineLength = await page.evaluate(() => {
+      const text = document.querySelector('[data-slate-string]')!.firstChild!
+      const length = text.textContent!.length
+      window.getSelection()!.setBaseAndExtent(text, length, text, length)
+      return length
+    })
+    await page.waitForTimeout(200)
+
+    const insertWhileBlurred = (text: string) =>
+      page.evaluate(text => {
+        const element = document.querySelector('[data-slate-editor]')!
+        const fiberKey = Object.keys(element).find(key =>
+          key.startsWith('__reactFiber$')
+        )!
+        let fiber = (element as any)[fiberKey]
+        while (fiber && !fiber.memoizedProps?.editor) {
+          fiber = fiber.return
+        }
+        const editor = fiber.memoizedProps.editor
+        let outside = document.querySelector<HTMLButtonElement>('#outside')
+        if (!outside) {
+          outside = document.createElement('button')
+          outside.id = 'outside'
+          outside.textContent = 'outside'
+          document.body.appendChild(outside)
+        }
+        outside.focus()
+        editor.insertText(text)
+        return new Promise(resolve =>
+          setTimeout(() => resolve(editor.selection?.anchor.offset), 300)
+        )
+      }, text)
+
+    expect(await insertWhileBlurred('-')).toBe(lineLength + 1)
+    expect(await insertWhileBlurred('+')).toBe(lineLength + 2)
+    await expect(textbox).toContainText('<textarea>!-+')
+  })
 })
