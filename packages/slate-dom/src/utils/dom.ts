@@ -230,6 +230,13 @@ export const getPlainText = (domNode: DOMNode) => {
   }
 
   if (isDOMElement(domNode)) {
+    if (
+      domNode.tagName === 'BR' &&
+      domNode.parentElement?.getAttribute('data-slate-zero-width') === 'n'
+    ) {
+      return text
+    }
+
     for (const childNode of Array.from(domNode.childNodes)) {
       text += getPlainText(childNode)
     }

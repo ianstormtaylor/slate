@@ -1,5 +1,5 @@
 import React from 'react'
-import { createEditor, Editor, Transforms } from 'slate'
+import { createEditor, Descendant, Editor, Transforms } from 'slate'
 import { render, act } from '@testing-library/react'
 import { Slate, withReact, Editable, ReactEditor } from '../src'
 
@@ -14,6 +14,26 @@ const clipboard = () => {
     } as unknown as DataTransfer,
   }
 }
+
+const copyAll = (initialValue: Descendant[]) => {
+  const editor = withReact(createEditor())
+  render(
+    <Slate editor={editor} initialValue={initialValue}>
+      <Editable />
+    </Slate>
+  )
+
+  act(() => {
+    Transforms.select(editor, Editor.range(editor, []))
+  })
+
+  const { data, transfer } = clipboard()
+  ReactEditor.setFragmentData(editor, transfer)
+  return data
+}
+
+const lines = (...texts: string[]): Descendant[] =>
+  texts.map(text => ({ children: [{ text }] }))
 
 describe('setFragmentData', () => {
   it('keeps an empty block as a line break in the copied HTML', () => {
@@ -42,6 +62,14 @@ describe('setFragmentData', () => {
     html.innerHTML = data['text/html']
     const emptyBlock = html.querySelector('[data-slate-zero-width="n"]')
     expect(emptyBlock?.innerHTML).toBe('<br>')
-    expect(data['text/plain']).toBe('before\n\n\nafter\n')
+    expect(data['text/plain']).toBe('before\n\nafter\n')
+  })
+
+  it('copies one blank line per empty block as plain text', () => {
+    expect(copyAll(lines('a', '', '', 'b'))['text/plain']).toBe('a\n\n\nb\n')
+  })
+
+  it('keeps a soft line break inside a block', () => {
+    expect(copyAll(lines('a\nb'))['text/plain']).toBe('a\nb')
   })
 })
