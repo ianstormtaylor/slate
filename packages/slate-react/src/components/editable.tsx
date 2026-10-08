@@ -2151,6 +2151,8 @@ export const defaultScrollSelectionIntoView = (
       domFocusPoint.getBoundingClientRect.bind(domFocusPoint)
     scrollIntoView(leafEl, {
       scrollMode: 'if-needed',
+      block: 'nearest',
+      inline: 'nearest',
     })
 
     // @ts-expect-error an unorthodox delete D:
