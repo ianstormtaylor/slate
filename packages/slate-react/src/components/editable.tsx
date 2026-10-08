@@ -357,7 +357,18 @@ export const Editable = forwardRef(
                   !androidInputManager?.hasPendingChanges() &&
                   !androidInputManager?.isFlushing()
                 ) {
-                  Transforms.select(editor, range)
+                  const isCaretOutsideText =
+                    domSelection.isCollapsed && !isInSlateText(anchorNode)
+
+                  if (
+                    isCaretOutsideText &&
+                    editor.selection &&
+                    Range.equals(range, editor.selection)
+                  ) {
+                    restoreDomSelection(editor, domSelection, state)
+                  } else {
+                    Transforms.select(editor, range)
+                  }
                 } else {
                   androidInputManager?.handleUserSelect(range)
                 }
@@ -685,6 +696,14 @@ export const Editable = forwardRef(
             // Skip native if there are marks, as
             // `insertText` will insert a node, not just text.
             if (editor.marks) {
+              native = false
+            }
+
+            const domAnchor = getSelection(
+              ReactEditor.findDocumentOrShadowRoot(editor)
+            )?.anchorNode
+
+            if (!isInSlateText(domAnchor)) {
               native = false
             }
 
@@ -2035,6 +2054,33 @@ export type RenderPlaceholderProps = {
 /**
  * The default placeholder element
  */
+
+const isInSlateText = (node: unknown) =>
+  isDOMNode(node) &&
+  node.nodeType === node.TEXT_NODE &&
+  !!node.parentElement?.closest('[data-slate-string], [data-slate-zero-width]')
+
+const restoreDomSelection = (
+  editor: ReactEditor,
+  domSelection: Selection,
+  state: { isUpdatingSelection: boolean }
+) => {
+  if (!editor.selection) {
+    return
+  }
+
+  const domRange = ReactEditor.toDOMRange(editor, editor.selection)
+  state.isUpdatingSelection = true
+  domSelection.setBaseAndExtent(
+    domRange.startContainer,
+    domRange.startOffset,
+    domRange.endContainer,
+    domRange.endOffset
+  )
+  setTimeout(() => {
+    state.isUpdatingSelection = false
+  })
+}
 
 const selectMovableRange = (editor: ReactEditor) => {
   const { selection } = editor
