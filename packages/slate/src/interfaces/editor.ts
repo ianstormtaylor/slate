@@ -180,7 +180,6 @@ export interface BaseEditor {
    * Insert a node at the current selection. If the selection is currently
    * expanded, delete it first.
    *
-   * **WARNING**: Inserting a node that already exists in the document (or another active document) can cause problems with certain plugins like `slate-dom` and `slate-react` that expect each node to be a unique object.
    * @param options Type also exported as `NodeInsertNodesOptions<T>`
    * @see {@link EditorInterface#insertNode} - A static version of this method.
    */
@@ -193,7 +192,6 @@ export interface BaseEditor {
    * Insert nodes in the editor at the specified location or (if not defined)
    * the current selection or (if not defined) the end of the document.
    *
-   * **WARNING**: Inserting a node that already exists in the document (or another active document) can cause problems with certain plugins like `slate-dom` and `slate-react` that expect each node to be a unique object.
    * @param options Type also exported as `NodeInsertNodesOptions<T>`
    * @see {@link TransformsInterface#insertNodes} - A static version of this method.
    */
@@ -1041,7 +1039,6 @@ export interface EditorInterface {
    * Inserts a fragment
    * at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
    *
-   * **WARNING**: Inserting a node that already exists in the document (or another active document) can cause problems with certain plugins like `slate-dom` and `slate-react` that expect each node to be a unique object.
    * @param options Type also exported as `TextInsertFragmentOptions`
    * @category Commands
    */
@@ -1055,7 +1052,6 @@ export interface EditorInterface {
    * Atomically inserts `nodes`
    * at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
    *
-   * **WARNING**: Inserting a node that already exists in the document (or another active document) can cause problems with certain plugins like `slate-dom` and `slate-react` that expect each node to be a unique object.
    * @param options Type also exported as `NodeInsertNodesOptions<T>`
    * @category Commands
    */
