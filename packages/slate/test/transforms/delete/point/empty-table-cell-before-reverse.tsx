@@ -7,15 +7,15 @@ export const run = editor => {
 }
 export const input = (
   <editor>
-    <block table>
-      <block row>
-        <block cell>a</block>
-        <block cell>
+    <block type="table">
+      <block type="row">
+        <block type="cell">a</block>
+        <block type="cell">
           <text />
         </block>
       </block>
     </block>
-    <block paragraph>
+    <block type="paragraph">
       <cursor />
       after
     </block>
@@ -23,10 +23,10 @@ export const input = (
 )
 export const output = (
   <editor>
-    <block table>
-      <block row>
-        <block cell>a</block>
-        <block cell>
+    <block type="table">
+      <block type="row">
+        <block type="cell">a</block>
+        <block type="cell">
           <cursor />
           after
         </block>

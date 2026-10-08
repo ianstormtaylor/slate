@@ -7,13 +7,13 @@ export const run = editor => {
 }
 export const input = (
   <editor>
-    <block list>
-      <block item>
+    <block type="list">
+      <block type="item">
         <anchor />
         one
       </block>
     </block>
-    <block paragraph>
+    <block type="paragraph">
       tw
       <focus />o
     </block>
@@ -21,8 +21,8 @@ export const input = (
 )
 export const output = (
   <editor>
-    <block list>
-      <block item>
+    <block type="list">
+      <block type="item">
         <cursor />o
       </block>
     </block>

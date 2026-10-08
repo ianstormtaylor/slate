@@ -7,10 +7,10 @@ export const run = editor => {
 }
 export const input = (
   <editor>
-    <block heading>
+    <block type="heading">
       <text />
     </block>
-    <block paragraph>
+    <block type="paragraph">
       <cursor />
       two
     </block>
@@ -18,7 +18,7 @@ export const input = (
 )
 export const output = (
   <editor>
-    <block paragraph>
+    <block type="paragraph">
       <cursor />
       two
     </block>
