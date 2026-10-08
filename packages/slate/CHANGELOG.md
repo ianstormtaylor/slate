@@ -1,5 +1,11 @@
 # slate
 
+## 0.130.1
+
+### Patch Changes
+
+- [#6165](https://github.com/ianstormtaylor/slate/pull/6165) [`4a96e69`](https://github.com/ianstormtaylor/slate/commit/4a96e690d43e2443a23c5ecbf8e57860bb088b53) Thanks [@dylans](https://github.com/dylans)! - Make `Node.fragment` only walk the top-level blocks the range covers, so copying or cutting in a large document no longer takes time proportional to the whole document.
+
 ## 0.130.0
 
 ### Minor Changes

@@ -1,5 +1,13 @@
 # slate-react
 
+## 0.130.1
+
+### Patch Changes
+
+- [#6167](https://github.com/ianstormtaylor/slate/pull/6167) [`eb9dc9b`](https://github.com/ianstormtaylor/slate/commit/eb9dc9b81f5ff3bf22087f57b8cb369bb9b0b559) Thanks [@dylans](https://github.com/dylans)! - Add `-webkit-user-select: none` to the default placeholder style so iOS Safari can't partially select the placeholder text.
+
+- [#6166](https://github.com/ianstormtaylor/slate/pull/6166) [`a0bcfaa`](https://github.com/ianstormtaylor/slate/commit/a0bcfaaba0fcf028d6f483d9bf5840c1a171a812) Thanks [@dylans](https://github.com/dylans)! - Shift-clicking a void element now extends the selection to it instead of collapsing the selection onto the void.
+
 ## 0.130.0
 
 ### Patch Changes

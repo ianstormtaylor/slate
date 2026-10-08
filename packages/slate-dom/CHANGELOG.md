@@ -1,5 +1,11 @@
 # slate-dom
 
+## 0.130.1
+
+### Patch Changes
+
+- [#6169](https://github.com/ianstormtaylor/slate/pull/6169) [`fa2fcd0`](https://github.com/ianstormtaylor/slate/commit/fa2fcd0c2fb120fa48d08fdef31ad66fce3fbdfa) Thanks [@dylans](https://github.com/dylans)! - Keep empty blocks as a `<br>` in copied HTML, so pasting into Word and other rich-text targets no longer drops empty lines.
+
 ## 0.130.0
 
 ### Patch Changes
