@@ -80,7 +80,7 @@ Options supported: `NodeOptions & {height?: number, always?: boolean}`
 
 Wrap nodes at the specified location in the `element` container. If no location is specified, wrap the selection.
 
-Options supported: `NodeOptions & {split?: boolean}`.
+Options supported: `NodeOptions & {hanging?: boolean, split?: boolean}`.
 
 - `options.mode`: `'all'` is also supported.
 - `options.split` indicates that it's okay to split a node in order to wrap the location. For example, if `ipsum` was selected in a `Text` node with `lorem ipsum dolar`, `split: true` would wrap the word `ipsum` only, resulting in splitting the `Text` node. If `split: false`, the entire `Text` node `lorem ipsum dolar` would be wrapped.
@@ -89,7 +89,7 @@ Options supported: `NodeOptions & {split?: boolean}`.
 
 Unwrap nodes at the specified location. If necessary, the parent node is split. If no location is specified, use the selection.
 
-Options supported: `NodeOptions & {split?: boolean}`. For `options.mode`, `'all'` is also supported.
+Options supported: `NodeOptions & {hanging?: boolean, split?: boolean}`. For `options.mode`, `'all'` is also supported.
 
 #### `Transforms.setNodes(editor: Editor, props: Partial<NullableProps<Node>>, options?)`
 
