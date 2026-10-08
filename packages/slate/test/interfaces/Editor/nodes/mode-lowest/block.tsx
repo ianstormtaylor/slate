@@ -14,7 +14,7 @@ export const input = (
 )
 export const test = editor => {
   return Array.from(
-    Editor.nodes(editor, { at: [], match: n => n.a, mode: 'lowest' })
+    Editor.nodes(editor, { at: [], match: n => n.a === true, mode: 'lowest' })
   )
 }
 export const output = [

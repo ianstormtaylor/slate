@@ -142,6 +142,10 @@ export const getEditableChildAndIndex = (
   index: number,
   direction: 'forward' | 'backward'
 ): [DOMNode, number] => {
+  if (typeof index !== 'number') {
+    throw new Error('Expected index to be a number')
+  }
+
   const { childNodes } = parent
   let child = childNodes[index]
   let i = index
@@ -227,7 +231,7 @@ export const getPlainText = (domNode: DOMNode) => {
 /**
  * Get x-slate-fragment attribute from data-slate-fragment
  */
-const catchSlateFragment = /data-slate-fragment="(.+?)"/m
+const catchSlateFragment = /<[^>]*\sdata-slate-fragment="([^"]+)"/m
 export const getSlateFragmentAttribute = (
   dataTransfer: DataTransfer
 ): string | void => {

@@ -1,5 +1,74 @@
 # slate
 
+## 0.130.1
+
+### Patch Changes
+
+- [#6165](https://github.com/ianstormtaylor/slate/pull/6165) [`4a96e69`](https://github.com/ianstormtaylor/slate/commit/4a96e690d43e2443a23c5ecbf8e57860bb088b53) Thanks [@dylans](https://github.com/dylans)! - Make `Node.fragment` only walk the top-level blocks the range covers, so copying or cutting in a large document no longer takes time proportional to the whole document.
+
+## 0.130.0
+
+### Minor Changes
+
+- [#6158](https://github.com/ianstormtaylor/slate/pull/6158) [`c760f06`](https://github.com/ianstormtaylor/slate/commit/c760f06381181e30e39816abdef8fcd6fc1efd84) Thanks [@dylans](https://github.com/dylans)! - Deleting the only node in the editor, such as a lone image, now leaves an empty block instead of an editor with no children. An empty editor had no start point, so focusing or typing threw "Cannot get the start point in the node at path [] because it has no start text node".
+
+## 0.129.0
+
+### Minor Changes
+
+- [#6141](https://github.com/ianstormtaylor/slate/pull/6141) [`1604e5f`](https://github.com/ianstormtaylor/slate/commit/1604e5feee47145c2949da00791e614866f60563) Thanks [@dylans](https://github.com/dylans)! - Deleting a character or word from an empty block next to a block void now removes the empty block and selects the void, instead of deleting the void. This matches native editors. The previous behaviour deleted the image when pressing Backspace in an empty paragraph after it.
+
+### Patch Changes
+
+- [#6132](https://github.com/ianstormtaylor/slate/pull/6132) [`ff63fad`](https://github.com/ianstormtaylor/slate/commit/ff63fadcb0ff0fb641448ca1675c532374f650fd) Thanks [@dylans](https://github.com/dylans)! - Deleting a single character next to, or inside, an empty non-void inline now removes the inline, instead of skipping over it and deleting the character on its other side.
+
+## 0.128.0
+
+### Patch Changes
+
+- [#6115](https://github.com/ianstormtaylor/slate/pull/6115) [`52f05bf8`](https://github.com/ianstormtaylor/slate/commit/52f05bf8b614407423fab40525862f044c51884b) Thanks [@giaBaoJS](https://github.com/giaBaoJS)! - - When deleting a void element backward from a cursor inside it, place the cursor before the removed void instead of moving it into the following node
+
+  - In Chrome and Safari, pressing Delete on a selected void now deletes forward instead of backward
+
+- [#6003](https://github.com/ianstormtaylor/slate/pull/6003) [`50cdf5e9`](https://github.com/ianstormtaylor/slate/commit/50cdf5e940ed474c8b57acceecde9d47c66dfaa0) Thanks [@nabbydude](https://github.com/nabbydude)! - Changed type signature of `Editor#setSelection` to allow non-Range properties of Selections (functionality unchanged)
+
+## 0.126.2
+
+### Patch Changes
+
+- [#6092](https://github.com/ianstormtaylor/slate/pull/6092) [`4231105d`](https://github.com/ianstormtaylor/slate/commit/4231105dbe7cab405406eabd23cf40261e56b9fc) Thanks [@12joan](https://github.com/12joan)! - Deeply compare nested data structures inside array properties on nodes for the purpose of merging identical text nodes. Previously, items in array properties were shallowly compared using `===`.
+
+## 0.126.1
+
+### Patch Changes
+
+- [#6083](https://github.com/ianstormtaylor/slate/pull/6083) [`ad3eaee5`](https://github.com/ianstormtaylor/slate/commit/ad3eaee5c02360a024cb2af0ae2b3c1313bf9655) Thanks [@12joan](https://github.com/12joan)! - Broaden the types of `Transforms.setNodes` and `editor.setNodes` to allow setting optional node properties to null (which has the effect of unsetting them).
+
+## 0.126.0
+
+### Patch Changes
+
+- [#6074](https://github.com/ianstormtaylor/slate/pull/6074) [`c5ea32ea`](https://github.com/ianstormtaylor/slate/commit/c5ea32eac49d8730be10fd4f8208d01e1cbced80) Thanks [@greymoth-jp](https://github.com/greymoth-jp)! - Treat Indic conjunct clusters as a single grapheme in `getCharacterDistance`, implementing Unicode UAX #29 rule GB9c. Character-by-character cursor movement (`Editor.positions` with `unit: 'character'`, and the `Editor.before` / `Editor.after` it powers) over scripts such as Devanagari and Bengali no longer stops inside a `Consonant + virama + Consonant` conjunct.
+
+## 0.124.1
+
+### Patch Changes
+
+- [#6040](https://github.com/ianstormtaylor/slate/pull/6040) [`20a1a937`](https://github.com/ianstormtaylor/slate/commit/20a1a9371538dda1911d533e0f02b1655ffffa12) Thanks [@12joan](https://github.com/12joan)! - - Harden property accessors against untrusted keys
+  - Fix incorrect argument types for the `compare` and `merge` options of `Transforms.setNodes`
+
+## 0.124.0
+
+### Minor Changes
+
+- [#6006](https://github.com/ianstormtaylor/slate/pull/6006) [`72e4f025`](https://github.com/ianstormtaylor/slate/commit/72e4f025761ea7670d4944c0f25fc6da97f1e5f5) Thanks [@skorenb](https://github.com/skorenb)! - Added `force` property to `normalizeNode` passed from `normalize` method
+
+### Patch Changes
+
+- [#6018](https://github.com/ianstormtaylor/slate/pull/6018) [`91321bdc`](https://github.com/ianstormtaylor/slate/commit/91321bdcd2c6c0baef010bbcde3079e11841e69f) Thanks [@12joan](https://github.com/12joan)! - Do not allow paths to contain strings when getting nodes
+
+- [#6024](https://github.com/ianstormtaylor/slate/pull/6024) [`a1729221`](https://github.com/ianstormtaylor/slate/commit/a1729221a0c5785f48493177beb81b4b8ef08594) Thanks [@juliankrispel](https://github.com/juliankrispel)! - Fix normalization hanging when merging text under non-selectable elements
+
 ## 0.123.0
 
 ### Minor Changes

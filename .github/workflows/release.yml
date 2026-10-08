@@ -6,62 +6,133 @@ on:
       - main
 
 permissions: {}
+
 jobs:
   release:
-    permissions:
-      contents: write # to create release (changesets/action)
-      pull-requests: write # to create pull request (changesets/action)
-
     name: ${{ matrix.channel }}
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write
+
     strategy:
       max-parallel: 1
       matrix:
-        channel:
-          - latest
-          - dev
+        channel: [latest, dev]
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Setup node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: 22.17
+          node-version: 24
           cache: yarn
-          registry-url: https://registry.npmjs.org
-          key: node20
+
+      - name: Enable Corepack (Yarn)
+        run: corepack enable
+
+      - name: Upgrade npm (OIDC fixes ship in npm releases)
+        run: npm i -g npm@11.18.0
+
+      - name: Configure npm registry (no token)
+        run: |
+          cat > ~/.npmrc <<'EOF'
+          registry=https://registry.npmjs.org/
+          EOF
+
+      - name: Debug npm auth config
+        run: |
+          npm -v
+          echo "=== user npmrc ==="
+          cat ~/.npmrc || true
+          echo "=== any auth/token config? ==="
+          npm config list -l | grep -iE 'auth|token|always-auth' || true
 
       - name: Install dependencies
-        run: yarn
+        run: yarn install
 
       - name: Prepare release
         run: yarn prerelease
 
-      # https://github.com/changesets/action
-      - name: Create release pull request or Publish to npm
+      - name: Create or update release PR
         if: matrix.channel == 'latest'
-        uses: changesets/action@v1
+        id: changesets
+        uses: changesets/action@v2.0.0-next.3
         with:
-          # defined in package.json#scripts
-          version: yarn changesetversion
-          publish: yarn changeset publish
+          version-script: yarn changesetversion
+          github-token: ${{ secrets.GITHUB_TOKEN }}
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           YARN_ENABLE_IMMUTABLE_INSTALLS: false
 
-      # https://github.com/atlassian/changesets/blob/master/docs/snapshot-releases.md
+      - name: Publish to latest channel
+        if: matrix.channel == 'latest' && steps.changesets.outputs['has-changesets'] == 'false'
+        run: |
+          set -euo pipefail
+          yarn changeset publish
+
+          tags="$(git tag --points-at HEAD --list 'slate*@*')"
+          if [ -z "$tags" ]; then
+            exit 0
+          fi
+
+          while IFS= read -r tag; do
+            [ -n "$tag" ] || continue
+
+            package="${tag%@*}"
+            version="${tag##*@}"
+            changelog="packages/${package}/CHANGELOG.md"
+            notes="$RUNNER_TEMP/${tag}.md"
+
+            git push "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "refs/tags/${tag}"
+
+            if gh release view "$tag" >/dev/null 2>&1; then
+              continue
+            fi
+
+            awk -v version="$version" '
+              $0 ~ "^## " {
+                if (found) exit
+                if ($0 ~ "^## " version "($| )") {
+                  found = 1
+                  next
+                }
+              }
+              found { print }
+            ' "$changelog" > "$notes"
+
+            if [ ! -s "$notes" ]; then
+              printf '%s\n' "$tag" > "$notes"
+            fi
+
+            gh release create "$tag" --title "$tag" --notes-file "$notes" --verify-tag
+          done <<< "$tags"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Release to @dev channel
         if: matrix.channel == 'dev'
         run: |
+          set -euo pipefail
+
+          for manifest in packages/*/package.json; do
+            name="$(node -p "require('./$manifest').name")"
+            version="$(node -p "require('./$manifest').version")"
+
+            if ! npm view "$name@$version" version > /dev/null 2>&1; then
+              echo "::warning::$name@$version is not on npm yet, so skipping the dev release to keep it off the dev tag"
+              exit 0
+            fi
+          done
+
           yarn changeset version --snapshot
           yarn changeset publish --tag dev
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

@@ -3,7 +3,7 @@ import { Editor, Text, Path, Element, Node } from 'slate'
 
 import { ReactEditor, useSlateStatic } from '..'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
-import { IS_ANDROID } from 'slate-dom'
+import { IS_ANDROID, IS_COMPOSING } from 'slate-dom'
 import { MARK_PLACEHOLDER_SYMBOL } from 'slate-dom'
 
 /**
@@ -61,6 +61,7 @@ const String = (props: {
  */
 const TextString = (props: { text: string; isTrailing?: boolean }) => {
   const { text, isTrailing = false } = props
+  const editor = useSlateStatic()
   const ref = useRef<HTMLSpanElement>(null)
   const getTextContent = () => {
     return `${text ?? ''}${isTrailing ? '\n' : ''}`
@@ -81,6 +82,20 @@ const TextString = (props: { text: string; isTrailing?: boolean }) => {
     const textWithTrailing = getTextContent()
 
     if (ref.current && ref.current.textContent !== textWithTrailing) {
+      // On Android the DOM intentionally runs ahead of the value while the IME
+      // composes, since input is buffered as pending diffs. Writing
+      // `textContent` here would replace the text node the composition lives in
+      // and cancel it; the pending diffs reconcile this span when the
+      // composition ends.
+      if (IS_ANDROID && IS_COMPOSING.get(editor)) {
+        const composingNode =
+          ReactEditor.getWindow(editor).getSelection()?.anchorNode
+
+        if (composingNode && ref.current.contains(composingNode)) {
+          return
+        }
+      }
+
       ref.current.textContent = textWithTrailing
     }
 
@@ -135,9 +150,15 @@ export const ZeroWidthString = (props: {
   // be because accepting an IME suggestion when at the start of a block (no
   // preceding \uFEFF) removes one or more DOM elements that `toSlateRange`
   // depends on. (https://github.com/ianstormtaylor/slate/issues/5703)
+  // A leaf with no text node at all forces the IME to create one when the
+  // first character is composed there, and no re-render can then touch the
+  // leaf without cancelling the composition. Rendering the zero-width space on
+  // Android too gives the composition a React-owned text node to live in; the
+  // wrapper keeps its data-slate-zero-width attributes, so selection mapping
+  // is unchanged.
   return (
     <span {...attributes}>
-      {!IS_ANDROID || !isLineBreak ? '\uFEFF' : null}
+      {'\uFEFF'}
       {isLineBreak ? <br /> : null}
     </span>
   )

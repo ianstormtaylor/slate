@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Descendant, Editor, Node, Operation, Scrubber, Selection } from 'slate'
 import { EDITOR_TO_ON_CHANGE } from 'slate-dom'
 import { FocusedContext } from '../hooks/use-focused'
@@ -16,7 +16,13 @@ import { Editable } from './editable'
 interface SlateProps {
   /** An instance of `ReactEditor`. */
   editor: ReactEditor
-  /** The initial value of the Editor. */
+  /**
+   * The initial value of the editor. It is loaded into the editor when `Slate` mounts, and again if a different `editor` is passed.
+   *
+   * Slate is not a controlled component: changing `initialValue` afterwards has no effect, because directly replacing the value would corrupt state such as the edit history. To change the content, apply transforms to the editor, or remount `Slate` with a new `key`.
+   *
+   * Each editor must have its own node objects. To render several editors from the same value, give each one a deep copy, for example with `structuredClone(value)`. Sharing the same objects between editors breaks the lookups Slate uses to map nodes to the DOM.
+   */
   initialValue: Descendant[]
   /** The `children` which must contain an `Editable` component. */
   children: React.ReactNode
@@ -46,8 +52,9 @@ export const Slate = (props: SlateProps) => {
     ...rest
   } = props
 
-  // Run once on first mount, but before `useEffect` or render
-  React.useState(() => {
+  const initializedEditor = useRef<ReactEditor | null>(null)
+
+  if (initializedEditor.current !== editor) {
     if (!Node.isNodeList(initialValue)) {
       throw new Error(
         `[Slate] initialValue is invalid! Expected a list of elements but got: ${Scrubber.stringify(
@@ -64,7 +71,8 @@ export const Slate = (props: SlateProps) => {
 
     editor.children = initialValue
     Object.assign(editor, rest)
-  })
+    initializedEditor.current = editor
+  }
 
   const { selectorContext, onChange: handleSelectorChange } =
     useSelectorContext()
@@ -123,7 +131,7 @@ export const Slate = (props: SlateProps) => {
         document.removeEventListener('blur', fn, true)
       }
     }
-  }, [])
+  }, [editor])
 
   return (
     <SlateSelectorContext.Provider value={selectorContext}>

@@ -1,4 +1,4 @@
-import { Editor, Path, Range, Scrubber, Text } from '..'
+import { Editor, Path, Point, Range, Scrubber, Text } from '..'
 import { Element, ElementEntry } from './element'
 import { modifyChildren, modifyLeaf, removeChildren } from '../utils/modify'
 
@@ -103,6 +103,8 @@ export interface NodeInterface {
   /**
    * Get an entry for the common ancesetor of two paths.
    * In most cases this will be an Element node, but could the root Editor node if the paths have no other common ancestors, or a Text node if the paths are the same (or if they point to nodes that don't exist).
+   *
+   * If the paths are equal, or one is an ancestor of the other, the entry is for the node at the shorter path. For example, `Node.common(editor, [0, 0], [0, 0])` returns the text node at `[0, 0]`, and `Node.common(editor, [0], [0, 0])` returns the element at `[0]`.
    * @category Retrieval
    */
   common(root: Node, path: Path, another: Path): NodeEntry
@@ -344,6 +346,10 @@ export const Node: NodeInterface = {
       )
     }
 
+    if (typeof index !== 'number') {
+      throw new Error('Expected index to be a number')
+    }
+
     const c = root.children[index] as Descendant
 
     if (c == null) {
@@ -448,16 +454,26 @@ export const Node: NodeInterface = {
   },
 
   fragment<T extends Ancestor = Editor>(root: T, range: Range): T['children'] {
-    const newRoot = { children: root.children }
+    const [rootStart, rootEnd] = Range.edges(range)
+    const firstIndex = rootStart.path[0]
+    const newRoot = {
+      children: root.children.slice(firstIndex, rootEnd.path[0] + 1),
+    }
+    const toSlicedPoint = (point: Point): Point => ({
+      ...point,
+      path: [point.path[0] - firstIndex, ...point.path.slice(1)],
+    })
+    const start = toSlicedPoint(rootStart)
+    const end = toSlicedPoint(rootEnd)
+    const slicedRange = { anchor: start, focus: end }
 
-    const [start, end] = Range.edges(range)
     const nodeEntries = Node.nodes(newRoot, {
       reverse: true,
-      pass: ([, path]) => !Range.includes(range, path),
+      pass: ([, path]) => !Range.includes(slicedRange, path),
     })
 
     for (const [, path] of nodeEntries) {
-      if (!Range.includes(range, path)) {
+      if (!Range.includes(slicedRange, path)) {
         const index = path[path.length - 1]
 
         modifyChildren(newRoot, Path.parent(path), children =>
@@ -501,6 +517,10 @@ export const Node: NodeInterface = {
     for (let i = 0; i < path.length; i++) {
       const p = path[i]
 
+      if (typeof p !== 'number') {
+        throw new Error('Got non-numeric path index')
+      }
+
       if (Node.isText(node) || !node.children[p]) {
         return
       }
@@ -516,6 +536,10 @@ export const Node: NodeInterface = {
 
     for (let i = 0; i < path.length; i++) {
       const p = path[i]
+
+      if (typeof p !== 'number') {
+        throw new Error('Got non-numeric path index')
+      }
 
       if (Node.isText(node) || !node.children[p]) {
         return false

@@ -22,6 +22,8 @@ export interface PointRef {
    * Free the resources used by the PointRef. This should be called when you no
    * longer need to track the point. Returns the final point value before being
    * unrefed, or `null` if the point was already invalid.
+   *
+   * This removes the ref from `Editor.pointRefs(editor)` and sets `current` to `null`. If an operation removes the node containing the point, the editor releases the ref automatically. Calling `unref()` again returns `null`.
    */
   unref(): Point | null
 }

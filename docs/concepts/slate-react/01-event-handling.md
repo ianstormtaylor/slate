@@ -43,3 +43,19 @@ function MyEditor() {
   )
 }
 ```
+
+## Native `input` events
+
+Slate applies most edits itself instead of letting the browser change the DOM. For each `beforeinput` event it usually calls `preventDefault()` and applies the change with transforms, so the browser never fires the matching `input` event. That includes deletions, line breaks, pastes, digits and punctuation.
+
+The browser inserts the text natively, and fires `input`, only when all of these hold:
+
+- the edit types a single letter `a`–`z` or a space
+- the selection is collapsed and isn't at the start of a text node
+- no marks are pending, such as after toggling bold with nothing selected
+- the caret isn't at the end of a link
+
+So don't rely on `onInput`, or a native `input` listener on the editable element, to observe changes. Instead:
+
+- use `onValueChange` (or `onChange`) on `<Slate>` to react to every change of the value
+- use `onDOMBeforeInput` on `<Editable>` to see, or take over, an edit before Slate applies it

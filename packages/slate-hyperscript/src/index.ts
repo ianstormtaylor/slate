@@ -9,6 +9,7 @@ import {
   HyperscriptShorthands,
 } from './hyperscript'
 import { createEditor, createText } from './creators'
+import { HyperscriptPointRef, HyperscriptRangeRef } from './refs'
 
 /**
  * The default hyperscript factory that ships with Slate, without custom tags.
@@ -22,5 +23,7 @@ export {
   createEditor,
   createText,
   HyperscriptCreators,
+  HyperscriptPointRef,
+  HyperscriptRangeRef,
   HyperscriptShorthands,
 }

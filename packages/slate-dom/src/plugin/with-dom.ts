@@ -34,8 +34,29 @@ import {
   EDITOR_TO_USER_MARKS,
   EDITOR_TO_USER_SELECTION,
   NODE_TO_KEY,
+  NODE_TO_PARENT,
 } from '../utils/weak-maps'
 import { DOMEditor } from './dom-editor'
+
+const INSERTED_NODES: WeakSet<Node> = new WeakSet()
+
+const isNodeInUse = (node: Node): boolean =>
+  NODE_TO_PARENT.has(node) ||
+  INSERTED_NODES.has(node) ||
+  (Node.isElement(node) && node.children.some(isNodeInUse))
+
+const copyNode = <N extends Node>(node: N): N =>
+  Node.isElement(node)
+    ? { ...node, children: node.children.map(copyNode) }
+    : { ...node }
+
+const markInserted = (node: Node) => {
+  INSERTED_NODES.add(node)
+
+  if (Node.isElement(node)) {
+    node.children.forEach(markInserted)
+  }
+}
 
 /**
  * `withDOM` adds DOM specific behaviors to the editor.
@@ -51,7 +72,21 @@ export const withDOM = <T extends BaseEditor>(
   clipboardFormatKey = 'x-slate-fragment'
 ): T & DOMEditor => {
   const e = editor as T & DOMEditor
-  const { apply, onChange, deleteBackward, addMark, removeMark } = e
+  const { apply, onChange, deleteBackward, addMark, removeMark, insertNodes } =
+    e
+
+  e.insertNodes = (nodes, options) => {
+    const prepare = <N extends Node>(node: N): N => {
+      const prepared = isNodeInUse(node) ? copyNode(node) : node
+      markInserted(prepared)
+      return prepared
+    }
+
+    insertNodes(
+      Node.isNode(nodes) ? prepare(nodes) : nodes.map(prepare),
+      options
+    )
+  }
 
   // The WeakMap which maps a key to a specific HTMLElement must be scoped to the editor instance to
   // avoid collisions between editors in the DOM that share the same value.
@@ -286,7 +321,10 @@ export const withDOM = <T extends BaseEditor>(
     Array.from(contents.querySelectorAll('[data-slate-zero-width]')).forEach(
       zw => {
         const isNewline = zw.getAttribute('data-slate-zero-width') === 'n'
-        zw.textContent = isNewline ? '\n' : ''
+        zw.textContent = ''
+        if (isNewline) {
+          zw.appendChild(zw.ownerDocument.createElement('br'))
+        }
       }
     )
 

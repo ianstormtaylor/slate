@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import { dragSelection, selectStrings } from '../support/move-text'
 
 test.describe('On richtext example', () => {
   test.beforeEach(
@@ -52,15 +53,36 @@ test.describe('On richtext example', () => {
     await editor.press('Backspace')
     await expect(firstParagraph).toBeHidden()
 
-    await editor.press(
-      process.platform === 'darwin' ? 'Meta+ArrowDown' : 'Control+End'
-    )
-    await expect(secondParagraph).not.toBeInViewport()
+    await expect(async () => {
+      await page.evaluate(() =>
+        window.scrollTo(0, document.documentElement.scrollHeight)
+      )
+      await expect(secondParagraph).not.toBeInViewport({ timeout: 500 })
+    }).toPass()
 
     // Undo deletion
     await editor.press('ControlOrMeta+Z')
 
     await expect(firstParagraph).toBeVisible()
     await expect(firstParagraph).toBeInViewport()
+  })
+
+  test('dragging the quote line moves the quote without leaving it empty', async ({
+    page,
+    browserName,
+  }) => {
+    test.skip(browserName !== 'firefox', 'Native text drags need Firefox')
+    const textbox = page.getByRole('textbox')
+    await selectStrings(
+      page,
+      { text: 'A wise quote.', offset: 0 },
+      { text: 'Try it out for yourself!', offset: 0 }
+    )
+    await dragSelection(page, 'A wise quote.', { text: '!', edge: 'end' })
+    await expect(textbox.locator('blockquote')).toHaveCount(0)
+    await expect(textbox.locator('p').first()).toContainText('!A wise quote.')
+    await expect(
+      textbox.locator('p', { hasText: 'Try it out for yourself!' })
+    ).toHaveCount(1)
   })
 })

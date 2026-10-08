@@ -1,6 +1,7 @@
 import { SelectionTransforms } from '../interfaces/transforms/selection'
-import { Range } from '../interfaces/range'
 import { Point } from '../interfaces/point'
+import { Selection } from '../interfaces'
+import { NON_SETTABLE_SELECTION_PROPERTIES } from '../interfaces/transforms/general'
 
 /** @ignore */
 export const setSelection: SelectionTransforms['setSelection'] = (
@@ -8,27 +9,27 @@ export const setSelection: SelectionTransforms['setSelection'] = (
   props
 ) => {
   const { selection } = editor
-  const oldProps: Partial<Range> | null = {}
-  const newProps: Partial<Range> = {}
+  const oldProps: Partial<Selection> = {}
+  const newProps: Partial<Selection> = {}
 
   if (!selection) {
     return
   }
 
   for (const k in props) {
-    if (
-      (k === 'anchor' &&
-        props.anchor != null &&
-        !Point.equals(props.anchor, selection.anchor)) ||
-      (k === 'focus' &&
-        props.focus != null &&
-        !Point.equals(props.focus, selection.focus)) ||
-      (k !== 'anchor' &&
-        k !== 'focus' &&
-        props[<keyof Range>k] !== selection[<keyof Range>k])
-    ) {
-      oldProps[<keyof Range>k] = selection[<keyof Range>k]
-      newProps[<keyof Range>k] = props[<keyof Range>k]
+    if (NON_SETTABLE_SELECTION_PROPERTIES.includes(k)) {
+      continue
+    }
+
+    const value = Object.hasOwn(selection, k)
+      ? selection[<keyof Selection>k]
+      : undefined
+
+    const newValue = props[<keyof Selection>k]
+
+    if (compareSelectionProps(<keyof Selection>k, value, newValue)) {
+      oldProps[<keyof Selection>k] = selection[<keyof Selection>k]
+      newProps[<keyof Selection>k] = props[<keyof Selection>k]
     }
   }
 
@@ -39,4 +40,19 @@ export const setSelection: SelectionTransforms['setSelection'] = (
       newProperties: newProps,
     })
   }
+}
+
+function compareSelectionProps(
+  key: keyof Selection,
+  value: unknown,
+  newValue: unknown
+) {
+  if (
+    (key === 'anchor' || key === 'focus') &&
+    Point.isPoint(value) &&
+    Point.isPoint(newValue)
+  ) {
+    return !Point.equals(value, newValue)
+  }
+  return value !== newValue
 }

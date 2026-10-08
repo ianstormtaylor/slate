@@ -1,5 +1,94 @@
 # slate-react
 
+## 0.130.2
+
+### Patch Changes
+
+- [#6171](https://github.com/ianstormtaylor/slate/pull/6171) [`7843bd5`](https://github.com/ianstormtaylor/slate/commit/7843bd5d32590835c58808e9f04b21667a9a3d96) Thanks [@dylans](https://github.com/dylans)! - Moving whole lines by dragging or cutting no longer adds an empty line. Whole top-level blocks are now moved as blocks. Nested content, like list items and table cells, is moved without its trailing line break, so no containers get merged. Dropping text back onto its own selection is now a no-op, and drag-and-drop deletes through `editor.deleteFragment`, like cut does, so plugins that guard deletion apply to both.
+
+## 0.130.1
+
+### Patch Changes
+
+- [#6167](https://github.com/ianstormtaylor/slate/pull/6167) [`eb9dc9b`](https://github.com/ianstormtaylor/slate/commit/eb9dc9b81f5ff3bf22087f57b8cb369bb9b0b559) Thanks [@dylans](https://github.com/dylans)! - Add `-webkit-user-select: none` to the default placeholder style so iOS Safari can't partially select the placeholder text.
+
+- [#6166](https://github.com/ianstormtaylor/slate/pull/6166) [`a0bcfaa`](https://github.com/ianstormtaylor/slate/commit/a0bcfaaba0fcf028d6f483d9bf5840c1a171a812) Thanks [@dylans](https://github.com/dylans)! - Shift-clicking a void element now extends the selection to it instead of collapsing the selection onto the void.
+
+## 0.130.0
+
+### Patch Changes
+
+- [#6164](https://github.com/ianstormtaylor/slate/pull/6164) [`209c334`](https://github.com/ianstormtaylor/slate/commit/209c33497c34e90dfef79d2b31e23f1c45715f98) Thanks [@dylans](https://github.com/dylans)! - Fix typed text coming out reversed after a soft break at the end of a leaf in Chrome. Chrome reports the caret after a trailing `\n` as the start of the next text node, and Slate restored its own selection after each insert, so every character landed in front of the last.
+
+## 0.129.0
+
+### Patch Changes
+
+- [#6140](https://github.com/ianstormtaylor/slate/pull/6140) [`7119501`](https://github.com/ianstormtaylor/slate/commit/7119501cca7550174d74262b794840b236a91cc6) Thanks [@dylans](https://github.com/dylans)! - Stop dropping Android input that arrives before the editor re-renders. When the node map was stale, `beforeinput` events were ignored, so the browser's native insert was overwritten by the next render. That lost the first character typed into an emptied editor, or every other character when typing fast. They now resolve against the editor's selection instead of the stale DOM.
+
+- [#6130](https://github.com/ianstormtaylor/slate/pull/6130) [`ab50c3b`](https://github.com/ianstormtaylor/slate/commit/ab50c3bda1c963a45e96b0e188725f57869588e1) Thanks [@dylans](https://github.com/dylans)! - Initialize the editor from `initialValue` when a different `editor` is passed to an already mounted `<Slate>`, such as when React fast refresh re-runs the `useMemo` that creates it. Previously the new editor kept empty `children`, and the next operation threw "Cannot find a descendant at path [0]".
+
+## 0.128.0
+
+### Minor Changes
+
+- [#6117](https://github.com/ianstormtaylor/slate/pull/6117) [`4e8cf0aa`](https://github.com/ianstormtaylor/slate/commit/4e8cf0aa0aa98cad9da21dc03d54d9bf878d10f8) Thanks [@juliankrispel](https://github.com/juliankrispel)! - Ignore input, paste and drop events dispatched by script rather than by the user, so a script running on the page can no longer insert content without the user acting.
+
+  This breaks tests that simulate a paste by dispatching an event, such as `fireEvent.paste` or Cypress's `trigger('paste')`. Drive a real paste instead, with Playwright's keyboard or `cypress-real-events`, or call `editor.insertData` directly.
+
+### Patch Changes
+
+- [#6115](https://github.com/ianstormtaylor/slate/pull/6115) [`52f05bf8`](https://github.com/ianstormtaylor/slate/commit/52f05bf8b614407423fab40525862f044c51884b) Thanks [@giaBaoJS](https://github.com/giaBaoJS)! - - When deleting a void element backward from a cursor inside it, place the cursor before the removed void instead of moving it into the following node
+  - In Chrome and Safari, pressing Delete on a selected void now deletes forward instead of backward
+
+## 0.127.1
+
+### Patch Changes
+
+- [#6110](https://github.com/ianstormtaylor/slate/pull/6110) [`fbe8e50b`](https://github.com/ianstormtaylor/slate/commit/fbe8e50befd728ecff7117d2ae3a4b45e0a79d7c) Thanks [@unrevised6419](https://github.com/unrevised6419)! - Declare `@types/react` (`>=18.0.0`) and `@types/lodash` (`^4.14.0`) as optional peer dependencies. The shipped type declarations import from `react` and `lodash` in type positions, but the typings packages were only listed in `devDependencies`. Under a hoisted `node_modules` layout that resolves by accident; under pnpm's isolated linker with a global virtual store it does not, and consumers get `TS7016` implicit-any errors (or silently degraded `any` props) for the editor components. Both entries are optional, so JavaScript-only consumers do not get unmet-peer warnings.
+
+## 0.126.4
+
+### Patch Changes
+
+- [#6099](https://github.com/ianstormtaylor/slate/pull/6099) [`ad04f91c`](https://github.com/ianstormtaylor/slate/commit/ad04f91c7f2e9b254bea324eefff1707b6b13bc7) Thanks [@BetterAndBetterII](https://github.com/BetterAndBetterII)! - Skip `Selection.collapseToEnd()` during composition selection-sync when the live DOM selection has no ranges, so a cleared selection no longer throws `InvalidStateError` and unmounts the editor.
+
+## 0.126.3
+
+### Patch Changes
+
+- [#6096](https://github.com/ianstormtaylor/slate/pull/6096) [`b96028a5`](https://github.com/ianstormtaylor/slate/commit/b96028a57a90099d07c615a0b8d8ae06c3b86f12) Thanks [@melodysdreamj](https://github.com/melodysdreamj)! - Fix IME composition being cancelled on the first character typed into an empty leaf on Android, which left the first character behind as a separate, uncomposed character (typing 안녕 in Korean produced ㅇ안녕).
+
+## 0.126.0
+
+### Minor Changes
+
+- [#6073](https://github.com/ianstormtaylor/slate/pull/6073) [`6fa9a129`](https://github.com/ianstormtaylor/slate/commit/6fa9a129ecdd91d6b3297dedd9ee2707bc3c177c) Thanks [@NikunjSonigara](https://github.com/NikunjSonigara)! - Add a `suppressThrow` option to `useSelected` to return `false` instead of throwing when the element can no longer be found in the editor.
+
+### Patch Changes
+
+- [#6080](https://github.com/ianstormtaylor/slate/pull/6080) [`9265c408`](https://github.com/ianstormtaylor/slate/commit/9265c4085aaf22dbfea95e69ea0b20bf9140a840) Thanks [@isachivka](https://github.com/isachivka)! - Suppress the `findPath` throw when translating `beforeinput` target ranges in `<Editable>` (#3556). A browser target range can point at a DOM node no longer resolvable to a Slate node (stale `NODE_MAP` after a re-render, IME composition, cross-editor click); with `suppressThrow: false` the "Unable to find the path" error escaped the DOM event handler and crashed the app. The two `onDOMBeforeInput` call sites now use `suppressThrow: true` (matching the other `toSlateRange` sites) and degrade gracefully — fall back to synthetic handling, or skip the selection move.
+
+## 0.125.1
+
+### Patch Changes
+
+- [#6033](https://github.com/ianstormtaylor/slate/pull/6033) [`23e6a84e`](https://github.com/ianstormtaylor/slate/commit/23e6a84ecddee0ca2580ff76e69f433115265e63) Thanks [@dannelundqvist](https://github.com/dannelundqvist)! - Fix caret jumping to wrong position when the decorate prop changes asynchronously
+
+- [#6079](https://github.com/ianstormtaylor/slate/pull/6079) [`a6b520ed`](https://github.com/ianstormtaylor/slate/commit/a6b520ed168d15718e1255bef53fef582860e4d4) Thanks [@dylans](https://github.com/dylans)! - Fix Firefox contenteditable text input breaking on editor mount, caused by a forced re-render added in `useDecorateContext` for decoration-driven caret restoration (#6078)
+
+## 0.124.2
+
+### Patch Changes
+
+- [#6054](https://github.com/ianstormtaylor/slate/pull/6054) [`31d8354f`](https://github.com/ianstormtaylor/slate/commit/31d8354ff7795c83ddb1554c3522c984b9e9bc8b) Thanks [@ckale-scorpio](https://github.com/ckale-scorpio)! - fix: add missing `RenderTextProps` export
+
+## 0.124.0
+
+### Patch Changes
+
+- [#6012](https://github.com/ianstormtaylor/slate/pull/6012) [`57bdd4fe`](https://github.com/ianstormtaylor/slate/commit/57bdd4feee71f2805af5baab08cf622ee55bceaa) Thanks [@changlin-cn](https://github.com/changlin-cn)! - Fix Slate component to properly handle editor updates by adding `editor` as a dependency in the useEffect hook.
+
 ## 0.123.0
 
 ### Patch Changes

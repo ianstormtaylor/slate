@@ -25,6 +25,8 @@ export interface RangeRef {
    * Free the resources used by the RangeRef. This should be called when you no
    * longer need to track the range. Returns the final range value before being
    * unrefed, or `null` if the range was already invalid.
+   *
+   * This removes the ref from `Editor.pointRefs(editor)` and sets `current` to `null`. If an operation removes the node containing the point, the editor releases the ref automatically. Calling `unref()` again returns `null`.
    */
   unref(): Range | null
 }

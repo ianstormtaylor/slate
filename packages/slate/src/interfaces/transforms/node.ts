@@ -1,5 +1,5 @@
 import { Editor, Element, Location, Node, Path } from '../../index'
-import { NodeMatch, PropsCompare, PropsMerge } from '../editor'
+import { NodeMatch, NullableProps, PropsCompare, PropsMerge } from '../editor'
 import { MaximizeMode, RangeMode } from '../../types/types'
 
 /** @hidden @inline */
@@ -15,8 +15,7 @@ export interface NodeInsertNodesOptions<T extends Node> {
 
 export interface NodeTransforms {
   /**
-   * Insert nodes in the editor
-   * at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
+   * Insert nodes in the editor at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
    *
    * **WARNING**: Inserting a node that already exists in the document (or another active document) can cause problems with certain plugins like `slate-dom` and `slate-react` that expect each node to be a unique object.
    *
@@ -66,7 +65,9 @@ export interface NodeTransforms {
   ): void
 
   /**
-   * Move the nodes at a location to a new location.
+   * Move the nodes from an origin to a destination. A destination must be specified in the `options`. If no origin is specified, move the selection.
+   *
+   * `to` is the path the node ends up at once the move is done, not the path it is inserted before. For example, with four blocks `1 2 3 4`, moving `[0]` to `[2]` gives `2 3 1 4`. When `match` selects several nodes, they are moved one at a time, each to `to`.
    */
   moveNodes<T extends Node>(
     editor: Editor,
@@ -94,11 +95,15 @@ export interface NodeTransforms {
   ): void
 
   /**
-   * Set new properties on the nodes at a location.
+   * Set properties of nodes at the specified location. If no location is specified, use the selection. Optional node properties can be set to `null` to unset them.
+   *
+   * If `props` contains `undefined` values, the node's corresponding property will also be set to `undefined` as opposed to ignored.
+   *
+   * `children` and `text` in `props` are ignored, since they hold a node's content rather than its properties. To change content, use `insertNodes`, `removeNodes` or the text transforms.
    */
   setNodes<T extends Node>(
     editor: Editor,
-    props: Partial<T>,
+    props: Partial<NullableProps<T>>,
     options?: {
       at?: Location
       match?: NodeMatch<T>

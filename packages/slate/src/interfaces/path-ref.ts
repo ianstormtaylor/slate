@@ -19,9 +19,9 @@ export interface PathRef {
    */
   affinity: TextDirection | null
   /**
-   * Free the resources used by the PathRef. This should be called when you no
-   * longer need to track the path. Returns the final path value before being
-   * unrefed, or `null` if the path was already invalid.
+   * Free the resources used by the PathRef. This should be called when you no longer need to track the path. Returns the final path value before being unrefed, or null if the path was already invalid.
+   *
+   * This removes the ref from `Editor.pathRefs(editor)` and sets `current` to `null`. If an operation removes the tracked node, the editor releases the ref automatically. Calling `unref()` again returns `null`.
    */
   unref(): Path | null
 }

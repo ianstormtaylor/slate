@@ -89,6 +89,7 @@ export interface BaseEditor {
     options?: {
       operation?: Operation
       fallbackElement?: () => Element
+      force?: boolean
     }
   ): void
 
@@ -249,7 +250,9 @@ export interface BaseEditor {
   move(options?: SelectionMoveOptions): void
 
   /**
-   * Move the nodes at a location to a new location.
+   * Move the nodes from an origin to a destination. A destination must be specified in the `options`. If no origin is specified, move the selection.
+   *
+   * `to` is the path the node ends up at once the move is done, not the path it is inserted before. For example, with four blocks `1 2 3 4`, moving `[0]` to `[2]` gives `2 3 1 4`. When `match` selects several nodes, they are moved one at a time, each to `to`.
    * @see {@link TransformsInterface#moveNodes} - A static version of this method.
    */
   moveNodes<T extends Node>(options: {
@@ -295,11 +298,15 @@ export interface BaseEditor {
   select(target: Location): void
 
   /**
-   * Set new properties on the nodes at a location.
+   * Set properties of nodes at the specified location. If no location is specified, use the selection. Optional node properties can be set to `null` to unset them.
    * @see {@link TransformsInterface#setNodes} - A static version of this method.
+   *
+   * If `props` contains `undefined` values, the node's corresponding property will also be set to `undefined` as opposed to ignored.
+   *
+   * `children` and `text` in `props` are ignored, since they hold a node's content rather than its properties. To change content, use `insertNodes`, `removeNodes` or the text transforms.
    */
   setNodes<T extends Node>(
-    props: Partial<T>,
+    props: Partial<NullableProps<T>>,
     options?: {
       at?: Location
       match?: NodeMatch<T>
@@ -331,7 +338,7 @@ export interface BaseEditor {
    * Set new properties on the selection.
    * @see {@link TransformsInterface#setSelection} - A static version of this method.
    */
-  setSelection(props: Partial<Range>): void
+  setSelection(props: Partial<Selection>): void
 
   /**
    * Split the nodes at a specific location.
@@ -485,7 +492,7 @@ export interface BaseEditor {
   hasTexts(element: Element): boolean
 
   /**
-   * Check if a value is a block `Element` object.
+   * Check if an element is a block element. It only accepts an `Element`, so check other values with `Element.isElement` first.
    * @see {@link EditorInterface#isBlock} - A static version of this method.
    */
   isBlock(value: Element): boolean
@@ -509,7 +516,7 @@ export interface BaseEditor {
   isEnd(point: Point, at: Location): boolean
 
   /**
-   * Check if a value is an inline `Element` object.
+   * Check if an element is an inline element. It only accepts an `Element`, so check other values with `Element.isElement` first.
    * @see {@link EditorInterface#isInline} - A static version of this method.
    */
   isInline(value: Element): boolean
@@ -527,7 +534,7 @@ export interface BaseEditor {
   isStart(point: Point, at: Location): boolean
 
   /**
-   * Check if a value is a void `Element` object.
+   * Check if an element is a void element. It only accepts an `Element`, so check other values with `Element.isElement` first.
    * @see {@link EditorInterface#isVoid} - A static version of this method.
    */
   isVoid(value: Element): boolean
@@ -1079,7 +1086,7 @@ export interface EditorInterface {
   ): void
 
   /**
-   * Check if a value is a block `Element` object.
+   * Check if an element is a block element. It only accepts an `Element`, so check other values with `Element.isElement` first.
    * @category Queries
    */
   isBlock(editor: Editor, value: Element): boolean
@@ -1116,7 +1123,7 @@ export interface EditorInterface {
   isEnd(editor: Editor, point: Point, at: Location): boolean
 
   /**
-   * Check if a value is an inline `Element` object.
+   * Check if an element is an inline element. It only accepts an `Element`, so check other values with `Element.isElement` first.
    * @category Queries
    */
   isInline(editor: Editor, value: Element): boolean
@@ -1140,7 +1147,7 @@ export interface EditorInterface {
   isStart(editor: Editor, point: Point, at: Location): boolean
 
   /**
-   * Check if a value is a void `Element` object.
+   * Check if an element is a void element. It only accepts an `Element`, so check other values with `Element.isElement` first.
    * @category Queries
    */
   isVoid(editor: Editor, value: Element): boolean
@@ -1650,5 +1657,9 @@ export type NodeMatch<T extends Node> =
   | ((node: Node, path: Path) => node is T)
   | ((node: Node, path: Path) => boolean)
 
-export type PropsCompare = (prop: Partial<Node>, node: Partial<Node>) => boolean
-export type PropsMerge = (prop: Partial<Node>, node: Partial<Node>) => object
+export type PropsCompare = (prop: unknown, node: unknown) => boolean
+export type PropsMerge = (prop: unknown, node: unknown) => object
+
+export type NullableProps<T> = {
+  [K in keyof T]: undefined extends T[K] ? T[K] | null : T[K]
+}

@@ -19,6 +19,7 @@ import {
   Node,
   NodeEntry,
   Path,
+  Point,
   Range,
   Text,
   Transforms,
@@ -33,6 +34,7 @@ import { ReadOnlyContext } from '../hooks/use-read-only'
 import { useSlate } from '../hooks/use-slate'
 import { useTrackUserInput } from '../hooks/use-track-user-input'
 import { ReactEditor } from '../plugin/react-editor'
+import { deleteMovedRange, getMovableRange } from '../utils/move-range'
 import { TRIPLE_CLICK } from 'slate-dom'
 import {
   containsShadowAware,
@@ -82,6 +84,23 @@ import { useFlushDeferredSelectorsOnRender } from '../hooks/use-slate-selector'
 import { Slate } from './slate'
 
 type DeferredOperation = () => void
+
+const isSameCaretPosition = (editor: Editor, a: Range, b: Range) => {
+  if (!Range.isCollapsed(a) || !Range.isCollapsed(b)) {
+    return false
+  }
+
+  const [first, second] = Path.isBefore(a.anchor.path, b.anchor.path)
+    ? [a.anchor, b.anchor]
+    : [b.anchor, a.anchor]
+
+  if (second.offset !== 0 || !Path.equals(Path.next(first.path), second.path)) {
+    return false
+  }
+
+  const node = Node.get(editor, first.path)
+  return Node.isText(node) && first.offset === node.text.length
+}
 
 const Children = (props: Parameters<typeof useChildren>[0]) => (
   <React.Fragment>{useChildren(props)}</React.Fragment>
@@ -202,7 +221,7 @@ export interface EditableProps
    * The `renderLeaf` prop allows you to customize the rendering of leaf nodes in the document tree of your Slate editor. A "leaf" in Slate is the smallest chunk of text and its associated formatting attributes.
    *
    * @example
-   * ```typescript
+   * ```jsx
    * <Editor
    *   renderLeaf={({ attributes, children, leaf }) => {
    *     return (
@@ -240,14 +259,21 @@ export interface EditableProps
   /**
    * The `renderPlaceholder` prop allows you to customize how the placeholder of the Slate.js `Editable` component is rendered when the editor is empty. The placeholder will only be shown when the editor's content is empty.
    *
+   * Note that the `attributes` prop that comes in will contain a `style` object already. This object contains important styling properties which will make the placeholder behave like a placeholder. As such, it is advisable to extend styles and to focus on things like changing colors, opacity etc. Changing positioning, for example, could cause undesirable behavior.
    * @example
    * ```jsx
    * <Editable
-   *   renderPlaceholder={({ attributes, children }) => (
-   *     <div {...attributes} style={{ fontStyle: 'italic', color: 'gray' }}>
-   *       {children}
-   *     </div>
-   *   )}
+   *   placeholder="Enter text here..."
+   *   renderPlaceholder={({ attributes, children }) => {
+   *     const styledAttributes = {
+   *       ...attributes,
+   *       style: {
+   *         ...attributes.style,
+   *         color: 'gray',
+   *       },
+   *     }
+   *     return <div {...styledAttributes}>{children}</div>
+   *   }}
    * />
    * ```
    */
@@ -591,7 +617,9 @@ export const Editable: (props: EditableProps) => ReactNode = forwardRef(
 
         if (newDomRange) {
           if (ReactEditor.isComposing(editor) && !IS_ANDROID) {
-            domSelection.collapseToEnd()
+            if (domSelection.rangeCount > 0) {
+              domSelection.collapseToEnd()
+            }
           } else if (Range.isBackward(selection!)) {
             domSelection.setBaseAndExtent(
               newDomRange.endContainer,
@@ -674,6 +702,10 @@ export const Editable: (props: EditableProps) => ReactNode = forwardRef(
     // https://github.com/facebook/react/issues/11211
     const onDOMBeforeInput = useCallback(
       (event: InputEvent) => {
+        if (!event.isTrusted) {
+          return
+        }
+
         handleNativeHistoryEvents(editor, event)
         const el = ReactEditor.toDOMNode(editor, editor)
         const root = el.getRootNode()
@@ -687,13 +719,15 @@ export const Editable: (props: EditableProps) => ReactNode = forwardRef(
           newRange.setStart(range.startContainer, range.startOffset)
           newRange.setEnd(range.endContainer, range.endOffset)
 
-          // Translate the DOM Range into a Slate Range
+          // Unresolvable ranges would throw out of the handler (#3556); suppress and skip the move.
           const slateRange = ReactEditor.toSlateRange(editor, newRange, {
             exactMatch: false,
-            suppressThrow: false,
+            suppressThrow: true,
           })
 
-          Transforms.select(editor, slateRange)
+          if (slateRange) {
+            Transforms.select(editor, slateRange)
+          }
 
           event.preventDefault()
           event.stopImmediatePropagation()
@@ -813,17 +847,21 @@ export const Editable: (props: EditableProps) => ReactNode = forwardRef(
             const [targetRange] = (event as any).getTargetRanges()
 
             if (targetRange) {
+              // Unresolvable ranges would throw out of the handler (#3556); suppress and fall back to synthetic handling.
               const range = ReactEditor.toSlateRange(editor, targetRange, {
                 exactMatch: false,
-                suppressThrow: false,
+                suppressThrow: true,
               })
 
-              if (!selection || !Range.equals(selection, range)) {
+              if (!range) {
+                native = false
+              } else if (!selection || !Range.equals(selection, range)) {
                 native = false
 
                 const selectionRef =
                   !isCompositionChange &&
                   editor.selection &&
+                  !isSameCaretPosition(editor, editor.selection, range) &&
                   Editor.rangeRef(editor, editor.selection)
 
                 Transforms.select(editor, range)
@@ -1389,6 +1427,15 @@ export const Editable: (props: EditableProps) => ReactNode = forwardRef(
                         endVoid &&
                         Path.equals(startVoid[1], endVoid[1])
                       ) {
+                        if (event.shiftKey && editor.selection) {
+                          const { anchor } = editor.selection
+                          const focus = Point.isBefore(anchor, start)
+                            ? end
+                            : start
+                          Transforms.select(editor, { anchor, focus })
+                          return
+                        }
+
                         const range = Editor.range(editor, start)
                         Transforms.select(editor, range)
                       }
@@ -1523,6 +1570,7 @@ export const Editable: (props: EditableProps) => ReactNode = forwardRef(
                       !isDOMEventTargetInput(event)
                     ) {
                       event.preventDefault()
+                      selectMovableRange(editor)
                       ReactEditor.setFragmentData(
                         editor,
                         event.clipboardData,
@@ -1532,7 +1580,7 @@ export const Editable: (props: EditableProps) => ReactNode = forwardRef(
 
                       if (selection) {
                         if (Range.isExpanded(selection)) {
-                          Editor.deleteFragment(editor)
+                          deleteMovedRange(editor, selection)
                         } else {
                           const node = Node.parent(
                             editor,
@@ -1585,6 +1633,7 @@ export const Editable: (props: EditableProps) => ReactNode = forwardRef(
                         Transforms.select(editor, range)
                       }
 
+                      selectMovableRange(editor)
                       state.isDraggingInternally = true
 
                       ReactEditor.setFragmentData(
@@ -1600,6 +1649,7 @@ export const Editable: (props: EditableProps) => ReactNode = forwardRef(
                   (event: React.DragEvent<HTMLDivElement>) => {
                     if (
                       !readOnly &&
+                      event.isTrusted &&
                       ReactEditor.hasTarget(editor, event.target) &&
                       !isEventHandled(event, attributes.onDrop)
                     ) {
@@ -1614,15 +1664,19 @@ export const Editable: (props: EditableProps) => ReactNode = forwardRef(
 
                       Transforms.select(editor, range)
 
-                      if (state.isDraggingInternally) {
-                        if (
-                          draggedRange &&
-                          !Range.equals(draggedRange, range) &&
-                          !Editor.void(editor, { at: range, voids: true })
-                        ) {
-                          Transforms.delete(editor, {
-                            at: draggedRange,
-                          })
+                      if (state.isDraggingInternally && draggedRange) {
+                        if (Range.includes(draggedRange, range.anchor)) {
+                          return
+                        }
+
+                        if (!Editor.void(editor, { at: range, voids: true })) {
+                          const dropRef = Editor.rangeRef(editor, range)
+                          deleteMovedRange(editor, draggedRange)
+                          const dropRange = dropRef.unref()
+
+                          if (dropRange) {
+                            Transforms.select(editor, dropRange)
+                          }
                         }
                       }
 
@@ -1961,7 +2015,12 @@ export const Editable: (props: EditableProps) => ReactNode = forwardRef(
                                 Editor.isBlock(editor, currentNode))
                             ) {
                               event.preventDefault()
-                              Editor.deleteBackward(editor, { unit: 'block' })
+
+                              if (Hotkeys.isDeleteForward(nativeEvent)) {
+                                Editor.deleteForward(editor, { unit: 'block' })
+                              } else {
+                                Editor.deleteBackward(editor, { unit: 'block' })
+                              }
 
                               return
                             }
@@ -1976,6 +2035,7 @@ export const Editable: (props: EditableProps) => ReactNode = forwardRef(
                   (event: React.ClipboardEvent<HTMLDivElement>) => {
                     if (
                       !readOnly &&
+                      event.isTrusted &&
                       ReactEditor.hasEditableTarget(editor, event.target) &&
                       !isEventHandled(event, attributes.onPaste)
                     ) {
@@ -2028,6 +2088,18 @@ export type RenderPlaceholderProps = {
     contentEditable: boolean
     ref: React.RefCallback<any>
     style: React.CSSProperties
+  }
+}
+
+const selectMovableRange = (editor: ReactEditor) => {
+  const { selection } = editor
+
+  if (selection && Range.isExpanded(selection)) {
+    const movableRange = getMovableRange(editor, selection)
+
+    if (!Range.equals(movableRange, selection)) {
+      Transforms.select(editor, movableRange)
+    }
   }
 }
 
