@@ -1,5 +1,15 @@
 # slate
 
+## 0.132.0
+
+### Minor Changes
+
+- [#6187](https://github.com/ianstormtaylor/slate/pull/6187) [`d8cdecd`](https://github.com/ianstormtaylor/slate/commit/d8cdecd97d866321a1c83bc4ad36161501b0a818) Thanks [@dylans](https://github.com/dylans)! - Add `Range.direction(range)`, which returns `'forward'`, `'backward'` or `'collapsed'`. `Range.isForward` and `Range.isBackward` are unchanged; a collapsed range still counts as forward, which is now documented.
+
+### Patch Changes
+
+- [#6137](https://github.com/ianstormtaylor/slate/pull/6137) [`63134d0`](https://github.com/ianstormtaylor/slate/commit/63134d044fe784ee8b10bf56c9e1ed8708221d51) Thanks [@cpruijsen](https://github.com/cpruijsen)! - Fix the `PropsMerge` type for `Transforms.setNodes` so the `merge` option can return scalar property values, not just objects.
+
 ## 0.131.0
 
 ### Minor Changes

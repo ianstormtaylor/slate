@@ -1,5 +1,15 @@
 # slate-react
 
+## 0.132.0
+
+### Minor Changes
+
+- [#6190](https://github.com/ianstormtaylor/slate/pull/6190) [`bac6474`](https://github.com/ianstormtaylor/slate/commit/bac64747a3e520d4dc1d8dc909739e64303018a7) Thanks [@dylans](https://github.com/dylans)! - Type `Editable`'s extra props as `div` attributes (`React.HTMLAttributes<HTMLDivElement>`) instead of `textarea` attributes. Textarea-only props such as `rows`, `cols`, `maxLength`, `wrap` and `value` never did anything on the editor's `div`; they now fail to type-check, so remove them.
+
+### Patch Changes
+
+- [#6192](https://github.com/ianstormtaylor/slate/pull/6192) [`6bcf677`](https://github.com/ianstormtaylor/slate/commit/6bcf67718a8e3c0c3a25bff968c0563230b131a0) Thanks [@dylans](https://github.com/dylans)! - The default `scrollSelectionIntoView` now scrolls just enough to reveal the caret (`block: 'nearest'`) instead of centering it, so moving the caret with the arrow keys past the edge of the viewport no longer jumps the page by half a screen. Pass your own `scrollSelectionIntoView` to keep centering.
+
 ## 0.131.0
 
 ### Minor Changes
