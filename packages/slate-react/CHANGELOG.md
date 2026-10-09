@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.133.0
+
+### Minor Changes
+
+- [#6198](https://github.com/ianstormtaylor/slate/pull/6198) [`dd6d37f`](https://github.com/ianstormtaylor/slate/commit/dd6d37faf5cc628fffc6c923383bc497d1c30aed) Thanks [@GaurangTandon](https://github.com/GaurangTandon)! - Revert "Ignore input events dispatched by script" (#6117). Input, paste and drop events dispatched by script are handled again, as in 0.127.1.
+
 ## 0.132.0
 
 ### Minor Changes
