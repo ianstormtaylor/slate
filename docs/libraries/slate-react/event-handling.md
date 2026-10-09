@@ -59,3 +59,5 @@ So don't rely on `onInput`, or a native `input` listener on the editable element
 
 - use `onValueChange` (or `onChange`) on `<Slate>` to react to every change of the value
 - use `onDOMBeforeInput` on `<Editable>` to see, or take over, an edit before Slate applies it
+
+Pastes are an exception for `onDOMBeforeInput`. Slate handles a paste in `onPaste` and cancels the native event, so no `beforeinput` fires, when the pasted data is plain text only ("paste without formatting"), in Safari and other WebKit browsers, and in browsers without `beforeinput` support. To observe every paste, use `onPaste` on `<Editable>` or override `editor.insertData`.
