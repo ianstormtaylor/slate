@@ -308,9 +308,8 @@ export function createAndroidInputManager({
     if (userMarks !== undefined && userMarks !== editor.marks) {
       editor.marks = userMarks
       editor.onChange()
-    } else if (userMarks !== undefined) {
-      editor.marks = userMarks
     }
+  }
 
   const handleCompositionEnd = (
     _event: React.CompositionEvent<HTMLDivElement>
