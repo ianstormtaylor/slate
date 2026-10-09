@@ -3,7 +3,11 @@
   "entryPoints": ["packages/*"],
   "entryPointStrategy": "packages",
   "out": "docs/api",
-  "plugin": ["typedoc-plugin-markdown", "typedoc-plugin-no-inherit", "./support/typedoc-gitbook-summary.mjs"],
+  "plugin": [
+    "typedoc-plugin-markdown",
+    "typedoc-plugin-no-inherit",
+    "./support/typedoc-gitbook-summary.mjs"
+  ],
 
   "readme": "none",
   "hidePageHeader": true,

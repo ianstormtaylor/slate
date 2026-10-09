@@ -50,10 +50,10 @@ import {
  * @noInheritDoc
  */
 export interface DOMEditor extends BaseEditor {
-  hasEditableTarget: (
+  hasEditableTarget(
     editor: DOMEditor,
     target: EventTarget | null
-  ) => target is DOMNode
+  ): target is DOMNode
   hasRange(editor: DOMEditor, range: Range): boolean
   hasSelectableTarget(editor: DOMEditor, target: EventTarget | null): boolean
   hasTarget(editor: DOMEditor, target: EventTarget | null): target is DOMNode
