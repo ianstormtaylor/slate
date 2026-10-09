@@ -123,5 +123,49 @@ describe('slate-react', () => {
         expect(onValueChange).not.toHaveBeenCalled()
       })
     })
+
+    describe('.findEventRange', () => {
+      const initialValue = [{ type: 'block', children: [{ text: 'test' }] }]
+
+      let outside: HTMLElement | null = null
+
+      afterEach(() => {
+        outside?.remove()
+        outside = null
+      })
+
+      const renderEditorAndOutsideTarget = () => {
+        const editor = withReact(createEditor())
+
+        act(() => {
+          render(
+            <Slate editor={editor} initialValue={initialValue}>
+              <Editable />
+            </Slate>
+          )
+        })
+
+        outside = document.body.appendChild(document.createElement('p'))
+        const event = { clientX: 1, clientY: 1, target: outside }
+
+        return { editor, event }
+      }
+
+      test('should return null for a target outside of the editor with suppressThrow', () => {
+        const { editor, event } = renderEditorAndOutsideTarget()
+
+        expect(
+          ReactEditor.findEventRange(editor, event, { suppressThrow: true })
+        ).toBeNull()
+      })
+
+      test('should throw for a target outside of the editor without suppressThrow', () => {
+        const { editor, event } = renderEditorAndOutsideTarget()
+
+        expect(() => ReactEditor.findEventRange(editor, event)).toThrow(
+          'Cannot resolve a Slate node from DOM node'
+        )
+      })
+    })
   })
 })
