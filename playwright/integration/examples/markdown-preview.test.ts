@@ -1,28 +1,5 @@
-import { test, expect, Locator } from '@playwright/test'
-import type { BaseEditor } from 'slate'
-
-const clearEditor = async (element: Locator) => {
-  await element.click()
-  await element.evaluate(element => {
-    type Fiber = {
-      return: Fiber | null
-      memoizedProps?: { editor?: BaseEditor }
-    }
-    const fiberKey = Object.keys(element).find(key =>
-      key.startsWith('__reactFiber$')
-    )!
-    let fiber: Fiber | null = (element as unknown as Record<string, Fiber>)[
-      fiberKey
-    ]
-    while (fiber && !fiber.memoizedProps?.editor) {
-      fiber = fiber.return
-    }
-    const editor = fiber!.memoizedProps!.editor!
-    editor.select({ anchor: editor.start([]), focus: editor.end([]) })
-    editor.deleteFragment()
-  })
-  await expect(element.locator('[data-slate-string]')).toHaveCount(0)
-}
+import { test, expect } from '@playwright/test'
+import { clearEditor } from '../support/editor'
 
 test.describe('markdown preview', () => {
   const slateEditor = 'div[data-slate-editor="true"]'
@@ -40,13 +17,13 @@ test.describe('markdown preview', () => {
     await editor.pressSequentially('## Plain *italic* and **bold** end')
 
     await expect(
-      editor.locator(markdown).filter({ hasText: /^italic$/ })
+      editor.locator(markdown).filter({ hasText: /^\*italic\*$/ })
     ).toHaveCSS('font-style', 'italic')
     await expect(
-      editor.locator(markdown).filter({ hasText: /^bold$/ })
+      editor.locator(markdown).filter({ hasText: /^\*\*bold\*\*$/ })
     ).toHaveCSS('font-weight', '700')
     await expect(
-      editor.locator(markdown).filter({ hasText: /^italic$/ })
+      editor.locator(markdown).filter({ hasText: /^\*italic\*$/ })
     ).toHaveCSS('font-size', '20px')
     await expect(
       editor.locator(markdown).filter({ hasText: /^ end$/ })
@@ -62,21 +39,29 @@ test.describe('markdown preview', () => {
     await editor.pressSequentially('## **bold _nested_** and `*plain*`')
 
     await expect(
-      editor.locator(markdown).filter({ hasText: /^nested$/ })
+      editor.locator(markdown).filter({ hasText: /^_nested_$/ })
     ).toHaveCSS('font-style', 'italic')
     await expect(
-      editor.locator(markdown).filter({ hasText: /^`\*plain\*`$/ })
+      editor.locator(markdown).filter({ hasText: /^ and `\*plain\*`$/ })
     ).toHaveCSS('font-style', 'normal')
     await expect(editor).toHaveText('## **bold _nested_** and `*plain*`')
+  })
+
+  test('keeps an unformatted heading in one leaf', async ({ page }) => {
+    const editor = page.locator(slateEditor)
+    await clearEditor(editor)
+    await editor.pressSequentially('## Plain heading')
+    await expect(editor.locator('[data-slate-leaf]')).toHaveCount(1)
+    await expect(editor.locator(markdown)).toHaveCSS('font-size', '20px')
   })
 
   test('checks for markdown', async ({ page }) => {
     const editor = page.locator(slateEditor)
     await expect(
-      editor.locator(markdown).filter({ hasText: /^decorations$/ })
+      editor.locator(markdown).filter({ hasText: /^\*\*decorations\*\*$/ })
     ).toHaveCSS('font-weight', '700')
     await expect(
-      editor.locator(markdown).filter({ hasText: /^dead$/ })
+      editor.locator(markdown).filter({ hasText: /^_dead_$/ })
     ).toHaveCSS('font-style', 'italic')
 
     await editor.click()
@@ -85,7 +70,7 @@ test.describe('markdown preview', () => {
     await page.keyboard.type('## Another heading')
     await page.keyboard.press('Enter')
     await expect(
-      editor.locator(markdown).filter({ hasText: /^ Another heading$/ })
+      editor.locator(markdown).filter({ hasText: /^## Another heading$/ })
     ).toHaveCSS('font-size', '20px')
   })
 })

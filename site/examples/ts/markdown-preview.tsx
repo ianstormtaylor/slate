@@ -26,6 +26,17 @@ if (Array.isArray(titles)) {
   }
 }
 
+const decoratedTokenTypes = new Set([
+  'bold',
+  'italic',
+  'underlined',
+  'title',
+  'list',
+  'hr',
+  'blockquote',
+  'code',
+])
+
 const MarkdownPreviewExample = () => {
   const renderLeaf = useCallback(
     (props: RenderLeafProps) => <Leaf {...props} />,
@@ -56,11 +67,13 @@ const MarkdownPreviewExample = () => {
             ? token.content
             : [token.content]
           offset = decorateTokens(content, offset)
-          ranges.push({
-            [token.type]: true,
-            anchor: { path, offset: start },
-            focus: { path, offset },
-          })
+          if (decoratedTokenTypes.has(token.type)) {
+            ranges.push({
+              [token.type]: true,
+              anchor: { path, offset: start },
+              focus: { path, offset },
+            })
+          }
         }
       }
 

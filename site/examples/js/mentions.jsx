@@ -6,7 +6,13 @@ import React, {
   useRef,
   useState,
 } from 'react'
-import { Editor, Transforms, Range, createEditor } from 'slate'
+import {
+  Editor,
+  Transforms,
+  Range,
+  createEditor,
+  Element as SlateElement,
+} from 'slate'
 import { withHistory } from 'slate-history'
 import {
   Editable,
@@ -80,26 +86,34 @@ const MentionExample = () => {
         const { selection } = editor
         if (selection && Range.isCollapsed(selection)) {
           const [start] = Range.edges(selection)
-          const blockStart = Editor.start(
-            editor,
-            Editor.path(editor, start, { depth: 1 })
-          )
-          const beforeText = Editor.string(
-            editor,
-            Editor.range(editor, blockStart, start)
-          )
-          const beforeMatch = beforeText.match(/@([\w-]+)$/)
+          const block = Editor.above(editor, {
+            at: start,
+            match: n => SlateElement.isElement(n) && Editor.isBlock(editor, n),
+          })
+          const blockStart = block && Editor.start(editor, block[1])
+          const beforeText =
+            blockStart &&
+            Editor.string(editor, Editor.range(editor, blockStart, start))
+          const beforeMatch = beforeText && beforeText.match(/@([\w-]+)$/)
           const before =
             beforeMatch &&
             Editor.before(editor, start, {
               distance: beforeMatch[1].length + 1,
+              unit: 'character',
             })
           const beforeRange = before && Editor.range(editor, before, start)
+          const [voidMatch] = beforeRange
+            ? Editor.nodes(editor, {
+                at: beforeRange,
+                match: n =>
+                  SlateElement.isElement(n) && Editor.isVoid(editor, n),
+              })
+            : []
           const after = Editor.after(editor, start)
           const afterRange = Editor.range(editor, start, after)
           const afterText = Editor.string(editor, afterRange)
           const afterMatch = afterText.match(/^(\s|$)/)
-          if (beforeRange && beforeMatch && afterMatch) {
+          if (beforeRange && beforeMatch && afterMatch && !voidMatch) {
             setTarget(beforeRange)
             setSearch(beforeMatch[1])
             setIndex(0)
