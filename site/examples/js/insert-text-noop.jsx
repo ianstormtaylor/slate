@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react'
-import { createEditor, Descendant, Editor, Node, NodeEntry, Range } from 'slate'
-import { Slate, Editable, withReact, RenderLeafProps } from 'slate-react'
+import { createEditor, Node } from 'slate'
+import { Slate, Editable, withReact } from 'slate-react'
 
-const withNoUppercase = (editor: Editor) => {
+const withNoUppercase = editor => {
   const { insertText } = editor
   editor.insertText = (text, options) => {
     if (!/[A-Z]/.test(text)) {
@@ -11,8 +11,7 @@ const withNoUppercase = (editor: Editor) => {
   }
   return editor
 }
-
-const decorate = ([node, path]: NodeEntry): Range[] =>
+const decorate = ([node, path]) =>
   Node.isText(node) && node.text.length >= 3
     ? [
         {
@@ -22,8 +21,7 @@ const decorate = ([node, path]: NodeEntry): Range[] =>
         },
       ]
     : []
-
-const renderLeaf = ({ attributes, children, leaf }: RenderLeafProps) => (
+const renderLeaf = ({ attributes, children, leaf }) => (
   <span
     {...attributes}
     style={
@@ -35,7 +33,6 @@ const renderLeaf = ({ attributes, children, leaf }: RenderLeafProps) => (
     {children}
   </span>
 )
-
 const InsertTextNoopExample = () => {
   const editor = useMemo(() => withNoUppercase(withReact(createEditor())), [])
   return (
@@ -48,9 +45,5 @@ const InsertTextNoopExample = () => {
     </Slate>
   )
 }
-
-const initialValue: Descendant[] = [
-  { type: 'paragraph', children: [{ text: 'abcdef' }] },
-]
-
+const initialValue = [{ type: 'paragraph', children: [{ text: 'abcdef' }] }]
 export default InsertTextNoopExample
