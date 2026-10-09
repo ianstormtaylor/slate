@@ -52,10 +52,13 @@ export const insertNodes: NodeTransforms['insertNodes'] = (
       if (Range.isCollapsed(at)) {
         at = at.anchor
       } else {
-        const [, end] = Range.edges(at)
-        const pointRef = Editor.pointRef(editor, end)
+        const [start, end] = Range.edges(at)
+        const startRef = Editor.pointRef(editor, start)
+        const endRef = Editor.pointRef(editor, end)
         Transforms.delete(editor, { at })
-        at = pointRef.unref()!
+        const startPoint = startRef.unref()
+        const endPoint = endRef.unref()
+        at = endPoint ?? startPoint!
       }
     }
 
