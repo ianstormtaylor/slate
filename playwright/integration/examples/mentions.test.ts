@@ -1,28 +1,5 @@
-import { test, expect, Page, Locator } from '@playwright/test'
-import type { BaseEditor } from 'slate'
-
-const clearEditor = async (element: Locator) => {
-  await element.click()
-  await element.evaluate(element => {
-    type Fiber = {
-      return: Fiber | null
-      memoizedProps?: { editor?: BaseEditor }
-    }
-    const fiberKey = Object.keys(element).find(key =>
-      key.startsWith('__reactFiber$')
-    )!
-    let fiber: Fiber | null = (element as unknown as Record<string, Fiber>)[
-      fiberKey
-    ]
-    while (fiber && !fiber.memoizedProps?.editor) {
-      fiber = fiber.return
-    }
-    const editor = fiber!.memoizedProps!.editor!
-    editor.select({ anchor: editor.start([]), focus: editor.end([]) })
-    editor.deleteFragment()
-  })
-  await expect(element.locator('[data-slate-string]')).toHaveCount(0)
-}
+import { test, expect, Page } from '@playwright/test'
+import { clearEditor, getEditorHandle } from '../support/editor'
 
 test.describe('mentions example', () => {
   test.beforeEach(
@@ -54,6 +31,95 @@ test.describe('mentions example', () => {
       'Hello '
     )
     await expect(page.locator('[data-cy="mentions-portal"]')).toHaveCount(0)
+  })
+
+  test('does not match a query across nested blocks', async ({ page }) => {
+    const element = page.getByRole('textbox')
+    await clearEditor(element)
+    const editor = await getEditorHandle(element)
+    await editor.evaluate(editor => {
+      editor.withoutNormalizing(() => {
+        editor.removeNodes({ at: [0] })
+        const block = {
+          type: 'block-quote',
+          children: [
+            { type: 'paragraph', children: [{ text: '@' }] },
+            { type: 'paragraph', children: [{ text: '' }] },
+          ],
+        }
+        editor.insertNodes(block, { at: [0] })
+        editor.select(editor.end([]))
+      })
+    })
+    await editor.dispose()
+    await element.pressSequentially('R2-')
+    await expect(page.locator('[data-cy="mentions-portal"]')).toHaveCount(0)
+  })
+
+  test('does not match a query across an inline void', async ({ page }) => {
+    const element = page.getByRole('textbox')
+    await clearEditor(element)
+    const editor = await getEditorHandle(element)
+    await editor.evaluate(editor => {
+      editor.insertText('@')
+      const mention = {
+        type: 'mention',
+        character: 'Mace Windu',
+        children: [{ text: '' }],
+      }
+      editor.insertNodes(mention)
+      editor.select(editor.end([]))
+    })
+    await editor.dispose()
+    await element.pressSequentially('R2-')
+    await expect(page.locator('[data-cy="mentions-portal"]')).toHaveCount(0)
+    await expect(page.locator('[data-cy="mention-Mace-Windu"]')).toHaveCount(1)
+  })
+
+  test('replaces a query spanning marked text without keeping the trigger', async ({
+    page,
+  }) => {
+    const element = page.getByRole('textbox')
+    await clearEditor(element)
+    const editor = await getEditorHandle(element)
+    await editor.evaluate(editor => {
+      editor.withoutNormalizing(() => {
+        editor.removeNodes({ at: [0] })
+        const paragraph = {
+          type: 'paragraph',
+          children: [{ text: '@R', bold: true }, { text: '2' }],
+        }
+        editor.insertNodes(paragraph, { at: [0] })
+        editor.select(editor.end([]))
+      })
+    })
+    await editor.dispose()
+    await element.pressSequentially('-')
+    await expect(page.locator('[data-cy="mentions-portal"]')).toHaveCount(1)
+    await element.press('Enter')
+    await expect(page.locator('[data-cy="mention-R2-D2"]')).toHaveCount(1)
+    await expect(element.locator('[data-slate-string]')).toHaveCount(0)
+  })
+
+  test('preserves an inline void before a complete query', async ({ page }) => {
+    const element = page.getByRole('textbox')
+    await clearEditor(element)
+    const editor = await getEditorHandle(element)
+    await editor.evaluate(editor => {
+      const mention = {
+        type: 'mention',
+        character: 'Mace Windu',
+        children: [{ text: '' }],
+      }
+      editor.insertNodes(mention)
+      editor.select(editor.end([]))
+    })
+    await editor.dispose()
+    await element.pressSequentially('@R2-')
+    await expect(page.locator('[data-cy="mentions-portal"]')).toHaveCount(1)
+    await element.press('Enter')
+    await expect(page.locator('[data-cy="mention-Mace-Windu"]')).toHaveCount(1)
+    await expect(page.locator('[data-cy="mention-R2-D2"]')).toHaveCount(1)
   })
 
   test('inserts on enter from list', async ({ page }) => {
