@@ -1,4 +1,28 @@
-import { test, expect, Page } from '@playwright/test'
+import { test, expect, Page, Locator } from '@playwright/test'
+import type { BaseEditor } from 'slate'
+
+const clearEditor = async (element: Locator) => {
+  await element.click()
+  await element.evaluate(element => {
+    type Fiber = {
+      return: Fiber | null
+      memoizedProps?: { editor?: BaseEditor }
+    }
+    const fiberKey = Object.keys(element).find(key =>
+      key.startsWith('__reactFiber$')
+    )!
+    let fiber: Fiber | null = (element as unknown as Record<string, Fiber>)[
+      fiberKey
+    ]
+    while (fiber && !fiber.memoizedProps?.editor) {
+      fiber = fiber.return
+    }
+    const editor = fiber!.memoizedProps!.editor!
+    editor.select({ anchor: editor.start([]), focus: editor.end([]) })
+    editor.deleteFragment()
+  })
+  await expect(element.locator('[data-slate-string]')).toHaveCount(0)
+}
 
 test.describe('mentions example', () => {
   test.beforeEach(
@@ -17,6 +41,19 @@ test.describe('mentions example', () => {
     await page.getByRole('textbox').press('Backspace')
     await page.getByRole('textbox').pressSequentially(' @ma')
     await expect(page.locator('[data-cy="mentions-portal"]')).toHaveCount(1)
+  })
+
+  test('matches and replaces a dashed mention after text', async ({ page }) => {
+    const editor = page.getByRole('textbox')
+    await clearEditor(editor)
+    await editor.pressSequentially('Hello @R2-')
+    await expect(page.locator('[data-cy="mentions-portal"]')).toHaveCount(1)
+    await editor.press('Enter')
+    await expect(page.locator('[data-cy="mention-R2-D2"]')).toHaveCount(1)
+    await expect(editor.locator('[data-slate-string]').first()).toHaveText(
+      'Hello '
+    )
+    await expect(page.locator('[data-cy="mentions-portal"]')).toHaveCount(0)
   })
 
   test('inserts on enter from list', async ({ page }) => {
