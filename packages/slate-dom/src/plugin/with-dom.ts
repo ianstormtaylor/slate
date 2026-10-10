@@ -176,6 +176,8 @@ export const withDOM = <T extends BaseEditor>(
 
         if (!Range.isCollapsed(currentLineRange)) {
           Transforms.delete(e, { at: currentLineRange })
+        } else {
+          deleteBackward('character')
         }
       }
     }
