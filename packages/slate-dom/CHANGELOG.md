@@ -1,5 +1,11 @@
 # slate-dom
 
+## 0.133.1
+
+### Patch Changes
+
+- [#6203](https://github.com/ianstormtaylor/slate/pull/6203) [`e78057b`](https://github.com/ianstormtaylor/slate/commit/e78057b0cac86bd84a8a035bd48cc63415b8e906) Thanks [@dylans](https://github.com/dylans)! - Fall back to deleting backward by character when deleting to the start of a line has an empty range, allowing empty blocks and block starts to merge with preceding content.
+
 ## 0.132.0
 
 ### Patch Changes
