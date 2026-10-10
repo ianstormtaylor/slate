@@ -93,6 +93,86 @@ describe('Android input flushing', () => {
     expect(manager.hasPendingChanges()).toBe(false)
   })
 
+  test('flushes a backward deletion with an expanded target range', async () => {
+    const { editor, manager, beforeInput } = setup()
+    editor.selection = {
+      anchor: { path: [0, 0], offset: 2 },
+      focus: { path: [0, 0], offset: 4 },
+    }
+    beforeInput('deleteContentBackward')
+    manager.handleInput()
+    await jest.advanceTimersByTimeAsync(0)
+
+    expect(Node.string(editor)).toBe('中文')
+    expect(manager.hasPendingChanges()).toBe(false)
+  })
+
+  test('still flushes typed text when a selection action is pending', async () => {
+    const { editor, manager, beforeInput } = setup('word')
+    beforeInput('insertText', 'Z')
+    expect(manager.hasPendingAction()).toBe(true)
+    manager.handleInput()
+
+    expect(Node.string(editor)).toBe('wordZ')
+    expect(manager.hasPendingChanges()).toBe(false)
+  })
+
+  test('keeps typed text without a pending action until FLUSH_DELAY', async () => {
+    const { editor, manager, beforeInput } = setup('word')
+    const point = { path: [0, 0], offset: 4 }
+    const range = { anchor: point, focus: point }
+    editor.selection = null
+    IS_NODE_MAP_DIRTY.set(editor, false)
+    jest.spyOn(ReactEditor, 'toSlateRange').mockReturnValue(range)
+
+    beforeInput('insertText', 'Z')
+    expect(manager.hasPendingAction()).toBe(false)
+    manager.handleInput()
+    const after = { path: [0, 0], offset: 5 }
+    manager.handleUserSelect({ anchor: after, focus: after })
+    await jest.advanceTimersByTimeAsync(199)
+
+    expect(Node.string(editor)).toBe('word')
+    expect(manager.hasPendingDiffs()).toBe(true)
+
+    await jest.advanceTimersByTimeAsync(1)
+
+    expect(Node.string(editor)).toBe('wordZ')
+    expect(manager.hasPendingChanges()).toBe(false)
+  })
+
+  test('clears superseded scheduled flushes before applying a later selection', async () => {
+    const { editor, manager } = setup('word')
+    const originalSelection = editor.selection
+    manager.scheduleFlush()
+    manager.scheduleFlush()
+    manager.flush()
+
+    const point = { path: [0, 0], offset: 0 }
+    manager.handleUserSelect({ anchor: point, focus: point })
+    await jest.advanceTimersByTimeAsync(0)
+
+    expect(editor.selection).toEqual(originalSelection)
+    manager.flush()
+    expect(editor.selection).toEqual({ anchor: point, focus: point })
+  })
+
+  test('clears a scheduled flush when scheduling an action', async () => {
+    const { editor, manager, beforeInput } = setup('word')
+    manager.scheduleFlush()
+    beforeInput('insertParagraph')
+    manager.flush()
+    const selectionAfterAction = editor.selection
+
+    const point = { path: [0, 0], offset: 0 }
+    manager.handleUserSelect({ anchor: point, focus: point })
+    await jest.advanceTimersByTimeAsync(0)
+
+    expect(editor.selection).toEqual(selectionAfterAction)
+    await jest.advanceTimersByTimeAsync(200)
+    expect(editor.selection).toEqual({ anchor: point, focus: point })
+  })
+
   test('preserves a live composition in an empty leaf until it ends', async () => {
     const { editor, manager, beforeInput } = setup('')
     IS_COMPOSING.set(editor, true)
