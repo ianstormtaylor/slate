@@ -1,5 +1,11 @@
 # slate
 
+## 0.133.1
+
+### Patch Changes
+
+- [#6204](https://github.com/ianstormtaylor/slate/pull/6204) [`94b1fcd`](https://github.com/ianstormtaylor/slate/commit/94b1fcd899dbb1db75c499e44180807306ab8b99) Thanks [@dylans](https://github.com/dylans)! - Keep a valid insertion point when replacing a selection whose end node is removed: a void node for insertNodes or a read-only node for insertFragment.
+
 ## 0.132.0
 
 ### Minor Changes
