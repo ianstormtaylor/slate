@@ -29,15 +29,18 @@ export const insertFragment: TextTransforms['insertFragment'] = (
       if (Range.isCollapsed(at)) {
         at = at.anchor
       } else {
-        const [, end] = Range.edges(at)
+        const [start, end] = Range.edges(at)
 
         if (!voids && Editor.void(editor, { at: end })) {
           return
         }
 
-        const pointRef = Editor.pointRef(editor, end)
+        const startRef = Editor.pointRef(editor, start)
+        const endRef = Editor.pointRef(editor, end)
         Transforms.delete(editor, { at })
-        at = pointRef.unref()!
+        const startPoint = startRef.unref()
+        const endPoint = endRef.unref()
+        at = endPoint ?? startPoint!
       }
     } else if (Location.isPath(at)) {
       at = Editor.start(editor, at)
