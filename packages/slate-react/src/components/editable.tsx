@@ -84,6 +84,9 @@ import { useFlushDeferredSelectorsOnRender } from '../hooks/use-slate-selector'
 
 type DeferredOperation = () => void
 
+const isTextDOMNode = (node: unknown): node is DOMText =>
+  isDOMNode(node) && node.nodeType === 3
+
 const isSameCaretPosition = (editor: Editor, a: Range, b: Range) => {
   if (!Range.isCollapsed(a) || !Range.isCollapsed(b)) {
     return false
@@ -219,6 +222,14 @@ export const Editable = forwardRef(
     const [isComposing, setIsComposing] = useState(false)
     const ref = useRef<HTMLDivElement | null>(null)
     const deferredOperations = useRef<DeferredOperation[]>([])
+    const lastNativeInsertion = useRef<{
+      point: Point
+      text: string
+      domNode: DOMText
+      domOffset: number
+      domText: string
+      char: string
+    } | null>(null)
     const [placeholderHeight, setPlaceholderHeight] = useState<
       number | undefined
     >()
@@ -672,6 +683,7 @@ export const Editable = forwardRef(
           }
 
           let native = false
+          let nativePoint: [DOMText, number] | null = null
           if (
             type === 'insertText' &&
             selection &&
@@ -695,9 +707,10 @@ export const Editable = forwardRef(
               native = false
             }
 
-            const domAnchor = getSelection(
+            const domSelection = getSelection(
               ReactEditor.findDocumentOrShadowRoot(editor)
-            )?.anchorNode
+            )
+            const domAnchor = domSelection?.anchorNode
 
             if (!isInSlateText(domAnchor)) {
               native = false
@@ -749,6 +762,13 @@ export const Editable = forwardRef(
                   native = false
                 }
               }
+
+              if (native && isTextDOMNode(node)) {
+                nativePoint =
+                  domSelection?.isCollapsed && isTextDOMNode(domAnchor)
+                    ? [domAnchor, domSelection.anchorOffset]
+                    : [node, offset]
+              }
             }
           }
           // COMPAT: For the deleting forward/backward input types we don't want
@@ -759,7 +779,7 @@ export const Editable = forwardRef(
             (!type.startsWith('delete') || type.startsWith('deleteBy')) &&
             !IS_NODE_MAP_DIRTY.get(editor)
           ) {
-            const [targetRange] = (event as any).getTargetRanges()
+            const [targetRange] = event.getTargetRanges()
 
             if (targetRange) {
               // Unresolvable ranges would throw out of the handler (#3556); suppress and fall back to synthetic handling.
@@ -785,6 +805,13 @@ export const Editable = forwardRef(
                   EDITOR_TO_USER_SELECTION.set(editor, selectionRef)
                 }
               }
+
+              if (native && isTextDOMNode(targetRange.startContainer)) {
+                nativePoint = [
+                  targetRange.startContainer,
+                  targetRange.startOffset,
+                ]
+              }
             }
           }
 
@@ -795,6 +822,7 @@ export const Editable = forwardRef(
           }
 
           if (!native) {
+            lastNativeInsertion.current = null
             event.preventDefault()
           }
 
@@ -901,6 +929,19 @@ export const Editable = forwardRef(
                 // Only insertText operations use the native functionality, for now.
                 // Potentially expand to single character deletes, as well.
                 if (native) {
+                  lastNativeInsertion.current = null
+                  if (nativePoint && selection) {
+                    const [node] = Editor.leaf(editor, selection.anchor)
+                    const [domNode, domOffset] = nativePoint
+                    lastNativeInsertion.current = {
+                      point: selection.anchor,
+                      text: node.text,
+                      domNode,
+                      domOffset,
+                      domText: domNode.data,
+                      char: data,
+                    }
+                  }
                   deferredOperations.current.push(() =>
                     Editor.insertText(editor, data)
                   )
@@ -1238,6 +1279,35 @@ export const Editable = forwardRef(
                       op()
                     }
                     deferredOperations.current = []
+
+                    const nativeInsertion = lastNativeInsertion.current
+                    lastNativeInsertion.current = null
+
+                    if (nativeInsertion) {
+                      const { point, text, domNode, domOffset, domText, char } =
+                        nativeInsertion
+                      const node = Node.getIf(editor, point.path)
+                      if (
+                        Text.isText(node) &&
+                        node.text === text &&
+                        domNode.isConnected &&
+                        domNode.data ===
+                          domText.slice(0, domOffset) +
+                            char +
+                            domText.slice(domOffset)
+                      ) {
+                        domNode.deleteData(domOffset, char.length)
+                        if (
+                          editor.selection &&
+                          Range.isCollapsed(editor.selection) &&
+                          Point.equals(editor.selection.anchor, point)
+                        ) {
+                          getSelection(
+                            ReactEditor.findDocumentOrShadowRoot(editor)
+                          )?.collapse(domNode, domOffset)
+                        }
+                      }
+                    }
 
                     // COMPAT: Since `beforeinput` doesn't fully `preventDefault`,
                     // there's a chance that content might be placed in the browser's undo stack.
