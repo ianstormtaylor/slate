@@ -33,6 +33,7 @@ import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect
 import { ReadOnlyContext } from '../hooks/use-read-only'
 import { useSlate } from '../hooks/use-slate'
 import { useTrackUserInput } from '../hooks/use-track-user-input'
+import { useCompositionDOM } from '../hooks/use-composition-dom'
 import { ReactEditor } from '../plugin/react-editor'
 import { deleteMovedRange, getMovableRange } from '../utils/move-range'
 import { TRIPLE_CLICK } from 'slate-dom'
@@ -223,6 +224,7 @@ export const Editable = forwardRef(
       number | undefined
     >()
     const processing = useRef(false)
+    const compositionDOM = useCompositionDOM(editor)
 
     const { onUserInput, receivedUserInput } = useTrackUserInput()
 
@@ -668,6 +670,9 @@ export const Editable = forwardRef(
           // COMPAT: use composition change events as a hint to where we should insert
           // composition text if we aren't composing to work around https://github.com/ianstormtaylor/slate/issues/5038
           if (isCompositionChange && ReactEditor.isComposing(editor)) {
+            if (IS_CHROME) {
+              compositionDOM.track(event.data)
+            }
             return
           }
 
@@ -930,6 +935,7 @@ export const Editable = forwardRef(
         onDOMSelectionChange,
         onUserInput,
         propsOnDOMBeforeInput,
+        compositionDOM,
         readOnly,
         scheduleOnDOMSelectionChange,
       ]
@@ -1221,6 +1227,7 @@ export const Editable = forwardRef(
                 )}
                 onInput={useCallback(
                   (event: React.FormEvent<HTMLDivElement>) => {
+                    compositionDOM.pause()
                     if (isEventHandled(event, attributes.onInput)) {
                       return
                     }
@@ -1250,7 +1257,7 @@ export const Editable = forwardRef(
                       )
                     }
                   },
-                  [attributes.onInput, editor]
+                  [attributes.onInput, editor, compositionDOM]
                 )}
                 onBlur={useCallback(
                   (event: React.FocusEvent<HTMLDivElement>) => {
@@ -1420,6 +1427,7 @@ export const Editable = forwardRef(
                         isEventHandled(event, attributes.onCompositionEnd) ||
                         IS_ANDROID
                       ) {
+                        compositionDOM.clear()
                         return
                       }
 
@@ -1445,6 +1453,7 @@ export const Editable = forwardRef(
                           editor.marks = placeholderMarks
                         }
 
+                        compositionDOM.restore()
                         Editor.insertText(editor, event.data)
 
                         const userMarks = EDITOR_TO_USER_MARKS.get(editor)
@@ -1453,9 +1462,10 @@ export const Editable = forwardRef(
                           editor.marks = userMarks
                         }
                       }
+                      compositionDOM.clear()
                     }
                   },
-                  [attributes.onCompositionEnd, editor]
+                  [attributes.onCompositionEnd, editor, compositionDOM]
                 )}
                 onCompositionUpdate={useCallback(
                   (event: React.CompositionEvent<HTMLDivElement>) => {
@@ -1489,6 +1499,7 @@ export const Editable = forwardRef(
                         return
                       }
 
+                      compositionDOM.clear()
                       setIsComposing(true)
 
                       const { selection } = editor
@@ -1498,7 +1509,7 @@ export const Editable = forwardRef(
                       }
                     }
                   },
-                  [attributes.onCompositionStart, editor]
+                  [attributes.onCompositionStart, editor, compositionDOM]
                 )}
                 onCopy={useCallback(
                   (event: React.ClipboardEvent<HTMLDivElement>) => {
