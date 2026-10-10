@@ -55,10 +55,13 @@ export const insertNodes: NodeTransforms['insertNodes'] = (
         const [start, end] = Range.edges(at)
         const startRef = Editor.pointRef(editor, start)
         const endRef = Editor.pointRef(editor, end)
+        const before = Editor.before(editor, start, { voids })
+        const beforeRef = before && Editor.pointRef(editor, before)
         Transforms.delete(editor, { at })
         const startPoint = startRef.unref()
         const endPoint = endRef.unref()
-        at = endPoint ?? startPoint!
+        const beforePoint = beforeRef ? beforeRef.unref() : null
+        at = endPoint ?? startPoint ?? beforePoint ?? Editor.start(editor, [])
       }
     }
 
