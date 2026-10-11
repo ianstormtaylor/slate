@@ -1,5 +1,13 @@
 # slate-react
 
+## 0.133.2
+
+### Patch Changes
+
+- [#5985](https://github.com/ianstormtaylor/slate/pull/5985) [`5eeea5e`](https://github.com/ianstormtaylor/slate/commit/5eeea5e509cb7df18d98ab4e495a4e1ecb5dc26e) Thanks [@wljray](https://github.com/wljray)! - Flush Android backward text deletions without waiting for another input event, retain the typing delay when no action is pending, cancel superseded flush timers, and avoid an extra change notification when restoring unchanged marks.
+
+- [#6207](https://github.com/ianstormtaylor/slate/pull/6207) [`906eafe`](https://github.com/ianstormtaylor/slate/commit/906eafe6e872bc5c4dbeb6add60da49a219907d6) Thanks [@dylans](https://github.com/dylans)! - Restore Chromium's structural DOM changes before applying multiline composition commits, preventing duplicated text while preserving intervening React updates.
+
 ## 0.133.0
 
 ### Minor Changes
