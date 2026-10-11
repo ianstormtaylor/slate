@@ -33,6 +33,7 @@ import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect
 import { ReadOnlyContext } from '../hooks/use-read-only'
 import { useSlate } from '../hooks/use-slate'
 import { useTrackUserInput } from '../hooks/use-track-user-input'
+import { useCompositionDOM } from '../hooks/use-composition-dom'
 import { ReactEditor } from '../plugin/react-editor'
 import { deleteMovedRange, getMovableRange } from '../utils/move-range'
 import { TRIPLE_CLICK } from 'slate-dom'
@@ -169,8 +170,7 @@ export interface RenderTextProps {
  * `EditableProps` are passed to the `<Editable>` component.
  * @inline
  */
-export interface EditableProps
-  extends React.TextareaHTMLAttributes<HTMLDivElement> {
+export interface EditableProps extends React.HTMLAttributes<HTMLDivElement> {
   decorate?: (entry: NodeEntry) => DecoratedRange[]
   onDOMBeforeInput?: (event: InputEvent) => void
 
@@ -354,6 +354,7 @@ export const Editable: (props: EditableProps) => ReactNode = forwardRef(
       number | undefined
     >()
     const processing = useRef(false)
+    const compositionDOM = useCompositionDOM(editor)
 
     const { onUserInput, receivedUserInput } = useTrackUserInput()
 
@@ -367,6 +368,10 @@ export const Editable: (props: EditableProps) => ReactNode = forwardRef(
     const state = useMemo(
       () => ({
         isDraggingInternally: false,
+        pendingSelection: null as {
+          range: Range
+          basedOn: Range | null
+        } | null,
         isUpdatingSelection: false,
         latestElement: null as DOMElement | null,
         hasMarkPlaceholder: false,
@@ -382,10 +387,16 @@ export const Editable: (props: EditableProps) => ReactNode = forwardRef(
     // set by `useIsomorphicLayoutEffect` before `onDOMSelectionChange` updates
     // `editor.selection`, the DOM selection can be removed accidentally.
     useEffect(() => {
-      if (ref.current && autoFocus) {
+      if (!ref.current || !autoFocus) {
+        return
+      }
+
+      if (editor.children.length > 0) {
+        ReactEditor.focus(editor)
+      } else {
         ref.current.focus()
       }
-    }, [autoFocus])
+    }, [autoFocus, editor])
 
     /**
      * The AndroidInputManager object has a cyclical dependency on onDOMSelectionChange
@@ -409,6 +420,8 @@ export const Editable: (props: EditableProps) => ReactNode = forwardRef(
             onDOMSelectionChange()
             return
           }
+
+          state.pendingSelection = null
 
           const el = ReactEditor.toDOMNode(editor, editor)
           const root = el.getRootNode()
@@ -457,8 +470,14 @@ export const Editable: (props: EditableProps) => ReactNode = forwardRef(
               ReactEditor.isTargetInsideNonReadonlyVoid(editor, anchorNode)
 
             const focusNodeInEditor = ReactEditor.hasTarget(editor, focusNode)
+            const isFocusInEditor =
+              isDOMNode(activeElement) && el.contains(activeElement)
 
-            if (anchorNodeSelectable && focusNodeInEditor) {
+            if (
+              anchorNodeSelectable &&
+              focusNodeInEditor &&
+              (readOnly || isFocusInEditor)
+            ) {
               const range = ReactEditor.toSlateRange(editor, domSelection, {
                 exactMatch: false,
                 suppressThrow: true,
@@ -470,7 +489,18 @@ export const Editable: (props: EditableProps) => ReactNode = forwardRef(
                   !androidInputManager?.hasPendingChanges() &&
                   !androidInputManager?.isFlushing()
                 ) {
-                  Transforms.select(editor, range)
+                  const isCaretOutsideText =
+                    domSelection.isCollapsed && !isInSlateText(anchorNode)
+
+                  if (
+                    isCaretOutsideText &&
+                    editor.selection &&
+                    Range.equals(range, editor.selection)
+                  ) {
+                    restoreDomSelection(editor, domSelection, state)
+                  } else {
+                    Transforms.select(editor, range)
+                  }
                 } else {
                   androidInputManager?.handleUserSelect(range)
                 }
@@ -604,6 +634,19 @@ export const Editable: (props: EditableProps) => ReactNode = forwardRef(
           return
         }
 
+        const pending = state.pendingSelection
+        state.pendingSelection = null
+
+        if (
+          pending &&
+          !forceChange &&
+          pending.basedOn === selection &&
+          !(selection && Range.equals(pending.range, selection))
+        ) {
+          Transforms.select(editor, pending.range)
+          return
+        }
+
         // Otherwise the DOM selection is out of sync, so update it.
         state.isUpdatingSelection = true
 
@@ -702,10 +745,6 @@ export const Editable: (props: EditableProps) => ReactNode = forwardRef(
     // https://github.com/facebook/react/issues/11211
     const onDOMBeforeInput = useCallback(
       (event: InputEvent) => {
-        if (!event.isTrusted) {
-          return
-        }
-
         handleNativeHistoryEvents(editor, event)
         const el = ReactEditor.toDOMNode(editor, editor)
         const root = el.getRootNode()
@@ -761,6 +800,9 @@ export const Editable: (props: EditableProps) => ReactNode = forwardRef(
           // COMPAT: use composition change events as a hint to where we should insert
           // composition text if we aren't composing to work around https://github.com/ianstormtaylor/slate/issues/5038
           if (isCompositionChange && ReactEditor.isComposing(editor)) {
+            if (IS_CHROME) {
+              compositionDOM.track(event.data)
+            }
             return
           }
 
@@ -785,6 +827,14 @@ export const Editable: (props: EditableProps) => ReactNode = forwardRef(
             // Skip native if there are marks, as
             // `insertText` will insert a node, not just text.
             if (editor.marks) {
+              native = false
+            }
+
+            const domAnchor = getSelection(
+              ReactEditor.findDocumentOrShadowRoot(editor)
+            )?.anchorNode
+
+            if (!isInSlateText(domAnchor)) {
               native = false
             }
 
@@ -1015,6 +1065,7 @@ export const Editable: (props: EditableProps) => ReactNode = forwardRef(
         onDOMSelectionChange,
         onUserInput,
         propsOnDOMBeforeInput,
+        compositionDOM,
         readOnly,
         scheduleOnDOMSelectionChange,
       ]
@@ -1067,12 +1118,53 @@ export const Editable: (props: EditableProps) => ReactNode = forwardRef(
       // <textarea> elements are appended to the DOM, causing
       // `editor.selection` to be overwritten in some circumstances.
       // (2025/01/16) https://issues.chromium.org/issues/389368412
+      const readUnsyncedSelection = () => {
+        const androidInputManager = androidInputManagerRef.current
+
+        if (
+          state.isUpdatingSelection ||
+          state.isDraggingInternally ||
+          ReactEditor.isComposing(editor) ||
+          androidInputManager?.hasPendingChanges() ||
+          androidInputManager?.isFlushing() ||
+          IS_NODE_MAP_DIRTY.get(editor)
+        ) {
+          return null
+        }
+
+        const domSelection = getSelection(
+          ReactEditor.findDocumentOrShadowRoot(editor)
+        )
+
+        if (
+          !domSelection ||
+          !(
+            ReactEditor.hasEditableTarget(editor, domSelection.anchorNode) ||
+            ReactEditor.isTargetInsideNonReadonlyVoid(
+              editor,
+              domSelection.anchorNode
+            )
+          ) ||
+          !ReactEditor.hasTarget(editor, domSelection.focusNode)
+        ) {
+          return null
+        }
+
+        const range = ReactEditor.toSlateRange(editor, domSelection, {
+          exactMatch: false,
+          suppressThrow: true,
+        })
+
+        return range ? { range, basedOn: editor.selection } : null
+      }
+
       const onSelectionChange = ({ target }: Event) => {
         const targetElement = target instanceof HTMLElement ? target : null
         const targetTagName = targetElement?.tagName
         if (targetTagName === 'INPUT' || targetTagName === 'TEXTAREA') {
           return
         }
+        state.pendingSelection = readUnsyncedSelection()
         scheduleOnDOMSelectionChange()
       }
 
@@ -1100,7 +1192,7 @@ export const Editable: (props: EditableProps) => ReactNode = forwardRef(
         window.document.removeEventListener('dragend', stoppedDragging)
         window.document.removeEventListener('drop', stoppedDragging)
       }
-    }, [scheduleOnDOMSelectionChange, state])
+    }, [editor, scheduleOnDOMSelectionChange, state])
 
     const decorations = decorate([editor, []])
     const decorateContext = useDecorateContext(decorate)
@@ -1265,6 +1357,7 @@ export const Editable: (props: EditableProps) => ReactNode = forwardRef(
                 )}
                 onInput={useCallback(
                   (event: React.FormEvent<HTMLDivElement>) => {
+                    compositionDOM.pause()
                     if (isEventHandled(event, attributes.onInput)) {
                       return
                     }
@@ -1294,7 +1387,7 @@ export const Editable: (props: EditableProps) => ReactNode = forwardRef(
                       )
                     }
                   },
-                  [attributes.onInput, editor]
+                  [attributes.onInput, editor, compositionDOM]
                 )}
                 onBlur={useCallback(
                   (event: React.FocusEvent<HTMLDivElement>) => {
@@ -1464,6 +1557,7 @@ export const Editable: (props: EditableProps) => ReactNode = forwardRef(
                         isEventHandled(event, attributes.onCompositionEnd) ||
                         IS_ANDROID
                       ) {
+                        compositionDOM.clear()
                         return
                       }
 
@@ -1489,6 +1583,7 @@ export const Editable: (props: EditableProps) => ReactNode = forwardRef(
                           editor.marks = placeholderMarks
                         }
 
+                        compositionDOM.restore()
                         Editor.insertText(editor, event.data)
 
                         const userMarks = EDITOR_TO_USER_MARKS.get(editor)
@@ -1497,9 +1592,10 @@ export const Editable: (props: EditableProps) => ReactNode = forwardRef(
                           editor.marks = userMarks
                         }
                       }
+                      compositionDOM.clear()
                     }
                   },
-                  [attributes.onCompositionEnd, editor]
+                  [attributes.onCompositionEnd, editor, compositionDOM]
                 )}
                 onCompositionUpdate={useCallback(
                   (event: React.CompositionEvent<HTMLDivElement>) => {
@@ -1533,6 +1629,7 @@ export const Editable: (props: EditableProps) => ReactNode = forwardRef(
                         return
                       }
 
+                      compositionDOM.clear()
                       setIsComposing(true)
 
                       const { selection } = editor
@@ -1542,7 +1639,7 @@ export const Editable: (props: EditableProps) => ReactNode = forwardRef(
                       }
                     }
                   },
-                  [attributes.onCompositionStart, editor]
+                  [attributes.onCompositionStart, editor, compositionDOM]
                 )}
                 onCopy={useCallback(
                   (event: React.ClipboardEvent<HTMLDivElement>) => {
@@ -1649,7 +1746,6 @@ export const Editable: (props: EditableProps) => ReactNode = forwardRef(
                   (event: React.DragEvent<HTMLDivElement>) => {
                     if (
                       !readOnly &&
-                      event.isTrusted &&
                       ReactEditor.hasTarget(editor, event.target) &&
                       !isEventHandled(event, attributes.onDrop)
                     ) {
@@ -2035,7 +2131,6 @@ export const Editable: (props: EditableProps) => ReactNode = forwardRef(
                   (event: React.ClipboardEvent<HTMLDivElement>) => {
                     if (
                       !readOnly &&
-                      event.isTrusted &&
                       ReactEditor.hasEditableTarget(editor, event.target) &&
                       !isEventHandled(event, attributes.onPaste)
                     ) {
@@ -2089,6 +2184,33 @@ export type RenderPlaceholderProps = {
     ref: React.RefCallback<any>
     style: React.CSSProperties
   }
+}
+
+const isInSlateText = (node: unknown) =>
+  isDOMNode(node) &&
+  node.nodeType === node.TEXT_NODE &&
+  !!node.parentElement?.closest('[data-slate-string], [data-slate-zero-width]')
+
+const restoreDomSelection = (
+  editor: ReactEditor,
+  domSelection: Selection,
+  state: { isUpdatingSelection: boolean }
+) => {
+  if (!editor.selection) {
+    return
+  }
+
+  const domRange = ReactEditor.toDOMRange(editor, editor.selection)
+  state.isUpdatingSelection = true
+  domSelection.setBaseAndExtent(
+    domRange.startContainer,
+    domRange.startOffset,
+    domRange.endContainer,
+    domRange.endOffset
+  )
+  setTimeout(() => {
+    state.isUpdatingSelection = false
+  })
 }
 
 const selectMovableRange = (editor: ReactEditor) => {
@@ -2164,6 +2286,8 @@ export const defaultScrollSelectionIntoView = (
       domFocusPoint.getBoundingClientRect.bind(domFocusPoint)
     scrollIntoView(leafEl, {
       scrollMode: 'if-needed',
+      block: 'nearest',
+      inline: 'nearest',
     })
 
     // @ts-expect-error an unorthodox delete D:

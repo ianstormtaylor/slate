@@ -1,4 +1,4 @@
-import { EditorInterface, Editor, Node } from '../interfaces'
+import { EditorInterface, Editor, Node, Path } from '../interfaces'
 
 /** @ignore */
 export const shouldMergeNodesRemovePrevNode: EditorInterface['shouldMergeNodesRemovePrevNode'] =
@@ -10,7 +10,9 @@ export const shouldMergeNodesRemovePrevNode: EditorInterface['shouldMergeNodesRe
     // if prevNode is first child in parent,don't remove it.
 
     return (
-      (Node.isElement(prevNode) && Editor.isEmpty(editor, prevNode)) ||
+      (Node.isElement(prevNode) &&
+        Editor.isEmpty(editor, prevNode) &&
+        Path.isSibling(prevPath, curNodePath)) ||
       (Node.isText(prevNode) &&
         prevNode.text === '' &&
         prevPath[prevPath.length - 1] !== 0)

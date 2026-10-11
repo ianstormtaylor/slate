@@ -33,6 +33,11 @@ export interface RangeTransformOptions {
 
 export interface RangeInterface {
   /**
+   * Get the direction of a `range`: `'forward'` when the focus point comes after the anchor point, `'backward'` when it comes before, and `'collapsed'` when they're at the same position.
+   */
+  direction: (range: Range) => 'forward' | 'backward' | 'collapsed'
+
+  /**
    * Get the start and end points of a range, in the order in which they appear
    * in the document.
    * @param options Type also exported as `RangeEdgesOptions`
@@ -77,7 +82,7 @@ export interface RangeInterface {
 
   /**
    * Check if a range is backward, meaning that its anchor point appears in the
-   * document _after_ its focus point.
+   * document _after_ its focus point. A collapsed range is not backward.
    * @category Queries
    */
   isBackward(range: Range): boolean
@@ -100,7 +105,7 @@ export interface RangeInterface {
 
   /**
    * Check if a range is forward, meaning that its anchor point appears in the
-   * document _before_ its focus point.
+   * document _before_ its focus point, so a collapsed range counts as forward. Use {@link RangeInterface#direction} to tell collapsed ranges apart.
    * @category Queries
    */
   isForward(range: Range): boolean
@@ -139,6 +144,11 @@ export interface RangeInterface {
 
 // eslint-disable-next-line no-redeclare
 export const Range: RangeInterface = {
+  direction(range: Range): 'forward' | 'backward' | 'collapsed' {
+    const order = Point.compare(range.focus, range.anchor)
+    return order > 0 ? 'forward' : order < 0 ? 'backward' : 'collapsed'
+  },
+
   edges(range: Range, options: RangeEdgesOptions = {}): [Point, Point] {
     const { reverse = false } = options
     const { anchor, focus } = range

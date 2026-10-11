@@ -1,5 +1,25 @@
 # slate-dom
 
+## 0.133.1
+
+### Patch Changes
+
+- [#6203](https://github.com/ianstormtaylor/slate/pull/6203) [`e78057b`](https://github.com/ianstormtaylor/slate/commit/e78057b0cac86bd84a8a035bd48cc63415b8e906) Thanks [@dylans](https://github.com/dylans)! - Fall back to deleting backward by character when deleting to the start of a line has an empty range, allowing empty blocks and block starts to merge with preceding content.
+
+## 0.132.0
+
+### Patch Changes
+
+- [#6191](https://github.com/ianstormtaylor/slate/pull/6191) [`edda8d0`](https://github.com/ianstormtaylor/slate/commit/edda8d08a38f0f6c56f45ff87c08506135745103) Thanks [@dylans](https://github.com/dylans)! - Copying text that contains inline voids, such as mentions, no longer puts each void on its own line in plain text.
+
+## 0.131.0
+
+### Patch Changes
+
+- [#6186](https://github.com/ianstormtaylor/slate/pull/6186) [`843bfaa`](https://github.com/ianstormtaylor/slate/commit/843bfaa3bcbe2051264b63ac846d5c5375b15e02) Thanks [@dylans](https://github.com/dylans)! - Copying text inside an inline element, such as a link, now keeps that element in the copied HTML, so pasting into other apps (or HTML-based paste handlers) keeps the link.
+
+- [#6185](https://github.com/ianstormtaylor/slate/pull/6185) [`8cd5101`](https://github.com/ianstormtaylor/slate/commit/8cd5101da644eb99f7cf87e9a2f1acde23edc025) Thanks [@dylans](https://github.com/dylans)! - Copying an empty line now gives one blank line in plain text instead of two.
+
 ## 0.130.1
 
 ### Patch Changes

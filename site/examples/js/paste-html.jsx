@@ -45,8 +45,34 @@ const applyTextAttributes = (child, attrs) =>
         ),
       }
     : jsx('text', attrs, child)
+const BLOCK_TAGS = new Set([
+  'BLOCKQUOTE',
+  'DIV',
+  'H1',
+  'H2',
+  'H3',
+  'H4',
+  'H5',
+  'H6',
+  'LI',
+  'OL',
+  'P',
+  'PRE',
+  'UL',
+])
 export const deserialize = el => {
   if (el.nodeType === 3) {
+    if (
+      /^[\t\n\r ]*$/.test(el.textContent ?? '') &&
+      ['BODY', 'DIV', 'BLOCKQUOTE', 'UL', 'OL'].includes(
+        el.parentElement?.nodeName ?? ''
+      ) &&
+      [el.previousSibling, el.nextSibling].some(
+        sibling => sibling && BLOCK_TAGS.has(sibling.nodeName)
+      )
+    ) {
+      return null
+    }
     return el.textContent
   } else if (el.nodeType !== 1) {
     return null

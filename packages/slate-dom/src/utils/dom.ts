@@ -214,13 +214,26 @@ export const getPlainText = (domNode: DOMNode) => {
   }
 
   if (isDOMElement(domNode)) {
+    if (domNode.hasAttribute('data-slate-spacer')) {
+      return text
+    }
+
+    if (
+      domNode.tagName === 'BR' &&
+      domNode.parentElement?.getAttribute('data-slate-zero-width') === 'n'
+    ) {
+      return text
+    }
+
     for (const childNode of Array.from(domNode.childNodes)) {
       text += getPlainText(childNode)
     }
 
     const display = getComputedStyle(domNode).getPropertyValue('display')
+    const isBlock = display === 'block' || display === 'list'
+    const isInsideInline = !!domNode.closest('[data-slate-inline="true"]')
 
-    if (display === 'block' || display === 'list' || domNode.tagName === 'BR') {
+    if (domNode.tagName === 'BR' || (isBlock && !isInsideInline)) {
       text += '\n'
     }
   }

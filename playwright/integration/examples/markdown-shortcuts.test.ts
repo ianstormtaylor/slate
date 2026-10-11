@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import { getEditorHandle } from '../support/editor'
 
 test.describe('On markdown-shortcuts example', () => {
   test.beforeEach(async ({ page }) => {
@@ -11,13 +12,16 @@ test.describe('On markdown-shortcuts example', () => {
     ).toContain('A wise quote.')
   })
 
-  test('can add list items', async ({ page }, testInfo) => {
+  test('can add list items', async ({ page }) => {
     await expect(page.getByRole('textbox').locator('ul')).toHaveCount(0)
 
-    await page.getByRole('textbox').click()
-    await page
-      .getByRole('textbox')
-      .press(testInfo.project.name === 'webkit' ? 'Meta+ArrowLeft' : 'Home')
+    await page.getByRole('textbox').focus()
+    const editor = await getEditorHandle(page.getByRole('textbox'))
+    await editor.evaluate(editor => editor.select(editor.start([])))
+    await editor.dispose()
+    await expect
+      .poll(() => page.evaluate(() => window.getSelection()!.anchorOffset))
+      .toBe(0)
     await page.getByRole('textbox').pressSequentially('* ')
     await page.getByRole('textbox').pressSequentially('1st Item')
     await page.keyboard.press('Enter')

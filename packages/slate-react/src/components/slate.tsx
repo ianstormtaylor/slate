@@ -19,11 +19,15 @@ interface SlateProps {
   /**
    * The initial value of the editor. It is loaded into the editor when `Slate` mounts, and again if a different `editor` is passed.
    *
+   * If you leave it out, the editor's existing `editor.children` are used, which suits editors you create and fill ahead of rendering. Leaving it out when `editor.children` is empty throws, since that is usually a forgotten setup step; pass `initialValue={[]}` if an empty editor is intended.
+   *
+   * An editor needs at least one block to hold the cursor, so an empty array is loaded as one empty block, `{ children: [{ text: '' }] }`. The block has no `type`, so if your schema requires one, pass your own empty block instead, for example `[{ type: 'paragraph', children: [{ text: '' }] }]`.
+   *
    * Slate is not a controlled component: changing `initialValue` afterwards has no effect, because directly replacing the value would corrupt state such as the edit history. To change the content, apply transforms to the editor, or remount `Slate` with a new `key`.
    *
    * Each editor must have its own node objects. To render several editors from the same value, give each one a deep copy, for example with `structuredClone(value)`. Sharing the same objects between editors breaks the lookups Slate uses to map nodes to the DOM.
    */
-  initialValue: Descendant[]
+  initialValue?: Descendant[]
   /** The `children` which must contain an `Editable` component. */
   children: React.ReactNode
   /** An optional callback function which you can use to be notified of changes in the editor's selection and/or value. */
@@ -55,21 +59,30 @@ export const Slate = (props: SlateProps) => {
   const initializedEditor = useRef<ReactEditor | null>(null)
 
   if (initializedEditor.current !== editor) {
-    if (!Node.isNodeList(initialValue)) {
-      throw new Error(
-        `[Slate] initialValue is invalid! Expected a list of elements but got: ${Scrubber.stringify(
-          initialValue
-        )}`
-      )
-    }
-
     if (!Editor.isEditor(editor)) {
       throw new Error(
         `[Slate] editor is invalid! You passed: ${Scrubber.stringify(editor)}`
       )
     }
 
-    editor.children = initialValue
+    if (initialValue === undefined && editor.children.length === 0) {
+      throw new Error(
+        '[Slate] editor.children is empty and no initialValue was provided. If this is intentional, pass initialValue={[]} to the Slate component.'
+      )
+    }
+
+    const value = initialValue ?? editor.children
+
+    if (!Node.isNodeList(value)) {
+      throw new Error(
+        `[Slate] initialValue is invalid! Expected a list of elements but got: ${Scrubber.stringify(
+          value
+        )}`
+      )
+    }
+
+    editor.children =
+      value.length > 0 ? value : [{ children: [{ text: '' }] } as Descendant]
     Object.assign(editor, rest)
     initializedEditor.current = editor
   }
