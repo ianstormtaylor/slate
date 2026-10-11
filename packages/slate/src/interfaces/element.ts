@@ -1,12 +1,4 @@
-import {
-  Ancestor,
-  Descendant,
-  Editor,
-  ExtendedType,
-  Node,
-  Path,
-  isObject,
-} from '..'
+import { Ancestor, Descendant, ExtendedType, Node, Path, isObject } from '..'
 
 /**
  * `Element` objects are a type of node in a Slate document that contain other
@@ -15,10 +7,10 @@ import {
  *
  * ## Element Behavior Types
  *
- * Element nodes behave differently depending on the [Slate editor's configuration](./editor.md#schema-specific-instance-methods-to-override). An element can be:
+ * Element nodes behave differently depending on the Slate editor's configuration. An element can be:
  *
- * - "block" or "inline" as defined by `editor.isInline`
- * - either "void" or "not void" as defined by `editor.isVoid`
+ * - "block" or "inline" as defined by {@link BaseEditor#isInline}
+ * - either "void" or "not void" as defined by {@link BaseEditor#isVoid}
  *
  * ### Block vs. Inline
  *

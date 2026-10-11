@@ -64,6 +64,7 @@ export class FocusToken extends Token<HyperscriptRangeRef> {}
 
 /**
  * Point tokens represent arbitrary points.
+ * @inline
  */
 export class PointToken extends Token<HyperscriptPointRef> {}
 
