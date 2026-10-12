@@ -158,6 +158,10 @@ export const getEditableChildAndIndex = (
   index: number,
   direction: 'forward' | 'backward'
 ): [DOMNode, number] => {
+  if (typeof index !== 'number') {
+    throw new Error('Expected index to be a number')
+  }
+
   const { childNodes } = parent
   let child = childNodes[index]
   let i = index
@@ -226,13 +230,26 @@ export const getPlainText = (domNode: DOMNode) => {
   }
 
   if (isDOMElement(domNode)) {
+    if (domNode.hasAttribute('data-slate-spacer')) {
+      return text
+    }
+
+    if (
+      domNode.tagName === 'BR' &&
+      domNode.parentElement?.getAttribute('data-slate-zero-width') === 'n'
+    ) {
+      return text
+    }
+
     for (const childNode of Array.from(domNode.childNodes)) {
       text += getPlainText(childNode)
     }
 
     const display = getComputedStyle(domNode).getPropertyValue('display')
+    const isBlock = display === 'block' || display === 'list'
+    const isInsideInline = !!domNode.closest('[data-slate-inline="true"]')
 
-    if (display === 'block' || display === 'list' || domNode.tagName === 'BR') {
+    if (domNode.tagName === 'BR' || (isBlock && !isInsideInline)) {
       text += '\n'
     }
   }
@@ -243,7 +260,7 @@ export const getPlainText = (domNode: DOMNode) => {
 /**
  * Get x-slate-fragment attribute from data-slate-fragment
  */
-const catchSlateFragment = /data-slate-fragment="(.+?)"/m
+const catchSlateFragment = /<[^>]*\sdata-slate-fragment="([^"]+)"/m
 export const getSlateFragmentAttribute = (
   dataTransfer: DataTransfer
 ): string | void => {

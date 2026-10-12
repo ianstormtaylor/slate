@@ -33,6 +33,8 @@ Options: `{reverse?: boolean}`
 
 Get an entry for the common ancestor node of two paths. It might be a Text node, an Element, or the Editor itself.
 
+If the paths are equal, or one is an ancestor of the other, the entry is for the node at the shorter path. For example, `Node.common(editor, [0, 0], [0, 0])` returns the text node at `[0, 0]`, and `Node.common(editor, [0], [0, 0])` returns the element at `[0]`.
+
 For the common block ancestor, see [Editor Selection](https://docs.slatejs.org/concepts/03-locations#selection)
 
 #### `Node.descendant(root: Node, path: Path) => Descendant`

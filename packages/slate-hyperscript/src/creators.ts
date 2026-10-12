@@ -2,11 +2,14 @@ import { Element, Descendant, Node, Range, Text, Editor } from 'slate'
 import {
   AnchorToken,
   FocusToken,
+  PointToken,
   Token,
   addAnchorToken,
   addFocusToken,
-  getAnchorOffset,
-  getFocusOffset,
+  addPointToken,
+  getAnchors,
+  getFoci,
+  getPoints,
 } from './tokens'
 
 /**
@@ -16,18 +19,18 @@ import {
 
 const STRINGS: WeakSet<Text> = new WeakSet()
 
-const resolveDescendants = (children: any[]): Descendant[] => {
+function resolveDescendants(children: unknown[]): Descendant[] {
   const nodes: Node[] = []
 
-  const addChild = (child: Node | Token): void => {
-    if (child == null) {
+  function addChild(child: unknown) {
+    if (child == null || typeof child === 'boolean') {
       return
     }
 
     const prev = nodes[nodes.length - 1]
 
-    if (typeof child === 'string') {
-      const text = { text: child }
+    if (typeof child === 'string' || typeof child === 'number') {
+      const text = { text: child.toString() }
       STRINGS.add(text)
       child = text
     }
@@ -59,6 +62,8 @@ const resolveDescendants = (children: any[]): Descendant[] => {
         addAnchorToken(n, child)
       } else if (child instanceof FocusToken) {
         addFocusToken(n, child)
+      } else if (child instanceof PointToken) {
+        addPointToken(n, child)
       }
     } else {
       throw new Error(`Unexpected hyperscript child object: ${child}`)
@@ -130,6 +135,18 @@ export function createFragment(
   children: any[]
 ): Descendant[] {
   return resolveDescendants(children)
+}
+
+/**
+ * Create a point token.
+ */
+
+export function createPoint(
+  tagName: string,
+  attributes: { [key: string]: any },
+  children: any[]
+): PointToken {
+  return new PointToken(attributes)
 }
 
 /**
@@ -236,17 +253,23 @@ export const createEditor =
     // Search the document's texts to see if any of them have tokens associated
     // that need incorporated into the selection.
     for (const [node, path] of Node.texts(editor)) {
-      const anchor = getAnchorOffset(node)
-      const focus = getFocusOffset(node)
-
-      if (anchor != null) {
-        const [offset] = anchor
-        selection.anchor = { path, offset }
+      for (const { ref = selection, offset } of getAnchors(node)) {
+        if (offset != null) {
+          ref.anchor = { path, offset }
+        }
       }
 
-      if (focus != null) {
-        const [offset] = focus
-        selection.focus = { path, offset }
+      for (const { ref = selection, offset } of getFoci(node)) {
+        if (offset != null) {
+          ref.focus = { path, offset }
+        }
+      }
+
+      for (const { ref, offset } of getPoints(node)) {
+        if (ref) {
+          ref.offset = offset
+          ref.path = path
+        }
       }
     }
 

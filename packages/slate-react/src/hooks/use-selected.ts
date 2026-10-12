@@ -6,9 +6,14 @@ import { ReactEditor } from '../plugin/react-editor'
 
 /**
  * Get the current `selected` state of an element.
+ *
+ * Set `suppressThrow` to return `false` instead of throwing when the element
+ * can no longer be found in the editor.
  */
 
-export const useSelected = (): boolean => {
+export const useSelected = ({
+  suppressThrow = false,
+}: { suppressThrow?: boolean } = {}): boolean => {
   const element = useElementIf()
 
   // Breaking the rules of hooks is fine here since `!element` will remain true
@@ -21,11 +26,20 @@ export const useSelected = (): boolean => {
   const selector = useCallback(
     (editor: Editor) => {
       if (!editor.selection) return false
-      const path = ReactEditor.findPath(editor, element)
-      const range = Editor.range(editor, path)
-      return !!Range.intersection(range, editor.selection)
+
+      try {
+        const path = ReactEditor.findPath(editor, element)
+        const range = Editor.range(editor, path)
+        return !!Range.intersection(range, editor.selection)
+      } catch (e) {
+        if (suppressThrow) {
+          return false
+        }
+
+        throw e
+      }
     },
-    [element]
+    [element, suppressThrow]
   )
 
   // eslint-disable-next-line react-hooks/rules-of-hooks

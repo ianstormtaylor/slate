@@ -48,7 +48,7 @@ Please include tests and docs with every pull request!
 
 ## Repository Setup
 
-The Slate repository is a monorepo that is managed with [lerna](https://github.com/lerna/lerna). Unlike more traditional repositories, this means that the repository must be built in order for tests, linting, or other common development activities to function as expected.
+The Slate repository is a monorepo of [Yarn workspaces](https://yarnpkg.com/features/workspaces). Unlike more traditional repositories, this means that the repository must be built in order for tests, linting, or other common development activities to function as expected.
 
 To run the build, you need to have the Slate repository cloned to your computer. After that, you need to `cd` into the directory where you cloned it, and install the dependencies with `yarn` and build the monorepo:
 
@@ -143,36 +143,28 @@ When making changes that might affect Android compatibility, you can perform the
 
 ## Publishing Releases
 
-**Important**: When creating releases using Lerna with the instructions below, you will be given choices around how to increase version numbers. You should always use a `major`, `minor` or `patch` release and must never use a `prerelease`. If a prerelease is used, the root package will not link to the packages in the `packages` directory creating hard to diagnose issues.
+Releases are automated with [Changesets](https://github.com/changesets/changesets) and run from GitHub Actions, so there is no manual publish step.
 
-### Publishing Normal `@latest` Release
+### Adding a Changeset
 
-Since we use [Lerna](https://lerna.js.org) to manage the Slate packages this is fairly easy, just run:
+Any pull request that changes a published package should describe its version bump with:
 
 ```text
-yarn release:latest
+yarn changeset
 ```
 
-And follow the prompts Lerna gives you.
+Commit the generated file in `.changeset/` alongside your changes.
 
-Note that this will automatically run the prelease script first that will build, test and lint before attempting to publish.
+### Publishing to `@latest`
 
-### Publishing `@next` Release
+Once a pull request lands on `main`, `.github/workflows/release.yml` collects the pending changesets into a "Version Packages" pull request. Merging that pull request publishes the new versions to the `latest` channel, pushes the git tags and creates the matching GitHub releases.
 
-If we are unsure as to the stability of a release because there are significant changes and/or particularly complex changes, release with the `@next` tag.
+### Publishing to `@dev`
 
-```text
-yarn release:next
-```
-
-And follow the prompts Lerna gives you.
-
-### Publishing `@experimental` Release
-
-If you need to create an experimental release to see how a published package will behave during an actual publish, release with the `@experimental` tag. End users should have no expectation that an `@experimental` release will be usable.
+Every push to `main` also publishes a snapshot to the `dev` channel, so the tip of `main` stays installable:
 
 ```text
-yarn release:experimental
+yarn add slate@dev
 ```
 
 ### Running Prerelease Script

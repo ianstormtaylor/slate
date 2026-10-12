@@ -10,11 +10,20 @@ export const unwrapNodes: NodeTransforms['unwrapNodes'] = (
   options = {}
 ) => {
   Editor.withoutNormalizing(editor, () => {
-    const { mode = 'lowest', split = false, voids = false } = options
+    const {
+      mode = 'lowest',
+      hanging = false,
+      split = false,
+      voids = false,
+    } = options
     let { at = editor.selection, match } = options
 
     if (!at) {
       return
+    }
+
+    if (!hanging && Range.isRange(at)) {
+      at = Editor.unhangRange(editor, at, { voids })
     }
 
     if (match == null) {

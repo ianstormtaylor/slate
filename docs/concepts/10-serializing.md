@@ -163,9 +163,9 @@ For example, here's a `deserialize` function for HTML:
 import { jsx } from 'slate-hyperscript'
 
 const deserialize = (el, markAttributes = {}) => {
-  if (el.nodeType === Node.TEXT_NODE) {
+  if (el.nodeType === window.Node.TEXT_NODE) {
     return jsx('text', markAttributes, el.textContent)
-  } else if (el.nodeType !== Node.ELEMENT_NODE) {
+  } else if (el.nodeType !== window.Node.ELEMENT_NODE) {
     return null
   }
 
@@ -205,6 +205,8 @@ const deserialize = (el, markAttributes = {}) => {
   }
 }
 ```
+
+The node type constants come from the DOM's `window.Node`, not Slate's `Node`, which shadows the DOM global wherever it's imported.
 
 It takes in an `el` HTML element object and returns a Slate fragment. So if you have an HTML string, you can parse and deserialize it like so:
 

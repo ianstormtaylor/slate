@@ -24,6 +24,10 @@ Check if the user is currently composing inside the editor.
 
 Check if the editor is focused.
 
+#### `ReactEditor.isMounted(editor: ReactEditor): boolean`
+
+Check if the editor is mounted, meaning it is rendered and has a DOM element. Methods that resolve DOM nodes, such as `toDOMNode`, throw for an editor that is not mounted.
+
 #### `ReactEditor.isReadOnly(editor: ReactEditor): boolean`
 
 Check if the editor is in read-only mode.

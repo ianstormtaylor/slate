@@ -6,6 +6,7 @@ import {
   createElement,
   createFocus,
   createFragment,
+  createPoint,
   createSelection,
   createText,
 } from './creators'
@@ -21,6 +22,7 @@ const DEFAULT_CREATORS = {
   element: createElement,
   focus: createFocus,
   fragment: createFragment,
+  point: createPoint,
   selection: createSelection,
   text: createText,
 }
@@ -47,18 +49,24 @@ type HyperscriptShorthands = Record<string, Record<string, any>>
  * Create a Slate hyperscript function with `options`.
  */
 
-const createHyperscript = (
+const createHyperscript = <
+  E extends HyperscriptShorthands = {},
+  C extends HyperscriptCreators = {},
+>(
   options: {
-    creators?: HyperscriptCreators
-    elements?: HyperscriptShorthands
+    creators?: C
+    elements?: E
   } = {}
 ) => {
-  const { elements = {} } = options
-  const elementCreators = normalizeElements(elements)
+  const { elements = {} as E } = options
+  const elementCreators = normalizeElements(elements) as Record<
+    keyof E,
+    HyperscriptCreators<Element>[string]
+  >
   const creators = {
     ...DEFAULT_CREATORS,
     ...elementCreators,
-    ...options.creators,
+    ...(options.creators as C),
   }
 
   const jsx = createFactory(creators)
@@ -71,10 +79,14 @@ const createHyperscript = (
 
 const createFactory = <T extends HyperscriptCreators>(creators: T) => {
   const jsx = <S extends keyof T & string>(
-    tagName: S,
+    tagName: S | Function,
     attributes?: Object,
     ...children: any[]
   ): ReturnType<T[S]> => {
+    if (typeof tagName === 'function') {
+      return tagName({ children, ...attributes })
+    }
+
     const creator = creators[tagName]
 
     if (!creator) {

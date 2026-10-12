@@ -59,6 +59,7 @@ export interface BaseEditor {
     options?: {
       operation?: Operation
       fallbackElement?: () => Element
+      force?: boolean
     }
   ) => void
   onChange: (options?: { operation?: Operation }) => void
@@ -97,7 +98,7 @@ export interface BaseEditor {
   removeNodes: OmitFirstArg<typeof Transforms.removeNodes>
   select: OmitFirstArg<typeof Transforms.select>
   setNodes: <T extends Node>(
-    props: Partial<T>,
+    props: Partial<NullableProps<T>>,
     options?: {
       at?: Location
       match?: NodeMatch<T>
@@ -985,5 +986,9 @@ export type NodeMatch<T extends Node> =
   | ((node: Node, path: Path) => node is T)
   | ((node: Node, path: Path) => boolean)
 
-export type PropsCompare = (prop: Partial<Node>, node: Partial<Node>) => boolean
-export type PropsMerge = (prop: Partial<Node>, node: Partial<Node>) => object
+export type PropsCompare = (prop: unknown, node: unknown) => boolean
+export type PropsMerge = (prop: unknown, node: unknown) => unknown
+
+export type NullableProps<T> = {
+  [K in keyof T]: undefined extends T[K] ? T[K] | null : T[K]
+}

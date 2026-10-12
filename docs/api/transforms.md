@@ -44,7 +44,7 @@ Options: `{at?: Location, hanging?: boolean, voids?: boolean}`
 
 #### `Transforms.insertNodes(editor: Editor, nodes: Node | Node[], options?)`
 
-Atomically inserts `nodes` at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
+Atomically insert `nodes` at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
 
 Options supported: `NodeOptions & {hanging?: boolean, select?: boolean}`.
 
@@ -80,7 +80,7 @@ Options supported: `NodeOptions & {height?: number, always?: boolean}`
 
 Wrap nodes at the specified location in the `element` container. If no location is specified, wrap the selection.
 
-Options supported: `NodeOptions & {split?: boolean}`.
+Options supported: `NodeOptions & {hanging?: boolean, split?: boolean}`.
 
 - `options.mode`: `'all'` is also supported.
 - `options.split` indicates that it's okay to split a node in order to wrap the location. For example, if `ipsum` was selected in a `Text` node with `lorem ipsum dolar`, `split: true` would wrap the word `ipsum` only, resulting in splitting the `Text` node. If `split: false`, the entire `Text` node `lorem ipsum dolar` would be wrapped.
@@ -89,13 +89,15 @@ Options supported: `NodeOptions & {split?: boolean}`.
 
 Unwrap nodes at the specified location. If necessary, the parent node is split. If no location is specified, use the selection.
 
-Options supported: `NodeOptions & {split?: boolean}`. For `options.mode`, `'all'` is also supported.
+Options supported: `NodeOptions & {hanging?: boolean, split?: boolean}`. For `options.mode`, `'all'` is also supported.
 
-#### `Transforms.setNodes(editor: Editor, props: Partial<Node>, options?)`
+#### `Transforms.setNodes(editor: Editor, props: Partial<NullableProps<Node>>, options?)`
 
-Set properties of nodes at the specified location. If no location is specified, use the selection.
+Set properties of nodes at the specified location. If no location is specified, use the selection. Optional node properties can be set to `null` to unset them.
 
 If `props` contains `undefined` values, the node's corresponding property will also be set to `undefined` as opposed to ignored.
+
+`children` and `text` in `props` are ignored, since they hold a node's content rather than its properties. To change content, use `insertNodes`, `removeNodes` or the text transforms.
 
 Options supported: `NodeOptions & {hanging?: boolean, split?: boolean}`. For `options.mode`, `'all'` is also supported.
 
@@ -114,6 +116,8 @@ Options supported: `NodeOptions`. For `options.mode`, `'all'` is also supported.
 #### `Transforms.moveNodes(editor: Editor, options)`
 
 Move the nodes from an origin to a destination. A destination must be specified in the `options`. If no origin is specified, move the selection.
+
+`to` is the path the node ends up at once the move is done, not the path it is inserted before. For example, with four blocks `1 2 3 4`, moving `[0]` to `[2]` gives `2 3 1 4`. When `match` selects several nodes, they are moved one at a time, each to `to`.
 
 Options supported: `NodeOptions & {to: Path}`. For `options.mode`, `'all'` is also supported.
 

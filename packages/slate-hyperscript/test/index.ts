@@ -7,13 +7,15 @@ describe('slate-hyperscript', () => {
     | {
         input: unknown[]
         output: unknown[]
+        test?: () => void
       }
     | {
         input: Record<string, unknown>
         output: Record<string, unknown>
+        test?: () => void
       }
   >(resolve(__dirname, 'fixtures'), ({ module }) => {
-    const { input, output } = module
+    const { input, output, test } = module
     let actual: unknown[] | Record<string, unknown> = {}
 
     if (Array.isArray(input)) {
@@ -25,5 +27,6 @@ describe('slate-hyperscript', () => {
     }
 
     assert.deepEqual(actual, output)
+    test?.()
   })
 })

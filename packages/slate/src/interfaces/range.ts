@@ -33,6 +33,8 @@ export interface RangeTransformOptions {
 }
 
 export interface RangeInterface {
+  direction: (range: Range) => 'forward' | 'backward' | 'collapsed'
+
   /**
    * Get the start and end points of a range, in the order in which they appear
    * in the document.
@@ -135,6 +137,11 @@ export interface RangeInterface {
 
 // eslint-disable-next-line no-redeclare
 export const Range: RangeInterface = {
+  direction(range: Range): 'forward' | 'backward' | 'collapsed' {
+    const order = Point.compare(range.focus, range.anchor)
+    return order > 0 ? 'forward' : order < 0 ? 'backward' : 'collapsed'
+  },
+
   edges(range: Range, options: RangeEdgesOptions = {}): [Point, Point] {
     const { reverse = false } = options
     const { anchor, focus } = range

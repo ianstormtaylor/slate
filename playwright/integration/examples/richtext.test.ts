@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import { dragSelection, selectStrings } from '../support/move-text'
 
 test.describe('On richtext example', () => {
   test.beforeEach(
@@ -52,15 +53,75 @@ test.describe('On richtext example', () => {
     await editor.press('Backspace')
     await expect(firstParagraph).toBeHidden()
 
-    await editor.press(
-      process.platform === 'darwin' ? 'Meta+ArrowDown' : 'Control+End'
-    )
-    await expect(secondParagraph).not.toBeInViewport()
+    await expect(async () => {
+      await page.evaluate(() =>
+        window.scrollTo(0, document.documentElement.scrollHeight)
+      )
+      await expect(secondParagraph).not.toBeInViewport({ timeout: 500 })
+    }).toPass()
 
     // Undo deletion
     await editor.press('ControlOrMeta+Z')
 
     await expect(firstParagraph).toBeVisible()
     await expect(firstParagraph).toBeInViewport()
+  })
+
+  test('dragging the quote line moves the quote without leaving it empty', async ({
+    page,
+    browserName,
+  }) => {
+    test.skip(browserName !== 'firefox', 'Native text drags need Firefox')
+    const textbox = page.getByRole('textbox')
+    await selectStrings(
+      page,
+      { text: 'A wise quote.', offset: 0 },
+      { text: 'Try it out for yourself!', offset: 0 }
+    )
+    await dragSelection(page, 'A wise quote.', { text: '!', edge: 'end' })
+    await expect(textbox.locator('blockquote')).toHaveCount(0)
+    await expect(textbox.locator('p').first()).toContainText('!A wise quote.')
+    await expect(
+      textbox.locator('p', { hasText: 'Try it out for yourself!' })
+    ).toHaveCount(1)
+  })
+
+  test('arrow keys scroll just enough to reveal the caret', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 800, height: 600 })
+    await page.getByRole('textbox').click()
+    await page.evaluate(() => {
+      const element = document.querySelector('[data-slate-editor]')!
+      const fiberKey = Object.keys(element).find(key =>
+        key.startsWith('__reactFiber$')
+      )!
+      let fiber = (element as any)[fiberKey]
+      while (fiber && !fiber.memoizedProps?.editor) {
+        fiber = fiber.return
+      }
+      const editor = fiber.memoizedProps.editor
+      const lines = Array.from({ length: 60 }, (_, index) => ({
+        type: 'paragraph',
+        children: [{ text: `Line ${index}` }],
+      }))
+      editor.insertNodes(lines, { at: [editor.children.length] })
+      const target = editor.children.length - 30
+      editor.select({ path: [target, 0], offset: 0 })
+    })
+    await page.waitForTimeout(300)
+
+    const before = await page.evaluate(() => {
+      const caretLine = window.getSelection()!.anchorNode!.parentElement!
+      window.scrollBy(0, caretLine.getBoundingClientRect().top - 2)
+      return window.scrollY
+    })
+    await page.waitForTimeout(300)
+    await page.keyboard.press('ArrowLeft')
+    await page.waitForTimeout(300)
+    const after = await page.evaluate(() => window.scrollY)
+
+    expect(before - after).toBeGreaterThan(0)
+    expect(before - after).toBeLessThan(120)
   })
 })

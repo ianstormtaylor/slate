@@ -17,7 +17,7 @@ export const input = (
 )
 export const output = (
   <editor>
-    <block>
+    <block void>
       <cursor />
     </block>
   </editor>

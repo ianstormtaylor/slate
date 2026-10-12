@@ -141,7 +141,7 @@ If you're maintaining a translation, feel free to pull request it here!
 
 ### Packages
 
-Slate's codebase is monorepo managed with [Lerna](https://lerna.js.org/). It consists of a handful of packages—although you won't always use all of them. They are:
+Slate's codebase is a monorepo of Yarn workspaces, released with [Changesets](https://github.com/changesets/changesets). It consists of a handful of packages—although you won't always use all of them. They are:
 
 | **Package**                                         |                                                                                                                           **Version** |                                                                                                                                                                                       **Size** | **Description**                                  |
 | :-------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------: | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------- |

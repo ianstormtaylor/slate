@@ -1,7 +1,5 @@
 import babel from 'rollup-plugin-babel'
-import builtins from 'rollup-plugin-node-builtins'
 import commonjs from 'rollup-plugin-commonjs'
-import globals from 'rollup-plugin-node-globals'
 import json from 'rollup-plugin-json'
 import replace from 'rollup-plugin-replace'
 import resolve from 'rollup-plugin-node-resolve'
@@ -45,6 +43,7 @@ function configure(pkg, env, target) {
 
     typescript({
       abortOnError: false,
+      include: ['*.ts', '**/*.ts', '*.tsx', '**/*.tsx'],
       tsconfig: `./packages/${pkg.name}/tsconfig.json`,
       // COMPAT: Without this flag sometimes the declarations are not updated.
       // clean: isProd ? true : false,
@@ -73,9 +72,6 @@ function configure(pkg, env, target) {
       'process.env.NODE_ENV': JSON.stringify(env),
     }),
 
-    // Register Node.js builtins for browserify compatibility.
-    builtins(),
-
     // Use Babel to transpile the result, limiting it to the source code.
     babel({
       runtimeHelpers: true,
@@ -92,6 +88,7 @@ function configure(pkg, env, target) {
                   '@babel/plugin-transform-regenerator',
                   '@babel/transform-async-to-generator',
                 ],
+                bugfixes: true,
                 modules: false,
                 targets: {
                   esmodules: isModule,
@@ -113,9 +110,6 @@ function configure(pkg, env, target) {
         '@babel/plugin-proposal-class-properties',
       ],
     }),
-
-    // Register Node.js globals for browserify compatibility.
-    globals(),
 
     // Only minify the output in production, since it is very slow. And only
     // for UMD builds, since modules will be bundled by the consumer.

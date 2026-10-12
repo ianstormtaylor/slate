@@ -1,5 +1,32 @@
 # slate-hyperscript
 
+## 0.129.1
+
+### Patch Changes
+
+- [#6152](https://github.com/ianstormtaylor/slate/pull/6152) [`fde516b`](https://github.com/ianstormtaylor/slate/commit/fde516bca389d92f9c6fb99a65ba00fef85f9e6b) Thanks [@dylans](https://github.com/dylans)! - Type the tags added through `createHyperscript`'s `elements` and `creators` options, so `h('item')` for a custom shorthand type-checks instead of failing with TS2345.
+
+## 0.127.0
+
+### Minor Changes
+
+- [#6103](https://github.com/ianstormtaylor/slate/pull/6103) [`0e798d36`](https://github.com/ianstormtaylor/slate/commit/0e798d363fb593f5f2ac245b6f4b6d982e2784b8) Thanks [@12joan](https://github.com/12joan)! - Add support for JSX components (the `slate-hyperscript` equivalent of React components)
+
+### Patch Changes
+
+- [#6102](https://github.com/ianstormtaylor/slate/pull/6102) [`45a16ee5`](https://github.com/ianstormtaylor/slate/commit/45a16ee53fa7c54a551c755cb96af5cb39eb868d) Thanks [@12joan](https://github.com/12joan)! - Convert numbers to strings and ignore booleans, consistent with React JSX
+
+## 0.125.0
+
+### Minor Changes
+
+- [#6065](https://github.com/ianstormtaylor/slate/pull/6065) [`cf5b3520`](https://github.com/ianstormtaylor/slate/commit/cf5b3520320d1b4ee3ad880041a7fdad43256e05) Thanks [@12joan](https://github.com/12joan)! - - Introduced new `HyperscriptPointRef` and `HyperscriptRangeRef` classes.
+  - A `HyperscriptPointRef` can passed to the `ref` prop of the new `<point />` tag to store any arbitrary point in the editor.
+  - To access the point, call the `point()` method on the `HyperscriptPointRef` instance.
+  - A `HyperscriptRangeRef` can be passed to the `ref` prop of an `<anchor />` or `<focus />` tag to construct an arbitrary range.
+  - `<anchor />` and `<focus />` tags used in this manner do not affect `editor.selection`.
+  - To access the range, call the `range()` method on the `HyperscriptRangeRef` instance.
+
 ## 0.115.0
 
 ### Patch Changes

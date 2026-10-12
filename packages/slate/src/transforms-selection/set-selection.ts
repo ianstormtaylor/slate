@@ -1,6 +1,7 @@
 import { SelectionTransforms } from '../interfaces/transforms/selection'
 import { Point } from '../interfaces/point'
 import { Selection } from '../interfaces'
+import { NON_SETTABLE_SELECTION_PROPERTIES } from '../interfaces/transforms/general'
 
 export const setSelection: SelectionTransforms['setSelection'] = (
   editor,
@@ -15,19 +16,19 @@ export const setSelection: SelectionTransforms['setSelection'] = (
   }
 
   for (const k in props) {
-    if (
-      (k === 'anchor' &&
-        props.anchor != null &&
-        !Point.equals(props.anchor, selection.anchor)) ||
-      (k === 'focus' &&
-        props.focus != null &&
-        !Point.equals(props.focus, selection.focus)) ||
-      (k !== 'anchor' &&
-        k !== 'focus' &&
-        props[k as keyof Selection] !== selection[k as keyof Selection])
-    ) {
-      oldProps[k as keyof Selection] = selection[k as keyof Selection]
-      newProps[k as keyof Selection] = props[k as keyof Selection]
+    if (NON_SETTABLE_SELECTION_PROPERTIES.includes(k)) {
+      continue
+    }
+
+    const value = Object.hasOwn(selection, k)
+      ? selection[<keyof Selection>k]
+      : undefined
+
+    const newValue = props[<keyof Selection>k]
+
+    if (compareSelectionProps(<keyof Selection>k, value, newValue)) {
+      oldProps[<keyof Selection>k] = selection[<keyof Selection>k]
+      newProps[<keyof Selection>k] = props[<keyof Selection>k]
     }
   }
 
@@ -38,4 +39,19 @@ export const setSelection: SelectionTransforms['setSelection'] = (
       newProperties: newProps,
     })
   }
+}
+
+function compareSelectionProps(
+  key: keyof Selection,
+  value: unknown,
+  newValue: unknown
+) {
+  if (
+    (key === 'anchor' || key === 'focus') &&
+    Point.isPoint(value) &&
+    Point.isPoint(newValue)
+  ) {
+    return !Point.equals(value, newValue)
+  }
+  return value !== newValue
 }

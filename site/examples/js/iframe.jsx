@@ -81,10 +81,10 @@ const MarkButton = ({ format, icon }) => {
   return (
     <Button
       active={isMarkActive(editor, format)}
-      onMouseDown={event => {
+      onPointerDown={event => {
         event.preventDefault()
-        toggleMark(editor, format)
       }}
+      onClick={() => toggleMark(editor, format)}
     >
       <Icon>{icon}</Icon>
     </Button>

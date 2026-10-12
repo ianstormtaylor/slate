@@ -32,6 +32,8 @@ Transforms.select(editor, selectionRef.unref())
 Call this when you no longer need to sync this range.
 It also returns the current value.
 
+This removes the ref from `Editor.rangeRefs(editor)` and sets `current` to `null`. If an operation removes a node containing either endpoint, the editor releases the ref automatically. Calling `unref()` again returns `null`.
+
 ## Static methods
 
 ### Transform methods
