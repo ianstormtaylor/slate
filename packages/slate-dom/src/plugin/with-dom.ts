@@ -37,29 +37,9 @@ import {
   EDITOR_TO_USER_MARKS,
   EDITOR_TO_USER_SELECTION,
   NODE_TO_KEY,
-  NODE_TO_PARENT,
 } from '../utils/weak-maps'
+import { copyNodeInUse } from '../utils/node-identity'
 import { DOMEditor } from './dom-editor'
-
-const INSERTED_NODES: WeakSet<Node> = new WeakSet()
-
-const isNodeInUse = (node: Node): boolean =>
-  NODE_TO_PARENT.has(node) ||
-  INSERTED_NODES.has(node) ||
-  (Node.isElement(node) && node.children.some(isNodeInUse))
-
-const copyNode = <N extends Node>(node: N): N =>
-  Node.isElement(node)
-    ? { ...node, children: node.children.map(copyNode) }
-    : { ...node }
-
-const markInserted = (node: Node) => {
-  INSERTED_NODES.add(node)
-
-  if (Node.isElement(node)) {
-    node.children.forEach(markInserted)
-  }
-}
 
 /**
  * `withDOM` adds DOM specific behaviors to the editor.
@@ -105,14 +85,8 @@ export const withDOM = <T extends BaseEditor>(
     e
 
   e.insertNodes = (nodes, options) => {
-    const prepare = <N extends Node>(node: N): N => {
-      const prepared = isNodeInUse(node) ? copyNode(node) : node
-      markInserted(prepared)
-      return prepared
-    }
-
     insertNodes(
-      Node.isNode(nodes) ? prepare(nodes) : nodes.map(prepare),
+      Node.isNode(nodes) ? copyNodeInUse(nodes) : nodes.map(copyNodeInUse),
       options
     )
   }
