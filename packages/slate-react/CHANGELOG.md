@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.133.7
+
+### Patch Changes
+
+- [#6233](https://github.com/ianstormtaylor/slate/pull/6233) [`a0bcf70`](https://github.com/ianstormtaylor/slate/commit/a0bcf7013898a826f894c5d1b7b125064f69abab) Thanks [@dylans](https://github.com/dylans)! - Sync the selection from the DOM before calling an `Editable` `onClick` handler, so `editor.selection` in the handler reflects the click instead of the previous selection.
+
 ## 0.133.6
 
 ### Patch Changes
