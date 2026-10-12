@@ -65,6 +65,29 @@ describe('nested native editing hosts', () => {
     }
   )
 
+  test('owns Slate text rendered inside an editable island', () => {
+    const editor = withReact(createEditor())
+    const { container } = render(
+      <Slate editor={editor} initialValue={initialValue}>
+        <Editable
+          renderElement={({ attributes, children }) => (
+            <div {...attributes} contentEditable={false}>
+              <span>Fixed header</span>
+              <span contentEditable suppressContentEditableWarning>
+                {children}
+              </span>
+            </div>
+          )}
+        />
+      </Slate>
+    )
+    const text = container.querySelector('[data-slate-string]')!.firstChild!
+    const island = container.querySelector('span[contenteditable="true"]')!
+
+    expect(ReactEditor.hasDOMNode(editor, text)).toBe(true)
+    expect(ReactEditor.hasDOMNode(editor, island)).toBe(true)
+  })
+
   test('keeps readonly text and non-editable descendants inside the editor', () => {
     const editor = withReact(createEditor())
     const { container } = render(

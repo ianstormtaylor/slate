@@ -539,7 +539,17 @@ export const DOMEditor: DOMEditorInterface = {
       closestShadowAware(nonEditableAncestor, '[data-slate-editor]') ===
         editorEl
     ) {
-      return false
+      const slateText =
+        closestShadowAware(targetEl, '[data-slate-node="text"]') ??
+        editableElement?.querySelector('[data-slate-node="text"]')
+
+      if (
+        !slateText ||
+        !editableElement?.contains(slateText) ||
+        closestShadowAware(slateText, '[data-slate-editor]') !== editorEl
+      ) {
+        return false
+      }
     }
 
     return !editable || targetEl.isContentEditable
