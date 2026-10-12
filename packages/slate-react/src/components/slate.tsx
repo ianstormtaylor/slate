@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Descendant, Editor, Node, Operation, Scrubber, Selection } from 'slate'
-import { EDITOR_TO_ON_CHANGE } from 'slate-dom'
+import { copyNodeInUse, EDITOR_TO_ON_CHANGE } from 'slate-dom'
 import { FocusedContext } from '../hooks/use-focused'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
 import {
@@ -59,8 +59,15 @@ export const Slate = (props: {
       )
     }
 
+    const copied = initialValue === undefined ? value : value.map(copyNodeInUse)
+    const children = copied.every((node, i) => node === value[i])
+      ? value
+      : copied
+
     editor.children =
-      value.length > 0 ? value : [{ children: [{ text: '' }] } as Descendant]
+      children.length > 0
+        ? children
+        : [{ children: [{ text: '' }] } as Descendant]
     Object.assign(editor, rest)
     initializedEditor.current = editor
   }

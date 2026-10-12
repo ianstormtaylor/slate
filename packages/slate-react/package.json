@@ -45,7 +45,7 @@
     "react": ">=18.2.0",
     "react-dom": ">=18.2.0",
     "slate": ">=0.121.0",
-    "slate-dom": ">=0.133.5"
+    "slate-dom": ">=0.133.6"
   },
   "peerDependenciesMeta": {
     "@types/lodash": {
