@@ -522,7 +522,10 @@ export const DOMEditor: DOMEditorInterface = {
     }
 
     return (
-      closestShadowAware(targetEl, `[data-slate-editor]`) === editorEl &&
+      closestShadowAware(
+        targetEl,
+        '[data-slate-editor], [contenteditable="true" i], [contenteditable=""], [contenteditable="plaintext-only" i]'
+      ) === editorEl &&
       (!editable || targetEl.isContentEditable
         ? true
         : (typeof targetEl.isContentEditable === 'boolean' && // isContentEditable exists only on HTMLElement, and on other nodes it will be undefined
