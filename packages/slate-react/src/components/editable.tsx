@@ -658,6 +658,9 @@ export const Editable = forwardRef(
           // triggering a `beforeinput` expecting the change to be applied to the immediately before
           // set selection.
           scheduleOnDOMSelectionChange.flush()
+          if (!(IS_WEBKIT && root instanceof ShadowRoot)) {
+            onDOMSelectionChange()
+          }
           onDOMSelectionChange.flush()
 
           const { selection } = editor
