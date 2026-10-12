@@ -105,6 +105,7 @@ describe('nested native editing hosts', () => {
     expect(ReactEditor.hasDOMNode(editor, text)).toBe(true)
     expect(ReactEditor.hasDOMNode(editor, nonEditable)).toBe(true)
   })
+
   test('keeps editable text when the editor itself is in a non-editable container', () => {
     const editor = withReact(createEditor())
     const { container } = render(
