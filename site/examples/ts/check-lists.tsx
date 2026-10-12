@@ -4,6 +4,7 @@ import {
   Descendant,
   Editor,
   Node,
+  Path,
   Point,
   Range,
   Element as SlateElement,
@@ -125,9 +126,25 @@ const withChecklists = (editor: CustomEditor) => {
 
   editor.insertBreak = () => {
     insertBreak()
+    const isCheckListItem = (n: Node) =>
+      Node.isElement(n) && n.type === 'check-list-item'
+    const [entry] = Editor.nodes(editor, { match: isCheckListItem })
+
+    if (!entry) {
+      return
+    }
+
+    const [item, path] = entry
+    const previousPath = Path.hasPrevious(path) ? Path.previous(path) : null
+    const previous = previousPath && Node.get(editor, previousPath)
+    const splitAtStart =
+      previous &&
+      isCheckListItem(previous) &&
+      Editor.isEmpty(editor, previous as SlateElement) &&
+      !Editor.isEmpty(editor, item as SlateElement)
     const newProperties: Partial<SlateElement> = { checked: false }
     Transforms.setNodes(editor, newProperties, {
-      match: n => Node.isElement(n) && n.type === 'check-list-item',
+      at: splitAtStart && previousPath ? previousPath : path,
     })
   }
 

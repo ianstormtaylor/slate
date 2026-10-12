@@ -14,6 +14,7 @@ test.describe('Check-lists example', () => {
       anchor: 4,
       focus: 4,
       texts: ['task', ''],
+      checkedAfter: [true, false],
     },
     {
       name: 'checked item middle',
@@ -21,6 +22,7 @@ test.describe('Check-lists example', () => {
       anchor: 2,
       focus: 2,
       texts: ['ta', 'sk'],
+      checkedAfter: [true, false],
     },
     {
       name: 'checked item start',
@@ -28,6 +30,7 @@ test.describe('Check-lists example', () => {
       anchor: 0,
       focus: 0,
       texts: ['', 'task'],
+      checkedAfter: [false, true],
     },
     {
       name: 'unchecked item end',
@@ -35,6 +38,7 @@ test.describe('Check-lists example', () => {
       anchor: 4,
       focus: 4,
       texts: ['task', ''],
+      checkedAfter: [false, false],
     },
     {
       name: 'selected text in a checked item',
@@ -42,9 +46,10 @@ test.describe('Check-lists example', () => {
       anchor: 1,
       focus: 3,
       texts: ['t', 'k'],
+      checkedAfter: [true, false],
     },
   ]) {
-    test(`Enter at ${scenario.name} creates an unchecked item`, async ({
+    test(`Enter at ${scenario.name} leaves only the new empty part unchecked`, async ({
       page,
     }, testInfo) => {
       test.skip(
@@ -88,7 +93,7 @@ test.describe('Check-lists example', () => {
 
       const expected = scenario.texts.map((text, index) => ({
         type: 'check-list-item',
-        checked: index === 0 ? scenario.checked : false,
+        checked: scenario.checkedAfter[index],
         children: [{ text }],
       }))
       await expect
@@ -96,14 +101,15 @@ test.describe('Check-lists example', () => {
         .toEqual(expected)
       const checkboxes = element.getByRole('checkbox')
       await expect(checkboxes).toHaveCount(2)
-      await expect(checkboxes.nth(0)).toBeChecked({ checked: scenario.checked })
-      await expect(checkboxes.nth(1)).not.toBeChecked()
-      await expect(
-        element
-          .locator('[data-slate-node="element"]')
-          .nth(1)
-          .locator('span[contenteditable="true"]')
-      ).toHaveCSS('text-decoration-line', 'none')
+      for (const [index, checked] of scenario.checkedAfter.entries()) {
+        await expect(checkboxes.nth(index)).toBeChecked({ checked })
+        await expect(
+          element
+            .locator('[data-slate-node="element"]')
+            .nth(index)
+            .locator('span[contenteditable="true"]')
+        ).toHaveCSS('text-decoration-line', checked ? 'line-through' : 'none')
+      }
       expect(await editor.evaluate(editor => editor.selection)).toEqual({
         anchor: { path: [1, 0], offset: 0 },
         focus: { path: [1, 0], offset: 0 },
