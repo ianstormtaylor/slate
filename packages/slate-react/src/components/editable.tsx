@@ -225,6 +225,7 @@ export const Editable = forwardRef(
     >()
     const processing = useRef(false)
     const compositionDOM = useCompositionDOM(editor)
+    const deleteOnCompositionEndRef = useRef(false)
 
     const { onUserInput, receivedUserInput } = useTrackUserInput()
 
@@ -390,6 +391,15 @@ export const Editable = forwardRef(
       () => debounce(onDOMSelectionChange, 0),
       [onDOMSelectionChange]
     )
+
+    const flushDOMSelectionChange = useCallback(() => {
+      const root = ReactEditor.toDOMNode(editor, editor).getRootNode()
+      scheduleOnDOMSelectionChange.flush()
+      if (!(IS_WEBKIT && root instanceof ShadowRoot)) {
+        onDOMSelectionChange()
+      }
+      onDOMSelectionChange.flush()
+    }, [editor, onDOMSelectionChange, scheduleOnDOMSelectionChange])
 
     androidInputManagerRef.current = useAndroidInputManager({
       node: ref,
@@ -657,11 +667,7 @@ export const Editable = forwardRef(
           // Some IMEs/Chrome extensions like e.g. Grammarly set the selection immediately before
           // triggering a `beforeinput` expecting the change to be applied to the immediately before
           // set selection.
-          scheduleOnDOMSelectionChange.flush()
-          if (!(IS_WEBKIT && root instanceof ShadowRoot)) {
-            onDOMSelectionChange()
-          }
-          onDOMSelectionChange.flush()
+          flushDOMSelectionChange()
 
           const { selection } = editor
           const { inputType: type } = event
@@ -673,7 +679,7 @@ export const Editable = forwardRef(
           // COMPAT: use composition change events as a hint to where we should insert
           // composition text if we aren't composing to work around https://github.com/ianstormtaylor/slate/issues/5038
           if (isCompositionChange && ReactEditor.isComposing(editor)) {
-            if (IS_CHROME) {
+            if (IS_CHROME || deleteOnCompositionEndRef.current) {
               compositionDOM.track(event.data)
             }
             return
@@ -935,12 +941,11 @@ export const Editable = forwardRef(
       },
       [
         editor,
-        onDOMSelectionChange,
         onUserInput,
         propsOnDOMBeforeInput,
         compositionDOM,
+        flushDOMSelectionChange,
         readOnly,
-        scheduleOnDOMSelectionChange,
       ]
     )
 
@@ -1430,12 +1435,21 @@ export const Editable = forwardRef(
                         event
                       )
 
+                      const deleteOnCompositionEnd =
+                        deleteOnCompositionEndRef.current
+                      deleteOnCompositionEndRef.current = false
+
                       if (
                         isEventHandled(event, attributes.onCompositionEnd) ||
                         IS_ANDROID
                       ) {
                         compositionDOM.clear()
                         return
+                      }
+
+                      if (deleteOnCompositionEnd && !event.data) {
+                        compositionDOM.restore()
+                        Editor.deleteFragment(editor)
                       }
 
                       // COMPAT: In Chrome, `beforeinput` events for compositions
@@ -1509,14 +1523,27 @@ export const Editable = forwardRef(
                       compositionDOM.clear()
                       setIsComposing(true)
 
+                      flushDOMSelectionChange()
+
                       const { selection } = editor
                       if (selection && Range.isExpanded(selection)) {
+                        if (IS_FIREFOX && !IS_FIREFOX_LEGACY) {
+                          compositionDOM.observe()
+                          deleteOnCompositionEndRef.current = true
+                          return
+                        }
+
                         Editor.deleteFragment(editor)
                         return
                       }
                     }
                   },
-                  [attributes.onCompositionStart, editor, compositionDOM]
+                  [
+                    attributes.onCompositionStart,
+                    editor,
+                    compositionDOM,
+                    flushDOMSelectionChange,
+                  ]
                 )}
                 onCopy={useCallback(
                   (event: React.ClipboardEvent<HTMLDivElement>) => {
