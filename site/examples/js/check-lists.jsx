@@ -73,7 +73,7 @@ const CheckListsExample = () => {
   )
 }
 const withChecklists = editor => {
-  const { deleteBackward } = editor
+  const { deleteBackward, insertBreak } = editor
   editor.deleteBackward = (...args) => {
     const { selection } = editor
     if (selection && Range.isCollapsed(selection)) {
@@ -95,6 +95,13 @@ const withChecklists = editor => {
       }
     }
     deleteBackward(...args)
+  }
+  editor.insertBreak = () => {
+    insertBreak()
+    const newProperties = { checked: false }
+    Transforms.setNodes(editor, newProperties, {
+      match: n => Node.isElement(n) && n.type === 'check-list-item',
+    })
   }
   return editor
 }

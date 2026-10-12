@@ -94,7 +94,7 @@ const CheckListsExample = () => {
 }
 
 const withChecklists = (editor: CustomEditor) => {
-  const { deleteBackward } = editor
+  const { deleteBackward, insertBreak } = editor
 
   editor.deleteBackward = (...args) => {
     const { selection } = editor
@@ -121,6 +121,14 @@ const withChecklists = (editor: CustomEditor) => {
     }
 
     deleteBackward(...args)
+  }
+
+  editor.insertBreak = () => {
+    insertBreak()
+    const newProperties: Partial<SlateElement> = { checked: false }
+    Transforms.setNodes(editor, newProperties, {
+      match: n => Node.isElement(n) && n.type === 'check-list-item',
+    })
   }
 
   return editor
