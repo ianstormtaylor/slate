@@ -42,6 +42,15 @@ test('a trailing soft break puts the caret on the new line', async ({
     .poll(() => editor.evaluate(editor => editor.string([])))
     .toBe('abc\n\nZ')
   await page.keyboard.press('Backspace')
+  await expect
+    .poll(() =>
+      editor.evaluate(editor => ({
+        text: editor.string([]),
+        offset: editor.selection?.anchor.offset,
+      }))
+    )
+    .toEqual({ text: 'abc\n\n', offset: 5 })
+  await expect(element).toHaveText(/^abc\n\n\n$/)
   await page.keyboard.press('Backspace')
   await expect
     .poll(() => editor.evaluate(editor => editor.string([])))
