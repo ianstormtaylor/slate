@@ -23,7 +23,7 @@ const setup = async () => {
   return { editor, scrollSelectionIntoView }
 }
 
-test('calls the custom scroll hook after deleting backward between empty paragraphs', async () => {
+test('does not scroll for an edit that did not come from user input', async () => {
   const { editor, scrollSelectionIntoView } = await setup()
 
   await act(async () => {
@@ -31,15 +31,7 @@ test('calls the custom scroll hook after deleting backward between empty paragra
   })
 
   expect(editor.children).toHaveLength(1)
-  expect(editor.selection).toEqual({
-    anchor: { path: [0, 0], offset: 0 },
-    focus: { path: [0, 0], offset: 0 },
-  })
-  expect(scrollSelectionIntoView).toHaveBeenCalledTimes(1)
-  expect(scrollSelectionIntoView).toHaveBeenCalledWith(
-    editor,
-    expect.any(Range)
-  )
+  expect(scrollSelectionIntoView).not.toHaveBeenCalled()
 })
 
 test('does not scroll an already synchronized selection on a render without input', async () => {

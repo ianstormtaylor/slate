@@ -223,6 +223,7 @@ export const Editable = forwardRef(
     const ref = useRef<HTMLDivElement | null>(null)
     const previousChildren = useRef(editor.children)
     const previousSelection = useRef(editor.selection)
+    const pendingInputScroll = useRef(false)
     const deferredOperations = useRef<DeferredOperation[]>([])
     const [placeholderHeight, setPlaceholderHeight] = useState<
       number | undefined
@@ -425,7 +426,10 @@ export const Editable = forwardRef(
 
       // Make sure the DOM selection state is in sync.
       const { selection } = editor
+      const scrollForInput = pendingInputScroll.current
+      pendingInputScroll.current = false
       const selectionChangedByEdit =
+        scrollForInput &&
         previousChildren.current !== editor.children &&
         !!selection &&
         (!previousSelection.current ||
@@ -667,6 +671,7 @@ export const Editable = forwardRef(
           return
         }
         onUserInput()
+        pendingInputScroll.current = true
 
         if (!readOnly && !isDOMEventHandled(event, propsOnDOMBeforeInput)) {
           // COMPAT: BeforeInput events aren't cancelable on android, so we have to handle them differently using the android input manager.
