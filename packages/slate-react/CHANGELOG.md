@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.133.3
+
+### Patch Changes
+
+- [#6210](https://github.com/ianstormtaylor/slate/pull/6210) [`ba60596`](https://github.com/ianstormtaylor/slate/commit/ba605969a50f520a38750051e0c56b41538baf4c) Thanks [@dylans](https://github.com/dylans)! - Clip text-node decorations to the node's range so decorations for other nodes are ignored and cross-node ranges use the correct offsets.
+
 ## 0.133.2
 
 ### Patch Changes
