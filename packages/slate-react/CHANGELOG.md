@@ -1,5 +1,15 @@
 # slate-react
 
+## 0.133.6
+
+### Patch Changes
+
+- [#6229](https://github.com/ianstormtaylor/slate/pull/6229) [`c486bad`](https://github.com/ianstormtaylor/slate/commit/c486badad7a8af56eaaa7f91461874e16b79d355) Thanks [@dylans](https://github.com/dylans)! - Move the caret to the empty last line of a block that ends with a newline when pressing ArrowUp from the block below in Chrome and Safari, which skipped that block natively.
+
+- [#6226](https://github.com/ianstormtaylor/slate/pull/6226) [`a8329a2`](https://github.com/ianstormtaylor/slate/commit/a8329a27140fe468c306933a8ed1bebd610d88b9) Thanks [@dylans](https://github.com/dylans)! - Copy `initialValue` nodes that another editor is already using, so two `Slate` components given the same value render and edit independently instead of throwing "Unable to find the path for Slate node". Requires slate-dom 0.133.6 or newer.
+
+- [#6225](https://github.com/ianstormtaylor/slate/pull/6225) [`cb788f8`](https://github.com/ianstormtaylor/slate/commit/cb788f8c368adcdb09efb1bb0c94150bab8fa6a3) Thanks [@dylans](https://github.com/dylans)! - Extend the selection from a selected void when Shift-clicking text, instead of leaving it collapsed in the void in Chromium.
+
 ## 0.133.5
 
 ### Patch Changes

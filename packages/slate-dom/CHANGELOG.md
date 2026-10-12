@@ -1,5 +1,13 @@
 # slate-dom
 
+## 0.133.6
+
+### Patch Changes
+
+- [#6228](https://github.com/ianstormtaylor/slate/pull/6228) [`3a5e736`](https://github.com/ianstormtaylor/slate/commit/3a5e736e3818f46bed66afa342690120797b5e67) Thanks [@dylans](https://github.com/dylans)! - Return the correct path from `findPath` when it is called after an operation but before the editor re-renders, such as in `onChange`, instead of throwing or returning the old path.
+
+- [#6226](https://github.com/ianstormtaylor/slate/pull/6226) [`a8329a2`](https://github.com/ianstormtaylor/slate/commit/a8329a27140fe468c306933a8ed1bebd610d88b9) Thanks [@dylans](https://github.com/dylans)! - Copy `initialValue` nodes that another editor is already using, so two `Slate` components given the same value render and edit independently instead of throwing "Unable to find the path for Slate node". Requires slate-dom 0.133.6 or newer.
+
 ## 0.133.5
 
 ### Patch Changes
