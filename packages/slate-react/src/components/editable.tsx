@@ -34,6 +34,7 @@ import { ReadOnlyContext } from '../hooks/use-read-only'
 import { useSlate } from '../hooks/use-slate'
 import { useTrackUserInput } from '../hooks/use-track-user-input'
 import { useCompositionDOM } from '../hooks/use-composition-dom'
+import { getPointAboveTrailingNewline } from '../utils/trailing-newline'
 import { ReactEditor } from '../plugin/react-editor'
 import { deleteMovedRange, getMovableRange } from '../utils/move-range'
 import { TRIPLE_CLICK } from 'slate-dom'
@@ -1817,6 +1818,32 @@ export const Editable = forwardRef(
                         }
 
                         return
+                      }
+
+                      if (
+                        (IS_CHROME || IS_WEBKIT) &&
+                        nativeEvent.key === 'ArrowUp' &&
+                        !nativeEvent.altKey &&
+                        !nativeEvent.ctrlKey &&
+                        !nativeEvent.metaKey &&
+                        selection &&
+                        (nativeEvent.shiftKey || Range.isCollapsed(selection))
+                      ) {
+                        const above = getPointAboveTrailingNewline(
+                          editor,
+                          selection.focus
+                        )
+
+                        if (above) {
+                          event.preventDefault()
+                          Transforms.select(
+                            editor,
+                            nativeEvent.shiftKey
+                              ? { anchor: selection.anchor, focus: above }
+                              : above
+                          )
+                          return
+                        }
                       }
 
                       // COMPAT: Certain browsers don't handle the selection updates
