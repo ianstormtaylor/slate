@@ -59,8 +59,10 @@ export const Slate = (props: {
       )
     }
 
-    const children =
-      initialValue === undefined ? value : value.map(copyNodeInUse)
+    const copied = initialValue === undefined ? value : value.map(copyNodeInUse)
+    const children = copied.every((node, i) => node === value[i])
+      ? value
+      : copied
 
     editor.children =
       children.length > 0
