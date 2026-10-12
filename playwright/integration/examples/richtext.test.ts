@@ -23,6 +23,23 @@ test.describe('On richtext example', () => {
     )
   })
 
+  test('starts a new line after right-to-left text right-to-left', async ({
+    page,
+  }) => {
+    const editor = page.getByRole('textbox')
+
+    await editor.press('ControlOrMeta+A')
+    await editor.press('Backspace')
+    await page.keyboard.insertText('שלום')
+    await editor.press('Enter')
+
+    const blocks = editor.locator('[data-slate-node="element"]')
+    await expect(blocks).toHaveCount(2)
+    expect(
+      await blocks.nth(1).evaluate(block => getComputedStyle(block).direction)
+    ).toBe('rtl')
+  })
+
   test('undo scrolls back to restored text after deletion and scroll away', async ({
     page,
   }) => {
