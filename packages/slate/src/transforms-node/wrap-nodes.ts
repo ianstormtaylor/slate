@@ -59,39 +59,83 @@ export const wrapNodes: NodeTransforms['wrapNodes'] = (
         return blockAbove && Editor.isEdge(editor, point, blockAbove[1])
       }
 
-      const splitAt = (point: Point) => {
-        let splitMatch = match
-        let splitMode: 'lowest' | 'highest' = 'lowest'
+      const backward = Range.isBackward(at)
+      const collapsed = Range.isCollapsed(at)
+      const splitAt = (point: Point, edge: 'start' | 'end') => {
+        const [entry] = Editor.nodes(editor, {
+          at: point,
+          match,
+          mode: 'lowest',
+          voids,
+        })
 
-        if (editor.isInline(element)) {
-          const [entry] = Editor.nodes(editor, {
+        if (
+          !editor.isInline(element) ||
+          collapsed ||
+          !entry ||
+          !Node.isText(entry[0])
+        ) {
+          Transforms.splitNodes(editor, {
             at: point,
             match,
-            mode: 'lowest',
             voids,
+            always: !isAtBlockEdge(point),
           })
-
-          if (entry && entry[1].length > commonPath.length) {
-            splitMatch = (node, path) =>
-              path.length > commonPath.length &&
-              path.length <= entry[1].length &&
-              (Node.isText(node) ||
-                (Node.isElement(node) && editor.isInline(node)))
-            splitMode = 'highest'
-          }
+          return
         }
 
         Transforms.splitNodes(editor, {
           at: point,
-          match: splitMatch,
-          mode: splitMode,
+          match: Node.isText,
           voids,
           always: !isAtBlockEdge(point),
         })
+
+        const key =
+          edge === 'start'
+            ? backward
+              ? 'focus'
+              : 'anchor'
+            : backward
+            ? 'anchor'
+            : 'focus'
+        const minDepth = Math.min(commonPath.length + 1, entry[1].length)
+        const hasContent = (node: Node) =>
+          !Node.isText(node) || node.text !== ''
+
+        for (let depth = point.path.length - 1; depth >= minDepth; depth--) {
+          const current = rangeRef.current![key]
+          const path = current.path.slice(0, depth)
+          const node = Node.get(editor, path)
+
+          if (!Node.isElement(node) || !editor.isInline(node)) continue
+
+          const position = current.path[depth] + (edge === 'end' ? 1 : 0)
+          const before = node.children.slice(0, position).some(hasContent)
+          const after = node.children.slice(position).some(hasContent)
+
+          if (before && after) {
+            editor.apply({
+              type: 'split_node',
+              path,
+              position,
+              properties: Node.extractProps(node),
+            })
+          } else if (edge === 'start' ? before : after) {
+            const outside =
+              edge === 'start'
+                ? Editor.after(editor, path, { voids })
+                : Editor.before(editor, path, { voids })
+
+            if (outside) {
+              rangeRef.current = { ...rangeRef.current!, [key]: outside }
+            }
+          }
+        }
       }
 
-      splitAt(end)
-      splitAt(start)
+      splitAt(end, 'end')
+      splitAt(start, 'start')
 
       at = rangeRef.unref()!
 
