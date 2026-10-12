@@ -35,6 +35,7 @@ import { useSlate } from '../hooks/use-slate'
 import { useTrackUserInput } from '../hooks/use-track-user-input'
 import { useCompositionDOM } from '../hooks/use-composition-dom'
 import { getPointAboveTrailingNewline } from '../utils/trailing-newline'
+import { getCharacterMoveUnit } from '../utils/character-move'
 import { ReactEditor } from '../plugin/react-editor'
 import { deleteMovedRange, getMovableRange } from '../utils/move-range'
 import { TRIPLE_CLICK } from 'slate-dom'
@@ -1896,7 +1897,14 @@ export const Editable = forwardRef(
                         event.preventDefault()
 
                         if (selection && Range.isCollapsed(selection)) {
-                          Transforms.move(editor, { reverse: !isRTL })
+                          Transforms.move(editor, {
+                            reverse: !isRTL,
+                            unit: getCharacterMoveUnit(
+                              editor,
+                              selection.focus,
+                              !isRTL
+                            ),
+                          })
                         } else {
                           Transforms.collapse(editor, {
                             edge: isRTL ? 'end' : 'start',
@@ -1910,7 +1918,14 @@ export const Editable = forwardRef(
                         event.preventDefault()
 
                         if (selection && Range.isCollapsed(selection)) {
-                          Transforms.move(editor, { reverse: isRTL })
+                          Transforms.move(editor, {
+                            reverse: isRTL,
+                            unit: getCharacterMoveUnit(
+                              editor,
+                              selection.focus,
+                              isRTL
+                            ),
+                          })
                         } else {
                           Transforms.collapse(editor, {
                             edge: isRTL ? 'start' : 'end',
