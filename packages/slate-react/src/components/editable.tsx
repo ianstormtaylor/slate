@@ -1349,6 +1349,10 @@ export const Editable = forwardRef(
                 )}
                 onClick={useCallback(
                   (event: React.MouseEvent<HTMLDivElement>) => {
+                    if (ReactEditor.hasTarget(editor, event.target)) {
+                      flushDOMSelectionChange()
+                    }
+
                     if (
                       ReactEditor.hasTarget(editor, event.target) &&
                       !isEventHandled(event, attributes.onClick) &&
@@ -1446,7 +1450,12 @@ export const Editable = forwardRef(
                       }
                     }
                   },
-                  [editor, attributes.onClick, readOnly]
+                  [
+                    editor,
+                    attributes.onClick,
+                    readOnly,
+                    flushDOMSelectionChange,
+                  ]
                 )}
                 onCompositionEnd={useCallback(
                   (event: React.CompositionEvent<HTMLDivElement>) => {
