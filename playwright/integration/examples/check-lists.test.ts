@@ -167,6 +167,46 @@ test.describe('Check-lists example', () => {
     await editor.dispose()
   })
 
+  test('typing, deleting and Enter stay in an editable checklist span', async ({
+    page,
+  }) => {
+    const element = page.getByRole('textbox')
+    const editor = await getEditorHandle(element)
+    const item = element.locator('[data-slate-node="element"]').filter({
+      hasText: 'Slide to the left.',
+    })
+    await item.locator('span[contenteditable="true"]').click()
+    await page.waitForTimeout(200)
+    await page.keyboard.press('End')
+    await page.waitForTimeout(200)
+    await page.keyboard.type('XYZ', { delay: 120 })
+    await expect
+      .poll(() => editor.evaluate(editor => editor.string([1])))
+      .toBe('Slide to the left.XYZ')
+    await page.keyboard.press('Backspace')
+    await expect
+      .poll(() => editor.evaluate(editor => editor.string([1])))
+      .toBe('Slide to the left.XY')
+    await page.keyboard.press('Enter')
+    await page.waitForTimeout(200)
+    await page.keyboard.type('new', { delay: 120 })
+    await expect
+      .poll(() => editor.evaluate(editor => editor.children.slice(1, 3)))
+      .toEqual([
+        {
+          type: 'check-list-item',
+          checked: true,
+          children: [{ text: 'Slide to the left.XY' }],
+        },
+        {
+          type: 'check-list-item',
+          checked: false,
+          children: [{ text: 'new' }],
+        },
+      ])
+    await editor.dispose()
+  })
+
   test('checks the bullet when clicked', async ({ page }) => {
     const slateNodeElement = 'div[data-slate-node="element"]'
 

@@ -3,4 +3,4 @@
 'slate-react': patch
 ---
 
-Keep input, selection and history events from nested native contenteditable regions out of the surrounding Slate editor.
+Keep input, selection and history events from native contenteditable regions nested inside non-editable containers out of the surrounding Slate editor.

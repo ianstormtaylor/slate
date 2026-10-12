@@ -517,23 +517,38 @@ export const DOMEditor: DOMEditorInterface = {
       }
     }
 
-    if (!targetEl) {
+    if (
+      !targetEl ||
+      closestShadowAware(targetEl, '[data-slate-editor]') !== editorEl
+    ) {
       return false
     }
 
-    return (
-      closestShadowAware(
-        targetEl,
-        '[data-slate-editor], [contenteditable="true" i], [contenteditable=""], [contenteditable="plaintext-only" i]'
-      ) === editorEl &&
-      (!editable || targetEl.isContentEditable
-        ? true
-        : (typeof targetEl.isContentEditable === 'boolean' && // isContentEditable exists only on HTMLElement, and on other nodes it will be undefined
-            // this is the core logic that lets you know you got the right editor.selection instead of null when editor is contenteditable="false"(readOnly)
-            closestShadowAware(targetEl, '[contenteditable="false"]') ===
-              editorEl) ||
-          !!targetEl.getAttribute('data-slate-zero-width'))
+    const editableElement = closestShadowAware(
+      targetEl,
+      '[contenteditable="true" i], [contenteditable=""], [contenteditable="plaintext-only" i]'
     )
+    const nonEditableAncestor =
+      editableElement && editableElement !== editorEl
+        ? closestShadowAware(editableElement, '[contenteditable="false" i]')
+        : null
+
+    if (
+      nonEditableAncestor &&
+      nonEditableAncestor !== editorEl &&
+      closestShadowAware(nonEditableAncestor, '[data-slate-editor]') ===
+        editorEl
+    ) {
+      return false
+    }
+
+    return !editable || targetEl.isContentEditable
+      ? true
+      : (typeof targetEl.isContentEditable === 'boolean' && // isContentEditable exists only on HTMLElement, and on other nodes it will be undefined
+          // this is the core logic that lets you know you got the right editor.selection instead of null when editor is contenteditable="false"(readOnly)
+          closestShadowAware(targetEl, '[contenteditable="false"]') ===
+            editorEl) ||
+          !!targetEl.getAttribute('data-slate-zero-width')
   },
 
   hasEditableTarget: (editor, target): target is DOMNode =>

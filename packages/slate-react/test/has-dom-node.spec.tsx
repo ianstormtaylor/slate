@@ -34,7 +34,7 @@ describe('ReactEditor.hasDOMNode', () => {
 
 describe('nested native editing hosts', () => {
   test.each(['true', '', 'plaintext-only', 'TRUE'])(
-    'excludes contenteditable=%s from the outer editor',
+    'excludes contenteditable=%s only inside a non-editable island',
     contentEditable => {
       const editor = withReact(createEditor())
       const { container } = render(
@@ -46,9 +46,15 @@ describe('nested native editing hosts', () => {
       const inner = document.createElement('div')
       inner.setAttribute('contenteditable', contentEditable)
       inner.textContent = 'inner'
-      outer.appendChild(inner)
+      const island = document.createElement('span')
+      island.setAttribute('contenteditable', 'false')
+      outer.append(island, inner)
 
       expect(ReactEditor.hasDOMNode(editor, outer)).toBe(true)
+      expect(ReactEditor.hasDOMNode(editor, inner)).toBe(true)
+      expect(ReactEditor.hasDOMNode(editor, inner.firstChild!)).toBe(true)
+
+      island.appendChild(inner)
       expect(ReactEditor.hasDOMNode(editor, inner)).toBe(false)
       expect(ReactEditor.hasEditableTarget(editor, inner.firstChild)).toBe(
         false
@@ -75,5 +81,22 @@ describe('nested native editing hosts', () => {
     expect(ReactEditor.hasDOMNode(editor, outer)).toBe(true)
     expect(ReactEditor.hasDOMNode(editor, text)).toBe(true)
     expect(ReactEditor.hasDOMNode(editor, nonEditable)).toBe(true)
+  })
+  test('keeps editable text when the editor itself is in a non-editable container', () => {
+    const editor = withReact(createEditor())
+    const { container } = render(
+      <div contentEditable={false}>
+        <Slate editor={editor} initialValue={initialValue}>
+          <Editable />
+        </Slate>
+      </div>
+    )
+    const outer = container.querySelector('[data-slate-editor]')!
+    const inner = document.createElement('span')
+    inner.setAttribute('contenteditable', 'true')
+    inner.textContent = 'inside'
+    outer.appendChild(inner)
+
+    expect(ReactEditor.hasDOMNode(editor, inner.firstChild!)).toBe(true)
   })
 })
