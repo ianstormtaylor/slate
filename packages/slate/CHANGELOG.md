@@ -1,5 +1,11 @@
 # slate
 
+## 0.133.3
+
+### Patch Changes
+
+- [#6213](https://github.com/ianstormtaylor/slate/pull/6213) [`e2c702c`](https://github.com/ianstormtaylor/slate/commit/e2c702c84a6a95ce5b22883a6625932186e236cf) Thanks [@dylans](https://github.com/dylans)! - Preserve selection endpoints at the end of the document when inserting fragments so pasting over select-all removes trailing voids and empty paragraphs.
+
 ## 0.133.1
 
 ### Patch Changes
