@@ -83,6 +83,11 @@ const createFactory = <T extends HyperscriptCreators>(creators: T) => {
     attributes?: Object,
     ...children: any[]
   ): ReturnType<T[S]> => {
+    if (isObject(attributes)) {
+      const { __self, __source, ...rest } = attributes
+      attributes = rest
+    }
+
     if (typeof tagName === 'function') {
       return tagName({ children, ...attributes })
     }
