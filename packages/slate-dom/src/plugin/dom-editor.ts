@@ -679,7 +679,10 @@ export const DOMEditor: DOMEditorInterface = {
 
       if (point.offset <= end) {
         const offset = Math.min(length, Math.max(0, point.offset - start))
-        domPoint = [domNode, offset]
+        domPoint =
+          offset === length && text.hasAttribute('data-slate-trailing')
+            ? [text.lastChild!, 0]
+            : [domNode, offset]
         break
       }
 
@@ -792,7 +795,14 @@ export const DOMEditor: DOMEditorInterface = {
           const window = DOMEditor.getWindow(editor)
           const range = window.document.createRange()
           range.setStart(textNode, 0)
-          range.setEnd(nearestNode, nearestOffset)
+          range.setEnd(
+            nearestNode,
+            parentNode.hasAttribute('data-slate-trailing') &&
+              nearestNode === parentNode.lastChild &&
+              nearestNode.textContent === '\n'
+              ? 0
+              : nearestOffset
+          )
 
           const contents = range.cloneContents()
           const removals = [
@@ -1125,6 +1135,7 @@ export const DOMEditor: DOMEditorInterface = {
     // Slate point. (2023/11/01)
     if (
       IS_FIREFOX &&
+      !focusNode.parentElement?.hasAttribute('data-slate-trailing') &&
       focusNode.textContent?.endsWith('\n\n') &&
       focusOffset === focusNode.textContent.length
     ) {
