@@ -41,6 +41,9 @@ export const wrapNodes: NodeTransforms['wrapNodes'] = (
 
     if (split && Location.isRange(at)) {
       const [start, end] = Range.edges(at)
+      const commonPath = Path.equals(start.path, end.path)
+        ? Path.parent(start.path)
+        : Path.common(start.path, end.path)
 
       const rangeRef = Editor.rangeRef(editor, at, {
         affinity: 'inward',
@@ -56,19 +59,39 @@ export const wrapNodes: NodeTransforms['wrapNodes'] = (
         return blockAbove && Editor.isEdge(editor, point, blockAbove[1])
       }
 
-      Transforms.splitNodes(editor, {
-        at: end,
-        match,
-        voids,
-        always: !isAtBlockEdge(end),
-      })
+      const splitAt = (point: Point) => {
+        let splitMatch = match
+        let splitMode: 'lowest' | 'highest' = 'lowest'
 
-      Transforms.splitNodes(editor, {
-        at: start,
-        match,
-        voids,
-        always: !isAtBlockEdge(start),
-      })
+        if (editor.isInline(element)) {
+          const [entry] = Editor.nodes(editor, {
+            at: point,
+            match,
+            mode: 'lowest',
+            voids,
+          })
+
+          if (entry && entry[1].length > commonPath.length) {
+            splitMatch = (node, path) =>
+              path.length > commonPath.length &&
+              path.length <= entry[1].length &&
+              (Node.isText(node) ||
+                (Node.isElement(node) && editor.isInline(node)))
+            splitMode = 'highest'
+          }
+        }
+
+        Transforms.splitNodes(editor, {
+          at: point,
+          match: splitMatch,
+          mode: splitMode,
+          voids,
+          always: !isAtBlockEdge(point),
+        })
+      }
+
+      splitAt(end)
+      splitAt(start)
 
       at = rangeRef.unref()!
 
