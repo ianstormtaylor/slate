@@ -221,6 +221,8 @@ export const Editable = forwardRef(
     // Rerender editor when composition status changed
     const [isComposing, setIsComposing] = useState(false)
     const ref = useRef<HTMLDivElement | null>(null)
+    const previousChildren = useRef(editor.children)
+    const previousSelection = useRef(editor.selection)
     const deferredOperations = useRef<DeferredOperation[]>([])
     const [placeholderHeight, setPlaceholderHeight] = useState<
       number | undefined
@@ -423,6 +425,13 @@ export const Editable = forwardRef(
 
       // Make sure the DOM selection state is in sync.
       const { selection } = editor
+      const selectionChangedByEdit =
+        previousChildren.current !== editor.children &&
+        !!selection &&
+        (!previousSelection.current ||
+          !Range.equals(previousSelection.current, selection))
+      previousChildren.current = editor.children
+      previousSelection.current = selection
       const root = ReactEditor.findDocumentOrShadowRoot(editor)
       const domSelection = getSelection(root)
 
@@ -488,19 +497,18 @@ export const Editable = forwardRef(
             suppressThrow: true,
           })
 
-          if (slateRange && Range.equals(slateRange, selection)) {
-            if (!state.hasMarkPlaceholder) {
-              return
-            }
-
-            // Ensure selection is inside the mark placeholder
-            if (
+          if (
+            slateRange &&
+            Range.equals(slateRange, selection) &&
+            (!state.hasMarkPlaceholder ||
               anchorNode?.parentElement?.hasAttribute(
                 'data-slate-mark-placeholder'
-              )
-            ) {
-              return
+              ))
+          ) {
+            if (selectionChangedByEdit) {
+              scrollSelectionIntoView(editor, domSelection.getRangeAt(0))
             }
+            return
           }
         }
 
