@@ -1,5 +1,23 @@
 # slate-react
 
+## 0.133.5
+
+### Patch Changes
+
+- [#6224](https://github.com/ianstormtaylor/slate/pull/6224) [`84f047c`](https://github.com/ianstormtaylor/slate/commit/84f047c858785112e563ad53a5b5c333817eaec4) Thanks [@dylans](https://github.com/dylans)! - Replace an expanded selection correctly when an IME composition starts right after selecting it. The selection is now synced before the composition starts, and Firefox no longer crashes or leaves the replaced text in the document.
+
+- [#6222](https://github.com/ianstormtaylor/slate/pull/6222) [`c333eed`](https://github.com/ianstormtaylor/slate/commit/c333eed13b9b046d0b161afc57ddda11650dc4e7) Thanks [@dylans](https://github.com/dylans)! - Render an empty block right-to-left when the nearest sibling block with text is right-to-left, so a new line after Hebrew or Arabic text starts on the right.
+
+- [#6220](https://github.com/ianstormtaylor/slate/pull/6220) [`3eed905`](https://github.com/ianstormtaylor/slate/commit/3eed9053d1058cfab8744a965be6156fec259cac) Thanks [@dylans](https://github.com/dylans)! - Keep input, selection and history events from native contenteditable regions nested inside non-editable containers out of the surrounding Slate editor. Preserve Slate text and event hosts inside custom editable islands.
+
+- [#6223](https://github.com/ianstormtaylor/slate/pull/6223) [`8c929a8`](https://github.com/ianstormtaylor/slate/commit/8c929a8fd83bb9f96e758a22a3f005351adc089b) Thanks [@dylans](https://github.com/dylans)! - Keep the Firefox caret on the new line after a trailing soft break without adding zero-width characters to the document. Preserve selection offsets and copied text around the extra rendering newline.
+
+  Requires slate-dom 0.133.5 or newer for the matching DOM selection mapping.
+
+- [#6219](https://github.com/ianstormtaylor/slate/pull/6219) [`8e8cf36`](https://github.com/ianstormtaylor/slate/commit/8e8cf361a9a7bcfa89b56cbd1e6e181140b98ddc) Thanks [@dylans](https://github.com/dylans)! - Stop re-rendering every text node in a block when only one of them changes. Text and leaf components now compare what they use from the parent (its properties, whether the text is its last child, and whether the block is empty) instead of the parent object itself.
+
+- [#6221](https://github.com/ianstormtaylor/slate/pull/6221) [`270a4a0`](https://github.com/ianstormtaylor/slate/commit/270a4a0fe03789b5c82b2107e79474e4eed0f516) Thanks [@dylans](https://github.com/dylans)! - Call deletion overrides in WebKit when Backspace at the start or Delete at the end of a document does not emit beforeinput.
+
 ## 0.133.4
 
 ### Patch Changes
