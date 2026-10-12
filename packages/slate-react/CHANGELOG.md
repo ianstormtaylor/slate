@@ -1,5 +1,13 @@
 # slate-react
 
+## 0.133.8
+
+### Patch Changes
+
+- [#6238](https://github.com/ianstormtaylor/slate/pull/6238) [`468b58d`](https://github.com/ianstormtaylor/slate/commit/468b58d072fd8c3033c2b8ed5a3e0a38260733bf) Thanks [@dylans](https://github.com/dylans)! - Scroll the caret into view when an edit changes the selection even if the DOM selection already matches the editor, including Backspace between empty paragraphs.
+
+- [#6235](https://github.com/ianstormtaylor/slate/pull/6235) [`22ede7f`](https://github.com/ianstormtaylor/slate/commit/22ede7f5dc29bc7ae8392ef00a6461c76f39d4bb) Thanks [@dylans](https://github.com/dylans)! - Move the caret into an adjacent empty text node when an arrow key leaves an editable inline, so padding does not leave the caret drawn inside the inline.
+
 ## 0.133.7
 
 ### Patch Changes
