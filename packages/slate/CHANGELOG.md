@@ -1,5 +1,11 @@
 # slate
 
+## 0.133.7
+
+### Patch Changes
+
+- [#6230](https://github.com/ianstormtaylor/slate/pull/6230) [`30f0a23`](https://github.com/ianstormtaylor/slate/commit/30f0a23584a7a28976baf907b72c3d4b96644c80) Thanks [@dylans](https://github.com/dylans)! - Keep unselected text outside an inline wrapper when `wrapNodes` splits a selection across an existing inline boundary.
+
 ## 0.133.3
 
 ### Patch Changes
