@@ -2,6 +2,7 @@ import { Transforms } from '../interfaces/transforms'
 import { Editor } from '../interfaces/editor'
 import { Range } from '../interfaces/range'
 import { Path } from '../interfaces/path'
+import { Point } from '../interfaces/point'
 import { Element } from '../interfaces/element'
 import { Descendant, Node, NodeEntry } from '../interfaces/node'
 import { TextTransforms } from '../interfaces/transforms/text'
@@ -23,7 +24,12 @@ export const insertFragment: TextTransforms['insertFragment'] = (
 
     if (Location.isRange(at)) {
       if (!hanging) {
-        at = Editor.unhangRange(editor, at, { voids })
+        const [, end] = Range.edges(at)
+        const endOfDoc = Editor.end(editor, [])
+
+        if (!Point.equals(end, endOfDoc)) {
+          at = Editor.unhangRange(editor, at, { voids })
+        }
       }
 
       if (Range.isCollapsed(at)) {
