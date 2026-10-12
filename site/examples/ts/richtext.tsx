@@ -4,6 +4,7 @@ import {
   Descendant,
   Editor,
   Node,
+  Range,
   Element as SlateElement,
   Transforms,
   createEditor,
@@ -49,7 +50,10 @@ const RichTextExample = () => {
     (props: RenderLeafProps) => <Leaf {...props} />,
     []
   )
-  const editor = useMemo(() => withHistory(withReact(createEditor())), [])
+  const editor = useMemo(
+    () => withRichText(withHistory(withReact(createEditor()))),
+    []
+  )
 
   return (
     <Slate editor={editor} initialValue={initialValue}>
@@ -86,6 +90,38 @@ const RichTextExample = () => {
       />
     </Slate>
   )
+}
+
+const withRichText = (editor: CustomEditor) => {
+  const { deleteFragment } = editor
+
+  editor.deleteFragment = direction => {
+    const { selection } = editor
+
+    if (selection && Range.isExpanded(selection)) {
+      const [start, end] = Range.edges(selection)
+
+      if (Editor.isStart(editor, start, []) && Editor.isEnd(editor, end, [])) {
+        Editor.withoutNormalizing(editor, () => {
+          Transforms.removeNodes(editor, {
+            at: [],
+            match: node => SlateElement.isElement(node),
+            mode: 'highest',
+          })
+          Transforms.insertNodes(
+            editor,
+            { type: 'paragraph', children: [{ text: '' }] },
+            { at: [0], select: true }
+          )
+        })
+        return
+      }
+    }
+
+    deleteFragment(direction)
+  }
+
+  return editor
 }
 
 const toggleBlock = (editor: CustomEditor, format: CustomElementFormat) => {
