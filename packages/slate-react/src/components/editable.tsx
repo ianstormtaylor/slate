@@ -392,6 +392,15 @@ export const Editable = forwardRef(
       [onDOMSelectionChange]
     )
 
+    const flushDOMSelectionChange = useCallback(() => {
+      const root = ReactEditor.toDOMNode(editor, editor).getRootNode()
+      scheduleOnDOMSelectionChange.flush()
+      if (!(IS_WEBKIT && root instanceof ShadowRoot)) {
+        onDOMSelectionChange()
+      }
+      onDOMSelectionChange.flush()
+    }, [editor, onDOMSelectionChange, scheduleOnDOMSelectionChange])
+
     androidInputManagerRef.current = useAndroidInputManager({
       node: ref,
       onDOMSelectionChange,
@@ -658,11 +667,7 @@ export const Editable = forwardRef(
           // Some IMEs/Chrome extensions like e.g. Grammarly set the selection immediately before
           // triggering a `beforeinput` expecting the change to be applied to the immediately before
           // set selection.
-          scheduleOnDOMSelectionChange.flush()
-          if (!(IS_WEBKIT && root instanceof ShadowRoot)) {
-            onDOMSelectionChange()
-          }
-          onDOMSelectionChange.flush()
+          flushDOMSelectionChange()
 
           const { selection } = editor
           const { inputType: type } = event
@@ -674,7 +679,7 @@ export const Editable = forwardRef(
           // COMPAT: use composition change events as a hint to where we should insert
           // composition text if we aren't composing to work around https://github.com/ianstormtaylor/slate/issues/5038
           if (isCompositionChange && ReactEditor.isComposing(editor)) {
-            if (IS_CHROME || IS_FIREFOX) {
+            if (IS_CHROME || deleteOnCompositionEndRef.current) {
               compositionDOM.track(event.data)
             }
             return
@@ -936,12 +941,11 @@ export const Editable = forwardRef(
       },
       [
         editor,
-        onDOMSelectionChange,
         onUserInput,
         propsOnDOMBeforeInput,
         compositionDOM,
+        flushDOMSelectionChange,
         readOnly,
-        scheduleOnDOMSelectionChange,
       ]
     )
 
@@ -1519,9 +1523,7 @@ export const Editable = forwardRef(
                       compositionDOM.clear()
                       setIsComposing(true)
 
-                      scheduleOnDOMSelectionChange.flush()
-                      onDOMSelectionChange()
-                      onDOMSelectionChange.flush()
+                      flushDOMSelectionChange()
 
                       const { selection } = editor
                       if (selection && Range.isExpanded(selection)) {
@@ -1540,8 +1542,7 @@ export const Editable = forwardRef(
                     attributes.onCompositionStart,
                     editor,
                     compositionDOM,
-                    onDOMSelectionChange,
-                    scheduleOnDOMSelectionChange,
+                    flushDOMSelectionChange,
                   ]
                 )}
                 onCopy={useCallback(
