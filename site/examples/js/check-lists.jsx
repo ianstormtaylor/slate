@@ -1,6 +1,14 @@
 import { css } from '@emotion/css'
 import React, { useCallback, useMemo } from 'react'
-import { Editor, Node, Point, Range, Transforms, createEditor } from 'slate'
+import {
+  Editor,
+  Node,
+  Path,
+  Point,
+  Range,
+  Transforms,
+  createEditor,
+} from 'slate'
 import { withHistory } from 'slate-history'
 import {
   Editable,
@@ -73,7 +81,7 @@ const CheckListsExample = () => {
   )
 }
 const withChecklists = editor => {
-  const { deleteBackward } = editor
+  const { deleteBackward, insertBreak } = editor
   editor.deleteBackward = (...args) => {
     const { selection } = editor
     if (selection && Range.isCollapsed(selection)) {
@@ -95,6 +103,27 @@ const withChecklists = editor => {
       }
     }
     deleteBackward(...args)
+  }
+  editor.insertBreak = () => {
+    insertBreak()
+    const isCheckListItem = n =>
+      Node.isElement(n) && n.type === 'check-list-item'
+    const [entry] = Editor.nodes(editor, { match: isCheckListItem })
+    if (!entry) {
+      return
+    }
+    const [item, path] = entry
+    const previousPath = Path.hasPrevious(path) ? Path.previous(path) : null
+    const previous = previousPath && Node.get(editor, previousPath)
+    const splitAtStart =
+      previous &&
+      isCheckListItem(previous) &&
+      Editor.isEmpty(editor, previous) &&
+      !Editor.isEmpty(editor, item)
+    const newProperties = { checked: false }
+    Transforms.setNodes(editor, newProperties, {
+      at: splitAtStart && previousPath ? previousPath : path,
+    })
   }
   return editor
 }
