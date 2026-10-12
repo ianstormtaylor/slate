@@ -225,6 +225,7 @@ export const Editable = forwardRef(
     >()
     const processing = useRef(false)
     const compositionDOM = useCompositionDOM(editor)
+    const deleteOnCompositionEndRef = useRef(false)
 
     const { onUserInput, receivedUserInput } = useTrackUserInput()
 
@@ -673,7 +674,7 @@ export const Editable = forwardRef(
           // COMPAT: use composition change events as a hint to where we should insert
           // composition text if we aren't composing to work around https://github.com/ianstormtaylor/slate/issues/5038
           if (isCompositionChange && ReactEditor.isComposing(editor)) {
-            if (IS_CHROME) {
+            if (IS_CHROME || IS_FIREFOX) {
               compositionDOM.track(event.data)
             }
             return
@@ -1430,12 +1431,21 @@ export const Editable = forwardRef(
                         event
                       )
 
+                      const deleteOnCompositionEnd =
+                        deleteOnCompositionEndRef.current
+                      deleteOnCompositionEndRef.current = false
+
                       if (
                         isEventHandled(event, attributes.onCompositionEnd) ||
                         IS_ANDROID
                       ) {
                         compositionDOM.clear()
                         return
+                      }
+
+                      if (deleteOnCompositionEnd && !event.data) {
+                        compositionDOM.restore()
+                        Editor.deleteFragment(editor)
                       }
 
                       // COMPAT: In Chrome, `beforeinput` events for compositions
@@ -1509,14 +1519,30 @@ export const Editable = forwardRef(
                       compositionDOM.clear()
                       setIsComposing(true)
 
+                      scheduleOnDOMSelectionChange.flush()
+                      onDOMSelectionChange()
+                      onDOMSelectionChange.flush()
+
                       const { selection } = editor
                       if (selection && Range.isExpanded(selection)) {
+                        if (IS_FIREFOX && !IS_FIREFOX_LEGACY) {
+                          compositionDOM.observe()
+                          deleteOnCompositionEndRef.current = true
+                          return
+                        }
+
                         Editor.deleteFragment(editor)
                         return
                       }
                     }
                   },
-                  [attributes.onCompositionStart, editor, compositionDOM]
+                  [
+                    attributes.onCompositionStart,
+                    editor,
+                    compositionDOM,
+                    onDOMSelectionChange,
+                    scheduleOnDOMSelectionChange,
+                  ]
                 )}
                 onCopy={useCallback(
                   (event: React.ClipboardEvent<HTMLDivElement>) => {
