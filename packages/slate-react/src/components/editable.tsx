@@ -615,6 +615,10 @@ export const Editable = forwardRef(
     // https://github.com/facebook/react/issues/11211
     const onDOMBeforeInput = useCallback(
       (event: InputEvent) => {
+        if (!ReactEditor.hasEditableTarget(editor, event.target)) {
+          return
+        }
+
         handleNativeHistoryEvents(editor, event)
         const el = ReactEditor.toDOMNode(editor, editor)
         const root = el.getRootNode()
@@ -644,11 +648,7 @@ export const Editable = forwardRef(
         }
         onUserInput()
 
-        if (
-          !readOnly &&
-          ReactEditor.hasEditableTarget(editor, event.target) &&
-          !isDOMEventHandled(event, propsOnDOMBeforeInput)
-        ) {
+        if (!readOnly && !isDOMEventHandled(event, propsOnDOMBeforeInput)) {
           // COMPAT: BeforeInput events aren't cancelable on android, so we have to handle them differently using the android input manager.
           if (androidInputManagerRef.current) {
             return androidInputManagerRef.current.handleDOMBeforeInput(event)
@@ -1230,6 +1230,10 @@ export const Editable = forwardRef(
                 )}
                 onInput={useCallback(
                   (event: React.FormEvent<HTMLDivElement>) => {
+                    if (!ReactEditor.hasEditableTarget(editor, event.target)) {
+                      return
+                    }
+
                     compositionDOM.pause()
                     if (isEventHandled(event, attributes.onInput)) {
                       return
