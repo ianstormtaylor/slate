@@ -1396,6 +1396,35 @@ export const Editable = forwardRef(
                       const end = Editor.end(editor, path)
                       const startVoid = Editor.void(editor, { at: start })
                       const endVoid = Editor.void(editor, { at: end })
+                      const selectedVoid =
+                        editor.selection &&
+                        Range.isCollapsed(editor.selection) &&
+                        Editor.void(editor, { at: editor.selection.anchor })
+
+                      if (
+                        event.shiftKey &&
+                        selectedVoid &&
+                        !Path.isAncestor(selectedVoid[1], path) &&
+                        !(
+                          startVoid &&
+                          Path.equals(startVoid[1], selectedVoid[1])
+                        )
+                      ) {
+                        const clicked = ReactEditor.findEventRange(
+                          editor,
+                          event
+                        )
+                        const voidStart = Editor.start(editor, selectedVoid[1])
+                        const voidEnd = Editor.end(editor, selectedVoid[1])
+                        const anchor = Point.isBefore(clicked.anchor, voidStart)
+                          ? voidEnd
+                          : voidStart
+                        Transforms.select(editor, {
+                          anchor,
+                          focus: clicked.anchor,
+                        })
+                        return
+                      }
 
                       if (
                         startVoid &&
