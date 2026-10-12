@@ -1999,6 +1999,30 @@ export const Editable = forwardRef(
                             }
                           }
                         }
+
+                        if (
+                          IS_WEBKIT &&
+                          selection &&
+                          Range.isCollapsed(selection)
+                        ) {
+                          if (
+                            Hotkeys.isDeleteBackward(nativeEvent) &&
+                            Editor.isStart(editor, selection.anchor, [])
+                          ) {
+                            event.preventDefault()
+                            Editor.deleteBackward(editor)
+                            return
+                          }
+
+                          if (
+                            Hotkeys.isDeleteForward(nativeEvent) &&
+                            Editor.isEnd(editor, selection.anchor, [])
+                          ) {
+                            event.preventDefault()
+                            Editor.deleteForward(editor)
+                            return
+                          }
+                        }
                       }
                     }
                   },
