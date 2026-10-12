@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.133.4
+
+### Patch Changes
+
+- [#6215](https://github.com/ianstormtaylor/slate/pull/6215) [`ce3faf8`](https://github.com/ianstormtaylor/slate/commit/ce3faf8996e0d7f19b5428e3dbca9d718fd63c61) Thanks [@dylans](https://github.com/dylans)! - Read the DOM selection when a `beforeinput` event arrives, so input that follows a selection change before the browser fires `selectionchange` goes where the caret is.
+
 ## 0.133.3
 
 ### Patch Changes
