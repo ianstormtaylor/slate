@@ -18,6 +18,7 @@ import {
   useSlateStatic,
   withReact,
 } from 'slate-react'
+
 const initialValue = [
   {
     type: 'paragraph',
