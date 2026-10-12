@@ -13,6 +13,7 @@ import {
   RenderTextProps,
 } from './editable'
 import Leaf from './leaf'
+import { isTextParentEquivalent } from '../utils/text-parent'
 import { useDecorations } from '../hooks/use-decorations'
 
 const defaultRenderText = (props: RenderTextProps) => <DefaultText {...props} />
@@ -101,7 +102,7 @@ const Text = (props: {
 
 const MemoizedText = React.memo(Text, (prev, next) => {
   return (
-    next.parent === prev.parent &&
+    isTextParentEquivalent(prev.parent, next.parent, prev.text, next.text) &&
     next.isLast === prev.isLast &&
     next.renderText === prev.renderText &&
     next.renderLeaf === prev.renderLeaf &&
