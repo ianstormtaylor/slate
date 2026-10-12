@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import { getEditorHandle } from '../support/editor'
 import { dragSelection, selectStrings } from '../support/move-text'
 
 test.describe('On richtext example', () => {
@@ -141,4 +142,101 @@ test.describe('On richtext example', () => {
     expect(before - after).toBeGreaterThan(0)
     expect(before - after).toBeLessThan(120)
   })
+})
+
+for (const layout of ['heading', 'paragraph-heading', 'list']) {
+  for (const backward of [false, true]) {
+    test(`clearing ${layout} ${
+      backward ? 'backward' : 'forward'
+    } resets the document`, async ({ page }) => {
+      await page.goto('/examples/richtext')
+      const element = page.getByRole('textbox')
+      await element.click()
+      const editor = await getEditorHandle(element)
+      const original = await editor.evaluate(
+        (editor, { layout, backward }) => {
+          const heading = {
+            type: 'heading-one',
+            align: 'right',
+            children: [{ text: 'Heading', bold: true }],
+          }
+          const paragraph = {
+            type: 'paragraph',
+            children: [{ text: 'Paragraph' }],
+          }
+          const blocks =
+            layout === 'heading'
+              ? [heading]
+              : layout === 'paragraph-heading'
+              ? [paragraph, heading]
+              : [
+                  {
+                    type: 'bulleted-list',
+                    children: [
+                      { type: 'list-item', children: [{ text: 'Item' }] },
+                      { type: 'list-item', children: [{ text: 'Last' }] },
+                    ],
+                  },
+                ]
+          editor.withoutNormalizing(() => {
+            while (editor.children.length) editor.removeNodes({ at: [0] })
+            editor.insertNodes(blocks, { at: [0] })
+            const start = editor.start([])
+            const end = editor.end([])
+            editor.select({
+              anchor: backward ? end : start,
+              focus: backward ? start : end,
+            })
+          })
+          return editor.children
+        },
+        { layout, backward }
+      )
+      await expect(element).toContainText(
+        layout === 'list' ? 'Last' : 'Heading'
+      )
+      await element.press(backward ? 'Backspace' : 'Delete')
+      await expect
+        .poll(() => editor.evaluate(editor => editor.children))
+        .toEqual([{ type: 'paragraph', children: [{ text: '' }] }])
+      await element.press('ControlOrMeta+Z')
+      await expect
+        .poll(() => editor.evaluate(editor => editor.children))
+        .toEqual(original)
+      await editor.dispose()
+    })
+  }
+}
+
+test('deleting part of a heading preserves its formatting', async ({
+  page,
+}) => {
+  await page.goto('/examples/richtext')
+  const element = page.getByRole('textbox')
+  await element.click()
+  const editor = await getEditorHandle(element)
+  await editor.evaluate(editor => {
+    editor.withoutNormalizing(() => {
+      while (editor.children.length) editor.removeNodes({ at: [0] })
+      const heading = { type: 'heading-one', children: [{ text: 'Heading' }] }
+      editor.insertNodes(heading, { at: [0] })
+      editor.select({
+        anchor: { path: [0, 0], offset: 1 },
+        focus: editor.end([]),
+      })
+    })
+  })
+  await expect(element).toHaveText('Heading')
+  await element.press('Backspace')
+  await expect
+    .poll(() => editor.evaluate(editor => editor.children))
+    .toEqual([{ type: 'heading-one', children: [{ text: 'H' }] }])
+  await editor.evaluate(editor => {
+    editor.select(editor.start([]))
+    editor.deleteFragment()
+  })
+  await expect
+    .poll(() => editor.evaluate(editor => editor.children))
+    .toEqual([{ type: 'heading-one', children: [{ text: 'H' }] }])
+  await editor.dispose()
 })

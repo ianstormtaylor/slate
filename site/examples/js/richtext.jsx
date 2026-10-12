@@ -1,6 +1,13 @@
 import isHotkey from 'is-hotkey'
 import React, { useCallback, useMemo } from 'react'
-import { Editor, Node, Transforms, createEditor } from 'slate'
+import {
+  Editor,
+  Node,
+  Range,
+  Element as SlateElement,
+  Transforms,
+  createEditor,
+} from 'slate'
 import { withHistory } from 'slate-history'
 import { Editable, Slate, useSlate, withReact } from 'slate-react'
 import { Button, Icon, Toolbar } from './components'
@@ -16,7 +23,10 @@ const TEXT_ALIGN_TYPES = ['left', 'center', 'right', 'justify']
 const RichTextExample = () => {
   const renderElement = useCallback(props => <Element {...props} />, [])
   const renderLeaf = useCallback(props => <Leaf {...props} />, [])
-  const editor = useMemo(() => withHistory(withReact(createEditor())), [])
+  const editor = useMemo(
+    () => withRichText(withHistory(withReact(createEditor()))),
+    []
+  )
   return (
     <Slate editor={editor} initialValue={initialValue}>
       <Toolbar>
@@ -52,6 +62,32 @@ const RichTextExample = () => {
       />
     </Slate>
   )
+}
+const withRichText = editor => {
+  const { deleteFragment } = editor
+  editor.deleteFragment = direction => {
+    const { selection } = editor
+    if (selection && Range.isExpanded(selection)) {
+      const [start, end] = Range.edges(selection)
+      if (Editor.isStart(editor, start, []) && Editor.isEnd(editor, end, [])) {
+        Editor.withoutNormalizing(editor, () => {
+          Transforms.removeNodes(editor, {
+            at: [],
+            match: node => SlateElement.isElement(node),
+            mode: 'highest',
+          })
+          Transforms.insertNodes(
+            editor,
+            { type: 'paragraph', children: [{ text: '' }] },
+            { at: [0], select: true }
+          )
+        })
+        return
+      }
+    }
+    deleteFragment(direction)
+  }
+  return editor
 }
 const toggleBlock = (editor, format) => {
   const isActive = isBlockActive(
