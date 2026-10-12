@@ -417,12 +417,18 @@ export const DOMEditor: DOMEditorInterface = {
 
       const i = NODE_TO_INDEX.get(child)
 
-      if (i == null) {
+      if (i == null || parent.children[i] !== child) {
         break
       }
 
       path.unshift(i)
       child = parent
+    }
+
+    for (const [descendant, descendantPath] of Node.nodes(editor)) {
+      if (descendant === node) {
+        return descendantPath
+      }
     }
 
     throw new Error(
