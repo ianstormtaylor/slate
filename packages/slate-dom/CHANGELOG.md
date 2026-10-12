@@ -1,5 +1,15 @@
 # slate-dom
 
+## 0.133.5
+
+### Patch Changes
+
+- [#6220](https://github.com/ianstormtaylor/slate/pull/6220) [`3eed905`](https://github.com/ianstormtaylor/slate/commit/3eed9053d1058cfab8744a965be6156fec259cac) Thanks [@dylans](https://github.com/dylans)! - Keep input, selection and history events from native contenteditable regions nested inside non-editable containers out of the surrounding Slate editor. Preserve Slate text and event hosts inside custom editable islands.
+
+- [#6223](https://github.com/ianstormtaylor/slate/pull/6223) [`8c929a8`](https://github.com/ianstormtaylor/slate/commit/8c929a8fd83bb9f96e758a22a3f005351adc089b) Thanks [@dylans](https://github.com/dylans)! - Keep the Firefox caret on the new line after a trailing soft break without adding zero-width characters to the document. Preserve selection offsets and copied text around the extra rendering newline.
+
+  Requires slate-dom 0.133.5 or newer for the matching DOM selection mapping.
+
 ## 0.133.1
 
 ### Patch Changes
