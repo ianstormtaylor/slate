@@ -10129,7 +10129,7 @@ __metadata:
     react: ">=18.2.0"
     react-dom: ">=18.2.0"
     slate: ">=0.121.0"
-    slate-dom: ">=0.119.1"
+    slate-dom: ">=0.133.5"
   peerDependenciesMeta:
     "@types/lodash":
       optional: true
