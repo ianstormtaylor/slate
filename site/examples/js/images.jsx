@@ -3,7 +3,7 @@ import imageExtensions from 'image-extensions'
 import isHotkey from 'is-hotkey'
 import isUrl from 'is-url'
 import React, { useMemo } from 'react'
-import { Transforms, createEditor } from 'slate'
+import { Editor, Path, Range, Transforms, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
 import {
   Editable,
@@ -40,9 +40,27 @@ const ImagesExample = () => {
   )
 }
 const withImages = editor => {
-  const { insertData, isVoid } = editor
+  const { insertBreak, insertData, isVoid } = editor
   editor.isVoid = element => {
     return element.type === 'image' ? true : isVoid(element)
+  }
+  editor.insertBreak = () => {
+    const { selection } = editor
+    if (selection && Range.isCollapsed(selection)) {
+      const match = Editor.void(editor, { at: selection })
+      if (match && Editor.isBlock(editor, match[0])) {
+        const paragraph = {
+          type: 'paragraph',
+          children: [{ text: '' }],
+        }
+        Transforms.insertNodes(editor, paragraph, {
+          at: Path.next(match[1]),
+          select: true,
+        })
+        return
+      }
+    }
+    insertBreak()
   }
   editor.insertData = data => {
     const text = data.getData('text/plain')
