@@ -6,6 +6,77 @@ test.describe('On markdown-shortcuts example', () => {
     await page.goto('http://localhost:3000/examples/markdown-shortcuts')
   })
 
+  const cases = [
+    {
+      name: 'heading at document start',
+      value: [{ type: 'heading-one', children: [{ text: 'title' }] }],
+      at: { path: [0, 0], offset: 0 },
+      expected: [{ type: 'paragraph', children: [{ text: 'title' }] }],
+    },
+    {
+      name: 'empty heading at document start',
+      value: [{ type: 'heading-one', children: [{ text: '' }] }],
+      at: { path: [0, 0], offset: 0 },
+      expected: [{ type: 'paragraph', children: [{ text: '' }] }],
+    },
+    {
+      name: 'quote at document start',
+      value: [{ type: 'block-quote', children: [{ text: 'quote' }] }],
+      at: { path: [0, 0], offset: 0 },
+      expected: [{ type: 'paragraph', children: [{ text: 'quote' }] }],
+    },
+    {
+      name: 'list at document start',
+      value: [
+        {
+          type: 'bulleted-list',
+          children: [{ type: 'list-item', children: [{ text: 'item' }] }],
+        },
+      ],
+      at: { path: [0, 0, 0], offset: 0 },
+      expected: [{ type: 'paragraph', children: [{ text: 'item' }] }],
+    },
+    {
+      name: 'text inside a heading',
+      value: [{ type: 'heading-one', children: [{ text: 'title' }] }],
+      at: { path: [0, 0], offset: 1 },
+      expected: [{ type: 'heading-one', children: [{ text: 'itle' }] }],
+    },
+  ]
+
+  for (const scenario of cases) {
+    test(`Backspace handles ${scenario.name}`, async ({ page }) => {
+      const element = page.getByRole('textbox')
+      const editor = await getEditorHandle(element)
+      await element.focus()
+      await editor.evaluate((editor, scenario) => {
+        editor.children = scenario.value
+        editor.select(scenario.at)
+        editor.onChange()
+      }, scenario)
+      await expect
+        .poll(() =>
+          element.evaluate(element => {
+            const selection = window.getSelection()!
+            return {
+              inside: element.contains(selection.anchorNode),
+              offset: selection.anchorNode?.parentElement?.closest(
+                '[data-slate-zero-width]'
+              )
+                ? 0
+                : selection.anchorOffset,
+            }
+          })
+        )
+        .toEqual({ inside: true, offset: scenario.at.offset })
+      await page.keyboard.press('Backspace')
+      await expect
+        .poll(() => editor.evaluate(editor => editor.children))
+        .toEqual(scenario.expected)
+      await editor.dispose()
+    })
+  }
+
   test('contains quote', async ({ page }) => {
     expect(
       await page.getByRole('textbox').locator('blockquote').textContent()
