@@ -1,5 +1,4 @@
 import React, { useCallback, useMemo } from 'react'
-import isHotkey from 'is-hotkey'
 import {
   createEditor,
   Descendant,
@@ -88,19 +87,6 @@ const MarkdownShortcutsExample = () => {
     <Slate editor={editor} initialValue={initialValue}>
       <Editable
         onDOMBeforeInput={handleDOMBeforeInput}
-        onKeyDown={event => {
-          const { selection } = editor
-          if (
-            isHotkey('backspace', event) &&
-            !ReactEditor.isComposing(editor) &&
-            selection &&
-            Range.isCollapsed(selection) &&
-            Editor.isStart(editor, selection.anchor, [])
-          ) {
-            event.preventDefault()
-            editor.deleteBackward('character')
-          }
-        }}
         renderElement={renderElement}
         placeholder="Write some markdown..."
         spellCheck
