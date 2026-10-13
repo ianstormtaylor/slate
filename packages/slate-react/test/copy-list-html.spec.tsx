@@ -88,21 +88,37 @@ describe('copying lists as HTML', () => {
     const { html, data, fragment } = copy([list(type)])
     expect(html.querySelectorAll(`:scope > ${type} > li`)).toHaveLength(2)
     expect(html.textContent).toBe('onetwo')
+    expect(data['text/plain']).toBe('onetwo\n')
     expect(
       JSON.parse(decodeURIComponent(atob(data['application/x-slate-fragment'])))
     ).toEqual(fragment)
     expect(html.querySelector('[data-slate-fragment]')).not.toBeNull()
   })
 
-  it('keeps an ordered list start attribute for one partial item', () => {
+  it.each([
+    { label: 'part of one item', start: 1, end: 3, text: 'wo' },
+    { label: 'one whole item', start: 0, end: 3, text: 'two' },
+  ])('does not wrap $label in a list', ({ start, end, text }) => {
     const initialValue = [{ ...list('ol'), start: 4 }]
-    const { html } = copy(initialValue, {
-      anchor: { path: [0, 1, 0], offset: 1 },
-      focus: { path: [0, 1, 0], offset: 3 },
+    const { html, data } = copy(initialValue, {
+      anchor: { path: [0, 1, 0], offset: start },
+      focus: { path: [0, 1, 0], offset: end },
+    })
+    expect(html.querySelector('ol, ul, li')).toBeNull()
+    expect(html.textContent).toBe(text)
+    expect(data['text/plain']).toBe(text)
+  })
+
+  it('keeps an ordered list start attribute when copying across items', () => {
+    const initialValue = [{ ...list('ol'), start: 4 }]
+    const { html, data } = copy(initialValue, {
+      anchor: { path: [0, 0, 0], offset: 1 },
+      focus: { path: [0, 1, 0], offset: 2 },
     })
     expect(html.querySelector('ol')?.getAttribute('start')).toBe('4')
-    expect(html.querySelectorAll('ol > li')).toHaveLength(1)
-    expect(html.textContent).toBe('wo')
+    expect(html.querySelectorAll('ol > li')).toHaveLength(2)
+    expect(html.textContent).toBe('netw')
+    expect(data['text/plain']).toBe('netw\n')
   })
 
   it('keeps nested list ancestry without unselected text', () => {
@@ -133,11 +149,12 @@ describe('copying lists as HTML', () => {
         focus: { path: [0, 0, 1, 0], offset: 4 },
       }
     )
-    expect(html.querySelector('ul > li > a')?.textContent).toBe('link')
+    expect(html.querySelector('ol, ul, li')).toBeNull()
+    expect(html.querySelector('a')?.textContent).toBe('link')
   })
 
   it.each(['start', 'end'])(
-    'keeps a list whose selection has an inline void at the %s',
+    'does not wrap one item with an inline void at the %s',
     edge => {
       const children =
         edge === 'start'
@@ -154,9 +171,40 @@ describe('copying lists as HTML', () => {
               focus: { path: [0, 0, 1, 0], offset: 0 },
             }
       const { html } = copy([node('ul', [node('li', children)])], selection)
-      expect(html.querySelectorAll('ul > li')).toHaveLength(1)
+      expect(html.querySelector('ol, ul, li')).toBeNull()
       expect(html.textContent).toContain('@name')
       expect(html.querySelectorAll('[data-slate-void]')).toHaveLength(1)
+    }
+  )
+
+  it.each(['start', 'end'])(
+    'keeps list wrappers across items with an inline void at the %s',
+    edge => {
+      const mention = node('mention', [{ text: '' }])
+      const items =
+        edge === 'start'
+          ? [
+              node('li', [{ text: '' }, mention, { text: ' after' }]),
+              item('last'),
+            ]
+          : [
+              item('first'),
+              node('li', [{ text: 'before ' }, mention, { text: '' }]),
+            ]
+      const selection =
+        edge === 'start'
+          ? {
+              anchor: { path: [0, 0, 1, 0], offset: 0 },
+              focus: { path: [0, 1, 0], offset: 4 },
+            }
+          : {
+              anchor: { path: [0, 0, 0], offset: 0 },
+              focus: { path: [0, 1, 1, 0], offset: 0 },
+            }
+      const { html } = copy([node('ul', items)], selection)
+      expect(html.querySelectorAll('ul > li')).toHaveLength(2)
+      expect(html.querySelectorAll('[data-slate-void]')).toHaveLength(1)
+      expect(html.textContent).toContain('@name')
     }
   )
 

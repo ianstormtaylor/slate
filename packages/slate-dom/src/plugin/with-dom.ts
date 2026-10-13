@@ -56,6 +56,7 @@ const wrapInClipboardAncestors = (
   editorElement: DOMElement,
   includeInlines: boolean
 ): DocumentFragment => {
+  const includeLists = contents.querySelector('li') !== null
   let wrapped = contents
 
   for (
@@ -64,7 +65,7 @@ const wrapInClipboardAncestors = (
     ancestor = ancestor.parentElement
   ) {
     if (
-      ['OL', 'UL', 'LI'].includes(ancestor.nodeName) ||
+      (includeLists && ['OL', 'UL', 'LI'].includes(ancestor.nodeName)) ||
       (includeInlines &&
         ancestor.getAttribute('data-slate-inline') === 'true' &&
         !ancestor.hasAttribute('data-slate-void'))
