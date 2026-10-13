@@ -1,14 +1,11 @@
-import { Path, Range } from 'slate'
+import { Editor, Path, Range } from 'slate'
 import { DOMNode, DOMText, getSelection, isDOMNode } from 'slate-dom'
 import { ReactEditor } from '../plugin/react-editor'
 
 const isTextNode = (node: DOMNode | null | undefined): node is DOMText =>
   isDOMNode(node) && node.nodeType === node.TEXT_NODE
 
-export const removeCompositionFromOtherLeaf = (
-  editor: ReactEditor,
-  data: string
-) => {
+export const removeStrayComposition = (editor: ReactEditor, data: string) => {
   const { selection } = editor
   if (!selection || !Range.isCollapsed(selection)) return
 
@@ -27,7 +24,10 @@ export const removeCompositionFromOtherLeaf = (
     editor,
     ReactEditor.toSlateNode(editor, node)
   )
-  if (Path.equals(leafPath, selection.anchor.path)) return
+  const insertsIntoLeaf =
+    Path.equals(leafPath, selection.anchor.path) &&
+    !Editor.void(editor, { at: selection })
+  if (insertsIntoLeaf) return
 
   node.deleteData(start, data.length)
 }
