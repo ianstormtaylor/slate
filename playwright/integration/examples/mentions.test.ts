@@ -274,4 +274,40 @@ test.describe('mentions example', () => {
     await page.keyboard.type('X')
     await expect.poll(() => mentionLine(page)).toContain('like X@R2-D2')
   })
+
+  test('deletes a selected mention when the composition never ended', async ({
+    page,
+    browserName,
+  }) => {
+    test.skip(browserName === 'firefox', 'Firefox fires beforeinput for voids')
+    const editable = page.getByRole('textbox')
+    const editor = await getEditorHandle(editable)
+    await editable.click()
+    await editor.evaluate(editor => {
+      const [[, path]] = editor.nodes({
+        at: [],
+        match: node => 'character' in node && node.character === 'R2-D2',
+      })
+      editor.select(editor.start(path))
+    })
+    await editable.evaluate(element => {
+      for (const type of ['compositionstart', 'compositionupdate']) {
+        element.dispatchEvent(
+          new CompositionEvent(type, { bubbles: true, data: '' })
+        )
+      }
+      const backspace = new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        key: 'Backspace',
+        code: 'Backspace',
+        isComposing: true,
+      })
+      Object.defineProperty(backspace, 'keyCode', { value: 8 })
+      Object.defineProperty(backspace, 'which', { value: 8 })
+      element.dispatchEvent(backspace)
+    })
+    await expect(page.locator('[data-cy="mention-R2-D2"]')).toHaveCount(0)
+    await editor.dispose()
+  })
 })
