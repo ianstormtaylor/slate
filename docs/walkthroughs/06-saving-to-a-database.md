@@ -73,14 +73,14 @@ const App = () => {
   // Update the initial content to be pulled from Local Storage if it exists.
   const initialValue = useMemo(() => {
     const content = localStorage.getItem('content')
-    return content
-      ? JSON.parse(content)
-      : [
-          {
-            type: 'paragraph',
-            children: [{ text: 'A line of text in a paragraph.' }],
-          },
-        ]
+    return (
+      (content ? JSON.parse(content) : null) || [
+        {
+          type: 'paragraph',
+          children: [{ text: 'A line of text in a paragraph.' }],
+        },
+      ]
+    )
   }, [])
 
   return (
