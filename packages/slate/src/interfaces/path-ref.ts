@@ -10,6 +10,7 @@ export interface PathRef {
   current: Path | null
   affinity: 'forward' | 'backward' | null
   unref(): Path | null
+  [Symbol.dispose](): void
 }
 
 export interface PathRefInterface {
