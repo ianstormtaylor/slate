@@ -111,7 +111,7 @@ Options supported: `NodeOptions & {hanging?: boolean, split?: boolean}`. For `op
 
 Lift nodes at the specified location upwards in the document tree. If necessary, the parent node is split. If no location is specified, use the selection.
 
-Options supported: `NodeOptions`. For `options.mode`, `'all'` is also supported.
+Options supported: `NodeOptions & {height?: number}`. `height` defaults to `1` and must be a non-negative integer. A height of `0` does nothing; larger heights lift each matched node through that many ancestors, stopping at the top level. A node that is already at the top level cannot be lifted. For `options.mode`, `'all'` is also supported.
 
 #### `Transforms.moveNodes(editor: Editor, options)`
 
