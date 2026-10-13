@@ -135,6 +135,7 @@ export interface BaseEditor {
   hasBlocks: OmitFirstArg<typeof Editor.hasBlocks>
   hasInlines: OmitFirstArg<typeof Editor.hasInlines>
   hasPath: OmitFirstArg<typeof Editor.hasPath>
+  hasRange: OmitFirstArg<typeof Editor.hasRange>
   hasTexts: OmitFirstArg<typeof Editor.hasTexts>
   isBlock: OmitFirstArg<typeof Editor.isBlock>
   isEdge: OmitFirstArg<typeof Editor.isEdge>
@@ -415,6 +416,8 @@ export interface EditorInterface {
   hasInlines: (editor: Editor, element: Element) => boolean
 
   hasPath: (editor: Editor, path: Path) => boolean
+
+  hasRange: (editor: Editor, range: Range) => boolean
 
   /**
    * Check if a node has text children.
@@ -795,6 +798,10 @@ export const Editor: EditorInterface = {
 
   hasPath(editor, path) {
     return editor.hasPath(path)
+  },
+
+  hasRange(editor, range) {
+    return editor.hasRange(range)
   },
 
   hasTexts(editor, element) {
