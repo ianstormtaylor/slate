@@ -1,3 +1,4 @@
+const assert = require('node:assert/strict')
 const { execFileSync } = require('child_process')
 const { chromium } = require('@playwright/test')
 const { tapKey, tapLocator } = require('./android/touch.cjs')
@@ -53,51 +54,95 @@ const sleep = ms => new Promise(r => setTimeout(r, ms))
     return e && Object.keys(e).some(k => k.startsWith('__reactFiber$'))
   })
   await sleep(1000)
-  const probe = async label =>
-    console.log(
-      label,
-      /mInputShown=true/.test(adb('shell', 'dumpsys', 'input_method')),
-      JSON.stringify(
-        await page.evaluate(() => {
-          const el = document.querySelector('[data-slate-editor]')
-          let f = el[Object.keys(el).find(k => k.startsWith('__reactFiber$'))]
-          while (f && !f.memoizedProps?.editor) f = f.return
-          return [
-            f.memoizedProps.editor.selection,
-            document.activeElement.tagName,
-            scrollY,
-          ]
-        })
-      )
+  const probe = async label => {
+    const state = await page.evaluate(() => {
+      const el = document.querySelector('[data-slate-editor]')
+      let f = el[Object.keys(el).find(k => k.startsWith('__reactFiber$'))]
+      while (f && !f.memoizedProps?.editor) f = f.return
+      const ed = f.memoizedProps.editor
+      return {
+        children: ed.children,
+        selection: ed.selection,
+        activeElement: document.activeElement.tagName,
+        scrollY,
+      }
+    })
+    state.keyboardShown = /mInputShown=true/.test(
+      adb('shell', 'dumpsys', 'input_method')
     )
+    console.log(label, JSON.stringify(state))
+    return state
+  }
   await probe('loaded')
   await tapLocator(page, page.locator('[data-slate-editor] > *').last(), adb)
   await sleep(1500)
-  await probe('tapped editor')
+  const before = await probe('tapped editor')
+  assert.equal(before.keyboardShown, true, 'editor tap must show the keyboard')
+  assert.ok(before.selection, 'editor tap must select text')
+  const { anchor, focus } = before.selection
+  const lastIndex = before.children.length - 1
+  assert.deepEqual(anchor, focus, 'editor tap must place a caret')
+  assert.deepEqual(
+    focus.path,
+    [lastIndex, 0],
+    'caret must be in the last paragraph'
+  )
+  const last = before.children[lastIndex]
+  assert.equal(
+    last.children.length,
+    1,
+    'last paragraph must start as one text leaf'
+  )
+  const original = last.children[0]
+  assert.equal(
+    original.bold,
+    undefined,
+    'last paragraph must start without bold'
+  )
   await tapLocator(
     page,
     page.getByRole('button', { name: 'format_bold', exact: true }),
     adb
   )
   await sleep(800)
-  await probe('tapped bold')
+  const toggled = await probe('tapped bold')
+  assert.equal(
+    toggled.keyboardShown,
+    true,
+    'bold tap must keep the keyboard visible'
+  )
+  assert.deepEqual(
+    toggled.children,
+    before.children,
+    'bold tap must preserve the text'
+  )
+  assert.deepEqual(
+    toggled.selection,
+    before.selection,
+    'bold tap must preserve the caret'
+  )
   for (const key of ['b', 'o', 'l', 'd']) {
     tapKey(adb, key)
     await sleep(500)
   }
   await sleep(1500)
-  const shown = /mInputShown=true/.test(adb('shell', 'dumpsys', 'input_method'))
-  const state = await page.evaluate(() => {
-    const el = document.querySelector('[data-slate-editor]')
-    let f = el[Object.keys(el).find(k => k.startsWith('__reactFiber$'))]
-    while (f && !f.memoizedProps?.editor) f = f.return
-    const ed = f.memoizedProps.editor
-    return {
-      last: ed.children[ed.children.length - 1].children,
-      sel: ed.selection,
-    }
-  })
-  console.log(JSON.stringify({ port: PORT, keyboardShown: shown, ...state }))
+  const typed = await probe('after typing')
+  const expected = structuredClone(before.children)
+  expected[lastIndex].children = [
+    { ...original, text: original.text.slice(0, focus.offset) },
+    { ...original, text: 'bold', bold: true },
+    { ...original, text: original.text.slice(focus.offset) },
+  ].filter(leaf => leaf.text.length > 0)
+  assert.deepEqual(
+    typed.children,
+    expected,
+    'typing must insert bold text at the original caret'
+  )
+  assert.equal(
+    typed.keyboardShown,
+    true,
+    'typing must keep the keyboard visible'
+  )
   await browser.close()
 })().catch(e => {
   console.error(e.message)

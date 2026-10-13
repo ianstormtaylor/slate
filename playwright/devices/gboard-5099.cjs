@@ -1,3 +1,4 @@
+const assert = require('node:assert/strict')
 const { execFileSync } = require('child_process')
 const { chromium } = require('@playwright/test')
 const { tapKey, tapLocator } = require('./android/touch.cjs')
@@ -40,8 +41,8 @@ const sleep = ms => new Promise(r => setTimeout(r, ms))
     .contexts()[0]
     .pages()
     .find(p => p.url().startsWith(url))
-  const state = () =>
-    page.evaluate(() => {
+  const state = async () => ({
+    ...(await page.evaluate(() => {
       const el = document.querySelector('[data-slate-editor]')
       let f = el[Object.keys(el).find(k => k.startsWith('__reactFiber$'))]
       while (f && !f.memoizedProps?.editor) f = f.return
@@ -52,7 +53,26 @@ const sleep = ms => new Promise(r => setTimeout(r, ms))
         dom: el.innerText.slice(0, 40),
         placeholder: p ? getComputedStyle(p).display : 'none',
       }
-    })
+    })),
+    keyboardShown: /mInputShown=true/.test(
+      adb('shell', 'dumpsys', 'input_method')
+    ),
+  })
+  const expectEmpty = async label => {
+    const current = await state()
+    console.log(label, JSON.stringify(current))
+    assert.deepEqual(current.text, [''], `${label}: editor must be empty`)
+    assert.equal(
+      current.keyboardShown,
+      true,
+      `${label}: keyboard must stay visible`
+    )
+    assert.notEqual(
+      current.placeholder,
+      'none',
+      `${label}: placeholder must be visible`
+    )
+  }
   await tapLocator(page, page.locator('[data-slate-editor] > *').last(), adb)
   await sleep(1500)
   await page.evaluate(() => {
@@ -64,22 +84,28 @@ const sleep = ms => new Promise(r => setTimeout(r, ms))
     ed.deleteFragment()
   })
   await sleep(800)
-  console.log('cleared', JSON.stringify(await state()))
+  await expectEmpty('cleared')
   for (let i = 0; i < 3; i++) {
     tapKey(adb, 'Delete')
     await sleep(400)
   }
-  console.log(
-    'after backspace',
-    JSON.stringify(await state()),
-    /mInputShown=true/.test(adb('shell', 'dumpsys', 'input_method'))
-  )
+  await expectEmpty('after backspace')
   for (const k of ['a', 's', 'd']) {
     tapKey(adb, k)
     await sleep(400)
   }
   await sleep(1200)
-  console.log('after typing', JSON.stringify(await state()))
+  const typed = await state()
+  console.log('after typing', JSON.stringify(typed))
+  assert.equal(typed.text.length, 1, 'typing must keep one block')
+  assert.match(typed.text[0], /^[aA]sd$/, 'all three keys must reach the model')
+  assert.equal(typed.dom, typed.text[0], 'DOM and model must agree')
+  assert.equal(
+    typed.keyboardShown,
+    true,
+    'typing must keep the keyboard visible'
+  )
+  assert.equal(typed.placeholder, 'none', 'typing must hide the placeholder')
   await browser.close()
 })().catch(e => {
   console.error(e.message)
