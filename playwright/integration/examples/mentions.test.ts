@@ -45,23 +45,41 @@ test.describe('mentions example', () => {
   }) => {
     const editor = page.getByRole('textbox')
     await clearEditor(editor)
+    const slateEditor = await getEditorHandle(editor)
+    const deleteCharacter = async (text: string) => {
+      await editor.press('Backspace')
+      await expect
+        .poll(() =>
+          slateEditor.evaluate(editor => ({
+            text: editor.string([]),
+            anchor: editor.selection?.anchor.offset,
+            focus: editor.selection?.focus.offset,
+          }))
+        )
+        .toEqual({ text, anchor: text.length, focus: text.length })
+      await expect(editor.locator('[data-slate-string]')).toHaveText(
+        text ? [text] : []
+      )
+    }
     await editor.pressSequentially('@')
     const suggestions = page.locator('[data-cy="mentions-portal"] > div')
     await expect(suggestions).toHaveCount(10)
+    const unfiltered = await suggestions.allTextContents()
     await editor.pressSequentially('R2-')
     await expect(suggestions).toHaveText(['R2-D2', 'R2-KT'])
-    await editor.press('Backspace')
-    await editor.press('Backspace')
-    await editor.press('Backspace')
-    await expect(suggestions).toHaveCount(10)
+    for (const text of ['@R2', '@R', '@']) {
+      await deleteCharacter(text)
+    }
+    await expect(suggestions).toHaveText(unfiltered)
     await editor.press('Escape')
     await expect(suggestions).toHaveCount(0)
     await editor.pressSequentially('R')
     await expect(suggestions.first()).toBeVisible()
-    await editor.press('Backspace')
-    await expect(suggestions).toHaveCount(10)
-    await editor.press('Backspace')
+    await deleteCharacter('@')
+    await expect(suggestions).toHaveText(unfiltered)
+    await deleteCharacter('')
     await expect(suggestions).toHaveCount(0)
+    await slateEditor.dispose()
   })
 
   test('matches and replaces a dashed mention after text', async ({ page }) => {
