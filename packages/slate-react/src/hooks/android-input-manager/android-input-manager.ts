@@ -61,8 +61,11 @@ export type CreateAndroidInputManagerOptions = {
   onDOMSelectionChange: DebouncedFunc<() => void>
 }
 
+export const EDITOR_TO_FLUSH_DEFERRED_DIFFS = new WeakMap<Editor, () => void>()
+
 export type AndroidInputManager = {
   flush: () => void
+  flushDeferredDiffs: () => void
   scheduleFlush: () => void
 
   hasPendingDiffs: () => boolean
@@ -88,6 +91,7 @@ export function createAndroidInputManager({
   onDOMSelectionChange,
 }: CreateAndroidInputManagerOptions): AndroidInputManager {
   let flushing: 'action' | boolean = false
+  let flushingDeferredDiffs = false
   let compositionEndTimeoutId: ReturnType<typeof setTimeout> | null = null
   let flushTimeoutId: ReturnType<typeof setTimeout> | null = null
   let actionTimeoutId: ReturnType<typeof setTimeout> | null = null
@@ -198,7 +202,11 @@ export function createAndroidInputManager({
     // Composing into a leaf that already has text is unaffected: applying the
     // diff there only updates `textContent`, so the value still updates on
     // every `compositionupdate`.
-    if (isCompositionLive() && hasPendingDiffsInNewLeaf()) {
+    if (
+      !flushingDeferredDiffs &&
+      isCompositionLive() &&
+      hasPendingDiffsInNewLeaf()
+    ) {
       debug('deferring flush during composition in new leaf')
       flushTimeoutId = setTimeout(flush, COMPOSITION_RECHECK_DELAY)
       return
@@ -313,6 +321,20 @@ export function createAndroidInputManager({
     if (userMarks !== undefined && userMarks !== editor.marks) {
       editor.marks = userMarks
       editor.onChange()
+    }
+  }
+
+  const flushDeferredDiffs = () => {
+    if (flushing || !isCompositionLive() || !hasPendingDiffsInNewLeaf()) {
+      return
+    }
+
+    debug('flushing deferred diffs before a structural change')
+    flushingDeferredDiffs = true
+    try {
+      flush()
+    } finally {
+      flushingDeferredDiffs = false
     }
   }
 
@@ -935,6 +957,7 @@ export function createAndroidInputManager({
 
   return {
     flush,
+    flushDeferredDiffs,
     scheduleFlush,
 
     hasPendingDiffs,
