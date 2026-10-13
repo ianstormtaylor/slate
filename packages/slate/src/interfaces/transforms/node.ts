@@ -31,6 +31,7 @@ export interface NodeTransforms {
     editor: Editor,
     options?: {
       at?: Location
+      height?: number
       match?: NodeMatch<T>
       mode?: MaximizeMode
       voids?: boolean
