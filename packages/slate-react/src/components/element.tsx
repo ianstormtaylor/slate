@@ -23,6 +23,29 @@ import {
 import Text from './text'
 import { useDecorations } from '../hooks/use-decorations'
 
+const findSiblingDirection = (siblings: Iterable<Node>) => {
+  for (const sibling of siblings) {
+    const dir = getDirection(Node.string(sibling))
+
+    if (dir !== 'neutral') {
+      return dir
+    }
+  }
+}
+
+const getEmptyBlockDirection = (element: SlateElement) => {
+  const parent = NODE_TO_PARENT.get(element)
+  const index = NODE_TO_INDEX.get(element)
+
+  if (!parent || index === undefined) {
+    return
+  }
+
+  const before = parent.children.slice(0, index).reverse()
+  const after = parent.children.slice(index + 1)
+  return findSiblingDirection(before) ?? findSiblingDirection(after)
+}
+
 const defaultRenderElement = (props: RenderElementProps) => (
   <DefaultElement {...props} />
 )
@@ -101,7 +124,8 @@ const Element = (props: {
   // for text direction.
   if (!isInline && Editor.hasInlines(editor, element)) {
     const text = Node.string(element)
-    const dir = getDirection(text)
+    const dir =
+      text === '' ? getEmptyBlockDirection(element) : getDirection(text)
 
     if (dir === 'rtl') {
       attributes.dir = dir
@@ -127,6 +151,8 @@ const Element = (props: {
           color: 'transparent',
           outline: 'none',
           position: 'absolute',
+          userSelect: 'none',
+          WebkitUserSelect: 'none',
         }}
       >
         <Text

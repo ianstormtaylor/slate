@@ -26,7 +26,7 @@
     "internal:release:next": "yarn prerelease && yarn changeset publish --tag next",
     "serve": "cd ./site && next",
     "start": "npm-run-all --parallel --print-label watch serve",
-    "test": "yarn run test:mocha && yarn run test:jest",
+    "test": "yarn run test:mocha && yarn run test:jest && yarn run test:docs",
     "test:custom": "mocha --require ./config/babel/register.cjs ./packages/slate/test/index.js",
     "test:inspect": "yarn test --inspect-brk",
     "test:integration": "playwright install --with-deps && run-p -r serve playwright",
@@ -36,7 +36,8 @@
     "test:jest": "jest --config jest.config.js",
     "tsc:examples": "tsc --project ./site/tsconfig.example.json",
     "watch": "yarn build:rollup --watch",
-    "playwright": "playwright test"
+    "playwright": "playwright test",
+    "test:docs": "node ./config/docs/check-typescript.cjs"
   },
   "devDependencies": {
     "@babel/cli": "^7.23.0",

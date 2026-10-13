@@ -1,5 +1,43 @@
 # slate-dom
 
+## 0.133.6
+
+### Patch Changes
+
+- [#6228](https://github.com/ianstormtaylor/slate/pull/6228) [`3a5e736`](https://github.com/ianstormtaylor/slate/commit/3a5e736e3818f46bed66afa342690120797b5e67) Thanks [@dylans](https://github.com/dylans)! - Return the correct path from `findPath` when it is called after an operation but before the editor re-renders, such as in `onChange`, instead of throwing or returning the old path.
+
+- [#6226](https://github.com/ianstormtaylor/slate/pull/6226) [`a8329a2`](https://github.com/ianstormtaylor/slate/commit/a8329a27140fe468c306933a8ed1bebd610d88b9) Thanks [@dylans](https://github.com/dylans)! - Copy `initialValue` nodes that another editor is already using, so two `Slate` components given the same value render and edit independently instead of throwing "Unable to find the path for Slate node". Requires slate-dom 0.133.6 or newer.
+
+## 0.133.5
+
+### Patch Changes
+
+- [#6220](https://github.com/ianstormtaylor/slate/pull/6220) [`3eed905`](https://github.com/ianstormtaylor/slate/commit/3eed9053d1058cfab8744a965be6156fec259cac) Thanks [@dylans](https://github.com/dylans)! - Keep input, selection and history events from native contenteditable regions nested inside non-editable containers out of the surrounding Slate editor. Preserve Slate text and event hosts inside custom editable islands.
+
+- [#6223](https://github.com/ianstormtaylor/slate/pull/6223) [`8c929a8`](https://github.com/ianstormtaylor/slate/commit/8c929a8fd83bb9f96e758a22a3f005351adc089b) Thanks [@dylans](https://github.com/dylans)! - Keep the Firefox caret on the new line after a trailing soft break without adding zero-width characters to the document. Preserve selection offsets and copied text around the extra rendering newline.
+
+  Requires slate-dom 0.133.5 or newer for the matching DOM selection mapping.
+
+## 0.133.1
+
+### Patch Changes
+
+- [#6203](https://github.com/ianstormtaylor/slate/pull/6203) [`e78057b`](https://github.com/ianstormtaylor/slate/commit/e78057b0cac86bd84a8a035bd48cc63415b8e906) Thanks [@dylans](https://github.com/dylans)! - Fall back to deleting backward by character when deleting to the start of a line has an empty range, allowing empty blocks and block starts to merge with preceding content.
+
+## 0.132.0
+
+### Patch Changes
+
+- [#6191](https://github.com/ianstormtaylor/slate/pull/6191) [`edda8d0`](https://github.com/ianstormtaylor/slate/commit/edda8d08a38f0f6c56f45ff87c08506135745103) Thanks [@dylans](https://github.com/dylans)! - Copying text that contains inline voids, such as mentions, no longer puts each void on its own line in plain text.
+
+## 0.131.0
+
+### Patch Changes
+
+- [#6186](https://github.com/ianstormtaylor/slate/pull/6186) [`843bfaa`](https://github.com/ianstormtaylor/slate/commit/843bfaa3bcbe2051264b63ac846d5c5375b15e02) Thanks [@dylans](https://github.com/dylans)! - Copying text inside an inline element, such as a link, now keeps that element in the copied HTML, so pasting into other apps (or HTML-based paste handlers) keeps the link.
+
+- [#6185](https://github.com/ianstormtaylor/slate/pull/6185) [`8cd5101`](https://github.com/ianstormtaylor/slate/commit/8cd5101da644eb99f7cf87e9a2f1acde23edc025) Thanks [@dylans](https://github.com/dylans)! - Copying an empty line now gives one blank line in plain text instead of two.
+
 ## 0.130.1
 
 ### Patch Changes

@@ -9,6 +9,7 @@ import { JSX } from 'react'
 import { Element, LeafPosition, Text } from 'slate'
 import { ResizeObserver as ResizeObserverPolyfill } from '@juggle/resize-observer'
 import String from './string'
+import { isTextParentEquivalent } from '../utils/text-parent'
 import { PLACEHOLDER_SYMBOL, EDITOR_TO_PLACEHOLDER_ELEMENT } from 'slate-dom'
 import { RenderLeafProps, RenderPlaceholderProps } from './editable'
 import { useSlateStatic } from '../hooks/use-slate-static'
@@ -169,7 +170,7 @@ const Leaf = (props: {
 
 const MemoizedLeaf = React.memo(Leaf, (prev, next) => {
   return (
-    next.parent === prev.parent &&
+    isTextParentEquivalent(prev.parent, next.parent, prev.text, next.text) &&
     next.isLast === prev.isLast &&
     next.renderLeaf === prev.renderLeaf &&
     next.renderPlaceholder === prev.renderPlaceholder &&

@@ -59,6 +59,71 @@ This example is fairly simple. Whenever `normalizeNode` gets called on a paragra
 
 But what if the child has nested blocks?
 
+## Resetting a Cleared Document
+
+Deleting a selection preserves the surviving block's properties. Slate does not know which element type your application uses for a default block, so deleting every character can leave an empty heading or list.
+
+If deleting the whole document should create a fresh paragraph, override `deleteFragment`. Check the selection before deleting, and use transforms so undo can restore the original document. This is the policy used by the [richtext example](https://www.slatejs.org/examples/richtext):
+
+```javascript
+import { Editor, Element as SlateElement, Range, Transforms } from 'slate'
+
+const withRichText = editor => {
+  const { deleteFragment } = editor
+
+  editor.deleteFragment = direction => {
+    const { selection } = editor
+
+    if (selection && Range.isExpanded(selection)) {
+      const [start, end] = Range.edges(selection)
+
+      if (Editor.isStart(editor, start, []) && Editor.isEnd(editor, end, [])) {
+        Editor.withoutNormalizing(editor, () => {
+          Transforms.removeNodes(editor, {
+            at: [],
+            match: node => SlateElement.isElement(node),
+            mode: 'highest',
+          })
+          Transforms.insertNodes(
+            editor,
+            { type: 'paragraph', children: [{ text: '' }] },
+            { at: [0], select: true }
+          )
+        })
+        return
+      }
+    }
+
+    deleteFragment(direction)
+  }
+
+  return editor
+}
+```
+
+This override handles an expanded selection covering the whole document in either direction. Partial deletions use the original method. Inserting text or a fragment over a selection uses separate commands; choose their replacement behavior independently.
+
+Use `normalizeNode` for structural constraints, such as inserting a default block when the editor has no children. Do not reset every single empty heading in a normalizer: that would also undo a user's deliberate choice to create an empty heading. For example, an empty-root constraint can be added to your plugin as follows:
+
+```javascript
+const { normalizeNode } = editor
+
+editor.normalizeNode = (entry, options) => {
+  const [node] = entry
+
+  if (Editor.isEditor(node) && node.children.length === 0) {
+    Transforms.insertNodes(
+      editor,
+      { type: 'paragraph', children: [{ text: '' }] },
+      { at: [0] }
+    )
+    return
+  }
+
+  normalizeNode(entry, options)
+}
+```
+
 ## Multi-pass Normalizing
 
 One thing to understand about `normalizeNode` constraints is that they are **multi-pass**.

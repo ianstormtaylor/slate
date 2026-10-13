@@ -6,7 +6,14 @@ import {
   useReducer,
   useRef,
 } from 'react'
-import { DecoratedRange, Descendant, Node, NodeEntry } from 'slate'
+import {
+  DecoratedRange,
+  Descendant,
+  Editor,
+  Node,
+  NodeEntry,
+  Range,
+} from 'slate'
 import { isTextDecorationsEqual, isElementDecorationsEqual } from 'slate-dom'
 import { useSlateStatic } from './use-slate-static'
 import { ReactEditor } from '../plugin/react-editor'
@@ -35,7 +42,17 @@ export const useDecorations = (
   // Not memoized since we want nodes to be decorated on each render
   const selector = () => {
     const path = ReactEditor.findPath(editor, node)
-    return decorate([node, path])
+    const decorations = decorate([node, path])
+
+    if (Node.isText(node)) {
+      const range = Editor.range(editor, path)
+      return decorations.flatMap(decoration => {
+        const intersection = Range.intersection(decoration, range)
+        return intersection ? [intersection] : []
+      })
+    }
+
+    return decorations
   }
 
   const equalityFn = Node.isText(node)

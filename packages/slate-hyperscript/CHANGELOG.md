@@ -1,5 +1,11 @@
 # slate-hyperscript
 
+## 0.133.3
+
+### Patch Changes
+
+- [#6212](https://github.com/ianstormtaylor/slate/pull/6212) [`e86bcd3`](https://github.com/ianstormtaylor/slate/commit/e86bcd3f30e4f6fed6937ebd78599ebdbaf033a0) Thanks [@dylans](https://github.com/dylans)! - Strip Babel's `__self` and `__source` development metadata from hyperscript attributes so generated documents remain serializable and do not contain local source paths.
+
 ## 0.129.1
 
 ### Patch Changes

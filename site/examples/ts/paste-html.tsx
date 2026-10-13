@@ -72,8 +72,36 @@ const applyTextAttributes = (child: any, attrs: TextAttributes): any =>
       }
     : jsx('text', attrs, child)
 
+const BLOCK_TAGS = new Set([
+  'BLOCKQUOTE',
+  'DIV',
+  'H1',
+  'H2',
+  'H3',
+  'H4',
+  'H5',
+  'H6',
+  'LI',
+  'OL',
+  'P',
+  'PRE',
+  'UL',
+])
+
 export const deserialize = (el: HTMLElement | ChildNode): any => {
   if (el.nodeType === 3) {
+    if (
+      /^[\t\n\r ]*$/.test(el.textContent ?? '') &&
+      ['BODY', 'DIV', 'BLOCKQUOTE', 'UL', 'OL'].includes(
+        el.parentElement?.nodeName ?? ''
+      ) &&
+      [el.previousSibling, el.nextSibling].some(
+        sibling => sibling && BLOCK_TAGS.has(sibling.nodeName)
+      )
+    ) {
+      return null
+    }
+
     return el.textContent
   } else if (el.nodeType !== 1) {
     return null
@@ -103,6 +131,28 @@ export const deserialize = (el: HTMLElement | ChildNode): any => {
 
   if (ELEMENT_TAGS[nodeName]) {
     const attrs = ELEMENT_TAGS[nodeName](el as HTMLElement)
+    if (
+      nodeName === 'P' &&
+      children.some(child => Node.isElement(child) && child.type === 'image')
+    ) {
+      const blocks: Descendant[] = []
+      let paragraphChildren: (Descendant | string | null)[] = []
+      for (const child of children) {
+        if (Node.isElement(child) && child.type === 'image') {
+          if (paragraphChildren.length > 0) {
+            blocks.push(jsx('element', attrs, paragraphChildren))
+            paragraphChildren = []
+          }
+          blocks.push(child)
+        } else {
+          paragraphChildren.push(child)
+        }
+      }
+      if (paragraphChildren.length > 0) {
+        blocks.push(jsx('element', attrs, paragraphChildren))
+      }
+      return blocks
+    }
     return jsx('element', attrs, children)
   }
 

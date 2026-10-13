@@ -441,12 +441,18 @@ export const DOMEditor: DOMEditorInterface = {
 
       const i = NODE_TO_INDEX.get(child)
 
-      if (i == null) {
+      if (i == null || parent.children[i] !== child) {
         break
       }
 
       path.unshift(i)
       child = parent
+    }
+
+    for (const [descendant, descendantPath] of Node.nodes(editor)) {
+      if (descendant === node) {
+        return descendantPath
+      }
     }
 
     throw new Error(
@@ -541,20 +547,48 @@ export const DOMEditor: DOMEditorInterface = {
       }
     }
 
-    if (!targetEl) {
+    if (
+      !targetEl ||
+      closestShadowAware(targetEl, '[data-slate-editor]') !== editorEl
+    ) {
       return false
     }
 
-    return (
-      closestShadowAware(targetEl, `[data-slate-editor]`) === editorEl &&
-      (!editable || targetEl.isContentEditable
-        ? true
-        : (typeof targetEl.isContentEditable === 'boolean' && // isContentEditable exists only on HTMLElement, and on other nodes it will be undefined
-            // this is the core logic that lets you know you got the right editor.selection instead of null when editor is contenteditable="false"(readOnly)
-            closestShadowAware(targetEl, '[contenteditable="false"]') ===
-              editorEl) ||
-          !!targetEl.getAttribute('data-slate-zero-width'))
+    const editableElement = closestShadowAware(
+      targetEl,
+      '[contenteditable="true" i], [contenteditable=""], [contenteditable="plaintext-only" i]'
     )
+    const nonEditableAncestor =
+      editableElement && editableElement !== editorEl
+        ? closestShadowAware(editableElement, '[contenteditable="false" i]')
+        : null
+
+    if (
+      nonEditableAncestor &&
+      nonEditableAncestor !== editorEl &&
+      closestShadowAware(nonEditableAncestor, '[data-slate-editor]') ===
+        editorEl
+    ) {
+      const slateText =
+        closestShadowAware(targetEl, '[data-slate-node="text"]') ??
+        editableElement?.querySelector('[data-slate-node="text"]')
+
+      if (
+        !slateText ||
+        !editableElement?.contains(slateText) ||
+        closestShadowAware(slateText, '[data-slate-editor]') !== editorEl
+      ) {
+        return false
+      }
+    }
+
+    return !editable || targetEl.isContentEditable
+      ? true
+      : (typeof targetEl.isContentEditable === 'boolean' && // isContentEditable exists only on HTMLElement, and on other nodes it will be undefined
+          // this is the core logic that lets you know you got the right editor.selection instead of null when editor is contenteditable="false"(readOnly)
+          closestShadowAware(targetEl, '[contenteditable="false"]') ===
+            editorEl) ||
+          !!targetEl.getAttribute('data-slate-zero-width')
   },
 
   hasEditableTarget: (editor, target): target is DOMNode =>
@@ -675,7 +709,10 @@ export const DOMEditor: DOMEditorInterface = {
 
       if (point.offset <= end) {
         const offset = Math.min(length, Math.max(0, point.offset - start))
-        domPoint = [domNode, offset]
+        domPoint =
+          offset === length && text.hasAttribute('data-slate-trailing')
+            ? [text.lastChild!, 0]
+            : [domNode, offset]
         break
       }
 
@@ -788,7 +825,14 @@ export const DOMEditor: DOMEditorInterface = {
           const window = DOMEditor.getWindow(editor)
           const range = window.document.createRange()
           range.setStart(textNode, 0)
-          range.setEnd(nearestNode, nearestOffset)
+          range.setEnd(
+            nearestNode,
+            parentNode.hasAttribute('data-slate-trailing') &&
+              nearestNode === parentNode.lastChild &&
+              nearestNode.textContent === '\n'
+              ? 0
+              : nearestOffset
+          )
 
           const contents = range.cloneContents()
           const removals = [
@@ -1121,6 +1165,7 @@ export const DOMEditor: DOMEditorInterface = {
     // Slate point. (2023/11/01)
     if (
       IS_FIREFOX &&
+      !focusNode.parentElement?.hasAttribute('data-slate-trailing') &&
       focusNode.textContent?.endsWith('\n\n') &&
       focusOffset === focusNode.textContent.length
     ) {

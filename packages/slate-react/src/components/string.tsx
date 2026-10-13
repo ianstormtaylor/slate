@@ -3,7 +3,7 @@ import { Editor, Text, Path, Element, Node } from 'slate'
 
 import { ReactEditor, useSlateStatic } from '..'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
-import { IS_ANDROID, IS_COMPOSING } from 'slate-dom'
+import { IS_ANDROID, IS_COMPOSING, IS_FIREFOX, DOMText } from 'slate-dom'
 import { MARK_PLACEHOLDER_SYMBOL } from 'slate-dom'
 
 /**
@@ -97,6 +97,20 @@ const TextString = (props: { text: string; isTrailing?: boolean }) => {
       }
 
       ref.current.textContent = textWithTrailing
+    }
+
+    if (IS_FIREFOX) {
+      ref.current?.toggleAttribute('data-slate-trailing', isTrailing)
+    }
+
+    const textNode = ref.current?.firstChild
+    if (
+      IS_FIREFOX &&
+      isTrailing &&
+      ref.current?.childNodes.length === 1 &&
+      textNode?.nodeType === 3
+    ) {
+      ;(textNode as DOMText).splitText(text.length)
     }
 
     // intentionally not specifying dependencies, so that this effect runs on every render

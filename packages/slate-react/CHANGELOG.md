@@ -1,5 +1,109 @@
 # slate-react
 
+## 0.133.8
+
+### Patch Changes
+
+- [#6238](https://github.com/ianstormtaylor/slate/pull/6238) [`468b58d`](https://github.com/ianstormtaylor/slate/commit/468b58d072fd8c3033c2b8ed5a3e0a38260733bf) Thanks [@dylans](https://github.com/dylans)! - Scroll the caret into view when an edit changes the selection even if the DOM selection already matches the editor, including Backspace between empty paragraphs.
+
+- [#6235](https://github.com/ianstormtaylor/slate/pull/6235) [`22ede7f`](https://github.com/ianstormtaylor/slate/commit/22ede7f5dc29bc7ae8392ef00a6461c76f39d4bb) Thanks [@dylans](https://github.com/dylans)! - Move the caret into an adjacent empty text node when an arrow key leaves an editable inline, so padding does not leave the caret drawn inside the inline.
+
+## 0.133.7
+
+### Patch Changes
+
+- [#6233](https://github.com/ianstormtaylor/slate/pull/6233) [`a0bcf70`](https://github.com/ianstormtaylor/slate/commit/a0bcf7013898a826f894c5d1b7b125064f69abab) Thanks [@dylans](https://github.com/dylans)! - Sync the selection from the DOM before calling an `Editable` `onClick` handler, so `editor.selection` in the handler reflects the click instead of the previous selection.
+
+## 0.133.6
+
+### Patch Changes
+
+- [#6229](https://github.com/ianstormtaylor/slate/pull/6229) [`c486bad`](https://github.com/ianstormtaylor/slate/commit/c486badad7a8af56eaaa7f91461874e16b79d355) Thanks [@dylans](https://github.com/dylans)! - Move the caret to the empty last line of a block that ends with a newline when pressing ArrowUp from the block below in Chrome and Safari, which skipped that block natively.
+
+- [#6226](https://github.com/ianstormtaylor/slate/pull/6226) [`a8329a2`](https://github.com/ianstormtaylor/slate/commit/a8329a27140fe468c306933a8ed1bebd610d88b9) Thanks [@dylans](https://github.com/dylans)! - Copy `initialValue` nodes that another editor is already using, so two `Slate` components given the same value render and edit independently instead of throwing "Unable to find the path for Slate node". Requires slate-dom 0.133.6 or newer.
+
+- [#6225](https://github.com/ianstormtaylor/slate/pull/6225) [`cb788f8`](https://github.com/ianstormtaylor/slate/commit/cb788f8c368adcdb09efb1bb0c94150bab8fa6a3) Thanks [@dylans](https://github.com/dylans)! - Extend the selection from a selected void when Shift-clicking text, instead of leaving it collapsed in the void in Chromium.
+
+## 0.133.5
+
+### Patch Changes
+
+- [#6224](https://github.com/ianstormtaylor/slate/pull/6224) [`84f047c`](https://github.com/ianstormtaylor/slate/commit/84f047c858785112e563ad53a5b5c333817eaec4) Thanks [@dylans](https://github.com/dylans)! - Replace an expanded selection correctly when an IME composition starts right after selecting it. The selection is now synced before the composition starts, and Firefox no longer crashes or leaves the replaced text in the document.
+
+- [#6222](https://github.com/ianstormtaylor/slate/pull/6222) [`c333eed`](https://github.com/ianstormtaylor/slate/commit/c333eed13b9b046d0b161afc57ddda11650dc4e7) Thanks [@dylans](https://github.com/dylans)! - Render an empty block right-to-left when the nearest sibling block with text is right-to-left, so a new line after Hebrew or Arabic text starts on the right.
+
+- [#6220](https://github.com/ianstormtaylor/slate/pull/6220) [`3eed905`](https://github.com/ianstormtaylor/slate/commit/3eed9053d1058cfab8744a965be6156fec259cac) Thanks [@dylans](https://github.com/dylans)! - Keep input, selection and history events from native contenteditable regions nested inside non-editable containers out of the surrounding Slate editor. Preserve Slate text and event hosts inside custom editable islands.
+
+- [#6223](https://github.com/ianstormtaylor/slate/pull/6223) [`8c929a8`](https://github.com/ianstormtaylor/slate/commit/8c929a8fd83bb9f96e758a22a3f005351adc089b) Thanks [@dylans](https://github.com/dylans)! - Keep the Firefox caret on the new line after a trailing soft break without adding zero-width characters to the document. Preserve selection offsets and copied text around the extra rendering newline.
+
+  Requires slate-dom 0.133.5 or newer for the matching DOM selection mapping.
+
+- [#6219](https://github.com/ianstormtaylor/slate/pull/6219) [`8e8cf36`](https://github.com/ianstormtaylor/slate/commit/8e8cf361a9a7bcfa89b56cbd1e6e181140b98ddc) Thanks [@dylans](https://github.com/dylans)! - Stop re-rendering every text node in a block when only one of them changes. Text and leaf components now compare what they use from the parent (its properties, whether the text is its last child, and whether the block is empty) instead of the parent object itself.
+
+- [#6221](https://github.com/ianstormtaylor/slate/pull/6221) [`270a4a0`](https://github.com/ianstormtaylor/slate/commit/270a4a0fe03789b5c82b2107e79474e4eed0f516) Thanks [@dylans](https://github.com/dylans)! - Call deletion overrides in WebKit when Backspace at the start or Delete at the end of a document does not emit beforeinput.
+
+## 0.133.4
+
+### Patch Changes
+
+- [#6215](https://github.com/ianstormtaylor/slate/pull/6215) [`ce3faf8`](https://github.com/ianstormtaylor/slate/commit/ce3faf8996e0d7f19b5428e3dbca9d718fd63c61) Thanks [@dylans](https://github.com/dylans)! - Read the DOM selection when a `beforeinput` event arrives, so input that follows a selection change before the browser fires `selectionchange` goes where the caret is.
+
+## 0.133.3
+
+### Patch Changes
+
+- [#6210](https://github.com/ianstormtaylor/slate/pull/6210) [`ba60596`](https://github.com/ianstormtaylor/slate/commit/ba605969a50f520a38750051e0c56b41538baf4c) Thanks [@dylans](https://github.com/dylans)! - Clip text-node decorations to the node's range so decorations for other nodes are ignored and cross-node ranges use the correct offsets.
+
+## 0.133.2
+
+### Patch Changes
+
+- [#5985](https://github.com/ianstormtaylor/slate/pull/5985) [`5eeea5e`](https://github.com/ianstormtaylor/slate/commit/5eeea5e509cb7df18d98ab4e495a4e1ecb5dc26e) Thanks [@wljray](https://github.com/wljray)! - Flush Android backward text deletions without waiting for another input event, retain the typing delay when no action is pending, cancel superseded flush timers, and avoid an extra change notification when restoring unchanged marks.
+
+- [#6207](https://github.com/ianstormtaylor/slate/pull/6207) [`906eafe`](https://github.com/ianstormtaylor/slate/commit/906eafe6e872bc5c4dbeb6add60da49a219907d6) Thanks [@dylans](https://github.com/dylans)! - Restore Chromium's structural DOM changes before applying multiline composition commits, preventing duplicated text while preserving intervening React updates.
+
+## 0.133.0
+
+### Minor Changes
+
+- [#6198](https://github.com/ianstormtaylor/slate/pull/6198) [`dd6d37f`](https://github.com/ianstormtaylor/slate/commit/dd6d37faf5cc628fffc6c923383bc497d1c30aed) Thanks [@GaurangTandon](https://github.com/GaurangTandon)! - Revert "Ignore input events dispatched by script" (#6117). Input, paste and drop events dispatched by script are handled again, as in 0.127.1.
+
+## 0.132.0
+
+### Minor Changes
+
+- [#6190](https://github.com/ianstormtaylor/slate/pull/6190) [`bac6474`](https://github.com/ianstormtaylor/slate/commit/bac64747a3e520d4dc1d8dc909739e64303018a7) Thanks [@dylans](https://github.com/dylans)! - Type `Editable`'s extra props as `div` attributes (`React.HTMLAttributes<HTMLDivElement>`) instead of `textarea` attributes. Textarea-only props such as `rows`, `cols`, `maxLength`, `wrap` and `value` never did anything on the editor's `div`; they now fail to type-check, so remove them.
+
+### Patch Changes
+
+- [#6192](https://github.com/ianstormtaylor/slate/pull/6192) [`6bcf677`](https://github.com/ianstormtaylor/slate/commit/6bcf67718a8e3c0c3a25bff968c0563230b131a0) Thanks [@dylans](https://github.com/dylans)! - The default `scrollSelectionIntoView` now scrolls just enough to reveal the caret (`block: 'nearest'`) instead of centering it, so moving the caret with the arrow keys past the edge of the viewport no longer jumps the page by half a screen. Pass your own `scrollSelectionIntoView` to keep centering.
+
+## 0.131.0
+
+### Minor Changes
+
+- [#6183](https://github.com/ianstormtaylor/slate/pull/6183) [`35830d7`](https://github.com/ianstormtaylor/slate/commit/35830d78687e61bb56b2d31aeef4713eb42c5cbf) Thanks [@dylans](https://github.com/dylans)! - `initialValue` on `<Slate>` is now optional. When it's left out, the editor's existing `editor.children` are used, for editors created and filled ahead of rendering. Leaving it out while `editor.children` is empty throws with a hint to pass `initialValue={[]}` if an empty editor is intended.
+
+### Patch Changes
+
+- [#6174](https://github.com/ianstormtaylor/slate/pull/6174) [`ae5dc30`](https://github.com/ianstormtaylor/slate/commit/ae5dc3044a88aa9aaeaae58ce1fb6e3c73e1752f) Thanks [@dylans](https://github.com/dylans)! - `autoFocus` now focuses through `ReactEditor.focus`, which selects the start of the document when there's no selection, so you can type right away. Before, Firefox and Safari could end up focused with no selection, especially under React strict mode.
+
+- [#6182](https://github.com/ianstormtaylor/slate/pull/6182) [`835e185`](https://github.com/ianstormtaylor/slate/commit/835e18599d5313743a758a2b04a77c2a922e6c3a) Thanks [@dylans](https://github.com/dylans)! - Ignore DOM selection changes while focus is outside the editor (unless it's read-only). Firefox moves the DOM selection of a blurred editor when its content changes, so inserting text from outside the editor, such as from a toolbar button, used to jump the selection to the start.
+
+- [#6184](https://github.com/ianstormtaylor/slate/pull/6184) [`7a4e15c`](https://github.com/ianstormtaylor/slate/commit/7a4e15c4561e9463355c5071358c4cbb08ce1f97) Thanks [@dylans](https://github.com/dylans)! - Keep the caret in the editor's text when the browser moves it to a spot Slate can't represent, such as below a table that ends the document after pressing ArrowDown. Typing there used to insert the character twice: once in the last cell and once as stray text outside the table.
+
+- [#6175](https://github.com/ianstormtaylor/slate/pull/6175) [`46cd8f9`](https://github.com/ianstormtaylor/slate/commit/46cd8f977c6c509d6160b6b9492530151bab11eb) Thanks [@dylans](https://github.com/dylans)! - An empty `initialValue` is now loaded as one empty block, so the editor has somewhere to put the cursor instead of breaking.
+
+- [#6179](https://github.com/ianstormtaylor/slate/pull/6179) [`25f6353`](https://github.com/ianstormtaylor/slate/commit/25f6353b81292e4ced81b3e5cf6c6f2fa1b6851b) Thanks [@dylans](https://github.com/dylans)! - Fix clicks occasionally being undone when the editor re-renders right after them. A render inside the 100 ms selection-change throttle used to write the previous selection back to the DOM; it now applies the clicked selection instead.
+
+- [#6180](https://github.com/ianstormtaylor/slate/pull/6180) [`13d7c12`](https://github.com/ianstormtaylor/slate/commit/13d7c12aa4ed686ddaf117e865405cb5f415cbb2) Thanks [@dylans](https://github.com/dylans)! - Make the void spacer unselectable (`user-select: none`), so a selection that includes a void element no longer shows a darker band at its edge in Chromium.
+
+## 0.130.2
+
+### Patch Changes
+
+- [#6171](https://github.com/ianstormtaylor/slate/pull/6171) [`7843bd5`](https://github.com/ianstormtaylor/slate/commit/7843bd5d32590835c58808e9f04b21667a9a3d96) Thanks [@dylans](https://github.com/dylans)! - Moving whole lines by dragging or cutting no longer adds an empty line. Whole top-level blocks are now moved as blocks. Nested content, like list items and table cells, is moved without its trailing line break, so no containers get merged. Dropping text back onto its own selection is now a no-op, and drag-and-drop deletes through `editor.deleteFragment`, like cut does, so plugins that guard deletion apply to both.
+
 ## 0.130.1
 
 ### Patch Changes

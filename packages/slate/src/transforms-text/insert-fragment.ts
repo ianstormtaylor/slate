@@ -2,6 +2,7 @@ import { Transforms } from '../interfaces/transforms'
 import { Editor } from '../interfaces/editor'
 import { Range } from '../interfaces/range'
 import { Path } from '../interfaces/path'
+import { Point } from '../interfaces/point'
 import { Element } from '../interfaces/element'
 import { Descendant, Node, NodeEntry } from '../interfaces/node'
 import { TextTransforms } from '../interfaces/transforms/text'
@@ -23,21 +24,29 @@ export const insertFragment: TextTransforms['insertFragment'] = (
 
     if (Location.isRange(at)) {
       if (!hanging) {
-        at = Editor.unhangRange(editor, at, { voids })
+        const [, end] = Range.edges(at)
+        const endOfDoc = Editor.end(editor, [])
+
+        if (!Point.equals(end, endOfDoc)) {
+          at = Editor.unhangRange(editor, at, { voids })
+        }
       }
 
       if (Range.isCollapsed(at)) {
         at = at.anchor
       } else {
-        const [, end] = Range.edges(at)
+        const [start, end] = Range.edges(at)
 
         if (!voids && Editor.void(editor, { at: end })) {
           return
         }
 
-        const pointRef = Editor.pointRef(editor, end)
+        const startRef = Editor.pointRef(editor, start)
+        const endRef = Editor.pointRef(editor, end)
         Transforms.delete(editor, { at })
-        at = pointRef.unref()!
+        const startPoint = startRef.unref()
+        const endPoint = endRef.unref()
+        at = endPoint ?? startPoint!
       }
     } else if (Location.isPath(at)) {
       at = Editor.start(editor, at)
@@ -224,7 +233,7 @@ export const insertFragment: TextTransforms['insertFragment'] = (
     })
 
     if (isBlockEmpty && !starts.length && middles.length && !ends.length) {
-      Transforms.delete(editor, { at: blockPath, voids })
+      Transforms.removeNodes(editor, { at: blockPath, voids })
     }
 
     Transforms.insertNodes(editor, middles, {

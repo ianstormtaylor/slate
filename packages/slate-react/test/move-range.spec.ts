@@ -47,6 +47,38 @@ const move = (children: object[], selection: Range) => {
 }
 
 describe('moving a dragged or cut range', () => {
+  it('removes a dragged block void with a collapsed selection', () => {
+    const editor = editorWith([p('before'), block('image', ''), p('after')])
+    editor.isVoid = node => 'type' in node && node.type === 'image'
+
+    deleteMovedRange(editor, range([1, 0], 0, [1, 0], 0))
+
+    expect(editor.children).toEqual([p('before'), p('after')])
+  })
+
+  it('removes a dragged inline void without removing surrounding text', () => {
+    const editor = editorWith([
+      {
+        type: 'paragraph',
+        children: [{ text: 'before' }, block('mention', ''), { text: 'after' }],
+      },
+    ])
+    editor.isInline = node => 'type' in node && node.type === 'mention'
+    editor.isVoid = editor.isInline
+
+    deleteMovedRange(editor, range([0, 1, 0], 0, [0, 1, 0], 0))
+
+    expect(editor.children).toEqual([p('beforeafter')])
+  })
+
+  it('leaves ordinary text unchanged for a collapsed range', () => {
+    const editor = editorWith([p('before')])
+
+    deleteMovedRange(editor, range([0, 0], 2, [0, 0], 2))
+
+    expect(editor.children).toEqual([p('before')])
+  })
+
   it('moves whole top-level lines with their line break', () => {
     const result = move(
       [p('one'), p('two'), p('three')],

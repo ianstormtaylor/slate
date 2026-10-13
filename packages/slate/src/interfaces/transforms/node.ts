@@ -139,6 +139,7 @@ export interface NodeTransforms {
       at?: Location
       match?: NodeMatch<T>
       mode?: MaximizeMode
+      hanging?: boolean
       split?: boolean
       voids?: boolean
     }
@@ -155,6 +156,7 @@ export interface NodeTransforms {
       at?: Location
       match?: NodeMatch<T>
       mode?: MaximizeMode
+      hanging?: boolean
       split?: boolean
       voids?: boolean
     }

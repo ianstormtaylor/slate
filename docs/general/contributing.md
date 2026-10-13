@@ -11,9 +11,9 @@ Want to contribute to Slate? That would be awesome!
   - [Running Tests](contributing.md#running-tests)
   - [Testing Input Methods](contributing.md#testing-input-methods)
   - [Publishing Releases](contributing.md#publishing-releases)
-    - [Publishing Normal `@latest` Release](contributing.md#publishing-normal-latest-release)
-    - [Publishing `@next` Release](contributing.md#publishing-next-release)
-    - [Publishing `@experimental` Release](contributing.md#publishing-experimental-release)
+    - [Adding a Changeset](contributing.md#adding-a-changeset)
+    - [Publishing to `@latest`](contributing.md#publishing-to-latest)
+    - [Publishing to `@dev`](contributing.md#publishing-to-dev)
     - [Running Prerelease Script](contributing.md#running-prerelease-script)
 
 ## Reporting Bugs

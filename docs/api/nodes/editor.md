@@ -123,6 +123,8 @@ Options: `{at?: Location, match?: NodeMatch, reverse?: boolean, voids?: boolean}
 
 Get the marks that would be added to text at the current selection.
 
+If `editor.marks` is set (marks toggled with a collapsed selection), those are returned. With an expanded selection, it returns the marks of the first text node in the selection, skipping a node the selection only touches at its end, so it describes what typing over the selection would produce rather than marks shared by the whole selection. To check whether a mark applies to all of the selected text, iterate `Editor.nodes(editor, { match: Text.isText })` and compare each node.
+
 #### `Editor.next<T extends Descendant>(editor: Editor, options?) => NodeEntry<T> | undefined`
 
 Get the matching node in the branch of the document after a location.
@@ -152,6 +154,8 @@ Options: `{at?: Location | Span, match?: NodeMatch, mode?: 'all' | 'highest' | '
 - `'lowest'`: in a hierarchy of nodes, only return the lowest level matching nodes
 
 `options.pass`: Skip the descendants of certain nodes (but not the nodes themselves).
+
+`options.reverse`: Walk siblings from last to first. Ancestors still come before their descendants, so this isn't the forward order reversed: for `[block[text a, text b], block[text c]]` the forward order is `editor, 0, 0.0, 0.1, 1, 1.0` and the reverse order is `editor, 1, 1.0, 0, 0.1, 0.0`. To get the exact reverse, collect the forward entries and reverse the array.
 
 #### `Editor.parent(editor: Editor, at: Location, options?) => NodeEntry<Ancestor>`
 

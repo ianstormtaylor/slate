@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Descendant, Editor, Node, Operation, Scrubber, Selection } from 'slate'
-import { EDITOR_TO_ON_CHANGE } from 'slate-dom'
+import { copyNodeInUse, EDITOR_TO_ON_CHANGE } from 'slate-dom'
 import { FocusedContext } from '../hooks/use-focused'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
 import {
@@ -18,7 +18,7 @@ import { REACT_MAJOR_VERSION } from '../utils/environment'
 
 export const Slate = (props: {
   editor: ReactEditor
-  initialValue: Descendant[]
+  initialValue?: Descendant[]
   children: React.ReactNode
   onChange?: (value: Descendant[]) => void
   onSelectionChange?: (selection: Selection) => void
@@ -37,21 +37,37 @@ export const Slate = (props: {
   const initializedEditor = useRef<ReactEditor | null>(null)
 
   if (initializedEditor.current !== editor) {
-    if (!Node.isNodeList(initialValue)) {
-      throw new Error(
-        `[Slate] initialValue is invalid! Expected a list of elements but got: ${Scrubber.stringify(
-          initialValue
-        )}`
-      )
-    }
-
     if (!Editor.isEditor(editor)) {
       throw new Error(
         `[Slate] editor is invalid! You passed: ${Scrubber.stringify(editor)}`
       )
     }
 
-    editor.children = initialValue
+    if (initialValue === undefined && editor.children.length === 0) {
+      throw new Error(
+        '[Slate] editor.children is empty and no initialValue was provided. If this is intentional, pass initialValue={[]} to the Slate component.'
+      )
+    }
+
+    const value = initialValue ?? editor.children
+
+    if (!Node.isNodeList(value)) {
+      throw new Error(
+        `[Slate] initialValue is invalid! Expected a list of elements but got: ${Scrubber.stringify(
+          value
+        )}`
+      )
+    }
+
+    const copied = initialValue === undefined ? value : value.map(copyNodeInUse)
+    const children = copied.every((node, i) => node === value[i])
+      ? value
+      : copied
+
+    editor.children =
+      children.length > 0
+        ? children
+        : [{ children: [{ text: '' }] } as Descendant]
     Object.assign(editor, rest)
     initializedEditor.current = editor
   }
