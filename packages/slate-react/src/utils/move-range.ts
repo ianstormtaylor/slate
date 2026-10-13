@@ -38,6 +38,12 @@ export const getMovableRange = (editor: Editor, range: Range): Range =>
 
 export const deleteMovedRange = (editor: Editor, range: Range) => {
   if (Range.isCollapsed(range)) {
+    const voidEntry = Editor.void(editor, { at: range })
+
+    if (voidEntry) {
+      Transforms.removeNodes(editor, { at: voidEntry[1], voids: true })
+    }
+
     return
   }
 
