@@ -93,7 +93,22 @@ const RichTextExample = () => {
 }
 
 const withRichText = (editor: CustomEditor) => {
-  const { deleteFragment } = editor
+  const { deleteFragment, normalizeNode } = editor
+
+  editor.normalizeNode = (entry, options) => {
+    const [node, path] = entry
+
+    if (SlateElement.isElement(node) && isListType(node.type)) {
+      for (const [index, child] of node.children.entries()) {
+        if (SlateElement.isElement(child) && isListType(child.type)) {
+          Transforms.unwrapNodes(editor, { at: path.concat(index) })
+          return
+        }
+      }
+    }
+
+    normalizeNode(entry, options)
+  }
 
   editor.deleteFragment = direction => {
     const { selection } = editor
