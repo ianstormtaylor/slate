@@ -95,6 +95,29 @@ test.describe('mentions example', () => {
     await expect(page.locator('[data-cy="mentions-portal"]')).toHaveCount(0)
   })
 
+  test('keeps editor focus after tapping a suggestion', async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(!isMobile, 'Touch suggestion selection uses the mobile project')
+    const editor = page.getByRole('textbox')
+    await clearEditor(editor)
+    await editor.pressSequentially('@R2')
+    await page
+      .locator('[data-cy="mentions-portal"]')
+      .getByText('R2-D2', { exact: true })
+      .tap()
+    await expect(editor.locator('[data-cy="mention-R2-D2"]')).toHaveCount(1)
+    await expect(editor).toBeFocused()
+    await page.keyboard.type('after')
+    await expect(editor).toContainText('after')
+    const slate = await getEditorHandle(editor)
+    await expect
+      .poll(() => slate.evaluate(editor => editor.string([])))
+      .toBe('after')
+    await slate.dispose()
+  })
+
   test('does not match a query across nested blocks', async ({ page }) => {
     const element = page.getByRole('textbox')
     await clearEditor(element)

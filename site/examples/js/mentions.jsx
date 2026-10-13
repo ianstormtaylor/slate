@@ -148,7 +148,8 @@ const MentionExample = () => {
             {chars.map((char, i) => (
               <div
                 key={char}
-                onClick={e => {
+                onPointerDown={event => event.preventDefault()}
+                onClick={() => {
                   Transforms.select(editor, target)
                   insertMention(editor, char)
                   setTarget(null)

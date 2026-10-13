@@ -1,7 +1,6 @@
 import React, {
   Fragment,
   KeyboardEvent,
-  MouseEvent,
   useCallback,
   useEffect,
   useMemo,
@@ -172,7 +171,8 @@ const MentionExample = () => {
             {chars.map((char, i) => (
               <div
                 key={char}
-                onClick={(e: MouseEvent) => {
+                onPointerDown={event => event.preventDefault()}
+                onClick={() => {
                   Transforms.select(editor, target)
                   insertMention(editor, char)
                   setTarget(null)
