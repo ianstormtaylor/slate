@@ -1799,7 +1799,8 @@ export const Editable = forwardRef(
                       // aren't composing any more.
                       if (
                         ReactEditor.isComposing(editor) &&
-                        nativeEvent.isComposing === false
+                        (nativeEvent.isComposing === false ||
+                          isDeletingInVoid(editor, nativeEvent))
                       ) {
                         IS_COMPOSING.set(editor, false)
                         setIsComposing(false)
@@ -2212,6 +2213,17 @@ export type RenderPlaceholderProps = {
 /**
  * The default placeholder element
  */
+
+const isDeletingInVoid = (editor: Editor, event: KeyboardEvent) => {
+  const { selection } = editor
+
+  return (
+    !!selection &&
+    Range.isCollapsed(selection) &&
+    (Hotkeys.isDeleteBackward(event) || Hotkeys.isDeleteForward(event)) &&
+    !!Editor.void(editor, { at: selection })
+  )
+}
 
 const isInSlateText = (node: unknown) =>
   isDOMNode(node) &&
