@@ -297,6 +297,10 @@ Options:
 
 ### Check methods
 
+#### `Editor.hasRange(editor: Editor, range: Range) => boolean`
+
+Check whether both endpoint paths of a range exist in the editor. This checks paths, not whether offsets are within the text. `DOMEditor.hasRange` and `ReactEditor.hasRange` delegate to this method.
+
 #### `Editor.hasBlocks(editor: Editor, element: Element) => boolean`
 
 Check if a node has block children.

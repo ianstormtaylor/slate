@@ -55,7 +55,6 @@ export interface DOMEditor extends BaseEditor {
     editor: DOMEditor,
     target: EventTarget | null
   ) => target is DOMNode
-  hasRange: (editor: DOMEditor, range: Range) => boolean
   hasSelectableTarget: (
     editor: DOMEditor,
     target: EventTarget | null
@@ -572,6 +571,10 @@ export const DOMEditor: DOMEditorInterface = {
     DOMEditor.hasDOMNode(editor, target, { editable: true }),
 
   hasRange: (editor, range) => {
+    if (typeof editor.hasRange === 'function') {
+      return editor.hasRange(range)
+    }
+
     const { anchor, focus } = range
     return (
       Editor.hasPath(editor, anchor.path) && Editor.hasPath(editor, focus.path)
