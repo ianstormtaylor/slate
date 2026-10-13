@@ -6,6 +6,7 @@ const {
   installRecorder,
   placeCaret,
   readState,
+  waitForEditor,
   screenPoint,
   withEditor,
 } = require('../runner.cjs')
@@ -103,6 +104,7 @@ const runScenario = async (browser, rootPid, scenario, browserName) => {
   await page.addInitScript(outsideScript)
   await page.goto(`${BASE_URL}/examples/${scenario.example}`)
   await page.locator('[data-slate-editor]').waitFor()
+  await waitForEditor(page)
 
   const helper = (...helperArgs) =>
     execFileSync(IME_KEY, ['--pid', String(pid), ...helperArgs], {

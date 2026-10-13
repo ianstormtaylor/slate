@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="org.slatejs.testime">
+  <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="35" />
+  <application android:label="Slate Test IME">
+    <service
+      android:name=".TestIme"
+      android:label="Slate Test IME"
+      android:permission="android.permission.BIND_INPUT_METHOD"
+      android:exported="true">
+      <intent-filter>
+        <action android:name="android.view.InputMethod" />
+      </intent-filter>
+      <meta-data android:name="android.view.im" android:resource="@xml/method" />
+    </service>
+  </application>
+</manifest>

@@ -104,6 +104,15 @@ const screenPoint = (page, selector, position = 'start') =>
     [selector, position]
   )
 
+const waitForEditor = page =>
+  page.waitForFunction(() => {
+    const element = document.querySelector('[data-slate-editor]')
+    return (
+      element &&
+      Object.keys(element).some(key => key.startsWith('__reactFiber$'))
+    )
+  })
+
 const consistencyProblems = state => {
   const problems = []
   if (JSON.stringify(state.dom) !== JSON.stringify(state.model)) {
@@ -122,5 +131,6 @@ module.exports = {
   placeCaret,
   readState,
   screenPoint,
+  waitForEditor,
   withEditor,
 }

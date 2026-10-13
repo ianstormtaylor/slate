@@ -22,3 +22,4 @@ coverage
 !.yarn/versions
 .pnp.*
 playwright/devices/macos/.build
+playwright/devices/android/ime/.build
