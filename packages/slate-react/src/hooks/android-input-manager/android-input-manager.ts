@@ -177,6 +177,11 @@ export function createAndroidInputManager({
       }
     })
 
+  const hasPendingDiffsInNewLeaf = () =>
+    hasPendingDiffsInEmptyLeaf() ||
+    (hasPendingDiffs() &&
+      EDITOR_TO_PENDING_INSERTION_MARKS.get(editor) !== undefined)
+
   const flush = () => {
     if (flushTimeoutId) {
       clearTimeout(flushTimeoutId)
@@ -193,8 +198,8 @@ export function createAndroidInputManager({
     // Composing into a leaf that already has text is unaffected: applying the
     // diff there only updates `textContent`, so the value still updates on
     // every `compositionupdate`.
-    if (isCompositionLive() && hasPendingDiffsInEmptyLeaf()) {
-      debug('deferring flush during composition in empty leaf')
+    if (isCompositionLive() && hasPendingDiffsInNewLeaf()) {
+      debug('deferring flush during composition in new leaf')
       flushTimeoutId = setTimeout(flush, COMPOSITION_RECHECK_DELAY)
       return
     }
@@ -322,7 +327,7 @@ export function createAndroidInputManager({
     // that compose one syllable at a time (Hangul, kana) start the next
     // composition in the same tick as this event, so an asynchronous render
     // would replace the text node that composition has already started in.
-    if (hasPendingDiffsInEmptyLeaf() && !flushing) {
+    if (hasPendingDiffsInNewLeaf() && !flushing) {
       ReactDOM.flushSync(() => {
         IS_COMPOSING.set(editor, false)
         flush()
@@ -826,15 +831,7 @@ export function createAndroidInputManager({
                 offset: start.offset + text.length,
               }
 
-              scheduleAction(
-                () => {
-                  Transforms.select(editor, {
-                    anchor: newPoint,
-                    focus: newPoint,
-                  })
-                },
-                { at: newPoint }
-              )
+              scheduleAction(() => {}, { at: newPoint })
             }
             return
           }
