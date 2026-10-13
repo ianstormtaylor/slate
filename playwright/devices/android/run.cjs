@@ -113,7 +113,7 @@ const setUp = () => {
 
 const recordedPages = new WeakSet()
 
-const openExample = async (browser, example) => {
+const openExample = async (browser, example, localImages) => {
   const url = `http://localhost:${PORT}/examples/${example}`
   let page = browser.contexts()[0]?.pages()[0]
   if (!page) {
@@ -134,6 +134,15 @@ const openExample = async (browser, example) => {
     recordedPages.add(page)
     await installRecorder(page)
   }
+  if (localImages) {
+    await page.route('https://source.unsplash.com/**', route =>
+      route.fulfill({
+        contentType: 'image/svg+xml',
+        body: '<svg xmlns="http://www.w3.org/2000/svg" width="320" height="180"><rect width="320" height="180" fill="teal"/></svg>',
+      })
+    )
+  }
+  await page.bringToFront()
   await page.goto(url)
   await page.locator('[data-slate-editor]').waitFor()
   await waitForEditor(page)
@@ -179,7 +188,11 @@ const tapEditor = async page => {
 }
 
 const runScenario = async (browser, scenario) => {
-  const page = await openExample(browser, scenario.example)
+  const page = await openExample(
+    browser,
+    scenario.example,
+    scenario.localImages
+  )
   const errors = []
   const onError = error => errors.push(error.message)
   const onConsole = message => {
@@ -191,6 +204,54 @@ const runScenario = async (browser, scenario) => {
   const settle = () => page.waitForTimeout(250)
   const ctx = {
     page,
+    tap: async locator => {
+      await locator.scrollIntoViewIfNeeded()
+      const rect = await locator.boundingBox()
+      if (!rect) throw new Error('tap target has no rectangle')
+      await locator.evaluate(element => {
+        window.__slateDeviceTap = null
+        element.addEventListener(
+          'pointerdown',
+          event => {
+            window.__slateDeviceTap = {
+              trusted: event.isTrusted,
+              type: event.pointerType,
+            }
+          },
+          { once: true }
+        )
+      })
+      const session = await page.context().newCDPSession(page)
+      await session.send('Input.dispatchTouchEvent', {
+        type: 'touchStart',
+        touchPoints: [
+          { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 },
+        ],
+      })
+      await session.send('Input.dispatchTouchEvent', {
+        type: 'touchEnd',
+        touchPoints: [],
+      })
+      await session.detach()
+      const touch = await page.evaluate(() => window.__slateDeviceTap)
+      if (!touch?.trusted || touch.type !== 'touch')
+        throw new Error('touch did not reach the expected target')
+      await settle()
+    },
+    hideKeyboard: async () => {
+      adb('shell', 'input', 'keyevent', '4')
+      await page.waitForTimeout(800)
+    },
+    keyboardShown: () => {
+      const state = adb('shell', 'dumpsys', 'input_method')
+      const match = /mInputShown=(true|false)/.exec(state)
+      if (!match) throw new Error('keyboard visibility missing from dumpsys')
+      return match[1] === 'true'
+    },
+    composeSequence: async values => {
+      for (const text of values) imeCommand('compose', { text })
+      await settle()
+    },
     compose: async text => (imeCommand('compose', { text }), settle()),
     commit: async text => (imeCommand('commit', { text }), settle()),
     finish: async () => (imeCommand('finish'), settle()),

@@ -41,3 +41,15 @@ yarn node playwright/devices/android/run.cjs [--serial emulator-5554] [scenario-
 The script builds and installs the test keyboard on first use (needs the Android SDK build tools and a JDK), selects it, opens the example through `adb reverse`, and connects Playwright to Chrome's DevTools socket. It selects Gboard again when it finishes; set `KEEP_TEST_IME=1` to leave the test keyboard on.
 
 The test keyboard sends the calls a scenario lists. Real keyboards differ in which calls they make and in what order, so a passing scenario shows Slate handles that sequence, not that every keyboard works.
+
+Use separate emulator, example-server and DevTools ports for concurrent runs:
+
+```sh
+SLATE_PORT=3200 DEVTOOLS_PORT=9335 yarn node playwright/devices/android/run.cjs --serial emulator-5556 item35-second-composing-character-new-line
+```
+
+The `item35-*` scenarios add touch selection, suggestion replacement, sending during composition, paragraph formatting and scroll-container checks. Letter/digit, text/void, composing/committed and keyboard/touch controls distinguish input setup failures from the reported editing behavior. The image-tap cases substitute a local SVG for the example's remote image requests so they do not depend on the image host.
+
+`tap` sends a trusted touch through Chrome DevTools at viewport coordinates and checks that it reached the requested element. This avoids screen-coordinate drift when Chrome shows or hides its toolbar; composing text still goes through Android InputConnection. `keyboardShown` reads Android's `mInputShown` state. `hideKeyboard` sends Android's Back key to establish a hidden-keyboard precondition before comparing text and mention taps. `composeSequence` sends composing prefixes without the usual per-step pause; adb transport still adds latency, so this does not model every fast physical keyboard.
+
+Firefox for Android can be driven by geckodriver using `moz:firefoxOptions.androidPackage` and `androidDeviceSerial`. Complete its first-run screens and open a web page before waiting for a WebDriver session; the native home screen does not create a Marionette content window. WebDriver touch actions alone did not establish a test-keyboard input connection in the probe, while an adb touchscreen tap did. The Chrome runner is not a Firefox runner; verify both model and DOM when probing Firefox separately.
