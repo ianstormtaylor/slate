@@ -327,25 +327,9 @@ describe('slate-react', () => {
           value: makeDataTransfer(text),
         })
 
-        // `<Editable>` ignores events dispatched by script, and `dispatchEvent`
-        // marks every event as such. jsdom's `isTrusted` is a non-configurable
-        // getter over its internal event, so a listener ahead of React flags
-        // the event as trusted there.
-        const markTrusted = (dispatched: Event) => {
-          const impl = Object.getOwnPropertySymbols(dispatched).find(
-            symbol => symbol.description === 'impl'
-          )!
-          ;(dispatched as any)[impl].isTrusted = true
-        }
-        window.addEventListener(type, markTrusted, { capture: true })
-
-        try {
-          await act(async () => {
-            ReactEditor.toDOMNode(editor, editor).dispatchEvent(event)
-          })
-        } finally {
-          window.removeEventListener(type, markTrusted, { capture: true })
-        }
+        await act(async () => {
+          ReactEditor.toDOMNode(editor, editor).dispatchEvent(event)
+        })
       }
 
       const resolveDropPositionTo = (node: Node, offset: number) => {
