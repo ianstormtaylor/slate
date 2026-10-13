@@ -48,11 +48,11 @@ const App = () => {
             case '`': {
               event.preventDefault()
               const [match] = Editor.nodes(editor, {
-                match: n => n.type === 'code',
+                match: n => Element.isElement(n) && n.type === 'code',
               })
               Transforms.setNodes(
                 editor,
-                { type: match ? null : 'code' },
+                { type: match ? 'paragraph' : 'code' },
                 {
                   match: n => Element.isElement(n) && Editor.isBlock(editor, n),
                 }
@@ -87,7 +87,7 @@ const CustomEditor = {
 
   isCodeBlockActive(editor) {
     const [match] = Editor.nodes(editor, {
-      match: n => n.type === 'code',
+      match: n => Element.isElement(n) && n.type === 'code',
     })
 
     return !!match
@@ -106,7 +106,7 @@ const CustomEditor = {
     const isActive = CustomEditor.isCodeBlockActive(editor)
     Transforms.setNodes(
       editor,
-      { type: isActive ? null : 'code' },
+      { type: isActive ? 'paragraph' : 'code' },
       { match: n => Element.isElement(n) && Editor.isBlock(editor, n) }
     )
   },
@@ -214,7 +214,6 @@ const App = () => {
         </button>
       </div>
       <Editable
-        editor={editor}
         renderElement={renderElement}
         renderLeaf={renderLeaf}
         onKeyDown={event => {
@@ -244,46 +243,44 @@ const App = () => {
 
 That's the benefit of extracting the logic.
 
-We can make the code more modular by separating the logic within a few helper functions using the below code:
+For TypeScript, the same helpers can accept the mark and block names from your document model. This uses the `CustomText` and `CustomElement` definitions from the previous walkthroughs, plus `Descendant`, `RenderElementProps` and `RenderLeafProps` from the earlier typing steps.
 
-```jsx
-// Define our own custom set of helpers.
-// Below code is written for typescript users
+```tsx
 const CustomEditor = {
-    isMarkActive(editor: Editor, mark: string) {
-      const marks = Editor.marks(editor)
-      return marks ? marks?.[mark] === true : false
-    },
+  isMarkActive(editor: Editor, mark: keyof Omit<CustomText, 'text'>) {
+    const marks = Editor.marks(editor)
+    return marks ? marks[mark] === true : false
+  },
 
-    isBlockActive(editor: Editor, block: Element["type"]) {
-      const [match] = Editor.nodes(editor, {
-        match: (n) => Element.isElement(n) && n.type === block,
-      })
+  isBlockActive(editor: Editor, block: Element['type']) {
+    const [match] = Editor.nodes(editor, {
+      match: n => Element.isElement(n) && n.type === block,
+    })
 
-      return !!match
-    },
+    return !!match
+  },
 
-    toggleMark(editor: Editor, mark: string) {
-      if (CustomEditor.isMarkActive(editor, mark)) {
-        editor.removeMark(mark)
-      } else {
-        editor.addMark(mark, true)
+  toggleMark(editor: Editor, mark: keyof Omit<CustomText, 'text'>) {
+    if (CustomEditor.isMarkActive(editor, mark)) {
+      editor.removeMark(mark)
+    } else {
+      editor.addMark(mark, true)
+    }
+  },
+
+  toggleBlock(editor: Editor, block: Element['type']) {
+    const isActive = CustomEditor.isBlockActive(editor, block)
+    Transforms.setNodes(
+      editor,
+      { type: isActive ? 'paragraph' : block },
+      {
+        match: n => Element.isElement(n) && Editor.isBlock(editor, n),
       }
-    },
+    )
+  },
+}
 
-    toggleBlock(editor: Editor, block: Element["type"]) {
-      const isActive = CustomEditor.isBlockActive(editor, block)
-      Transforms.setNodes(
-        editor,
-        { type: isActive ? undefined : block },
-        {
-          match: (n) => Element.isElement(n) && Editor.isBlock(editor, n),
-        },
-      )
-    },
-  }
-
-const initialValue = [
+const initialValue: Descendant[] = [
   {
     type: 'paragraph',
     children: [{ text: 'A line of text in a paragraph.' }],
@@ -293,7 +290,7 @@ const initialValue = [
 const App = () => {
   const [editor] = useState(() => withReact(createEditor()))
 
-  const renderElement = useCallback(props => {
+  const renderElement = useCallback((props: RenderElementProps) => {
     switch (props.element.type) {
       case 'code':
         return <CodeElement {...props} />
@@ -302,7 +299,7 @@ const App = () => {
     }
   }, [])
 
-  const renderLeaf = useCallback(props => {
+  const renderLeaf = useCallback((props: RenderLeafProps) => {
     return <Leaf {...props} />
   }, [])
 
@@ -315,18 +312,16 @@ const App = () => {
           if (!event.ctrlKey) {
             return
           }
-
-          // Replace the `onKeyDown` logic with our new commands.
           switch (event.key) {
             case '`': {
               event.preventDefault()
-              CustomEditor.toggleBlock(editor, "code")
+              CustomEditor.toggleBlock(editor, 'code')
               break
             }
 
             case 'b': {
               event.preventDefault()
-              CustomEditor.toggleMark(editor, "bold")
+              CustomEditor.toggleMark(editor, 'bold')
               break
             }
           }

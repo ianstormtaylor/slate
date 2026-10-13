@@ -9,14 +9,16 @@ In this guide, we'll show you how to set up a collaborative Slate editor using a
 adding [slate-yjs](https://github.com/BitPhinix/slate-yjs) which allows you to add multiplayer features to Slate, such
 as live cursors.
 
-Let's start with a basic editor:
+Let's start with a basic editor. This example uses the earlier TypeScript declarations; JavaScript users can omit the `Descendant[]` annotation and its import.
 
-```jsx
-import { Slate } from 'slate-react'
+```tsx
+import React, { useState } from 'react'
+import { createEditor, Descendant } from 'slate'
+import { Editable, Slate, withReact } from 'slate-react'
 
-const initialValue = {
-  children: [{ text: '' }],
-}
+const initialValue: Descendant[] = [
+  { type: 'paragraph', children: [{ text: '' }] },
+]
 
 export const CollaborativeEditor = () => {
   return <SlateEditor />
@@ -47,9 +49,7 @@ import { createEditor, Editor, Transforms } from 'slate'
 import { Editable, Slate, withReact } from 'slate-react'
 import * as Y from 'yjs'
 
-const initialValue = {
-  children: [{ text: '' }],
-}
+const initialValue = [{ type: 'paragraph', children: [{ text: '' }] }]
 
 export const CollaborativeEditor = () => {
   const [connected, setConnected] = useState(false)
@@ -104,9 +104,7 @@ import { Editable, Slate, withReact } from 'slate-react'
 import { withYjs, YjsEditor } from '@slate-yjs/core'
 import * as Y from 'yjs'
 
-const initialValue = {
-  children: [{ text: '' }],
-}
+const initialValue = [{ type: 'paragraph', children: [{ text: '' }] }]
 
 export const CollaborativeEditor = () => {
   const [connected, setConnected] = useState(false)

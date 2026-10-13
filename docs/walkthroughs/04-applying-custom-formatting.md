@@ -4,6 +4,14 @@ In the previous guide we learned how to create custom block types that render ch
 
 In this guide, we'll show you how to add custom formatting options, like **bold**, _italic_, `code` or ~~strikethrough~~.
 
+For TypeScript, add the mark to your existing `CustomText` definition:
+
+```typescript
+type CustomText = { text: string; bold?: boolean }
+```
+
+Import `RenderLeafProps` from `slate-react` and use it for the `props` parameter of `Leaf` and the `renderLeaf` callback. Continue to annotate element renderers with `RenderElementProps` and initial values with `Descendant[]`.
+
 So we start with our app from earlier:
 
 ```jsx
@@ -34,7 +42,7 @@ const App = () => {
           if (event.key === '`' && event.ctrlKey) {
             event.preventDefault()
             const [match] = Editor.nodes(editor, {
-              match: n => n.type === 'code',
+              match: n => Element.isElement(n) && n.type === 'code',
             })
             Transforms.setNodes(
               editor,
@@ -85,7 +93,7 @@ const App = () => {
             case '`': {
               event.preventDefault()
               const [match] = Editor.nodes(editor, {
-                match: n => n.type === 'code',
+                match: n => Element.isElement(n) && n.type === 'code',
               })
               Transforms.setNodes(
                 editor,
@@ -175,11 +183,11 @@ const App = () => {
             case '`': {
               event.preventDefault()
               const [match] = Editor.nodes(editor, {
-                match: n => n.type === 'code',
+                match: n => Element.isElement(n) && n.type === 'code',
               })
               Transforms.setNodes(
                 editor,
-                { type: match ? null : 'code' },
+                { type: match ? 'paragraph' : 'code' },
                 {
                   match: n => Element.isElement(n) && Editor.isBlock(editor, n),
                 }
