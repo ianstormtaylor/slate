@@ -1,5 +1,15 @@
 # slate-dom
 
+## 0.134.0
+
+### Patch Changes
+
+- [#6250](https://github.com/ianstormtaylor/slate/pull/6250) [`b70a400`](https://github.com/ianstormtaylor/slate/commit/b70a4001b25e603ebfde866c3ae86d9786d40ce2) Thanks [@dylans](https://github.com/dylans)! - Fix typing on Android right after toggling a mark with a collapsed selection. The first letter no longer moves the caret past the end of the previous leaf, which closed the soft keyboard and scattered the following letters, and a composition into the new marked text is no longer interrupted by a re-render.
+
+- [#6256](https://github.com/ianstormtaylor/slate/pull/6256) [`f5b29a0`](https://github.com/ianstormtaylor/slate/commit/f5b29a0e28850a9b6160df28b8fdc38e6401d06d) Thanks [@dylans](https://github.com/dylans)! - Add Editor.hasRange to core and have DOMEditor.hasRange and ReactEditor.hasRange use it, falling back to the path check with older slate versions.
+
+- [#6241](https://github.com/ianstormtaylor/slate/pull/6241) [`ea6e643`](https://github.com/ianstormtaylor/slate/commit/ea6e643d68146a6a6908ca450d1ed8d3332d8d46) Thanks [@dylans](https://github.com/dylans)! - Keep list containers and list items around copied HTML when the selection spans list items, including nested lists and inline void boundaries. Copies within one item retain their existing HTML and plain text.
+
 ## 0.133.6
 
 ### Patch Changes
