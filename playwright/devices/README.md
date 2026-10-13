@@ -68,3 +68,5 @@ The touch geometry check runs without a device:
 ```sh
 yarn node --test playwright/devices/android/touch.test.cjs
 ```
+
+`item37-tap-mention-composing` records the native failure after composing `pending`, selecting a mention, pressing Backspace and composing `after`. The finished-composition and visible-keyboard controls exercise the same selection and deletion without an active composition. These are device regressions, so the composing case is expected to fail until the library handles the missing composition end. No synthetic composition event is used in the regression.

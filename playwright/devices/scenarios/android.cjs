@@ -95,6 +95,36 @@ const changeComposingParagraph = async (ctx, mode) => {
 }
 
 module.exports = [
+  ...['composing', 'finished-control', 'visible-keyboard'].map(mode => ({
+    name: `item37-tap-mention-${mode}`,
+    issues: [5183],
+    example: 'mentions',
+    run: async ctx => {
+      await addMention(ctx)
+      const hasText = mode !== 'visible-keyboard'
+      if (hasText) await ctx.compose('pending')
+      if (mode === 'finished-control') await ctx.finish()
+      await ctx.tap(ctx.page.locator('[data-cy="mention-R2-D2"]'))
+      const problems = expectKeyboard(ctx)
+      problems.push(...(await expectCaret(ctx, 0, [0, 1, 0])))
+      await ctx.key('delete')
+      const remaining = await ctx.editor(
+        editor =>
+          editor.children[0].children.filter(node => node.type === 'mention')
+            .length
+      )
+      if (remaining) problems.push('selected mention was not deleted')
+      await ctx.compose('after')
+      await ctx.finish()
+      problems.push(
+        ...(await expectText(
+          ctx,
+          hasText ? 'before after pending' : 'before after '
+        ))
+      )
+      return problems
+    },
+  })),
   {
     name: 'compose-and-commit-words',
     issues: [5019, 3811],
