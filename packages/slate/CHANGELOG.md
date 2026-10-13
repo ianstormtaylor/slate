@@ -1,5 +1,21 @@
 # slate
 
+## 0.134.0
+
+### Minor Changes
+
+- [#6256](https://github.com/ianstormtaylor/slate/pull/6256) [`f5b29a0`](https://github.com/ianstormtaylor/slate/commit/f5b29a0e28850a9b6160df28b8fdc38e6401d06d) Thanks [@dylans](https://github.com/dylans)! - Add Editor.hasRange to core and have DOMEditor.hasRange and ReactEditor.hasRange use it, falling back to the path check with older slate versions.
+
+- [#6259](https://github.com/ianstormtaylor/slate/pull/6259) [`1691cc0`](https://github.com/ianstormtaylor/slate/commit/1691cc0cb1e32b31fecb183b19ab8c9b9161f07f) Thanks [@dylans](https://github.com/dylans)! - Support Symbol.dispose on path, point and range refs so using declarations can release tracked locations automatically. TypeScript consumers now need TypeScript 5.2 or later with `esnext.disposable` in `lib`, or `skipLibCheck`.
+
+- [#6254](https://github.com/ianstormtaylor/slate/pull/6254) [`ff18f28`](https://github.com/ianstormtaylor/slate/commit/ff18f284ecdb54ae30add72dc17bf8cb1a0d973c) Thanks [@dylans](https://github.com/dylans)! - Add a height option to Transforms.liftNodes to lift matched nodes through multiple ancestors.
+
+### Patch Changes
+
+- [#6252](https://github.com/ianstormtaylor/slate/pull/6252) [`2c83cc2`](https://github.com/ianstormtaylor/slate/commit/2c83cc2c82c3c9f903deae98cd00288aac7c8318) Thanks [@dylans](https://github.com/dylans)! - Include the next dirty path in normalization loop errors to help locate the normalizeNode logic that keeps a node invalid.
+
+- [#6244](https://github.com/ianstormtaylor/slate/pull/6244) [`acccce1`](https://github.com/ianstormtaylor/slate/commit/acccce1b10f39432086303ba1f7178f055103c51) Thanks [@dylans](https://github.com/dylans)! - Respect partial inline selections when unwrapping nodes with `split: true`, preserving unselected portions of the inline.
+
 ## 0.133.7
 
 ### Patch Changes

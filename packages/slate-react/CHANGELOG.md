@@ -1,5 +1,19 @@
 # slate-react
 
+## 0.134.0
+
+### Patch Changes
+
+- [#6250](https://github.com/ianstormtaylor/slate/pull/6250) [`b70a400`](https://github.com/ianstormtaylor/slate/commit/b70a4001b25e603ebfde866c3ae86d9786d40ce2) Thanks [@dylans](https://github.com/dylans)! - Fix typing on Android right after toggling a mark with a collapsed selection. The first letter no longer moves the caret past the end of the previous leaf, which closed the soft keyboard and scattered the following letters, and a composition into the new marked text is no longer interrupted by a re-render.
+
+- [#6248](https://github.com/ianstormtaylor/slate/pull/6248) [`f9b0cbf`](https://github.com/ianstormtaylor/slate/commit/f9b0cbfe2c0dba4514ac65a18c1859d4545d2ea6) Thanks [@dylans](https://github.com/dylans)! - Fix an Android crash ("Failed to execute 'removeChild' on 'Node'") when typing starts in an empty editor just as the placeholder appears. The DOM restore that runs before Android renders no longer undoes React's own placeholder changes.
+
+- [#6243](https://github.com/ianstormtaylor/slate/pull/6243) [`56aa3c4`](https://github.com/ianstormtaylor/slate/commit/56aa3c4f1070869c58d0e377f7fa2cb064e66883) Thanks [@dylans](https://github.com/dylans)! - Remove the source void when it is dragged to a new position, preventing duplicate voids when the dragged selection is collapsed.
+
+- [#6249](https://github.com/ianstormtaylor/slate/pull/6249) [`d879fc1`](https://github.com/ianstormtaylor/slate/commit/d879fc1d73c778ee5923f0613f0f61bab7e24de8) Thanks [@dylans](https://github.com/dylans)! - Fix composed text appearing twice in Chrome when the caret sits at the start of a leaf that follows marked text. Chrome composes into the end of the previous leaf, so its copy is removed before Slate inserts the text into the selected leaf.
+
+- [#6251](https://github.com/ianstormtaylor/slate/pull/6251) [`927c228`](https://github.com/ianstormtaylor/slate/commit/927c228218b44601401d5e1c97be2218ac989d6f) Thanks [@dylans](https://github.com/dylans)! - Remove text an IME composes into a selected void element. Slate doesn't insert text into voids, so the browser's copy was left in the void's DOM.
+
 ## 0.133.8
 
 ### Patch Changes
