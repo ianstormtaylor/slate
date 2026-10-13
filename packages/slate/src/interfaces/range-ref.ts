@@ -10,6 +10,7 @@ export interface RangeRef {
   current: Range | null
   affinity: 'forward' | 'backward' | 'outward' | 'inward' | null
   unref(): Range | null
+  [Symbol.dispose](): void
 }
 
 export interface RangeRefInterface {
