@@ -36,6 +36,7 @@ import { useTrackUserInput } from '../hooks/use-track-user-input'
 import { useCompositionDOM } from '../hooks/use-composition-dom'
 import { getPointAboveTrailingNewline } from '../utils/trailing-newline'
 import { getCharacterMoveUnit } from '../utils/character-move'
+import { removeCompositionFromOtherLeaf } from '../utils/misplaced-composition'
 import { ReactEditor } from '../plugin/react-editor'
 import { deleteMovedRange, getMovableRange } from '../utils/move-range'
 import { TRIPLE_CLICK } from 'slate-dom'
@@ -1528,6 +1529,7 @@ export const Editable = forwardRef(
                         }
 
                         compositionDOM.restore()
+                        removeCompositionFromOtherLeaf(editor, event.data)
                         Editor.insertText(editor, event.data)
 
                         const userMarks = EDITOR_TO_USER_MARKS.get(editor)
