@@ -61,7 +61,7 @@ ANDROID_SERIAL=emulator-5556 SLATE_PORT=3200 DEVTOOLS_PORT=9335 yarn node playwr
 ANDROID_SERIAL=emulator-5556 SLATE_PORT=3200 DEVTOOLS_PORT=9335 yarn node playwright/devices/gboard-5099.cjs
 ```
 
-The first probe toggles bold and types `bold`; the second clears the editor, presses Backspace three times, then types `asd`. Both keep the original model/keyboard diagnostics. Reading a fresh key dump adds time between Gboard keystrokes, so these probes establish the recorded sequence rather than rapid typing behavior.
+The first probe toggles bold and types `bold`; the second clears the editor, presses Backspace three times, then types `asd`. Both keep the model/keyboard diagnostics and exit non-zero when an assertion fails. The bold probe checks the inserted mark, caret preservation and surrounding document. The empty-editor probe checks the model, placeholder and keyboard before and after Backspace and typing; it accepts Gboard’s automatic capitalization of the first letter. Reading a fresh key dump adds time between Gboard keystrokes, so these probes establish the recorded sequence rather than rapid typing behavior.
 
 The touch geometry check runs without a device:
 
