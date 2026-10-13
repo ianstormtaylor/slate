@@ -341,12 +341,24 @@ export const DOMEditor: DOMEditorInterface = {
       throw new Error(`Cannot resolve a Slate range from a DOM event: ${event}`)
     }
 
-    if (suppressThrow && !DOMEditor.hasTarget(editor, target)) {
-      return null as T extends true ? Range | null : Range
+    let node
+    try {
+      node = DOMEditor.toSlateNode(editor, event.target)
+    } catch (e) {
+      if (suppressThrow) {
+        return null as T extends true ? Range | null : Range
+      }
+      throw e
     }
-
-    const node = DOMEditor.toSlateNode(editor, event.target)
-    const path = DOMEditor.findPath(editor, node)
+    let path
+    try {
+      path = DOMEditor.findPath(editor, node)
+    } catch (e) {
+      if (suppressThrow) {
+        return null as T extends true ? Range | null : Range
+      }
+      throw e
+    }
 
     // If the drop target is inside a void node, move it into either the
     // next or previous node, depending on which side the `x` and `y`
