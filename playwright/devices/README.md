@@ -50,6 +50,21 @@ SLATE_PORT=3200 DEVTOOLS_PORT=9335 yarn node playwright/devices/android/run.cjs 
 
 The `item35-*` scenarios add touch selection, suggestion replacement, sending during composition, paragraph formatting and scroll-container checks. Letter/digit, text/void, composing/committed and keyboard/touch controls distinguish input setup failures from the reported editing behavior. The image-tap cases substitute a local SVG for the example's remote image requests so they do not depend on the image host.
 
-`tap` sends a trusted touch through Chrome DevTools at viewport coordinates and checks that it reached the requested element. This avoids screen-coordinate drift when Chrome shows or hides its toolbar; composing text still goes through Android InputConnection. `keyboardShown` reads Android's `mInputShown` state. `hideKeyboard` sends Android's Back key to establish a hidden-keyboard precondition before comparing text and mention taps. `composeSequence` sends composing prefixes without the usual per-step pause; adb transport still adds latency, so this does not model every fast physical keyboard.
+`tap` sends an Android `adb input tap` by default and checks that a trusted touch reached the requested element, then waits for its click before the scenario continues. It reads Chrome’s `toolbar_hairline` bounds from `uiautomator`, then chooses a visible, hit-tested client rectangle and converts it using the current visual viewport and device scale. Set `CDP_TAPS=1` to use Chrome DevTools touch dispatch for scenario taps instead. The initial editor tap remains native so Android establishes the keyboard input connection. Text still goes through Android InputConnection. `keyboardShown` reads Android's `mInputShown` state. `hideKeyboard` sends Android's Back key to establish a hidden-keyboard precondition before comparing text and mention taps. `composeSequence` sends composing prefixes without the usual per-step pause; adb transport still adds latency, so this does not model every fast physical keyboard.
 
 Firefox for Android can be driven by geckodriver using `moz:firefoxOptions.androidPackage` and `androidDeviceSerial`. Complete its first-run screens and open a web page before waiting for a WebDriver session; the native home screen does not create a Marionette content window. WebDriver touch actions alone did not establish a test-keyboard input connection in the probe, while an adb touchscreen tap did. The Chrome runner is not a Firefox runner; verify both model and DOM when probing Firefox separately.
+
+The Gboard probes use the keyboard’s accessibility key bounds from a fresh `uiautomator dump --windows`; they do not assume a screen size or fixed key coordinates. They require an English Gboard layout with the requested key labels exposed. A missing key stops the probe rather than guessing its location.
+
+```sh
+ANDROID_SERIAL=emulator-5556 SLATE_PORT=3200 DEVTOOLS_PORT=9335 yarn node playwright/devices/gboard-6022.cjs
+ANDROID_SERIAL=emulator-5556 SLATE_PORT=3200 DEVTOOLS_PORT=9335 yarn node playwright/devices/gboard-5099.cjs
+```
+
+The first probe toggles bold and types `bold`; the second clears the editor, presses Backspace three times, then types `asd`. Both keep the original model/keyboard diagnostics. Reading a fresh key dump adds time between Gboard keystrokes, so these probes establish the recorded sequence rather than rapid typing behavior.
+
+The touch geometry check runs without a device:
+
+```sh
+yarn node --test playwright/devices/android/touch.test.cjs
+```

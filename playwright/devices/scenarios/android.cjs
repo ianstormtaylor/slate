@@ -88,6 +88,9 @@ const changeComposingParagraph = async (ctx, mode) => {
   const problems = await expectText(ctx, 'new\nexisting')
   const type = await ctx.editor(editor => editor.children[0].type)
   if (type !== 'heading-one') problems.push(`expected heading-one, got ${type}`)
+  await ctx.compose('more')
+  await ctx.finish()
+  problems.push(...(await expectText(ctx, 'newmore\nexisting')))
   return problems
 }
 

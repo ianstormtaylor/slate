@@ -10,6 +10,7 @@ const {
   withEditor,
 } = require('../runner.cjs')
 const scenarios = require('../scenarios/android.cjs')
+const { tapLocator } = require('./touch.cjs')
 
 const SDK =
   process.env.ANDROID_HOME || path.join(process.env.HOME, 'Library/Android/sdk')
@@ -149,44 +150,6 @@ const openExample = async (browser, example, localImages) => {
   return page
 }
 
-let screenOffset = null
-
-const tapEditor = async page => {
-  const target = await page.evaluate(() => {
-    const element = document.querySelector('[data-slate-editor]')
-    const rect = element.getBoundingClientRect()
-    window.__lastTouch = null
-    document.addEventListener(
-      'touchstart',
-      event => {
-        window.__lastTouch = event.touches[0].clientY
-      },
-      { once: true, capture: true }
-    )
-    return {
-      x: rect.left + 16,
-      y: rect.top + 12,
-      dpr: devicePixelRatio,
-      inner: innerHeight,
-      screen: screen.height,
-    }
-  })
-  const guess = screenOffset ?? (target.screen - target.inner) * 0.6
-  adb(
-    'shell',
-    'input',
-    'tap',
-    String(Math.round(target.x * target.dpr)),
-    String(Math.round((target.y + guess) * target.dpr))
-  )
-  await page.waitForTimeout(400)
-  const touched = await page.evaluate(() => window.__lastTouch)
-  if (touched != null && screenOffset == null) {
-    screenOffset = guess + target.y - touched
-    return tapEditor(page)
-  }
-}
-
 const runScenario = async (browser, scenario) => {
   const page = await openExample(
     browser,
@@ -205,37 +168,7 @@ const runScenario = async (browser, scenario) => {
   const ctx = {
     page,
     tap: async locator => {
-      await locator.scrollIntoViewIfNeeded()
-      const rect = await locator.boundingBox()
-      if (!rect) throw new Error('tap target has no rectangle')
-      await locator.evaluate(element => {
-        window.__slateDeviceTap = null
-        element.addEventListener(
-          'pointerdown',
-          event => {
-            window.__slateDeviceTap = {
-              trusted: event.isTrusted,
-              type: event.pointerType,
-            }
-          },
-          { once: true }
-        )
-      })
-      const session = await page.context().newCDPSession(page)
-      await session.send('Input.dispatchTouchEvent', {
-        type: 'touchStart',
-        touchPoints: [
-          { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 },
-        ],
-      })
-      await session.send('Input.dispatchTouchEvent', {
-        type: 'touchEnd',
-        touchPoints: [],
-      })
-      await session.detach()
-      const touch = await page.evaluate(() => window.__slateDeviceTap)
-      if (!touch?.trusted || touch.type !== 'touch')
-        throw new Error('touch did not reach the expected target')
+      await tapLocator(page, locator, adb, process.env.CDP_TAPS === '1')
       await settle()
     },
     hideKeyboard: async () => {
@@ -285,7 +218,12 @@ const runScenario = async (browser, scenario) => {
   }
   let problems = []
   try {
-    await tapEditor(page)
+    await tapLocator(
+      page,
+      page.locator('[data-slate-editor] [data-slate-string]').first(),
+      adb
+    )
+    await settle()
     imeCommand('state')
     problems = (await scenario.run(ctx)) || []
     await page.waitForTimeout(400)
