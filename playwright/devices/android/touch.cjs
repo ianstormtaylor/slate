@@ -116,7 +116,10 @@ const tapLocator = async (page, locator, adb, cdp = false) => {
       String(Math.round(toolbar.rect[3] + point.y * point.scale))
     )
   }
-  const touch = await page.evaluate(() => window.__slateDeviceTap)
+  const touch = await page
+    .waitForFunction(() => window.__slateDeviceTap, null, { timeout: 2000 })
+    .then(handle => handle.jsonValue())
+    .catch(() => null)
   if (!touch?.trusted || touch.type !== 'touch')
     throw new Error('touch did not reach the expected target')
   await page.waitForFunction(() => window.__slateDeviceClick, null, {
