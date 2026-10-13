@@ -94,7 +94,7 @@ const MentionExample = () => {
           const beforeText =
             blockStart &&
             Editor.string(editor, Editor.range(editor, blockStart, start))
-          const beforeMatch = beforeText && beforeText.match(/@([\w-]+)$/)
+          const beforeMatch = beforeText && beforeText.match(/@([\w-]*)$/)
           const before =
             beforeMatch &&
             Editor.before(editor, start, {

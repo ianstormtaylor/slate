@@ -20,6 +20,50 @@ test.describe('mentions example', () => {
     await expect(page.locator('[data-cy="mentions-portal"]')).toHaveCount(1)
   })
 
+  test('shows ten suggestions after a bare @ and replaces the trigger', async ({
+    page,
+  }) => {
+    const editor = page.getByRole('textbox')
+    await clearEditor(editor)
+    await editor.pressSequentially('Hello @')
+    const suggestions = page.locator('[data-cy="mentions-portal"] > div')
+    await expect(suggestions).toHaveCount(10)
+    const selected = await suggestions.nth(1).textContent()
+    await editor.press('ArrowDown')
+    await editor.press('Enter')
+    const mention = editor.locator('[data-slate-void]')
+    await expect(mention).toHaveCount(1)
+    await expect(mention).toContainText(`@${selected}`)
+    await expect(editor.locator('[data-slate-string]').first()).toHaveText(
+      'Hello '
+    )
+    await expect(page.locator('[data-cy="mentions-portal"]')).toHaveCount(0)
+  })
+
+  test('filters bare @ suggestions and dismisses them after deleting the trigger', async ({
+    page,
+  }) => {
+    const editor = page.getByRole('textbox')
+    await clearEditor(editor)
+    await editor.pressSequentially('@')
+    const suggestions = page.locator('[data-cy="mentions-portal"] > div')
+    await expect(suggestions).toHaveCount(10)
+    await editor.pressSequentially('R2-')
+    await expect(suggestions).toHaveText(['R2-D2', 'R2-KT'])
+    await editor.press('Backspace')
+    await editor.press('Backspace')
+    await editor.press('Backspace')
+    await expect(suggestions).toHaveCount(10)
+    await editor.press('Escape')
+    await expect(suggestions).toHaveCount(0)
+    await editor.pressSequentially('R')
+    await expect(suggestions.first()).toBeVisible()
+    await editor.press('Backspace')
+    await expect(suggestions).toHaveCount(10)
+    await editor.press('Backspace')
+    await expect(suggestions).toHaveCount(0)
+  })
+
   test('matches and replaces a dashed mention after text', async ({ page }) => {
     const editor = page.getByRole('textbox')
     await clearEditor(editor)
