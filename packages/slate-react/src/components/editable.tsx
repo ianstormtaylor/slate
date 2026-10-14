@@ -35,6 +35,7 @@ import { useSlate } from '../hooks/use-slate'
 import { useTrackUserInput } from '../hooks/use-track-user-input'
 import { useCompositionDOM } from '../hooks/use-composition-dom'
 import { getPointAboveTrailingNewline } from '../utils/trailing-newline'
+import { reportError } from '../utils/report-error'
 import { getCharacterMoveUnit } from '../utils/character-move'
 import { removeStrayComposition } from '../utils/misplaced-composition'
 import { ReactEditor } from '../plugin/react-editor'
@@ -568,8 +569,16 @@ export const Editable = forwardRef(
 
         try {
           newDomRange = selection && ReactEditor.toDOMRange(editor, selection)
-        } catch (e) {
-          // Ignore, dom and state might be out of sync
+        } catch (error) {
+          const androidInputManager = androidInputManagerRef.current
+          const isDOMUpdatePending =
+            IS_NODE_MAP_DIRTY.get(editor) ||
+            androidInputManager?.isFlushing() ||
+            androidInputManager?.hasPendingChanges()
+
+          if (!isDOMUpdatePending) {
+            reportError(editor, error)
+          }
         }
 
         if (newDomRange) {
@@ -624,8 +633,8 @@ export const Editable = forwardRef(
               el.focus()
 
               setDomSelection(forceChange)
-            } catch (e) {
-              // Ignore, dom and state might be out of sync
+            } catch (error) {
+              reportError(editor, error)
             }
           }
 
@@ -772,44 +781,50 @@ export const Editable = forwardRef(
               // Therefore we don't allow native events to insert text at the end of anchor nodes.
               const { anchor } = selection
 
-              const [node, offset] = ReactEditor.toDOMPoint(editor, anchor)
-              const anchorNode = node.parentElement?.closest('a')
+              const domAnchor = toDOMPointOrReport(editor, anchor)
 
-              const window = ReactEditor.getWindow(editor)
+              if (!domAnchor) {
+                native = false
+              } else {
+                const [node, offset] = domAnchor
+                const anchorNode = node.parentElement?.closest('a')
 
-              if (
-                native &&
-                anchorNode &&
-                ReactEditor.hasDOMNode(editor, anchorNode)
-              ) {
-                // Find the last text node inside the anchor.
-                const lastText = window?.document
-                  .createTreeWalker(anchorNode, NodeFilter.SHOW_TEXT)
-                  .lastChild() as DOMText | null
+                const window = ReactEditor.getWindow(editor)
 
                 if (
-                  lastText === node &&
-                  lastText.textContent?.length === offset
+                  native &&
+                  anchorNode &&
+                  ReactEditor.hasDOMNode(editor, anchorNode)
                 ) {
-                  native = false
+                  // Find the last text node inside the anchor.
+                  const lastText = window?.document
+                    .createTreeWalker(anchorNode, NodeFilter.SHOW_TEXT)
+                    .lastChild() as DOMText | null
+
+                  if (
+                    lastText === node &&
+                    lastText.textContent?.length === offset
+                  ) {
+                    native = false
+                  }
                 }
-              }
 
-              // Chrome has issues with the presence of tab characters inside elements with whiteSpace = 'pre'
-              // causing abnormal insert behavior: https://bugs.chromium.org/p/chromium/issues/detail?id=1219139
-              if (
-                native &&
-                node.parentElement &&
-                window?.getComputedStyle(node.parentElement)?.whiteSpace ===
-                  'pre'
-              ) {
-                const block = Editor.above(editor, {
-                  at: anchor.path,
-                  match: n => Node.isElement(n) && Editor.isBlock(editor, n),
-                })
+                // Chrome has issues with the presence of tab characters inside elements with whiteSpace = 'pre'
+                // causing abnormal insert behavior: https://bugs.chromium.org/p/chromium/issues/detail?id=1219139
+                if (
+                  native &&
+                  node.parentElement &&
+                  window?.getComputedStyle(node.parentElement)?.whiteSpace ===
+                    'pre'
+                ) {
+                  const block = Editor.above(editor, {
+                    at: anchor.path,
+                    match: n => Node.isElement(n) && Editor.isBlock(editor, n),
+                  })
 
-                if (block && Node.string(block[0]).includes('\t')) {
-                  native = false
+                  if (block && Node.string(block[0]).includes('\t')) {
+                    native = false
+                  }
                 }
               }
 
@@ -1555,10 +1570,15 @@ export const Editable = forwardRef(
                           Path.equals(startVoid[1], selectedVoid[1])
                         )
                       ) {
-                        const clicked = ReactEditor.findEventRange(
-                          editor,
-                          event
-                        )
+                        let clicked: Range
+
+                        try {
+                          clicked = ReactEditor.findEventRange(editor, event)
+                        } catch (error) {
+                          reportError(editor, error)
+                          return
+                        }
+
                         const voidStart = Editor.start(editor, selectedVoid[1])
                         const voidEnd = Editor.end(editor, selectedVoid[1])
                         const anchor = Point.isBefore(clicked.anchor, voidStart)
@@ -2461,6 +2481,15 @@ const isInSlateText = (node: unknown) =>
   node.nodeType === node.TEXT_NODE &&
   !!node.parentElement?.closest('[data-slate-string], [data-slate-zero-width]')
 
+const toDOMPointOrReport = (editor: ReactEditor, point: Point) => {
+  try {
+    return ReactEditor.toDOMPoint(editor, point)
+  } catch (error) {
+    reportError(editor, error)
+    return null
+  }
+}
+
 const restoreDomSelection = (
   editor: ReactEditor,
   domSelection: Selection,
@@ -2470,7 +2499,15 @@ const restoreDomSelection = (
     return
   }
 
-  const domRange = ReactEditor.toDOMRange(editor, editor.selection)
+  let domRange: DOMRange
+
+  try {
+    domRange = ReactEditor.toDOMRange(editor, editor.selection)
+  } catch (error) {
+    reportError(editor, error)
+    return
+  }
+
   const backward = Range.isBackward(editor.selection)
   state.isUpdatingSelection = true
   domSelection.setBaseAndExtent(

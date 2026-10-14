@@ -113,3 +113,19 @@ Insert text data from a `DataTransfer` into the editor. Returns true if some con
 #### `ReactEditor.setFragmentData(editor: ReactEditor, data: DataTransfer, originEvent?: 'drag' | 'copy' | 'cut'): void`
 
 Sets data from the currently selected fragment on a `DataTransfer`.
+
+## Instance methods
+
+#### `editor.onError(error: unknown): void`
+
+Called with DOM mapping errors that Slate catches in its own event handlers and selection syncing, such as a model selection with no rendered DOM. By default it hands the error to the browser's `reportError`, so it shows in the console and reaches `window.onerror`, without interrupting the handler. Override it to throw, or to send errors to your own logging:
+
+```javascript
+const { onError } = editor
+editor.onError = error => {
+  logger.warn(error)
+  onError(error)
+}
+```
+
+Calls made from your own code, such as `ReactEditor.toDOMRange`, still throw unless you pass `suppressThrow`.

@@ -73,6 +73,7 @@ export interface DOMEditor extends BaseEditor {
     editor: DOMEditor,
     target: EventTarget | null
   ) => boolean
+  onError: (error: unknown) => void
   setFragmentData: (
     data: DataTransfer,
     originEvent?: 'drag' | 'copy' | 'cut'

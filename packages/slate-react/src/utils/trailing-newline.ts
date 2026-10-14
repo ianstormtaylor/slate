@@ -1,5 +1,6 @@
 import { Editor, Node, Point } from 'slate'
 import { ReactEditor } from '../plugin/react-editor'
+import { reportError } from './report-error'
 
 const caretTop = (editor: ReactEditor, point: Point) => {
   const range = ReactEditor.toDOMRange(editor, { anchor: point, focus: point })
@@ -27,12 +28,17 @@ export const getPointAboveTrailingNewline = (
     return null
   }
 
-  if (
-    !Point.equals(point, blockStart) &&
-    Math.abs(caretTop(editor, point) - caretTop(editor, blockStart)) > 2
-  ) {
-    return null
+  if (Point.equals(point, blockStart)) {
+    return before
   }
 
-  return before
+  try {
+    const distance = Math.abs(
+      caretTop(editor, point) - caretTop(editor, blockStart)
+    )
+    return distance > 2 ? null : before
+  } catch (error) {
+    reportError(editor, error)
+    return null
+  }
 }
