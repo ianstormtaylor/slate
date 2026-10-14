@@ -262,7 +262,7 @@ const runScenario = async (browser, scenario) => {
   for (const scenario of selected) {
     const { problems, state } = await runScenario(browser, scenario)
     const passed = problems.length === 0
-    results.push({ scenario: scenario.name, passed, problems })
+    results.push({ scenario: scenario.name, passed, problems, state })
     process.stdout.write(
       `${passed ? 'PASS' : 'FAIL'} android ${scenario.name} (${scenario.issues
         .map(issue => `#${issue}`)
