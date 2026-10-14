@@ -66,10 +66,7 @@ export const TextTransforms: TextTransforms = {
     options: TextInsertTextOptions = {}
   ): void {
     Editor.withoutNormalizing(editor, () => {
-      const {
-        voids = false,
-        select = options.at == null && editor.selection != null,
-      } = options
+      const { voids = false, select = false } = options
       let { at = getDefaultInsertLocation(editor) } = options
 
       if (Location.isPath(at)) {
@@ -104,11 +101,12 @@ export const TextTransforms: TextTransforms = {
         return
       }
 
+      const endRef = select ? Editor.pointRef(editor, at) : undefined
       const { path, offset } = at
       if (text.length > 0)
         editor.apply({ type: 'insert_text', path, offset, text })
-      if (select && (text.length > 0 || options.select === true))
-        Transforms.select(editor, { path, offset: offset + text.length })
+      const end = endRef?.unref()
+      if (end) Transforms.select(editor, end)
     })
   },
 }
