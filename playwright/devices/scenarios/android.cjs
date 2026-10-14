@@ -635,4 +635,141 @@ module.exports = [
       return problems
     },
   },
+  ...['heading-two', 'paragraph'].map(type => ({
+    name: `item42-enter-${type}`,
+    issues: [4521],
+    example: 'richtext',
+    run: async ctx => {
+      await clearAndSettle(ctx)
+      await ctx.editor((editor, type) => editor.setNodes({ type }), type)
+      await ctx.compose('Title')
+      await ctx.finish()
+      await ctx.key('enter')
+      await ctx.compose('body')
+      await ctx.finish()
+      return [
+        ...(await expectText(ctx, 'Title\nbody')),
+        ...(await expectCaret(ctx, 4, [1, 0])),
+        ...expectKeyboard(ctx),
+      ]
+    },
+  })),
+  ...['selected-delete', 'region-control'].map(mode => ({
+    name: `item42-suggestion-${mode}`,
+    issues: [5371],
+    example: 'plaintext',
+    run: async ctx => {
+      await clearAndSettle(ctx)
+      await ctx.compose('Eng')
+      await ctx.commit('Engineering')
+      await ctx.commit('x')
+      await ctx.key('delete', 9)
+      const problems = await expectText(ctx, 'Eng')
+      if (mode === 'selected-delete') {
+        await ctx.setSelection(0, 3)
+        await ctx.key('delete')
+      } else {
+        await ctx.region(0, 3)
+      }
+      await ctx.commit('Engineering')
+      problems.push(
+        ...(await expectText(ctx, 'Engineering')),
+        ...(await expectCaret(ctx, 11))
+      )
+      await ctx.commit('x')
+      problems.push(
+        ...(await expectText(ctx, 'Engineeringx')),
+        ...(await expectCaret(ctx, 12))
+      )
+      return problems
+    },
+  })),
+  ...['rapid', 'paced-control'].map(mode => ({
+    name: `item42-identical-composition-${mode}`,
+    issues: [5836],
+    example: 'richtext',
+    run: async ctx => {
+      await clearAndSettle(ctx)
+      await ctx.commit('prefix ')
+      const values = Array.from({ length: 24 }, (_, index) =>
+        index % 2 === 0 ? 'aaaa' : 'aaa'
+      )
+      if (mode === 'rapid') await ctx.composeSequence(values)
+      else for (const value of values) await ctx.compose(value)
+      await ctx.finish()
+      return [
+        ...(await expectText(ctx, 'prefix aaa')),
+        ...(await expectCaret(ctx, 10)),
+      ]
+    },
+  })),
+  ...[false, true].map(finished => ({
+    name: `item42-backspace-onchange-${
+      finished ? 'finished-control' : 'composing'
+    }`,
+    issues: [5984],
+    example: 'plaintext',
+    run: async ctx => {
+      await clearAndSettle(ctx)
+      await ctx.compose('12345')
+      if (finished) await ctx.finish()
+      await ctx.editor(editor => {
+        window.__item42Changes = []
+        const onChange = editor.onChange
+        editor.onChange = options => {
+          const plain = node => node.text ?? node.children.map(plain).join('')
+          window.__item42Changes.push(editor.children.map(plain).join('\n'))
+          onChange(options)
+        }
+      })
+      const problems = []
+      for (const expected of ['1234', '123', '12']) {
+        await ctx.page.evaluate(() => {
+          window.__item42Changes = []
+        })
+        await ctx.key('delete')
+        problems.push(
+          ...(await expectText(ctx, expected)),
+          ...(await expectCaret(ctx, expected.length))
+        )
+        const changes = await ctx.page.evaluate(() => window.__item42Changes)
+        if (!changes.includes(expected))
+          problems.push(
+            `Backspace did not publish ${JSON.stringify(
+              expected
+            )}: ${JSON.stringify(changes)}`
+          )
+      }
+      await ctx.finish()
+      return problems
+    },
+  })),
+  ...[true, false].map(blocks => ({
+    name: `item42-backspace-${
+      blocks ? 'across-blocks' : 'single-block-control'
+    }`,
+    issues: [4959, 3811],
+    example: 'plaintext',
+    run: async ctx => {
+      await clearAndSettle(ctx)
+      const parts = blocks ? ['ab', 'cd', 'ef'] : ['abcdef']
+      for (let index = 0; index < parts.length; index++) {
+        if (index) await ctx.key('enter')
+        await ctx.commit(parts[index])
+      }
+      const problems = await expectText(ctx, parts.join('\n'))
+      for (let index = 0; index < parts.join('\n').length; index++) {
+        await ctx.key('delete')
+        problems.push(...expectKeyboard(ctx))
+      }
+      problems.push(...(await expectText(ctx, '')))
+      await ctx.compose('again')
+      await ctx.finish()
+      problems.push(
+        ...(await expectText(ctx, 'again')),
+        ...(await expectCaret(ctx, 5))
+      )
+      return problems
+    },
+  })),
 ]
