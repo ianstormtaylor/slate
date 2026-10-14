@@ -1,5 +1,11 @@
 # slate
 
+## 0.138.2
+
+### Patch Changes
+
+- [#6288](https://github.com/ianstormtaylor/slate/pull/6288) [`919cc72`](https://github.com/ianstormtaylor/slate/commit/919cc722d70a3ad5e83f9a59b78569140ed0b186) Thanks [@dylans](https://github.com/dylans)! - Restore the faster `Text.equals` comparison for `loose: true` without `ignore`. 0.138.0 routed every loose comparison through a generic property filter, which made loose comparisons, used when normalization merges adjacent text nodes, about 1.8x slower.
+
 ## 0.138.1
 
 ### Patch Changes
