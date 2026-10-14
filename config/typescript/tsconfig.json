@@ -7,11 +7,12 @@
     "esModuleInterop": true,
     "jsx": "react",
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "sourceMap": true,
     "strict": true,
     "target": "esnext",
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "types": ["*"]
   }
 }

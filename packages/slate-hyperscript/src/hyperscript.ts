@@ -54,8 +54,8 @@ const createHyperscript = <
   C extends HyperscriptCreators = {},
 >(
   options: {
-    creators?: C
-    elements?: E
+    creators?: C | undefined
+    elements?: E | undefined
   } = {}
 ) => {
   const { elements = {} as E } = options

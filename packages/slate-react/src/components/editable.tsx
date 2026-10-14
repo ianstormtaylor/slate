@@ -175,20 +175,24 @@ export interface RenderTextProps {
  */
 
 export type EditableProps = {
-  decorate?: (entry: NodeEntry) => DecoratedRange[]
-  onDOMBeforeInput?: (event: InputEvent) => void
-  placeholder?: string
-  readOnly?: boolean
-  role?: string
-  style?: React.CSSProperties
-  renderElement?: (props: RenderElementProps) => React.JSX.Element
-  renderChunk?: (props: RenderChunkProps) => React.JSX.Element
-  renderLeaf?: (props: RenderLeafProps) => React.JSX.Element
-  renderText?: (props: RenderTextProps) => React.JSX.Element
-  renderPlaceholder?: (props: RenderPlaceholderProps) => React.JSX.Element
-  scrollSelectionIntoView?: (editor: ReactEditor, domRange: DOMRange) => void
-  as?: React.ElementType
-  disableDefaultStyles?: boolean
+  decorate?: ((entry: NodeEntry) => DecoratedRange[]) | undefined
+  onDOMBeforeInput?: ((event: InputEvent) => void) | undefined
+  placeholder?: string | undefined
+  readOnly?: boolean | undefined
+  role?: string | undefined
+  style?: React.CSSProperties | undefined
+  renderElement?: ((props: RenderElementProps) => React.JSX.Element) | undefined
+  renderChunk?: ((props: RenderChunkProps) => React.JSX.Element) | undefined
+  renderLeaf?: ((props: RenderLeafProps) => React.JSX.Element) | undefined
+  renderText?: ((props: RenderTextProps) => React.JSX.Element) | undefined
+  renderPlaceholder?:
+    | ((props: RenderPlaceholderProps) => React.JSX.Element)
+    | undefined
+  scrollSelectionIntoView?:
+    | ((editor: ReactEditor, domRange: DOMRange) => void)
+    | undefined
+  as?: React.ElementType | undefined
+  disableDefaultStyles?: boolean | undefined
 } & React.HTMLAttributes<HTMLDivElement>
 
 /**

@@ -18,11 +18,11 @@ import { REACT_MAJOR_VERSION } from '../utils/environment'
 
 export const Slate = (props: {
   editor: ReactEditor
-  initialValue?: Descendant[]
+  initialValue?: Descendant[] | undefined
   children: React.ReactNode
-  onChange?: (value: Descendant[]) => void
-  onSelectionChange?: (selection: Selection) => void
-  onValueChange?: (value: Descendant[]) => void
+  onChange?: ((value: Descendant[]) => void) | undefined
+  onSelectionChange?: ((selection: Selection) => void) | undefined
+  onValueChange?: ((value: Descendant[]) => void) | undefined
 }) => {
   const {
     editor,

@@ -131,7 +131,7 @@ const CodeBlockButton = () => {
         split: true,
       }
     )
-    Transforms.setNodes(
+    Transforms.setNodes<CustomElement>(
       editor,
       { type: CodeLineType },
       { match: n => Node.isElement(n) && n.type === ParagraphType }
