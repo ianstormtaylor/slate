@@ -75,13 +75,17 @@ export interface TextInterface {
   ) => { leaf: Text; position?: LeafPosition }[]
 }
 
+const omitText = ({ text, ...rest }: Text) => rest
+
 // eslint-disable-next-line no-redeclare
 export const Text: TextInterface = {
   equals(text: Text, another: Text, options: TextEqualsOptions = {}): boolean {
     const { loose = false, ignore = [] } = options
 
-    if (!loose && ignore.length === 0) {
-      return isDeepEqual(text, another)
+    if (ignore.length === 0) {
+      return loose
+        ? isDeepEqual(omitText(text), omitText(another))
+        : isDeepEqual(text, another)
     }
 
     const comparable = (node: Text) =>
