@@ -31,6 +31,7 @@ export interface NodeTransforms {
     editor: Editor,
     options?: {
       at?: Location
+      select?: boolean
       height?: number
       match?: NodeMatch<T>
       mode?: MaximizeMode
@@ -60,6 +61,7 @@ export interface NodeTransforms {
     editor: Editor,
     options: {
       at?: Location
+      select?: boolean
       match?: NodeMatch<T>
       mode?: MaximizeMode
       to: Path
@@ -109,6 +111,7 @@ export interface NodeTransforms {
     editor: Editor,
     options?: {
       at?: Location
+      select?: boolean
       match?: NodeMatch<T>
       mode?: RangeMode
       always?: boolean

@@ -72,6 +72,9 @@ export const liftNodes: NodeTransforms['liftNodes'] = (
             Transforms.moveNodes(editor, { at: path, to: toPath, voids })
           }
         }
+        if (options.select && pathRef.current) {
+          Transforms.select(editor, Editor.end(editor, pathRef.current))
+        }
       }
     } finally {
       for (const pathRef of pathRefs) {
