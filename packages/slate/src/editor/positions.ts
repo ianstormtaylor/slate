@@ -16,6 +16,7 @@ export function* positions(
   const {
     at = editor.selection,
     unit = 'offset',
+    isWordCharacter,
     reverse = false,
     voids = false,
   } = options
@@ -208,7 +209,7 @@ export function* positions(
     if (unit === 'character') {
       return getCharacterDistance(text, reverse)
     } else if (unit === 'word') {
-      return getWordDistance(text, reverse)
+      return getWordDistance(text, reverse, isWordCharacter)
     } else if (unit === 'line' || unit === 'block') {
       return text.length
     }
