@@ -25,3 +25,18 @@ for (const nested of [false, true]) {
     })
   }
 }
+
+it('deletes a trailing void block when the whole document is selected', () => {
+  const editor = createEditor()
+  editor.isVoid = element => 'type' in element && element.type === 'image'
+  editor.children = [
+    { children: [{ text: 'one' }] },
+    { type: 'image', children: [{ text: '' }] } as any,
+  ]
+  Transforms.select(editor, {
+    anchor: Editor.start(editor, []),
+    focus: Editor.end(editor, []),
+  })
+  Editor.deleteFragment(editor)
+  assert.deepStrictEqual(editor.children, [{ children: [{ text: '' }] }])
+})

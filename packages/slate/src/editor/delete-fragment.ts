@@ -1,6 +1,7 @@
 import { Range } from '../interfaces/range'
 import { Path } from '../interfaces/path'
 import { Node } from '../interfaces/node'
+import { Element } from '../interfaces/element'
 import { Transforms } from '../interfaces/transforms'
 import { Editor, EditorInterface } from '../interfaces/editor'
 
@@ -30,6 +31,7 @@ export const deleteFragment: EditorInterface['deleteFragment'] = (
       endBlock &&
       Path.isSibling(startBlock, endBlock) &&
       Path.isBefore(startBlock, endBlock) &&
+      !Editor.isVoid(editor, Node.get(editor, endBlock) as Element) &&
       Editor.isStart(editor, start, startBlock) &&
       Editor.isStart(editor, end, endBlock)
     ) {
