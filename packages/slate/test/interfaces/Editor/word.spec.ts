@@ -49,7 +49,10 @@ describe('Editor.word', () => {
   it('stops at punctuation by default and accepts a custom character test', () => {
     const editor = setup([paragraph('see foo-bar.baz now')])
     const at = { path: [0, 0], offset: 9 }
-    assert.strictEqual(textOf(editor, Editor.word(editor, { at })), 'bar')
+    assert.strictEqual(
+      textOf(editor, Editor.word(editor, { at: { path: [0, 0], offset: 5 } })),
+      'foo'
+    )
     assert.strictEqual(
       textOf(
         editor,
@@ -108,10 +111,64 @@ describe('Editor.word', () => {
     )
   })
 
-  it('includes emoji with skin tone modifiers in the word', () => {
+  it('keeps emoji out of the neighbouring word', () => {
     const editor = setup([paragraph('go 👍🏽ok now')])
-    const range = Editor.word(editor, { at: { path: [0, 0], offset: 5 } })
-    assert.strictEqual(textOf(editor, range), '👍🏽ok')
+    assert.strictEqual(
+      textOf(editor, Editor.word(editor, { at: { path: [0, 0], offset: 7 } })),
+      'ok'
+    )
+    assert.strictEqual(
+      Editor.word(editor, { at: { path: [0, 0], offset: 5 } }),
+      undefined
+    )
+  })
+
+  it('finds words in scripts written without spaces', () => {
+    const cases: [string, number, string][] = [
+      ['今日は良い天気です。', 4, '良い'],
+      ['我们今天去公园散步，好吗', 3, '今天'],
+      ['วันนี้อากาศดีมาก', 4, 'นี้'],
+    ]
+    for (const [text, offset, word] of cases) {
+      const editor = setup([paragraph(text)])
+      const range = Editor.word(editor, { at: { path: [0, 0], offset } })
+      assert.strictEqual(textOf(editor, range), word)
+    }
+  })
+
+  it('falls back to the word unit rules without Intl.Segmenter', () => {
+    const { Segmenter } = Intl
+    Object.defineProperty(Intl, 'Segmenter', {
+      value: undefined,
+      configurable: true,
+      writable: true,
+    })
+    try {
+      const editor = setup([
+        paragraph('see foo-bar.baz now'),
+        paragraph('今日は良い天気です。'),
+      ])
+      assert.strictEqual(
+        textOf(
+          editor,
+          Editor.word(editor, { at: { path: [0, 0], offset: 9 } })
+        ),
+        'bar'
+      )
+      assert.strictEqual(
+        textOf(
+          editor,
+          Editor.word(editor, { at: { path: [1, 0], offset: 4 } })
+        ),
+        '今日は良い天気です'
+      )
+    } finally {
+      Object.defineProperty(Intl, 'Segmenter', {
+        value: Segmenter,
+        configurable: true,
+        writable: true,
+      })
+    }
   })
 
   it('uses the selection focus by default', () => {

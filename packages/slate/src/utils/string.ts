@@ -119,11 +119,56 @@ export const getWordDistance = (text: string, isRTL = false): number => {
   return dist
 }
 
+const getSegmentedWordBounds = (
+  text: string,
+  offset: number
+): [number, number] | undefined => {
+  if (typeof Intl === 'undefined' || typeof Intl.Segmenter !== 'function') {
+    return undefined
+  }
+
+  const segmenter = new Intl.Segmenter(undefined, { granularity: 'word' })
+  let before: [number, number] | undefined
+  let after: [number, number] | undefined
+
+  for (const { index, segment, isWordLike } of segmenter.segment(text)) {
+    const end = index + segment.length
+
+    if (index > offset) {
+      break
+    }
+
+    if (!isWordLike) {
+      continue
+    }
+
+    if (index < offset && offset < end) {
+      return [index, end]
+    }
+
+    if (end === offset) {
+      before = [index, end]
+    } else if (index === offset) {
+      after = [index, end]
+    }
+  }
+
+  return before ?? after ?? [offset, offset]
+}
+
 export const getWordBounds = (
   text: string,
   offset: number,
   isWordChar?: (character: string) => boolean
 ): [number, number] => {
+  const segmented = isWordChar
+    ? undefined
+    : getSegmentedWordBounds(text, offset)
+
+  if (segmented) {
+    return segmented
+  }
+
   const matches = (char: string, remaining: string, isRTL: boolean) =>
     isWordChar ? isWordChar(char) : isWordCharacter(char, remaining, isRTL)
   let start = offset

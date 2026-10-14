@@ -229,7 +229,7 @@ Options: `{at?: Location, mode?: 'highest' | 'lowest', voids?: boolean}`
 
 Get the range of the word around a point, within its block. Defaults to the selection's focus. Returns `undefined` when the point isn't touching a word, is inside a void, or there is no selection.
 
-The word can span text nodes with different marks and inline elements such as links, but stops at inline voids. By default, word characters follow the same rules as the `'word'` unit in `Editor.before` and `Editor.after`: whitespace and punctuation end a word, and apostrophes inside a word don't. Pass `isWordCharacter` to define your own, for example to treat `foo-bar.baz` or `@name` as one word:
+The word can span text nodes with different marks and inline elements such as links, but stops at inline voids. By default, words come from the platform's `Intl.Segmenter`, which also splits Chinese, Japanese and Thai text that has no spaces between words. Where `Intl.Segmenter` is unavailable, the same rules as the `'word'` unit in `Editor.before` and `Editor.after` apply: whitespace and punctuation end a word, and apostrophes inside a word don't. Pass `isWordCharacter` to define your own, for example to treat `foo-bar.baz` or `@name` as one word:
 
 ```javascript
 const range = Editor.word(editor, {
@@ -239,6 +239,8 @@ const word = range && Editor.string(editor, range)
 ```
 
 Options: `{at?: Point | Range, isWordCharacter?: (character: string) => boolean}`
+
+`Editor.word` reads the editor's value, which doesn't include text an input method is still composing. In React, use [`ReactEditor.getWord`](../../libraries/slate-react/react-editor.md) to include it.
 
 ### Manipulation methods
 

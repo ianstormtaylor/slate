@@ -90,6 +90,12 @@ Find a Slate point from a DOM selection's `domNode` and `domOffset`.
 
 Find a Slate range from a DOM range or selection.
 
+### Word methods
+
+#### `ReactEditor.getWord(editor: ReactEditor, options?: { at?: Point | Range, isWordCharacter?: (character: string) => boolean }): { range: Range, text: string } | undefined`
+
+Like [`Editor.word`](../../api/nodes/editor.md), but while an input method is composing it reads the composing text from the DOM and uses the DOM caret when `at` isn't given. `text` is the word as currently shown. During a composition, `range` counts the composing characters, so it only matches the editor's value once the composition ends.
+
 ### DataTransfer methods
 
 #### `ReactEditor.insertData(editor: ReactEditor, data: DataTransfer): void`

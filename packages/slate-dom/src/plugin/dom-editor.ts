@@ -1,6 +1,9 @@
 import {
   BaseEditor,
+  createEditor,
+  Descendant,
   Editor,
+  EditorWordOptions,
   Node,
   Path,
   Point,
@@ -184,6 +187,11 @@ export interface DOMEditorInterface {
    * Check if the user is currently composing inside the editor.
    */
   isComposing: (editor: DOMEditor) => boolean
+
+  getWord: (
+    editor: DOMEditor,
+    options?: EditorWordOptions
+  ) => { range: Range; text: string } | undefined
 
   /**
    * Check if the editor is focused.
@@ -598,6 +606,23 @@ export const DOMEditor: DOMEditorInterface = {
 
   isComposing: editor => {
     return !!IS_COMPOSING.get(editor)
+  },
+
+  getWord: (editor, options = {}) => {
+    if (typeof Editor.word !== 'function') {
+      throw new Error('DOMEditor.getWord needs slate 0.135.0 or later')
+    }
+
+    const composing = DOMEditor.isComposing(editor)
+      ? getComposingView(editor)
+      : undefined
+    const view = composing?.view ?? editor
+    const range = Editor.word(view, {
+      ...options,
+      at: options.at ?? composing?.point,
+    })
+
+    return range && { range, text: Editor.string(view, range) }
   },
 
   isFocused: editor => !!IS_FOCUSED.get(editor),
@@ -1190,4 +1215,55 @@ export const DOMEditor: DOMEditorInterface = {
 
     return range as unknown as T extends true ? Range | null : Range
   },
+}
+
+const replaceText = (
+  nodes: Descendant[],
+  path: Path,
+  text: string
+): Descendant[] =>
+  nodes.map((node, index) => {
+    if (index !== path[0]) {
+      return node
+    }
+
+    if (path.length === 1) {
+      return { ...node, text }
+    }
+
+    return {
+      ...node,
+      children: replaceText(
+        (node as { children: Descendant[] }).children,
+        path.slice(1),
+        text
+      ),
+    }
+  })
+
+const getComposingView = (editor: DOMEditor) => {
+  const domSelection = DOMEditor.getWindow(editor).getSelection()
+
+  if (!domSelection?.focusNode) {
+    return undefined
+  }
+
+  const point = DOMEditor.toSlatePoint(
+    editor,
+    [domSelection.focusNode, domSelection.focusOffset],
+    { exactMatch: false, suppressThrow: true }
+  )
+
+  if (!point) {
+    return undefined
+  }
+
+  const textElement = DOMEditor.toDOMNode(editor, Node.get(editor, point.path))
+  const text = (textElement.textContent ?? '').replace(/\uFEFF/g, '')
+  const view = createEditor()
+  view.isInline = editor.isInline
+  view.isVoid = editor.isVoid
+  view.children = replaceText(editor.children, point.path, text)
+
+  return { view, point }
 }
