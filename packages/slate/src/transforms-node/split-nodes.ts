@@ -27,7 +27,11 @@ export const splitNodes: NodeTransforms['splitNodes'] = (
   options = {}
 ) => {
   Editor.withoutNormalizing(editor, () => {
-    const { mode = 'lowest', voids = false } = options
+    const {
+      mode = 'lowest',
+      voids = false,
+      select = options.at == null,
+    } = options
     let { match, at = editor.selection, height = 0, always = false } = options
 
     if (!at) return
@@ -132,7 +136,7 @@ export const splitNodes: NodeTransforms['splitNodes'] = (
         position = path[path.length - 1] + (split || isEnd ? 1 : 0)
       }
 
-      if (options.at == null) {
+      if (select) {
         const point = afterRef.current || Editor.end(editor, [])
         Transforms.select(editor, point)
       }

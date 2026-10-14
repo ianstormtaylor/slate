@@ -12,6 +12,7 @@ export interface TextDeleteOptions {
 }
 
 export interface TextInsertFragmentOptions {
+  select?: boolean
   at?: Location
   hanging?: boolean
   voids?: boolean
@@ -19,6 +20,7 @@ export interface TextInsertFragmentOptions {
 }
 
 export interface TextInsertTextOptions {
+  select?: boolean
   at?: Location
   voids?: boolean
 }
@@ -64,7 +66,10 @@ export const TextTransforms: TextTransforms = {
     options: TextInsertTextOptions = {}
   ): void {
     Editor.withoutNormalizing(editor, () => {
-      const { voids = false } = options
+      const {
+        voids = false,
+        select = options.at == null && editor.selection != null,
+      } = options
       let { at = getDefaultInsertLocation(editor) } = options
 
       if (Location.isPath(at)) {
@@ -87,7 +92,7 @@ export const TextTransforms: TextTransforms = {
           const endPoint = endRef.unref()
 
           at = startPoint || endPoint!
-          Transforms.setSelection(editor, { anchor: at, focus: at })
+          if (select) Transforms.select(editor, at)
         }
       }
 
@@ -101,6 +106,8 @@ export const TextTransforms: TextTransforms = {
       const { path, offset } = at
       if (text.length > 0)
         editor.apply({ type: 'insert_text', path, offset, text })
+      if (select && (text.length > 0 || options.select === true))
+        Transforms.select(editor, { path, offset: offset + text.length })
     })
   },
 }
