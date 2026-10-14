@@ -13,6 +13,7 @@
 - [Enabling Collaborative Editing](walkthroughs/07-enabling-collaborative-editing.md)
 - [Using the Bundled Source](walkthroughs/08-using-the-bundled-source.md)
 - [Improving Performance](walkthroughs/09-performance.md)
+- [Collaboration with Yjs](walkthroughs/10-collaboration-with-yjs.md)
 
 ## Concepts
 

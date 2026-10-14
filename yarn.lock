@@ -2979,6 +2979,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@slate-yjs/core@npm:1.0.2":
+  version: 1.0.2
+  resolution: "@slate-yjs/core@npm:1.0.2"
+  dependencies:
+    y-protocols: "npm:^1.0.5"
+  peerDependencies:
+    slate: ">=0.70.0"
+    yjs: ^13.5.29
+  checksum: 10/6c713ebbc9653b7ff2e4678f0ad7053b7116c1ac73528d4d4b0c834eb954216a3af0b59d91557c78f10fadf56403499a04f6e50abda33ab805a19188437c8def
+  languageName: node
+  linkType: hard
+
 "@swc/helpers@npm:0.5.15":
   version: 0.5.15
   resolution: "@swc/helpers@npm:0.5.15"
@@ -6968,6 +6980,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"isomorphic.js@npm:^0.2.4":
+  version: 0.2.5
+  resolution: "isomorphic.js@npm:0.2.5"
+  checksum: 10/d8d1b083f05f3c337a06628b982ac3ce6db953bbef14a9de8ad49131250c3592f864b73c12030fdc9ef138ce97b76ef55c7d96a849561ac215b1b4b9d301c8e9
+  languageName: node
+  linkType: hard
+
 "istanbul-lib-coverage@npm:^3.0.0":
   version: 3.0.0
   resolution: "istanbul-lib-coverage@npm:3.0.0"
@@ -7736,6 +7755,19 @@ __metadata:
     prelude-ls: "npm:~1.1.2"
     type-check: "npm:~0.3.2"
   checksum: 10/e1c3e75b5c430d9aa4c32c83c8a611e4ca53608ca78e3ea3bf6bbd9d017e4776d05d86e27df7901baebd3afa732abede9f26f715b8c1be19e95505c7a3a7b589
+  languageName: node
+  linkType: hard
+
+"lib0@npm:^0.2.85, lib0@npm:^0.2.99":
+  version: 0.2.119
+  resolution: "lib0@npm:0.2.119"
+  dependencies:
+    isomorphic.js: "npm:^0.2.4"
+  bin:
+    0ecdsa-generate-keypair: bin/0ecdsa-generate-keypair.js
+    0gentesthtml: bin/gentesthtml.js
+    0serve: bin/0serve.js
+  checksum: 10/013d67c9083d40ca16d55ea26d193f6dc2ea3e5e9c7f6f7dfa2551575c4bbc76bd466a77a42233ae7c399961d2c23b4e54a2e4e7e5f4785f6b85f72126d524db
   languageName: node
   linkType: hard
 
@@ -10038,6 +10070,7 @@ __metadata:
     "@fontsource/material-icons": "npm:^5.3.0"
     "@fontsource/roboto": "npm:^5.3.0"
     "@playwright/test": "npm:^1.62.1"
+    "@slate-yjs/core": "npm:1.0.2"
     "@types/is-hotkey": "npm:^0.1.10"
     "@types/is-url": "npm:^1.2.32"
     "@types/jest": "npm:29.5.6"
@@ -10094,6 +10127,7 @@ __metadata:
     source-map-loader: "npm:^4.0.1"
     ts-jest: "npm:^29.1.1"
     typescript: "npm:5.2.2"
+    yjs: "npm:13.6.33"
   languageName: unknown
   linkType: soft
 
@@ -11276,6 +11310,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"y-protocols@npm:^1.0.5":
+  version: 1.0.7
+  resolution: "y-protocols@npm:1.0.7"
+  dependencies:
+    lib0: "npm:^0.2.85"
+  peerDependencies:
+    yjs: ^13.0.0
+  checksum: 10/2c30352544e7af1026051f12158c19a077cd2d4a0c598a7f69b3a0b6841225ef8d0119b4c5edb10fc7ea0e8e9ee5642b8a2082109295d3f881a300fd9080060b
+  languageName: node
+  linkType: hard
+
 "y18n@npm:^5.0.5":
   version: 5.0.8
   resolution: "y18n@npm:5.0.8"
@@ -11357,6 +11402,15 @@ __metadata:
     y18n: "npm:^5.0.5"
     yargs-parser: "npm:^21.1.1"
   checksum: 10/a3826798c03b159e139d0580a3b2733953889a9a1bac8e4e1ca7a1a249b55315b213c323a6a1dbdb305f6e59496a9eaa810742c87e34abcf1a0584d8f59212a1
+  languageName: node
+  linkType: hard
+
+"yjs@npm:13.6.33":
+  version: 13.6.33
+  resolution: "yjs@npm:13.6.33"
+  dependencies:
+    lib0: "npm:^0.2.99"
+  checksum: 10/3ba73bf4543ddd885881a89fe3f8d3c1d8d3175f3e75d50cee9d21e57720e708f7da8b43e306af4bf9918873c172a76477ee67a51b869e96180749ba24fc2694
   languageName: node
   linkType: hard
 

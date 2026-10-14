@@ -2,6 +2,7 @@ export const EXAMPLE_NAMES_AND_PATHS = [
   ['Android Tests', 'android-tests'],
   ['Checklists', 'check-lists'],
   ['Code Highlighting', 'code-highlighting'],
+  ['Collaboration', 'collaboration'],
   ['Custom Placeholder', 'custom-placeholder'],
   ['Decorations Async', 'decorations-async'],
   ['Editable Voids', 'editable-voids'],
