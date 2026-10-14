@@ -225,6 +225,7 @@ export const Editable = forwardRef(
     const previousChildren = useRef(editor.children)
     const previousSelection = useRef(editor.selection)
     const pendingInputScroll = useRef(false)
+    const pendingNavigationScroll = useRef(false)
     const deferredOperations = useRef<DeferredOperation[]>([])
     const [placeholderHeight, setPlaceholderHeight] = useState<
       number | undefined
@@ -429,9 +430,11 @@ export const Editable = forwardRef(
       const { selection } = editor
       const scrollForInput = pendingInputScroll.current
       pendingInputScroll.current = false
-      const selectionChangedByEdit =
-        scrollForInput &&
-        previousChildren.current !== editor.children &&
+      const scrollForNavigation = pendingNavigationScroll.current
+      pendingNavigationScroll.current = false
+      const selectionChangedByInput =
+        ((scrollForInput && previousChildren.current !== editor.children) ||
+          scrollForNavigation) &&
         !!selection &&
         (!previousSelection.current ||
           !Range.equals(previousSelection.current, selection))
@@ -510,7 +513,7 @@ export const Editable = forwardRef(
                 'data-slate-mark-placeholder'
               ))
           ) {
-            if (selectionChangedByEdit) {
+            if (selectionChangedByInput) {
               scrollSelectionIntoView(editor, domSelection.getRangeAt(0))
             }
             return
@@ -1812,6 +1815,17 @@ export const Editable = forwardRef(
                       ) {
                         return
                       }
+
+                      pendingNavigationScroll.current = [
+                        'ArrowUp',
+                        'ArrowDown',
+                        'ArrowLeft',
+                        'ArrowRight',
+                        'Home',
+                        'End',
+                        'PageUp',
+                        'PageDown',
+                      ].includes(nativeEvent.key)
 
                       const { selection } = editor
                       const element =
