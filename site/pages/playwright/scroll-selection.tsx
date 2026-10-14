@@ -1,9 +1,10 @@
 import React, { useRef, useState } from 'react'
-import { createEditor } from 'slate'
+import { createEditor, Descendant } from 'slate'
 import { Editable, Slate, withReact } from 'slate-react'
 
-const initialValue = [
+const initialValue: Descendant[] = [
   {
+    type: 'paragraph',
     children: [
       {
         text: Array.from(
