@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.138.1
+
+### Patch Changes
+
+- [#6287](https://github.com/ianstormtaylor/slate/pull/6287) [`b0462a1`](https://github.com/ianstormtaylor/slate/commit/b0462a1505f7e6025419e8ffbe1f9ce7da0c9800) Thanks [@dylans](https://github.com/dylans)! - Limit whole-block deletion of a hanging selection, and native triple-click selections, to top-level blocks. Nested blocks such as table cells and list items keep the previous behavior, so cutting or dragging across cells in editors without `editor.isIsolated` no longer removes cells. After undoing a whole-block deletion, the default `scrollSelectionIntoView` scrolls to the restored text instead of the start of the following block.
+
 ## 0.138.0
 
 ### Patch Changes
