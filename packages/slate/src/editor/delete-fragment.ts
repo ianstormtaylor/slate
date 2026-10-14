@@ -29,6 +29,7 @@ export const deleteFragment: EditorInterface['deleteFragment'] = (
       !isolated &&
       startBlock &&
       endBlock &&
+      startBlock.length === 1 &&
       Path.isSibling(startBlock, endBlock) &&
       Path.isBefore(startBlock, endBlock) &&
       !Editor.isVoid(editor, Node.get(editor, endBlock) as Element) &&

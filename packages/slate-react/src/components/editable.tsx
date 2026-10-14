@@ -1390,15 +1390,7 @@ export const Editable = forwardRef(
                         return
                       }
 
-                      if (
-                        event.detail === TRIPLE_CLICK &&
-                        path.length >= 1 &&
-                        Editor.above(editor, {
-                          at: Editor.start(editor, path),
-                          match: n =>
-                            Node.isElement(n) && !!editor.isIsolated?.(n),
-                        })
-                      ) {
+                      if (event.detail === TRIPLE_CLICK && path.length >= 1) {
                         let blockPath = path
                         if (
                           !(
@@ -1414,9 +1406,17 @@ export const Editable = forwardRef(
                           blockPath = block?.[1] ?? path.slice(0, 1)
                         }
 
-                        const range = Editor.range(editor, blockPath)
-                        Transforms.select(editor, range)
-                        return
+                        const isIsolated = Editor.above(editor, {
+                          at: Editor.start(editor, blockPath),
+                          match: n =>
+                            Node.isElement(n) && !!editor.isIsolated?.(n),
+                        })
+
+                        if (blockPath.length > 1 || isIsolated) {
+                          const range = Editor.range(editor, blockPath)
+                          Transforms.select(editor, range)
+                          return
+                        }
                       }
 
                       if (readOnly) {
@@ -2324,8 +2324,16 @@ export const defaultScrollSelectionIntoView = (
   domRange: DOMRange
 ) => {
   // Scroll to the focus point of the selection, in case the selection is expanded
-  const isBackward = !!editor.selection && Range.isBackward(editor.selection)
-  const domFocusPoint = domRange.cloneRange()
+  const { selection } = editor
+  const isBackward = !!selection && Range.isBackward(selection)
+  const unhung =
+    selection && !isBackward && Range.isExpanded(selection)
+      ? Editor.unhangRange(editor, selection)
+      : selection
+  const domFocusPoint =
+    unhung && selection && !Range.equals(unhung, selection)
+      ? ReactEditor.toDOMRange(editor, unhung)
+      : domRange.cloneRange()
   domFocusPoint.collapse(isBackward)
 
   if (domFocusPoint.getBoundingClientRect) {
