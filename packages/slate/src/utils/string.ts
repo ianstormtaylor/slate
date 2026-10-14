@@ -119,6 +119,46 @@ export const getWordDistance = (text: string, isRTL = false): number => {
   return dist
 }
 
+export const getWordBounds = (
+  text: string,
+  offset: number,
+  isWordChar?: (character: string) => boolean
+): [number, number] => {
+  const matches = (char: string, remaining: string, isRTL: boolean) =>
+    isWordChar ? isWordChar(char) : isWordCharacter(char, remaining, isRTL)
+  let start = offset
+  let before = text.slice(0, offset)
+
+  while (before.length > 0) {
+    const dist = getCharacterDistance(before, true)
+    const [char, remaining] = splitByCharacterDistance(before, dist, true)
+
+    if (!matches(char, remaining, true)) {
+      break
+    }
+
+    start -= dist
+    before = remaining
+  }
+
+  let end = offset
+  let after = text.slice(offset)
+
+  while (after.length > 0) {
+    const dist = getCharacterDistance(after)
+    const [char, remaining] = splitByCharacterDistance(after, dist)
+
+    if (!matches(char, remaining, false)) {
+      break
+    }
+
+    end += dist
+    after = remaining
+  }
+
+  return [start, end]
+}
+
 /**
  * Split a string in two parts at a given distance starting from the end when
  * `isRTL` is set to `true`.

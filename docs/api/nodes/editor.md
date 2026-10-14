@@ -225,6 +225,21 @@ Match a void node in the current branch of the editor.
 
 Options: `{at?: Location, mode?: 'highest' | 'lowest', voids?: boolean}`
 
+#### `Editor.word(editor: Editor, options?) => Range | undefined`
+
+Get the range of the word around a point, within its block. Defaults to the selection's focus. Returns `undefined` when the point isn't touching a word, is inside a void, or there is no selection.
+
+The word can span text nodes with different marks and inline elements such as links, but stops at inline voids. By default, word characters follow the same rules as the `'word'` unit in `Editor.before` and `Editor.after`: whitespace and punctuation end a word, and apostrophes inside a word don't. Pass `isWordCharacter` to define your own, for example to treat `foo-bar.baz` or `@name` as one word:
+
+```javascript
+const range = Editor.word(editor, {
+  isWordCharacter: character => /[\w.@-]/.test(character),
+})
+const word = range && Editor.string(editor, range)
+```
+
+Options: `{at?: Point | Range, isWordCharacter?: (character: string) => boolean}`
+
 ### Manipulation methods
 
 #### `Editor.addMark(editor: Editor, key: string, value: any) => void`

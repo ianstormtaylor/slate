@@ -63,6 +63,7 @@ import {
   string,
   unhangRange,
   withoutNormalizing,
+  word,
 } from './editor'
 import { deleteText } from './transforms-text'
 import {
@@ -183,6 +184,7 @@ export const createEditor = (): Editor => {
     unsetNodes: (...args) => unsetNodes(editor, ...args),
     unwrapNodes: (...args) => unwrapNodes(editor, ...args),
     void: (...args) => getVoid(editor, ...args),
+    word: (...args) => word(editor, ...args),
     withoutNormalizing: (...args) => withoutNormalizing(editor, ...args),
     wrapNodes: (...args) => wrapNodes(editor, ...args),
     shouldMergeNodesRemovePrevNode: (...args) =>
