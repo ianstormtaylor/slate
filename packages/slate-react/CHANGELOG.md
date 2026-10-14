@@ -1,5 +1,13 @@
 # slate-react
 
+## 0.136.0
+
+### Minor Changes
+
+- [#6268](https://github.com/ianstormtaylor/slate/pull/6268) [`1e9e7e1`](https://github.com/ianstormtaylor/slate/commit/1e9e7e1bc1b970af5201c28319145e628981795c) Thanks [@dylans](https://github.com/dylans)! - Add `Editor.word`, which returns the range of the word around a point within its block. Words can cross mark changes and inline links but stop at voids, and `isWordCharacter` lets you define your own word characters. `ReactEditor.getWord` also includes text an input method is still composing.
+
+  The `'word'` unit (word deletion, word movement, and `Editor.before`/`after`/`positions`) now uses `Intl.Segmenter`, where available, to split runs of word characters. Chinese, Japanese and Thai text without spaces now deletes and moves one word at a time instead of a whole phrase. Text with spaces between words is unaffected.
+
 ## 0.134.1
 
 ### Patch Changes
