@@ -97,6 +97,7 @@ export function createAndroidInputManager({
   let actionTimeoutId: ReturnType<typeof setTimeout> | null = null
   let lastCompositionActivity = 0
   let compositionCleared = false
+  let hasUnrenderedMutations = false
 
   let idCounter = 0
   let insertPositionHint: StringDiff | null | false = false
@@ -118,6 +119,16 @@ export function createAndroidInputManager({
   }
 
   const performAction = () => {
+    const { children } = editor
+    runPendingAction()
+
+    if (hasUnrenderedMutations && editor.children === children) {
+      EDITOR_TO_FORCE_RENDER.get(editor)?.()
+    }
+    hasUnrenderedMutations = false
+  }
+
+  const runPendingAction = () => {
     const action = EDITOR_TO_PENDING_ACTION.get(editor)
     EDITOR_TO_PENDING_ACTION.delete(editor)
     if (!action) {
@@ -942,17 +953,26 @@ export function createAndroidInputManager({
   }
 
   const handleDomMutations = (mutations: MutationRecord[]) => {
-    if (hasPendingDiffs() || hasPendingAction()) {
+    if (hasPendingDiffs()) {
       return
     }
 
     if (
-      mutations.some(mutation => isTrackedMutation(editor, mutation, mutations))
+      !mutations.some(mutation =>
+        isTrackedMutation(editor, mutation, mutations)
+      )
     ) {
-      // Cause a re-render to restore the dom state if we encounter tracked mutations without
-      // a corresponding pending action.
-      EDITOR_TO_FORCE_RENDER.get(editor)?.()
+      return
     }
+
+    if (hasPendingAction()) {
+      hasUnrenderedMutations = true
+      return
+    }
+
+    // Cause a re-render to restore the dom state if we encounter tracked mutations without
+    // a corresponding pending action.
+    EDITOR_TO_FORCE_RENDER.get(editor)?.()
   }
 
   return {
