@@ -101,7 +101,11 @@ const segmentWords = (text: string) =>
  * Get the distance to the end of the first word in a string of text.
  */
 
-export const getWordDistance = (text: string, isRTL = false): number => {
+export const getWordDistance = (
+  text: string,
+  isRTL = false,
+  isWordChar?: (character: string) => boolean
+): number => {
   let dist = 0
   let wordStart = -1
   let rest = text
@@ -110,7 +114,9 @@ export const getWordDistance = (text: string, isRTL = false): number => {
     const charDist = getCharacterDistance(rest, isRTL)
     const [char, remaining] = splitByCharacterDistance(rest, charDist, isRTL)
 
-    if (isWordCharacter(char, remaining, isRTL)) {
+    if (
+      isWordChar ? isWordChar(char) : isWordCharacter(char, remaining, isRTL)
+    ) {
       if (wordStart < 0) {
         wordStart = dist
       }
@@ -122,7 +128,7 @@ export const getWordDistance = (text: string, isRTL = false): number => {
     rest = remaining
   }
 
-  if (wordStart < 0) {
+  if (isWordChar || wordStart < 0) {
     return dist
   }
 

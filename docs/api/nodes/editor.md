@@ -80,6 +80,8 @@ If there is no point after the location (e.g. we are at the bottom of the docume
 
 Options: `{distance?: number, unit?: 'offset' | 'character' | 'word' | 'line' | 'block', voids?: boolean}`
 
+For `unit: 'word'`, `isWordCharacter?: (character: string) => boolean` customizes word boundaries. The callback receives a whole grapheme, including a combined character or emoji. For example, `isWordCharacter: character => /[\w-]/.test(character)` treats `foo-bar_baz` as one word. A custom callback replaces the default punctuation rules and language segmentation; it is ignored for other units.
+
 #### `Editor.before(editor: Editor, at: Location, options?) => Point | undefined`
 
 Get the point before a location.
@@ -87,6 +89,8 @@ Get the point before a location.
 If there is no point before the location (e.g. we are at the top of the document) returns `undefined`.
 
 Options: `{distance?: number, unit?: 'offset' | 'character' | 'word' | 'line' | 'block', voids?: boolean}`
+
+For `unit: 'word'`, `isWordCharacter?: (character: string) => boolean` customizes word boundaries. The callback receives a whole grapheme, including a combined character or emoji. For example, `isWordCharacter: character => /[\w-]/.test(character)` treats `foo-bar_baz` as one word. A custom callback replaces the default punctuation rules and language segmentation; it is ignored for other units.
 
 #### `Editor.edges(editor: Editor, at: Location) => [Point, Point]`
 
@@ -194,6 +198,8 @@ Options:
   - `line` | `block`: Starts at the beginning position and then the position at the end of the block. Then starts at the beginning of the next block and then the end of the next block.
 - `reverse?: boolean = false`: When `true` returns the positions in reverse order. In the case of the `unit` being `word`, the actual returned positions are different (i.e. we will get the start of a word in reverse instead of the end).
 - `voids?: boolean = false`: When `true` include void Nodes.
+
+For `unit: 'word'`, `isWordCharacter?: (character: string) => boolean` customizes word boundaries. The callback receives a whole grapheme, including a combined character or emoji. For example, `isWordCharacter: character => /[\w-]/.test(character)` treats `foo-bar_baz` as one word. A custom callback replaces the default punctuation rules and language segmentation; it is ignored for other units.
 
 #### `Editor.previous<T extends Node>(editor: Editor, options?) => NodeEntry<T> | undefined`
 

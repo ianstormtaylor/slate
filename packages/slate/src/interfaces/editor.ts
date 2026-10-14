@@ -201,12 +201,14 @@ export interface EditorAboveOptions<T extends Ancestor> {
 }
 
 export interface EditorAfterOptions {
+  isWordCharacter?: (character: string) => boolean
   distance?: number
   unit?: TextUnitAdjustment
   voids?: boolean
 }
 
 export interface EditorBeforeOptions {
+  isWordCharacter?: (character: string) => boolean
   distance?: number
   unit?: TextUnitAdjustment
   voids?: boolean
@@ -292,6 +294,7 @@ export interface EditorPointRefOptions {
 }
 
 export interface EditorPositionsOptions {
+  isWordCharacter?: (character: string) => boolean
   at?: Location
   unit?: TextUnitAdjustment
   reverse?: boolean
