@@ -6,10 +6,7 @@ const blockPathAt = (editor: Editor, point: Point): Path | undefined =>
     match: n => Node.isElement(n) && Editor.isBlock(editor, n),
   })?.[1]
 
-export const getWholeTopLevelBlockPaths = (
-  editor: Editor,
-  range: Range
-): Path[] | null => {
+const getWholeBlockPaths = (editor: Editor, range: Range): Path[] | null => {
   const [start, end] = Range.edges(range)
   const startBlock = blockPathAt(editor, start)
   const endBlock = blockPathAt(editor, end)
@@ -17,24 +14,40 @@ export const getWholeTopLevelBlockPaths = (
   if (
     !startBlock ||
     !endBlock ||
-    startBlock.length !== 1 ||
-    endBlock.length !== 1 ||
-    startBlock[0] >= endBlock[0] ||
+    !Path.isSibling(startBlock, endBlock) ||
+    !Path.isBefore(startBlock, endBlock) ||
+    !!Editor.above(editor, {
+      at: start,
+      match: n => Node.isElement(n) && !!editor.isIsolated?.(n),
+      mode: 'highest',
+    }) ||
     !Editor.isStart(editor, start, startBlock) ||
     !Editor.isStart(editor, end, endBlock)
   ) {
     return null
   }
 
-  return Array.from({ length: endBlock[0] - startBlock[0] }, (_, offset) => [
-    startBlock[0] + offset,
-  ])
+  return Array.from(
+    {
+      length: endBlock[endBlock.length - 1] - startBlock[startBlock.length - 1],
+    },
+    (_, offset) => [
+      ...Path.parent(startBlock),
+      startBlock[startBlock.length - 1] + offset,
+    ]
+  )
+}
+
+export const getWholeTopLevelBlockPaths = (
+  editor: Editor,
+  range: Range
+): Path[] | null => {
+  const paths = getWholeBlockPaths(editor, range)
+  return paths?.[0].length === 1 ? paths : null
 }
 
 export const getMovableRange = (editor: Editor, range: Range): Range =>
-  getWholeTopLevelBlockPaths(editor, range)
-    ? range
-    : Editor.unhangRange(editor, range)
+  getWholeBlockPaths(editor, range) ? range : Editor.unhangRange(editor, range)
 
 export const deleteMovedRange = (editor: Editor, range: Range) => {
   if (Range.isCollapsed(range)) {
