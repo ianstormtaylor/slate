@@ -9,17 +9,29 @@ import {
 } from '../interfaces'
 
 export const insertChildren = <T>(
-  xs: T[],
+  children: T[],
   index: number,
   ...newValues: T[]
-) => [...xs.slice(0, index), ...newValues, ...xs.slice(index)]
+) => {
+  return replaceChildren(children, index, 0, ...newValues)
+}
 
 export const replaceChildren = <T>(
-  xs: T[],
+  children: T[],
   index: number,
   removeCount: number,
   ...newValues: T[]
-) => [...xs.slice(0, index), ...newValues, ...xs.slice(index + removeCount)]
+) => {
+  const out = children.slice()
+  out.splice(index, removeCount, ...newValues)
+  return out
+}
+
+export const replaceChild = <T>(children: T[], index: number, newValue: T) => {
+  const out = children.slice()
+  out[index] = newValue
+  return out
+}
 
 export const removeChildren = replaceChildren
 
@@ -45,12 +57,12 @@ export const modifyDescendant = <N extends Descendant>(
 
     modifiedNode = {
       ...ancestorNode,
-      children: replaceChildren(ancestorNode.children, index, 1, modifiedNode),
+      children: replaceChild(ancestorNode.children, index, modifiedNode),
     }
   }
 
-  const index = slicedPath.pop()!
-  root.children = replaceChildren(root.children, index, 1, modifiedNode)
+  const index = slicedPath[0]
+  root.children = replaceChild(root.children, index, modifiedNode)
 }
 
 /**
