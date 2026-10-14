@@ -1,5 +1,15 @@
 # slate-react
 
+## 0.134.1
+
+### Patch Changes
+
+- [#6260](https://github.com/ianstormtaylor/slate/pull/6260) [`a269d46`](https://github.com/ianstormtaylor/slate/commit/a269d4676c875d69023331232368c79e13dd76fc) Thanks [@dylans](https://github.com/dylans)! - Keep text composed into a new paragraph on Android when the paragraph's block type changes, or nodes are inserted, moved or removed, before the composition ends.
+
+- [#6264](https://github.com/ianstormtaylor/slate/pull/6264) [`03a3e9d`](https://github.com/ianstormtaylor/slate/commit/03a3e9d7bf9fa36260b3adb90cea774122432f4e) Thanks [@dylans](https://github.com/dylans)! - Restore the DOM on Android after a deletion that changes nothing, such as Backspace in an empty editor, so the next composition's text isn't removed while it is typed.
+
+- [#6261](https://github.com/ianstormtaylor/slate/pull/6261) [`58328f9`](https://github.com/ianstormtaylor/slate/commit/58328f9acd79fc5c15d4d0e32b425c24f18bedb1) Thanks [@dylans](https://github.com/dylans)! - Delete a selected void with Backspace or Delete when a composition never ended, as happens on Android after tapping a mention while composing.
+
 ## 0.134.0
 
 ### Patch Changes
