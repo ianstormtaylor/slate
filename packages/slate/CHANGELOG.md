@@ -1,5 +1,11 @@
 # slate
 
+## 0.134.1
+
+### Patch Changes
+
+- [#6258](https://github.com/ianstormtaylor/slate/pull/6258) [`d5b2fbd`](https://github.com/ianstormtaylor/slate/commit/d5b2fbd949d9ae5aaf764a1fd01fe72e9e0da425) Thanks [@nabbydude](https://github.com/nabbydude)! - Speed up tree-altering operations by using faster array functions when copying and replacing children.
+
 ## 0.134.0
 
 ### Minor Changes
