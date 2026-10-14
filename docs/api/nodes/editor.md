@@ -11,6 +11,7 @@ interface Editor {
 
   // Schema-specific node behaviors.
   isInline: (element: Element) => boolean
+  isIsolated: (element: Element) => boolean
   isVoid: (element: Element) => boolean
   markableVoid: (element: Element) => boolean
   normalizeNode: (entry: NodeEntry) => void
@@ -423,6 +424,23 @@ Check if a value is an inline `Element` object.
 #### `isVoid(element: Element) => boolean`
 
 Check if a value is a void `Element` object.
+
+#### `isIsolated(element: Element) => boolean`
+
+Mark elements whose content must not flow across their edges, such as table cells. Slate's default returns `false`.
+
+For an isolated element:
+
+- Backspace at its start and Delete at its end do nothing, so they don't merge it with a neighbour. Deleting by word or line stops at its edge.
+- Deleting a range that crosses its edge removes the selected text but doesn't merge the blocks on either side. Isolated elements that are entirely inside the range are still removed.
+- `insertBreak`, and `splitNodes` with its default match, don't split it. They still split blocks inside it. `splitNodes` with an explicit `match` that selects the element still splits it.
+- Explicit `mergeNodes` calls aren't affected.
+
+```javascript
+const { isIsolated } = editor
+editor.isIsolated = element =>
+  element.type === 'table-cell' || isIsolated(element)
+```
 
 ### Normalize methods
 

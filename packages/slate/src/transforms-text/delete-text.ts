@@ -101,6 +101,40 @@ const findEmptyInlineToDelete = (
   return undefined
 }
 
+const getIsolatedPath = (editor: Editor, point: Point) =>
+  Editor.above(editor, {
+    at: point,
+    match: n => Node.isElement(n) && Editor.isIsolated(editor, n),
+    voids: true,
+  })?.[1]
+
+const isSameIsolation = (editor: Editor, a: Point, b: Point) => {
+  const aPath = getIsolatedPath(editor, a)
+  const bPath = getIsolatedPath(editor, b)
+  return aPath && bPath ? Path.equals(aPath, bPath) : aPath === bPath
+}
+
+const clampToIsolation = (
+  editor: Editor,
+  point: Point,
+  target: Point,
+  reverse: boolean
+): Point | undefined => {
+  if (isSameIsolation(editor, point, target)) {
+    return target
+  }
+
+  const isolatedPath = getIsolatedPath(editor, point)
+
+  if (!isolatedPath || Path.isAncestor(isolatedPath, target.path)) {
+    return undefined
+  }
+
+  return reverse
+    ? Editor.start(editor, isolatedPath)
+    : Editor.end(editor, isolatedPath)
+}
+
 export const deleteText: TextTransforms['delete'] = (editor, options = {}) => {
   Editor.withoutNormalizing(editor, () => {
     const {
@@ -157,9 +191,19 @@ export const deleteText: TextTransforms['delete'] = (editor, options = {}) => {
         at = emptyInlinePath
       } else {
         const opts = { unit, distance }
-        const target = reverse
-          ? Editor.before(editor, at, opts) || Editor.start(editor, [])
-          : Editor.after(editor, at, opts) || Editor.end(editor, [])
+        const target = clampToIsolation(
+          editor,
+          at,
+          reverse
+            ? Editor.before(editor, at, opts) || Editor.start(editor, [])
+            : Editor.after(editor, at, opts) || Editor.end(editor, []),
+          reverse
+        )
+
+        if (!target) {
+          return
+        }
+
         at = { anchor: at, focus: target }
         hanging = true
       }
@@ -309,7 +353,13 @@ export const deleteText: TextTransforms['delete'] = (editor, options = {}) => {
       }
     }
 
-    if (!isSingleText && isAcrossBlocks && endRef.current && startRef.current) {
+    if (
+      !isSingleText &&
+      isAcrossBlocks &&
+      endRef.current &&
+      startRef.current &&
+      isSameIsolation(editor, startRef.current, endRef.current)
+    ) {
       Transforms.mergeNodes(editor, {
         at: endRef.current,
         hanging: true,
