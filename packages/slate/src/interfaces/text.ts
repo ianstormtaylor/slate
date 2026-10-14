@@ -22,6 +22,7 @@ export interface LeafPosition {
 }
 
 export interface TextEqualsOptions {
+  ignore?: readonly string[]
   loose?: boolean
 }
 
@@ -77,18 +78,20 @@ export interface TextInterface {
 // eslint-disable-next-line no-redeclare
 export const Text: TextInterface = {
   equals(text: Text, another: Text, options: TextEqualsOptions = {}): boolean {
-    const { loose = false } = options
+    const { loose = false, ignore = [] } = options
 
-    function omitText(obj: Record<any, any>) {
-      const { text, ...rest } = obj
-
-      return rest
+    if (!loose && ignore.length === 0) {
+      return isDeepEqual(text, another)
     }
 
-    return isDeepEqual(
-      loose ? omitText(text) : text,
-      loose ? omitText(another) : another
-    )
+    const comparable = (node: Text) =>
+      Object.fromEntries(
+        Object.entries(node).filter(
+          ([key]) => !(loose && key === 'text') && !ignore.includes(key)
+        )
+      )
+
+    return isDeepEqual(comparable(text), comparable(another))
   },
 
   isText(value: any): value is Text {
