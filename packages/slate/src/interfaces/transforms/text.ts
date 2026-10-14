@@ -92,7 +92,8 @@ export const TextTransforms: TextTransforms = {
           const endPoint = endRef.unref()
 
           at = startPoint || endPoint!
-          if (select) Transforms.select(editor, at)
+          if (options.select !== false)
+            Transforms.setSelection(editor, { anchor: at, focus: at })
         }
       }
 

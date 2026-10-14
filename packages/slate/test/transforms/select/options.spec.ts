@@ -73,6 +73,20 @@ it('moveNodes retains the selection within implicitly moved content', () => {
   assert.deepStrictEqual(editor.selection, { anchor: point, focus: point })
 })
 
+it('insertText collapses the selection into an explicit replaced range by default', () => {
+  const editor = create()
+  Transforms.insertText(editor, 'X', { at: [1] })
+  const point = { path: [1, 0], offset: 1 }
+  assert.deepStrictEqual(editor.selection, { anchor: point, focus: point })
+})
+
+it('insertText keeps the selection with select false for an explicit range', () => {
+  const editor = create()
+  const selection = editor.selection
+  Transforms.insertText(editor, 'X', { at: [1], select: false })
+  assert.deepStrictEqual(editor.selection, selection)
+})
+
 it('insertText does not create a selection implicitly', () => {
   const editor = create()
   Transforms.deselect(editor)
