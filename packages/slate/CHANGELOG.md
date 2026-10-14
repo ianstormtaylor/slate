@@ -1,5 +1,11 @@
 # slate
 
+## 0.137.0
+
+### Minor Changes
+
+- [#6272](https://github.com/ianstormtaylor/slate/pull/6272) [`4235516`](https://github.com/ianstormtaylor/slate/commit/4235516b3af1c76b35625050408a275d14fb633e) Thanks [@dylans](https://github.com/dylans)! - `Transforms.setNodes` and `editor.setNodes` accept a function `(node, path) => props` to compute properties per matched node. `editor.setNodes` now also accepts the `replace` option in its type.
+
 ## 0.136.0
 
 ### Minor Changes
