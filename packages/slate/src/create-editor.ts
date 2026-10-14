@@ -96,6 +96,7 @@ export const createEditor = (): Editor => {
     selection: null,
     marks: null,
     isElementReadOnly: () => false,
+    isIsolated: () => false,
     isInline: () => false,
     isSelectable: () => true,
     isVoid: () => false,

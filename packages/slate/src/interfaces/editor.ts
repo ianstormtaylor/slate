@@ -52,6 +52,7 @@ export interface BaseEditor {
   getDirtyPaths: (operation: Operation) => Path[]
   getFragment: () => Descendant[]
   isElementReadOnly: (element: Element) => boolean
+  isIsolated: (element: Element) => boolean
   isSelectable: (element: Element) => boolean
   markableVoid: (element: Element) => boolean
   normalizeNode: (
@@ -488,6 +489,8 @@ export interface EditorInterface {
    */
   isElementReadOnly: (editor: Editor, element: Element) => boolean
 
+  isIsolated: (editor: Editor, element: Element) => boolean
+
   /**
    * Check if an element is empty, accounting for void nodes.
    */
@@ -840,6 +843,10 @@ export const Editor: EditorInterface = {
 
   isElementReadOnly(editor, element) {
     return editor.isElementReadOnly(element)
+  },
+
+  isIsolated(editor, element) {
+    return editor.isIsolated(element)
   },
 
   isEmpty(editor, element) {

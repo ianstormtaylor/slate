@@ -32,6 +32,8 @@ export const splitNodes: NodeTransforms['splitNodes'] = (
 
     if (!at) return
 
+    const isDefaultMatch = match == null && !Location.isPath(at)
+
     if (match == null) {
       match = n => Node.isElement(n) && Editor.isBlock(editor, n)
     }
@@ -105,7 +107,10 @@ export const splitNodes: NodeTransforms['splitNodes'] = (
         if (
           path.length < highestPath.length ||
           path.length === 0 ||
-          (!voids && Node.isElement(node) && Editor.isVoid(editor, node))
+          (!voids && Node.isElement(node) && Editor.isVoid(editor, node)) ||
+          (Node.isElement(node) &&
+            Editor.isIsolated(editor, node) &&
+            (isDefaultMatch || !Path.equals(path, highestPath)))
         ) {
           break
         }
