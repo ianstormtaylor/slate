@@ -176,6 +176,7 @@ export interface BaseEditor {
   string: OmitFirstArg<typeof Editor.string>
   unhangRange: OmitFirstArg<typeof Editor.unhangRange>
   void: OmitFirstArg<typeof Editor.void>
+  word: OmitFirstArg<typeof Editor.word>
   shouldMergeNodesRemovePrevNode: OmitFirstArg<
     typeof Editor.shouldMergeNodesRemovePrevNode
   >
@@ -307,6 +308,11 @@ export interface EditorRangeRefOptions {
 
 export interface EditorStringOptions {
   voids?: boolean
+}
+
+export interface EditorWordOptions {
+  at?: Point | Range
+  isWordCharacter?: (character: string) => boolean
 }
 
 export interface EditorUnhangRangeOptions {
@@ -724,6 +730,8 @@ export interface EditorInterface {
     options?: EditorVoidOptions
   ) => NodeEntry<Element> | undefined
 
+  word: (editor: Editor, options?: EditorWordOptions) => Range | undefined
+
   /**
    * Call a function, deferring normalization until after it completes.
    */
@@ -982,6 +990,10 @@ export const Editor: EditorInterface = {
 
   void(editor, options) {
     return editor.void(options)
+  },
+
+  word(editor, options) {
+    return editor.word(options)
   },
 
   withoutNormalizing(editor, fn: () => void) {
