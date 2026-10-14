@@ -190,7 +190,7 @@ Options:
 - `unit?: 'offset' | 'character' | 'word' | 'line' | 'block' = 'offset'`:
   - `offset`: Moves to the next offset `Point`. It will include the `Point` at the end of a `Text` object and then move onto the first `Point` (at the 0th offset) of the next `Text` object. This may be counter-intuitive because the end of a `Text` and the beginning of the next `Text` might be thought of as the same position.
   - `character`: Moves to the next `character` but is not always the next `index` in the string. This is because Unicode encodings may require multiple bytes to create one character. Unlike `offset`, `character` will not count the end of a `Text` and the beginning of the next `Text` as separate positions to return. Warning: The character offsets for Unicode characters does not appear to be reliable in some cases like a Smiley Emoji will be identified as 2 characters.
-  - `word`: Moves to the position immediately after the next `word`. In `reverse` mode, moves to the position immediately before the previous `word`.
+  - `word`: Moves to the position immediately after the next `word`. In `reverse` mode, moves to the position immediately before the previous `word`. Whitespace and punctuation end a word, and apostrophes inside a word don't. Where `Intl.Segmenter` is available, a run of word characters is split further at its word boundaries, so Chinese, Japanese and Thai text without spaces moves and deletes one word at a time.
   - `line` | `block`: Starts at the beginning position and then the position at the end of the block. Then starts at the beginning of the next block and then the end of the next block.
 - `reverse?: boolean = false`: When `true` returns the positions in reverse order. In the case of the `unit` being `word`, the actual returned positions are different (i.e. we will get the start of a word in reverse instead of the end).
 - `voids?: boolean = false`: When `true` include void Nodes.
@@ -229,7 +229,7 @@ Options: `{at?: Location, mode?: 'highest' | 'lowest', voids?: boolean}`
 
 Get the range of the word around a point, within its block. Defaults to the selection's focus. Returns `undefined` when the point isn't touching a word, is inside a void, or there is no selection.
 
-The word can span text nodes with different marks and inline elements such as links, but stops at inline voids. By default, words come from the platform's `Intl.Segmenter`, which also splits Chinese, Japanese and Thai text that has no spaces between words. Where `Intl.Segmenter` is unavailable, the same rules as the `'word'` unit in `Editor.before` and `Editor.after` apply: whitespace and punctuation end a word, and apostrophes inside a word don't. Pass `isWordCharacter` to define your own, for example to treat `foo-bar.baz` or `@name` as one word:
+The word can span text nodes with different marks and inline elements such as links, but stops at inline voids. By default it finds the same words as the `'word'` unit that word deletion and `Editor.before`/`Editor.after` use. Whitespace and punctuation end a word, and apostrophes inside a word don't. Where `Intl.Segmenter` is available, Chinese, Japanese and Thai text without spaces is split into its words. Pass `isWordCharacter` to define your own, for example to treat `foo-bar.baz` or `@name` as one word:
 
 ```javascript
 const range = Editor.word(editor, {

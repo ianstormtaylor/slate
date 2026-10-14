@@ -111,15 +111,31 @@ describe('Editor.word', () => {
     )
   })
 
-  it('keeps emoji out of the neighbouring word', () => {
+  it('treats emoji as word characters like the word unit does', () => {
     const editor = setup([paragraph('go 👍🏽ok now')])
     assert.strictEqual(
-      textOf(editor, Editor.word(editor, { at: { path: [0, 0], offset: 7 } })),
+      textOf(editor, Editor.word(editor, { at: { path: [0, 0], offset: 9 } })),
       'ok'
     )
     assert.strictEqual(
-      Editor.word(editor, { at: { path: [0, 0], offset: 5 } }),
-      undefined
+      textOf(editor, Editor.word(editor, { at: { path: [0, 0], offset: 5 } })),
+      '👍🏽ok'
+    )
+  })
+
+  it('deletes and moves one word at a time in scripts written without spaces', () => {
+    const editor = setup([paragraph('今日は良い天気です')])
+    editor.selection = {
+      anchor: { path: [0, 0], offset: 9 },
+      focus: { path: [0, 0], offset: 9 },
+    }
+    editor.deleteBackward('word')
+    assert.strictEqual(Editor.string(editor, [0]), '今日は良い天気')
+    editor.deleteBackward('word')
+    assert.strictEqual(Editor.string(editor, [0]), '今日は良い')
+    assert.deepStrictEqual(
+      Editor.after(editor, { path: [0, 0], offset: 0 }, { unit: 'word' }),
+      { path: [0, 0], offset: 2 }
     )
   })
 
