@@ -99,7 +99,9 @@ export interface BaseEditor {
   removeNodes: OmitFirstArg<typeof Transforms.removeNodes>
   select: OmitFirstArg<typeof Transforms.select>
   setNodes: <T extends Node>(
-    props: Partial<NullableProps<T>>,
+    props:
+      | Partial<NullableProps<T>>
+      | ((node: T, path: Path) => Partial<NullableProps<T>>),
     options?: {
       at?: Location
       match?: NodeMatch<T>
@@ -109,6 +111,7 @@ export interface BaseEditor {
       voids?: boolean
       compare?: PropsCompare
       merge?: PropsMerge
+      replace?: boolean
     }
   ) => void
   setNormalizing: OmitFirstArg<typeof Editor.setNormalizing>

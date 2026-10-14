@@ -86,7 +86,9 @@ export interface NodeTransforms {
    */
   setNodes: <T extends Node>(
     editor: Editor,
-    props: Partial<NullableProps<T>>,
+    props:
+      | Partial<NullableProps<T>>
+      | ((node: T, path: Path) => Partial<NullableProps<T>>),
     options?: {
       at?: Location
       match?: NodeMatch<T>
