@@ -1,5 +1,13 @@
 # slate
 
+## 0.135.0
+
+### Minor Changes
+
+- [#6269](https://github.com/ianstormtaylor/slate/pull/6269) [`c526ecd`](https://github.com/ianstormtaylor/slate/commit/c526ecd457b85d68692cbc876c91404aa7c2db55) Thanks [@dylans](https://github.com/dylans)! - Add `editor.isIsolated(element)` for elements such as table cells whose content must not flow across their edges. Backspace, Delete and range deletion don't merge across an isolated element's edge, and `insertBreak` doesn't split one.
+
+- [#6267](https://github.com/ianstormtaylor/slate/pull/6267) [`193cd35`](https://github.com/ianstormtaylor/slate/commit/193cd359e76bdc505a5934d2aedd68557c9b8ecc) Thanks [@dylans](https://github.com/dylans)! - Add a `replace` option to `Transforms.setNodes` that removes every property not in `props`, in the same operation, so changing a node's type doesn't carry over properties from the old type. Undo restores them.
+
 ## 0.134.1
 
 ### Patch Changes
