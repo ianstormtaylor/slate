@@ -272,6 +272,8 @@ Options: `{unit?: 'character' | 'word' | 'line' | 'block'}`
 
 Delete the content in the current selection.
 
+A hanging selection from the start of a block to the start of a following sibling removes the fully selected blocks, preserving the following block. Inside an element identified by `editor.isIsolated`, deletion continues to unhang the selection and retain the block structure. Custom `deleteFragment` overrides still control deletion.
+
 #### `Editor.insertBreak(editor: Editor) => void`
 
 Insert a block break at the current selection.

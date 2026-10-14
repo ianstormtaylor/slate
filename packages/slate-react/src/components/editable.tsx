@@ -1390,7 +1390,15 @@ export const Editable = forwardRef(
                         return
                       }
 
-                      if (event.detail === TRIPLE_CLICK && path.length >= 1) {
+                      if (
+                        event.detail === TRIPLE_CLICK &&
+                        path.length >= 1 &&
+                        Editor.above(editor, {
+                          at: Editor.start(editor, path),
+                          match: n =>
+                            Node.isElement(n) && !!editor.isIsolated?.(n),
+                        })
+                      ) {
                         let blockPath = path
                         if (
                           !(
