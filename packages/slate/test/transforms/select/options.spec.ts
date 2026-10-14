@@ -113,3 +113,36 @@ it('liftNodes selects the lifted result at an explicit location', () => {
   assert.deepStrictEqual(editor.selection, { anchor: point, focus: point })
   assert.strictEqual(editor.pathRefs().size, 0)
 })
+
+describe('insertText selection when apply changes the inserted text', () => {
+  const trimming = () => {
+    const editor = create()
+    const { apply } = editor
+    editor.apply = operation => {
+      if (operation.type === 'insert_text') {
+        apply({ ...operation, text: operation.text.slice(0, 1) })
+      } else {
+        apply(operation)
+      }
+    }
+    return editor
+  }
+
+  it('keeps the caret inside the text by default', () => {
+    const editor = trimming()
+    Transforms.insertText(editor, 'XYZ')
+    const point = { path: [0, 0], offset: 2 }
+    assert.deepStrictEqual(editor.selection, { anchor: point, focus: point })
+  })
+
+  it('selects the end of the applied text with select true', () => {
+    const editor = trimming()
+    Transforms.insertText(editor, 'XYZ', {
+      at: { path: [1, 0], offset: 1 },
+      select: true,
+    })
+    const point = { path: [1, 0], offset: 2 }
+    assert.deepStrictEqual(editor.selection, { anchor: point, focus: point })
+    assert.strictEqual(editor.pointRefs().size, 0)
+  })
+})
