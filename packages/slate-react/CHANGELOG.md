@@ -1,5 +1,15 @@
 # slate-react
 
+## 0.138.0
+
+### Patch Changes
+
+- [#6280](https://github.com/ianstormtaylor/slate/pull/6280) [`b397417`](https://github.com/ianstormtaylor/slate/commit/b397417b17051b2d4459fa4128c3286b948eedfe) Thanks [@dylans](https://github.com/dylans)! - Call `scrollSelectionIntoView` when keyboard navigation moves a selection already synchronized with the DOM, including native movement between text lines. Custom callbacks can keep the caret clear of sticky headers. Renders and edits without user input remain excluded from this additional scrolling path.
+
+- [#6282](https://github.com/ianstormtaylor/slate/pull/6282) [`f64a47f`](https://github.com/ianstormtaylor/slate/commit/f64a47f90911284b6f5f405344c0cdd135bb92b9) Thanks [@dylans](https://github.com/dylans)! - Keep the browser's native triple-click selection outside `editor.isIsolated` elements, so Backspace and cut after a triple-click in Chrome and Safari remove the whole block as in a plain contenteditable. Inside isolated elements, triple-click still selects only the current block's contents. Firefox keeps its native non-hanging selection.
+
+- [#6279](https://github.com/ianstormtaylor/slate/pull/6279) [`dabbab7`](https://github.com/ianstormtaylor/slate/commit/dabbab7710cf1bcb13f80c72dc79c2867ab5e0ab) Thanks [@dylans](https://github.com/dylans)! - Use native selection word boundaries for word-navigation shortcuts so Option/Ctrl+Arrow respects native punctuation and language boundaries while synchronizing Slate's selection in the same key event. Fall back to Slate's word transform when native selection movement is unavailable.
+
 ## 0.136.0
 
 ### Minor Changes
