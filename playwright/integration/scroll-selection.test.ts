@@ -128,3 +128,47 @@ for (const { container, direction, layout } of [
     await editor.dispose()
   })
 }
+
+test('native line movement calls custom scrolling below a sticky header', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, 'Desktop keyboard navigation')
+  await page.setViewportSize({ width: 800, height: 600 })
+  await page.goto('/playwright/scroll-selection')
+  const textbox = page.getByRole('textbox')
+  await textbox.click()
+  const editor = await getEditorHandle(textbox)
+  const text = await textbox.innerText()
+  const offset = text.indexOf('Line 20:')
+  await editor.evaluate(
+    (editor, offset) => editor.select({ path: [0, 0], offset }),
+    offset
+  )
+  await expect
+    .poll(() => textbox.evaluate(() => window.getSelection()?.focusOffset))
+    .toBe(offset)
+  await page.evaluate(() =>
+    window.scrollBy(
+      0,
+      window.getSelection()!.getRangeAt(0).getBoundingClientRect().top - 105
+    )
+  )
+  const counter = page.getByTestId('scroll-calls')
+  let before = Number(await counter.getAttribute('data-count'))
+  for (let i = 0; i < 6; i++) {
+    await page.keyboard.press('ArrowUp')
+    await expect
+      .poll(async () => Number(await counter.getAttribute('data-count')))
+      .toBeGreaterThan(before)
+    before = Number(await counter.getAttribute('data-count'))
+  }
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () => window.getSelection()!.getRangeAt(0).getBoundingClientRect().top
+      )
+    )
+    .toBeGreaterThanOrEqual(79)
+  await editor.dispose()
+})
