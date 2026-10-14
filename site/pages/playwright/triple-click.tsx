@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { createEditor } from 'slate'
+import { createEditor, Descendant } from 'slate'
 import { Editable, Slate, withReact } from 'slate-react'
 
 const values = ['alpha', 'beta', 'gamma']
@@ -13,7 +13,9 @@ const EditorFixture = ({ isolated }: { isolated: boolean }) => {
   return (
     <Slate
       editor={editor}
-      initialValue={values.map(text => ({ children: [{ text }] }))}
+      initialValue={values.map(
+        (text): Descendant => ({ type: 'paragraph', children: [{ text }] })
+      )}
     >
       <Editable aria-label={isolated ? 'Isolated' : 'Slate'} />
     </Slate>
