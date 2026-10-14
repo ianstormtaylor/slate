@@ -1,5 +1,19 @@
 # slate
 
+## 0.138.0
+
+### Minor Changes
+
+- [#6278](https://github.com/ianstormtaylor/slate/pull/6278) [`1b70b23`](https://github.com/ianstormtaylor/slate/commit/1b70b231f41395f239b89c2a9ded1dd659be7d7b) Thanks [@dylans](https://github.com/dylans)! - Add `isWordCharacter` to `Editor.before`, `Editor.after` and `Editor.positions` options for custom boundaries with `unit: 'word'`, matching the callback supported by `Editor.word`.
+
+- [#6282](https://github.com/ianstormtaylor/slate/pull/6282) [`f64a47f`](https://github.com/ianstormtaylor/slate/commit/f64a47f90911284b6f5f405344c0cdd135bb92b9) Thanks [@dylans](https://github.com/dylans)! - `Editor.deleteFragment` removes wholly selected sibling blocks when the selection starts at the start of a block and ends at the start of a later sibling, instead of emptying them. Ranges inside `editor.isIsolated` elements keep the previous behavior.
+
+- [#6281](https://github.com/ianstormtaylor/slate/pull/6281) [`261fa43`](https://github.com/ianstormtaylor/slate/commit/261fa43f013a6b4072655e04628839b2fad78f3a) Thanks [@dylans](https://github.com/dylans)! - Support `select` on `insertText`, `insertFragment`, `splitNodes`, `moveNodes` and `liftNodes`, complementing `insertNodes`. An explicit `select: true` moves the caret to the result even with an explicit `at`. Insertion and splitting select by default when `at` is omitted; moving retains its existing selection-following behavior by default. `select: false` prevents explicit reselection while operations still transform the existing selection.
+
+  `insertText` preserves a null selection by default; use `select: true` to create a caret after inserting into an unfocused document.
+
+- [#6277](https://github.com/ianstormtaylor/slate/pull/6277) [`3d13180`](https://github.com/ianstormtaylor/slate/commit/3d13180115347d7b5173d4d685b527fd5a961424) Thanks [@dylans](https://github.com/dylans)! - Add `ignore` to `Text.equals` options to exclude selected top-level properties from comparison, independently of the existing `loose` option.
+
 ## 0.137.0
 
 ### Minor Changes
