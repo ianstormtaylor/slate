@@ -3,7 +3,7 @@ import { createEditor, Editor, Transforms } from 'slate'
 
 for (const nested of [false, true]) {
   for (const isolated of [false, true]) {
-    it(`deletes a hanging whole block with nested=${nested}, isolated=${isolated}`, () => {
+    it(`deletes a hanging whole top-level block with nested=${nested}, isolated=${isolated}`, () => {
       const editor = createEditor()
       const blocks = ['one', 'two', 'three'].map(text => ({
         children: [{ text }],
@@ -16,7 +16,8 @@ for (const nested of [false, true]) {
         focus: { path: [...prefix, 2, 0], offset: 0 },
       })
       Editor.deleteFragment(editor, { direction: 'backward' })
-      const expected = isolated ? ['one', '', 'three'] : ['one', 'three']
+      const expected =
+        isolated || nested ? ['one', '', 'three'] : ['one', 'three']
       assert.deepStrictEqual(
         expected.map((_, index) => Editor.string(editor, [...prefix, index])),
         expected

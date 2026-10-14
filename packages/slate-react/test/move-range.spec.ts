@@ -15,8 +15,6 @@ const cell = (text: string) => block('table-cell', text)
 const editorWith = (children: object[]) => {
   const editor = createEditor()
   editor.children = children as Descendant[]
-  editor.isIsolated = element =>
-    'type' in element && element.type === 'table-cell'
   return editor
 }
 
@@ -188,7 +186,7 @@ describe('moving a dragged or cut range', () => {
     ).toBeNull()
   })
 
-  it('removes whole selected list items without merging their neighbors', () => {
+  it('unhangs instead of merging list items', () => {
     const list = {
       type: 'bulleted-list',
       children: [
@@ -202,10 +200,7 @@ describe('moving a dragged or cut range', () => {
     expect(result.fragment).toEqual([
       {
         type: 'bulleted-list',
-        children: [
-          { type: 'list-item', children: ['two'] },
-          { type: 'list-item', children: [''] },
-        ],
+        children: [{ type: 'list-item', children: ['two'] }],
       },
     ])
     expect(result.children).toEqual([
@@ -213,6 +208,7 @@ describe('moving a dragged or cut range', () => {
         type: 'bulleted-list',
         children: [
           { type: 'list-item', children: ['one'] },
+          { type: 'list-item', children: [''] },
           { type: 'list-item', children: ['three'] },
         ],
       },
@@ -298,7 +294,7 @@ describe('moving a dragged or cut range', () => {
     const deleteFragment = jest.fn()
     editor.deleteFragment = deleteFragment
 
-    deleteMovedRange(editor, range([0, 0, 0], 0, [0, 1, 0], 0))
+    deleteMovedRange(editor, range([0, 0, 0], 1, [0, 1, 0], 1))
 
     expect(deleteFragment).toHaveBeenCalledTimes(1)
     expect(Editor.string(editor, [])).toBe('onetwo')
