@@ -1951,30 +1951,41 @@ export const Editable = forwardRef(
                         return
                       }
 
-                      if (Hotkeys.isMoveWordBackward(nativeEvent)) {
+                      const wordBackward =
+                        Hotkeys.isMoveWordBackward(nativeEvent)
+                      if (
+                        wordBackward ||
+                        Hotkeys.isMoveWordForward(nativeEvent)
+                      ) {
                         event.preventDefault()
-
+                        const root =
+                          ReactEditor.findDocumentOrShadowRoot(editor)
+                        const domSelection = getSelection(root)
+                        if (domSelection?.modify) {
+                          domSelection.modify(
+                            'move',
+                            wordBackward ? 'left' : 'right',
+                            'word'
+                          )
+                          const range = ReactEditor.toSlateRange(
+                            editor,
+                            domSelection,
+                            {
+                              exactMatch: false,
+                              suppressThrow: true,
+                            }
+                          )
+                          if (range) {
+                            Transforms.select(editor, range)
+                            return
+                          }
+                        }
                         if (selection && Range.isExpanded(selection)) {
                           Transforms.collapse(editor, { edge: 'focus' })
                         }
-
                         Transforms.move(editor, {
                           unit: 'word',
-                          reverse: !isRTL,
-                        })
-                        return
-                      }
-
-                      if (Hotkeys.isMoveWordForward(nativeEvent)) {
-                        event.preventDefault()
-
-                        if (selection && Range.isExpanded(selection)) {
-                          Transforms.collapse(editor, { edge: 'focus' })
-                        }
-
-                        Transforms.move(editor, {
-                          unit: 'word',
-                          reverse: isRTL,
+                          reverse: wordBackward ? !isRTL : isRTL,
                         })
                         return
                       }
