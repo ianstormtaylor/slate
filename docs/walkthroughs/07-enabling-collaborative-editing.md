@@ -1,9 +1,11 @@
 # Enabling Collaborative Editing
 
+For a runnable example without a server, see [Collaboration with Yjs](10-collaboration-with-yjs.md).
+
 A common use case for text editors is collaborative editing, and the Slate editor was designed with this in
 mind. You can enable multiplayer editing with [Yjs](https://github.com/yjs/yjs), a network-agnostic CRDT implementation
 that allows you to share data among connected users. Because Yjs is network-agnostic, each project requires
-a [communication provider](https://github.com/yjs/yjs#providers) set up on the back end to link users together.
+a [communication provider](https://github.com/yjs/yjs#providers) to link users together; the transport can run in the browser or use a back end.
 
 In this guide, we'll show you how to set up a collaborative Slate editor using a Yjs provider. We'll also be
 adding [slate-yjs](https://github.com/BitPhinix/slate-yjs) which allows you to add multiplayer features to Slate, such
