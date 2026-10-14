@@ -4,12 +4,15 @@ import { matchPath } from '../utils/match-path'
 import { Range } from '../interfaces/range'
 import { Transforms } from '../interfaces/transforms'
 import { Node } from '../interfaces/node'
+import { Path } from '../interfaces/path'
 import { Location } from '../interfaces'
 import { NON_SETTABLE_NODE_PROPERTIES } from '../interfaces/transforms/general'
 
+type GetProps = (node: Node, path: Path) => Partial<NullableProps<Node>>
+
 export const setNodes: NodeTransforms['setNodes'] = (
   editor,
-  props: Partial<NullableProps<Node>>,
+  props,
   options = {}
 ) => {
   Editor.withoutNormalizing(editor, () => {
@@ -90,8 +93,10 @@ export const setNodes: NodeTransforms['setNodes'] = (
       }
 
       let hasChanges = false
+      const nodeProps: Partial<NullableProps<Node>> =
+        typeof props === 'function' ? (props as GetProps)(node, path) : props
 
-      for (const k in props) {
+      for (const k in nodeProps) {
         if (NON_SETTABLE_NODE_PROPERTIES.includes(k)) {
           continue
         }
@@ -100,7 +105,7 @@ export const setNodes: NodeTransforms['setNodes'] = (
           ? node[<keyof Node>k]
           : undefined
 
-        const newValue: unknown = props[<keyof Node>k]
+        const newValue: unknown = nodeProps[<keyof Node>k]
 
         if (compare(newValue, value)) {
           hasChanges = true
@@ -119,7 +124,7 @@ export const setNodes: NodeTransforms['setNodes'] = (
         for (const k in node) {
           if (
             Object.hasOwn(node, k) &&
-            !Object.hasOwn(props, k) &&
+            !Object.hasOwn(nodeProps, k) &&
             !NON_SETTABLE_NODE_PROPERTIES.includes(k)
           ) {
             hasChanges = true

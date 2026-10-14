@@ -91,11 +91,19 @@ Unwrap nodes at the specified location. If necessary, the parent node is split. 
 
 Options supported: `NodeOptions & {hanging?: boolean, split?: boolean}`. For `options.mode`, `'all'` is also supported.
 
-#### `Transforms.setNodes(editor: Editor, props: Partial<NullableProps<Node>>, options?)`
+#### `Transforms.setNodes(editor: Editor, props: Partial<NullableProps<Node>> | ((node: Node, path: Path) => Partial<NullableProps<Node>>), options?)`
 
 Set properties of nodes at the specified location. If no location is specified, use the selection. Optional node properties can be set to `null` to unset them.
 
 If `props` contains `undefined` values, the node's corresponding property will also be set to `undefined` as opposed to ignored.
+
+`props` can also be a function that receives each matched node and its path and returns the properties for that node, so new values can depend on old ones. Each node still gets one `set_node` operation, so undo works per node:
+
+```javascript
+Transforms.setNodes(editor, node => ({ indent: (node.indent ?? 0) + 1 }), {
+  match: n => Element.isElement(n) && n.type === 'paragraph',
+})
+```
 
 `children` and `text` in `props` are ignored, since they hold a node's content rather than its properties. To change content, use `insertNodes`, `removeNodes` or the text transforms.
 
