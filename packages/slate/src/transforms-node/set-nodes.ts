@@ -17,6 +17,7 @@ export const setNodes: NodeTransforms['setNodes'] = (
     const {
       hanging = false,
       mode = 'lowest',
+      replace = false,
       split = false,
       voids = false,
     } = options
@@ -110,6 +111,19 @@ export const setNodes: NodeTransforms['setNodes'] = (
             if (newValue != null) newProperties[k] = merge(value, newValue)
           } else {
             if (newValue != null) newProperties[k] = newValue
+          }
+        }
+      }
+
+      if (replace) {
+        for (const k in node) {
+          if (
+            Object.hasOwn(node, k) &&
+            !Object.hasOwn(props, k) &&
+            !NON_SETTABLE_NODE_PROPERTIES.includes(k)
+          ) {
+            hasChanges = true
+            properties[k] = node[<keyof Node>k]
           }
         }
       }

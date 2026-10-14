@@ -99,7 +99,9 @@ If `props` contains `undefined` values, the node's corresponding property will a
 
 `children` and `text` in `props` are ignored, since they hold a node's content rather than its properties. To change content, use `insertNodes`, `removeNodes` or the text transforms.
 
-Options supported: `NodeOptions & {hanging?: boolean, split?: boolean}`. For `options.mode`, `'all'` is also supported.
+With `replace: true`, every other property of each matched node is removed in the same operation, so the node ends up with exactly `props` (plus its `children` or `text`). Use it to change a node into a different type without carrying over properties that only made sense for the old type, such as turning `{ type: 'callout', color: 'blue' }` into `{ type: 'paragraph' }`. Undo restores the removed properties.
+
+Options supported: `NodeOptions & {hanging?: boolean, split?: boolean, replace?: boolean}`. For `options.mode`, `'all'` is also supported.
 
 #### `Transforms.unsetNodes(editor: Editor, props: string | string[], options?)`
 
