@@ -250,6 +250,7 @@ export const Editable = forwardRef(
     const state = useMemo(
       () => ({
         isDraggingInternally: false,
+        isTabbing: false,
         pendingSelection: null as {
           range: Range
           basedOn: Range | null
@@ -1076,6 +1077,16 @@ export const Editable = forwardRef(
       // (2019/11/04) https://github.com/facebook/react/issues/5785
       window.document.addEventListener('selectionchange', onSelectionChange)
 
+      const onKeyDown = (event: KeyboardEvent) => {
+        state.isTabbing = event.key === 'Tab'
+      }
+      const clearTabbing = () => {
+        state.isTabbing = false
+      }
+      window.document.addEventListener('keydown', onKeyDown, true)
+      window.document.addEventListener('keyup', clearTabbing, true)
+      window.document.addEventListener('pointerdown', clearTabbing, true)
+
       // Listen for dragend and drop globally. In Firefox, if a drop handler
       // initiates an operation that causes the originally dragged element to
       // unmount, that element will not emit a dragend event. (2024/06/21)
@@ -1090,6 +1101,9 @@ export const Editable = forwardRef(
           'selectionchange',
           onSelectionChange
         )
+        window.document.removeEventListener('keydown', onKeyDown, true)
+        window.document.removeEventListener('keyup', clearTabbing, true)
+        window.document.removeEventListener('pointerdown', clearTabbing, true)
         window.document.removeEventListener('dragend', stoppedDragging)
         window.document.removeEventListener('drop', stoppedDragging)
       }
@@ -1795,6 +1809,15 @@ export const Editable = forwardRef(
                       }
 
                       IS_FOCUSED.set(editor, true)
+
+                      if (state.isTabbing && event.target === el) {
+                        const domSelection = getSelection(root)
+                        if (domSelection && editor.selection) {
+                          state.pendingSelection = null
+                          restoreDomSelection(editor, domSelection, state)
+                        }
+                        state.isTabbing = false
+                      }
                     }
                   },
                   [readOnly, state, editor, attributes.onFocus]
@@ -2277,12 +2300,13 @@ const restoreDomSelection = (
   }
 
   const domRange = ReactEditor.toDOMRange(editor, editor.selection)
+  const backward = Range.isBackward(editor.selection)
   state.isUpdatingSelection = true
   domSelection.setBaseAndExtent(
-    domRange.startContainer,
-    domRange.startOffset,
-    domRange.endContainer,
-    domRange.endOffset
+    backward ? domRange.endContainer : domRange.startContainer,
+    backward ? domRange.endOffset : domRange.startOffset,
+    backward ? domRange.startContainer : domRange.endContainer,
+    backward ? domRange.startOffset : domRange.endOffset
   )
   setTimeout(() => {
     state.isUpdatingSelection = false
