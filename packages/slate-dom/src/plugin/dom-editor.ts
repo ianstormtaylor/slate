@@ -610,7 +610,7 @@ export const DOMEditor: DOMEditorInterface = {
 
   getWord: (editor, options = {}) => {
     if (typeof Editor.word !== 'function') {
-      throw new Error('DOMEditor.getWord needs slate 0.135.0 or later')
+      throw new Error('DOMEditor.getWord needs slate 0.136.0 or later')
     }
 
     const composing = DOMEditor.isComposing(editor)
