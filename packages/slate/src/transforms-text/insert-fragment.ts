@@ -3,6 +3,7 @@ import { Editor } from '../interfaces/editor'
 import { Range } from '../interfaces/range'
 import { Path } from '../interfaces/path'
 import { Point } from '../interfaces/point'
+import { Text } from '../interfaces/text'
 import { Element } from '../interfaces/element'
 import { Descendant, Node, NodeEntry } from '../interfaces/node'
 import { TextTransforms } from '../interfaces/transforms/text'
@@ -72,12 +73,26 @@ export const insertFragment: TextTransforms['insertFragment'] = (
     if (inlineElementMatch) {
       const [, inlinePath] = inlineElementMatch
 
+      const parent = Node.parent(editor, inlinePath)
+      const index = inlinePath[inlinePath.length - 1]
+
       if (Editor.isEnd(editor, at, inlinePath)) {
-        const after = Editor.after(editor, inlinePath)!
-        at = after
+        const afterPath = Path.next(inlinePath)
+        if (!Text.isText(parent.children[index + 1])) {
+          Transforms.insertNodes(editor, { text: '' }, { at: afterPath, voids })
+        }
+        at = Editor.start(editor, afterPath)
       } else if (Editor.isStart(editor, at, inlinePath)) {
-        const before = Editor.before(editor, inlinePath)!
-        at = before
+        if (Text.isText(parent.children[index - 1])) {
+          at = Editor.end(editor, Path.previous(inlinePath))
+        } else {
+          Transforms.insertNodes(
+            editor,
+            { text: '' },
+            { at: inlinePath, voids }
+          )
+          at = Editor.start(editor, inlinePath)
+        }
       }
     }
 
