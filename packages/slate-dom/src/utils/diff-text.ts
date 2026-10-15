@@ -1,13 +1,4 @@
-import {
-  Editor,
-  Node,
-  Operation,
-  Path,
-  Point,
-  PointTransformingOperation,
-  Range,
-  Text,
-} from 'slate'
+import { Editor, Node, Operation, Path, Point, Range, Text } from 'slate'
 import { EDITOR_TO_PENDING_DIFFS } from './weak-maps'
 
 export type StringDiff = {
@@ -183,8 +174,6 @@ export function normalizePoint(editor: Editor, point: Point): Point | null {
     return null
   }
 
-  if (offset <= leaf.text.length) return point
-
   while (offset > leaf.text.length) {
     const entry = Editor.next(editor, { at: path, match: Node.isText })
     if (!entry || !Path.isDescendant(entry[1], parentBlock[1])) {
@@ -209,7 +198,7 @@ export function normalizeRange(editor: Editor, range: Range): Range | null {
   }
 
   if (Range.isCollapsed(range)) {
-    return anchor === range.anchor ? range : { anchor, focus: anchor }
+    return { anchor, focus: anchor }
   }
 
   const focus = normalizePoint(editor, range.focus)
@@ -217,14 +206,13 @@ export function normalizeRange(editor: Editor, range: Range): Range | null {
     return null
   }
 
-  if (anchor === range.anchor && focus === range.focus) return range
   return { anchor, focus }
 }
 
 export function transformPendingPoint(
   editor: Editor,
   point: Point,
-  op: PointTransformingOperation
+  op: Operation
 ): Point | null {
   const pendingDiffs = EDITOR_TO_PENDING_DIFFS.get(editor)
   const textDiff = pendingDiffs?.find(({ path }) =>
@@ -297,7 +285,7 @@ export function transformPendingPoint(
 export function transformPendingRange(
   editor: Editor,
   range: Range,
-  op: PointTransformingOperation
+  op: Operation
 ): Range | null {
   const anchor = transformPendingPoint(editor, range.anchor, op)
   if (!anchor) {
@@ -318,79 +306,125 @@ export function transformPendingRange(
 
 export function transformTextDiff(
   textDiff: TextDiff,
-  op: PointTransformingOperation
+  op: Operation
 ): TextDiff | null {
   const { path, diff, id } = textDiff
-  const { start, end, text } = diff
 
-  if (Path.equals(op.path, path)) {
-    switch (op.type) {
-      case 'insert_text': {
-        const length = op.text.length
-        if (op.offset <= start) {
-          return {
-            diff: { start: start + length, end: end + length, text },
-            id,
-            path,
-          }
-        } else if (op.offset < end) {
-          return {
-            diff: { start, end: end + length, text },
-            id,
-            path,
-          }
-        } else {
-          return textDiff
-        }
+  switch (op.type) {
+    case 'insert_text': {
+      if (!Path.equals(op.path, path) || op.offset >= diff.end) {
+        return textDiff
       }
-      case 'remove_text': {
-        const length = op.text.length
-        if (op.offset + length <= start) {
-          return {
-            diff: { start: start - length, end: end - length, text },
-            id,
-            path,
-          }
-        } else if (op.offset < end) {
-          return { diff: { start, end: end - length, text }, id, path }
-        } else {
-          return textDiff
-        }
-      }
-      case 'split_node': {
-        if (op.position <= start) {
-          return {
-            diff: { start: start - op.position, end: end - op.position, text },
-            id,
-            path: Path.next(path),
-          }
-        } else if (op.position < end) {
-          // its possible for the diff to span across the split,
-          // in that case we clamp the diff to the end of the first node
-          // TODO: fix bug
-          // this could cause issues with the latter part not getting properly applied, but we currently don't have a way to handle this
-          return {
-            diff: { start, end: Math.min(op.position, end), text },
-            id,
-            path,
-          }
-        } else {
-          return textDiff
-        }
-      }
-      case 'merge_node': {
+
+      if (op.offset <= diff.start) {
         return {
-          diff: { start: start + op.position, end: end + op.position, text },
+          diff: {
+            start: op.text.length + diff.start,
+            end: op.text.length + diff.end,
+            text: diff.text,
+          },
           id,
-          path: Path.previous(path),
+          path,
         }
+      }
+
+      return {
+        diff: {
+          start: diff.start,
+          end: diff.end + op.text.length,
+          text: diff.text,
+        },
+        id,
+        path,
+      }
+    }
+    case 'remove_text': {
+      if (!Path.equals(op.path, path) || op.offset >= diff.end) {
+        return textDiff
+      }
+
+      if (op.offset + op.text.length <= diff.start) {
+        return {
+          diff: {
+            start: diff.start - op.text.length,
+            end: diff.end - op.text.length,
+            text: diff.text,
+          },
+          id,
+          path,
+        }
+      }
+
+      return {
+        diff: {
+          start: diff.start,
+          end: diff.end - op.text.length,
+          text: diff.text,
+        },
+        id,
+        path,
+      }
+    }
+    case 'split_node': {
+      if (!Path.equals(op.path, path) || op.position >= diff.end) {
+        return {
+          diff,
+          id,
+          path: Path.transform(path, op, { affinity: 'backward' })!,
+        }
+      }
+
+      if (op.position > diff.start) {
+        return {
+          diff: {
+            start: diff.start,
+            end: Math.min(op.position, diff.end),
+            text: diff.text,
+          },
+          id,
+          path,
+        }
+      }
+
+      return {
+        diff: {
+          start: diff.start - op.position,
+          end: diff.end - op.position,
+          text: diff.text,
+        },
+        id,
+        path: Path.transform(path, op, { affinity: 'forward' })!,
+      }
+    }
+    case 'merge_node': {
+      if (!Path.equals(op.path, path)) {
+        return {
+          diff,
+          id,
+          path: Path.transform(path, op)!,
+        }
+      }
+
+      return {
+        diff: {
+          start: diff.start + op.position,
+          end: diff.end + op.position,
+          text: diff.text,
+        },
+        id,
+        path: Path.transform(path, op)!,
       }
     }
   }
 
-  if (!Operation.transformsPaths(op)) return textDiff
-
   const newPath = Path.transform(path, op)
-  if (!newPath) return null
-  return newPath === path ? textDiff : { diff, path: newPath, id }
+  if (!newPath) {
+    return null
+  }
+
+  return {
+    diff,
+    path: newPath,
+    id,
+  }
 }

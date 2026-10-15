@@ -1,6 +1,5 @@
 ---
 'slate': minor
-'slate-dom': patch
 ---
 
 Optimized all location transform functions and added checks to avoid calling them if not necessary.
