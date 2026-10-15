@@ -647,6 +647,11 @@ export const Editable = forwardRef(
     // https://github.com/facebook/react/issues/11211
     const onDOMBeforeInput = useCallback(
       (event: InputEvent) => {
+        if (readOnly) {
+          isDOMEventHandled(event, propsOnDOMBeforeInput)
+          return
+        }
+
         if (!ReactEditor.hasEditableTarget(editor, event.target)) {
           return
         }
@@ -681,7 +686,7 @@ export const Editable = forwardRef(
         onUserInput()
         pendingInputScroll.current = true
 
-        if (!readOnly && !isDOMEventHandled(event, propsOnDOMBeforeInput)) {
+        if (!isDOMEventHandled(event, propsOnDOMBeforeInput)) {
           // COMPAT: BeforeInput events aren't cancelable on android, so we have to handle them differently using the android input manager.
           if (androidInputManagerRef.current) {
             return androidInputManagerRef.current.handleDOMBeforeInput(event)
@@ -1238,12 +1243,16 @@ export const Editable = forwardRef(
                 }}
                 onBeforeInput={useCallback(
                   (event: React.InputEvent<HTMLDivElement>) => {
+                    if (readOnly) {
+                      isEventHandled(event, attributes.onBeforeInput)
+                      return
+                    }
+
                     // COMPAT: Certain browsers don't support the `beforeinput` event, so we
                     // fall back to React's leaky polyfill instead just for it. It
                     // only works for the `insertText` input type.
                     if (
                       !HAS_BEFORE_INPUT_SUPPORT &&
-                      !readOnly &&
                       !isEventHandled(event, attributes.onBeforeInput) &&
                       ReactEditor.hasSelectableTarget(editor, event.target)
                     ) {
@@ -1258,6 +1267,11 @@ export const Editable = forwardRef(
                 )}
                 onInput={useCallback(
                   (event: React.InputEvent<HTMLDivElement>) => {
+                    if (readOnly) {
+                      isEventHandled(event, attributes.onInput)
+                      return
+                    }
+
                     if (!ReactEditor.hasEditableTarget(editor, event.target)) {
                       return
                     }
@@ -1292,12 +1306,16 @@ export const Editable = forwardRef(
                       )
                     }
                   },
-                  [attributes.onInput, editor, compositionDOM]
+                  [readOnly, attributes.onInput, editor, compositionDOM]
                 )}
                 onBlur={useCallback(
                   (event: React.FocusEvent<HTMLDivElement>) => {
+                    if (readOnly) {
+                      isEventHandled(event, attributes.onBlur)
+                      return
+                    }
+
                     if (
-                      readOnly ||
                       state.isUpdatingSelection ||
                       !ReactEditor.hasSelectableTarget(editor, event.target) ||
                       isEventHandled(event, attributes.onBlur)
@@ -1489,6 +1507,11 @@ export const Editable = forwardRef(
                 )}
                 onCompositionEnd={useCallback(
                   (event: React.CompositionEvent<HTMLDivElement>) => {
+                    if (readOnly) {
+                      isEventHandled(event, attributes.onCompositionEnd)
+                      return
+                    }
+
                     if (isDOMEventTargetInput(event)) {
                       return
                     }
@@ -1556,10 +1579,20 @@ export const Editable = forwardRef(
                       compositionDOM.clear()
                     }
                   },
-                  [attributes.onCompositionEnd, editor, compositionDOM]
+                  [
+                    readOnly,
+                    attributes.onCompositionEnd,
+                    editor,
+                    compositionDOM,
+                  ]
                 )}
                 onCompositionUpdate={useCallback(
                   (event: React.CompositionEvent<HTMLDivElement>) => {
+                    if (readOnly) {
+                      isEventHandled(event, attributes.onCompositionUpdate)
+                      return
+                    }
+
                     if (
                       ReactEditor.hasSelectableTarget(editor, event.target) &&
                       !isEventHandled(event, attributes.onCompositionUpdate) &&
@@ -1571,10 +1604,15 @@ export const Editable = forwardRef(
                       }
                     }
                   },
-                  [attributes.onCompositionUpdate, editor]
+                  [readOnly, attributes.onCompositionUpdate, editor]
                 )}
                 onCompositionStart={useCallback(
                   (event: React.CompositionEvent<HTMLDivElement>) => {
+                    if (readOnly) {
+                      isEventHandled(event, attributes.onCompositionStart)
+                      return
+                    }
+
                     if (isDOMEventTargetInput(event)) {
                       return
                     }
@@ -1609,6 +1647,7 @@ export const Editable = forwardRef(
                     }
                   },
                   [
+                    readOnly,
                     attributes.onCompositionStart,
                     editor,
                     compositionDOM,
@@ -1634,8 +1673,12 @@ export const Editable = forwardRef(
                 )}
                 onCut={useCallback(
                   (event: React.ClipboardEvent<HTMLDivElement>) => {
+                    if (readOnly) {
+                      isEventHandled(event, attributes.onCut)
+                      return
+                    }
+
                     if (
-                      !readOnly &&
                       ReactEditor.hasSelectableTarget(editor, event.target) &&
                       !isEventHandled(event, attributes.onCut) &&
                       !isDOMEventTargetInput(event)
@@ -1668,6 +1711,11 @@ export const Editable = forwardRef(
                 )}
                 onDragOver={useCallback(
                   (event: React.DragEvent<HTMLDivElement>) => {
+                    if (readOnly) {
+                      isEventHandled(event, attributes.onDragOver)
+                      return
+                    }
+
                     if (
                       ReactEditor.hasTarget(editor, event.target) &&
                       !isEventHandled(event, attributes.onDragOver)
@@ -1682,12 +1730,16 @@ export const Editable = forwardRef(
                       }
                     }
                   },
-                  [attributes.onDragOver, editor]
+                  [readOnly, attributes.onDragOver, editor]
                 )}
                 onDragStart={useCallback(
                   (event: React.DragEvent<HTMLDivElement>) => {
+                    if (readOnly) {
+                      isEventHandled(event, attributes.onDragStart)
+                      return
+                    }
+
                     if (
-                      !readOnly &&
                       ReactEditor.hasTarget(editor, event.target) &&
                       !isEventHandled(event, attributes.onDragStart)
                     ) {
@@ -1718,8 +1770,12 @@ export const Editable = forwardRef(
                 )}
                 onDrop={useCallback(
                   (event: React.DragEvent<HTMLDivElement>) => {
+                    if (readOnly) {
+                      isEventHandled(event, attributes.onDrop)
+                      return
+                    }
+
                     if (
-                      !readOnly &&
                       ReactEditor.hasTarget(editor, event.target) &&
                       !isEventHandled(event, attributes.onDrop)
                     ) {
@@ -1763,8 +1819,12 @@ export const Editable = forwardRef(
                 )}
                 onDragEnd={useCallback(
                   (event: React.DragEvent<HTMLDivElement>) => {
+                    if (readOnly) {
+                      isEventHandled(event, attributes.onDragEnd)
+                      return
+                    }
+
                     if (
-                      !readOnly &&
                       state.isDraggingInternally &&
                       attributes.onDragEnd &&
                       ReactEditor.hasTarget(editor, event.target)
@@ -1776,8 +1836,12 @@ export const Editable = forwardRef(
                 )}
                 onFocus={useCallback(
                   (event: React.FocusEvent<HTMLDivElement>) => {
+                    if (readOnly) {
+                      isEventHandled(event, attributes.onFocus)
+                      return
+                    }
+
                     if (
-                      !readOnly &&
                       !state.isUpdatingSelection &&
                       ReactEditor.hasEditableTarget(editor, event.target) &&
                       !isEventHandled(event, attributes.onFocus)
@@ -1801,10 +1865,12 @@ export const Editable = forwardRef(
                 )}
                 onKeyDown={useCallback(
                   (event: React.KeyboardEvent<HTMLDivElement>) => {
-                    if (
-                      !readOnly &&
-                      ReactEditor.hasEditableTarget(editor, event.target)
-                    ) {
+                    if (readOnly) {
+                      isEventHandled(event, attributes.onKeyDown)
+                      return
+                    }
+
+                    if (ReactEditor.hasEditableTarget(editor, event.target)) {
                       androidInputManagerRef.current?.handleKeyDown(event)
 
                       const { nativeEvent } = event
@@ -2190,8 +2256,12 @@ export const Editable = forwardRef(
                 )}
                 onPaste={useCallback(
                   (event: React.ClipboardEvent<HTMLDivElement>) => {
+                    if (readOnly) {
+                      isEventHandled(event, attributes.onPaste)
+                      return
+                    }
+
                     if (
-                      !readOnly &&
                       ReactEditor.hasEditableTarget(editor, event.target) &&
                       !isEventHandled(event, attributes.onPaste)
                     ) {

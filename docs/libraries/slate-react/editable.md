@@ -35,6 +35,8 @@ The text to display as a placeholder when the Editor is empty. A typical value f
 
 When set to true, renders the editor in a "read-only" state. In this state, user input and interactions will not modify the editor's content.
 
+Caller-provided event handlers still run in read-only mode; Slate skips its own editing behavior. Add `tabIndex={0}` to make a read-only editor keyboard-focusable. Read-only editors do not receive a tab index by default.
+
 If this prop is omitted or set to false, the editor remains in the default "editable" state, allowing users to interact with and modify the content.
 
 This prop is particularly useful when you want to display text or rich media content without allowing users to edit it, such as when displaying published content or a preview of the user's input.
