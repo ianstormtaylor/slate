@@ -1,5 +1,15 @@
 # slate-react
 
+## 0.138.3
+
+### Patch Changes
+
+- [#6295](https://github.com/ianstormtaylor/slate/pull/6295) [`2d2a520`](https://github.com/ianstormtaylor/slate/commit/2d2a520fbd61620966dd3064ee2a628a9600a740) Thanks [@dylans](https://github.com/dylans)! - Restore an existing editor selection when Tab or Shift+Tab focuses Editable. Keep the browser's initial placement when no selection exists, and preserve mouse-based caret placement.
+
+- [#6294](https://github.com/ianstormtaylor/slate/pull/6294) [`acca98f`](https://github.com/ianstormtaylor/slate/commit/acca98f79624bb831c91b8fae7855e25aa8e393f) Thanks [@dylans](https://github.com/dylans)! - Call caller-provided Editable event handlers in read-only mode while skipping Slate's editing behavior. Read-only editors remain outside the tab order unless a tabIndex is provided.
+
+- [#6290](https://github.com/ianstormtaylor/slate/pull/6290) [`ee31c77`](https://github.com/ianstormtaylor/slate/commit/ee31c77683d78ed65a1055099965d418c306d87b) Thanks [@dylans](https://github.com/dylans)! - Accept `undefined` explicitly in the optional `Editable`, `Slate`, `useSelected` and `createHyperscript` options, so their published types stay compatible with `exactOptionalPropertyTypes` after the TypeScript 6 upgrade.
+
 ## 0.138.1
 
 ### Patch Changes
