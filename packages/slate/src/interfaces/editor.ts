@@ -54,6 +54,11 @@ export interface BaseEditor {
   getFragment: () => Descendant[]
   isElementReadOnly: (element: Element) => boolean
   isIsolated: (element: Element) => boolean
+  inlineEdgeAffinity: (
+    element: Element,
+    edge: 'start' | 'end'
+  ) => 'inside' | 'outside' | null
+  leafEdgeAffinity: (before: Text, after: Text) => 'backward' | 'forward' | null
   isSelectable: (element: Element) => boolean
   markableVoid: (element: Element) => boolean
   normalizeNode: (
@@ -142,6 +147,7 @@ export interface BaseEditor {
   hasPath: OmitFirstArg<typeof Editor.hasPath>
   hasRange: OmitFirstArg<typeof Editor.hasRange>
   hasTexts: OmitFirstArg<typeof Editor.hasTexts>
+  insertionPoint: OmitFirstArg<typeof Editor.insertionPoint>
   isBlock: OmitFirstArg<typeof Editor.isBlock>
   isEdge: OmitFirstArg<typeof Editor.isEdge>
   isEmpty: OmitFirstArg<typeof Editor.isEmpty>
@@ -501,6 +507,8 @@ export interface EditorInterface {
    * Check if a value is a read-only `Element` object.
    */
   isElementReadOnly: (editor: Editor, element: Element) => boolean
+
+  insertionPoint: (editor: Editor, point: Point) => Point
 
   isIsolated: (editor: Editor, element: Element) => boolean
 
@@ -862,6 +870,10 @@ export const Editor: EditorInterface = {
 
   isElementReadOnly(editor, element) {
     return editor.isElementReadOnly(element)
+  },
+
+  insertionPoint(editor, point) {
+    return editor.insertionPoint(point)
   },
 
   isIsolated(editor, element) {

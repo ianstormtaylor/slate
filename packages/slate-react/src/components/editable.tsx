@@ -746,7 +746,14 @@ export const Editable = forwardRef(
 
             // Skip native if there are marks, as
             // `insertText` will insert a node, not just text.
-            if (editor.marks) {
+            if (
+              editor.marks ||
+              (typeof Editor.insertionPoint === 'function' &&
+                !Point.equals(
+                  Editor.insertionPoint(editor, selection.anchor),
+                  selection.anchor
+                ))
+            ) {
               native = false
             }
 

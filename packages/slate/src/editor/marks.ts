@@ -3,6 +3,7 @@ import { Node } from '../interfaces/node'
 import { Range } from '../interfaces/range'
 import { Path } from '../interfaces/path'
 import { Point } from '../interfaces'
+import { getInsertionPoint } from '../utils/get-insertion-point'
 
 export const marks: EditorInterface['marks'] = (editor, options = {}) => {
   const { marks, selection } = editor
@@ -48,6 +49,13 @@ export const marks: EditorInterface['marks'] = (editor, options = {}) => {
     } else {
       return {}
     }
+  }
+
+  const insertion = getInsertionPoint(editor, anchor)
+  if (insertion.affinity) {
+    const [node] = Editor.leaf(editor, insertion.point)
+    const { text, ...rest } = node
+    return rest
   }
 
   const { path } = anchor
