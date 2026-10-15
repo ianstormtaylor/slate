@@ -1,5 +1,21 @@
 # slate
 
+## 0.141.0
+
+### Minor Changes
+
+- [#6311](https://github.com/ianstormtaylor/slate/pull/6311) [`a1852f8`](https://github.com/ianstormtaylor/slate/commit/a1852f8a635457dc8db06cb2a4ec277a4b7a0366) Thanks [@dylans](https://github.com/dylans)! - Add opt-in `inlineEdgeAffinity` and `leafEdgeAffinity` editor hooks and `Editor.insertionPoint` for consistent insertion at inline and mark boundaries. Implicit text, fragment and inline-node insertion at collapsed carets follows the configured rules, and `Editor.marks` reports the receiving leaf’s marks. Both hooks default to `null`, preserving existing behavior.
+
+  `BaseEditor` now requires the two affinity hooks and the `insertionPoint` query. Editors created through `createEditor` receive them automatically; structurally constructed editors and editor mocks must supply them. Slate React disables native insertion when affinity changes the receiving point, while retaining compatibility with older supported Slate peers that lack the helper.
+
+  Committed Android typing that changes receiving leaves uses the existing action reconciliation path, so a native mutation does not remain rendered in the old leaf. Active composition retains its existing diff path.
+
+- [#6310](https://github.com/ianstormtaylor/slate/pull/6310) [`407a066`](https://github.com/ianstormtaylor/slate/commit/407a0666fa60984e0912908e3c4d366329e2169b) Thanks [@dylans](https://github.com/dylans)! - Add a `filter` option to `insertFragment`. It is called for each node in the fragment with the destination block entry and returns `false` to skip that node.
+
+### Patch Changes
+
+- [#5937](https://github.com/ianstormtaylor/slate/pull/5937) [`428fd70`](https://github.com/ianstormtaylor/slate/commit/428fd70d0fb81ee86be8774012f5dd165db51b88) Thanks [@kinaluo](https://github.com/kinaluo)! - `insertFragment` now splits the block when block-level nodes such as a void image are pasted mid-block, so they land between the two halves instead of above the block, and the cursor moves to the start of the second half. Dropping a dragged block void onto the middle of a paragraph splits it the same way. Schemas that don't allow blocks inside a structure (for example a list item's text wrapper) should override `insertFragment` to move those nodes elsewhere before calling the original.
+
 ## 0.140.0
 
 ### Patch Changes
