@@ -54,8 +54,13 @@ for (const target of ['padding', 'text', 'self', 'later text']) {
     await page.mouse.move(source.x + 30, source.y + 30)
     await page.mouse.down()
     await page.mouse.move(source.x + 35, source.y + 35, { steps: 5 })
-    await page.mouse.move(destination.x + 10, destination.y + 10, { steps: 20 })
-    await page.mouse.move(destination.x + 12, destination.y + 12, { steps: 5 })
+    const inset = target === 'padding' ? 10 : 1
+    await page.mouse.move(destination.x + inset, destination.y + 10, {
+      steps: 20,
+    })
+    await page.mouse.move(destination.x + inset + 1, destination.y + 12, {
+      steps: 5,
+    })
     await page.mouse.up()
     await expect(textbox).toHaveAttribute('data-dropped', 'true')
     await expect(textbox.locator('img')).toHaveCount(1)
