@@ -86,6 +86,7 @@ const MarkdownShortcutsExample = () => {
   return (
     <Slate editor={editor} initialValue={initialValue}>
       <Editable
+        aria-label="Editor with markdown shortcuts"
         onDOMBeforeInput={handleDOMBeforeInput}
         renderElement={renderElement}
         placeholder="Write some markdown..."

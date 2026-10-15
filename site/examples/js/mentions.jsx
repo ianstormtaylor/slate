@@ -124,6 +124,7 @@ const MentionExample = () => {
       }}
     >
       <Editable
+        aria-label="Editor with mentions"
         renderElement={renderElement}
         renderLeaf={renderLeaf}
         onKeyDown={onKeyDown}

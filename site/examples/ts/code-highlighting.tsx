@@ -53,6 +53,7 @@ const CodeHighlightingExample = () => {
     <Slate editor={editor} initialValue={initialValue}>
       <ExampleToolbar />
       <Editable
+        aria-label="Code editor"
         decorate={decorate}
         renderElement={ElementWrapper}
         renderLeaf={renderLeaf}
@@ -236,6 +237,7 @@ const LanguageSelect = (props: LanguageSelectProps) => {
   return (
     <select
       data-test-id="language-select"
+      aria-label="Code language"
       contentEditable={false}
       className={css`
         position: absolute;

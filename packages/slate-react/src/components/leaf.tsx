@@ -123,6 +123,7 @@ const Leaf = (props: {
       children: leaf.placeholder,
       attributes: {
         'data-slate-placeholder': true,
+        'aria-hidden': true,
         style: {
           position: 'absolute',
           top: 0,

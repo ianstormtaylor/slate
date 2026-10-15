@@ -19,6 +19,7 @@ const StylingExample = () => {
         ]}
       >
         <Editable
+          aria-label="Editor with inline styles"
           style={{
             backgroundColor: 'rgb(255, 230, 156)',
             minHeight: '200px',
@@ -38,7 +39,11 @@ const StylingExample = () => {
           },
         ]}
       >
-        <Editable className="fancy" disableDefaultStyles />
+        <Editable
+          aria-label="Editor with a class name"
+          className="fancy"
+          disableDefaultStyles
+        />
       </Slate>
     </div>
   )

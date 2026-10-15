@@ -91,6 +91,7 @@ const InlinesExample = () => {
         <ToggleEditableButtonButton />
       </Toolbar>
       <Editable
+        aria-label="Editor with inlines"
         renderElement={props => <Element {...props} />}
         renderLeaf={props => <Text {...props} />}
         placeholder="Enter some text..."

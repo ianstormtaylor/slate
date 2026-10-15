@@ -180,6 +180,7 @@ const PasteHtmlExample = () => {
   return (
     <Slate editor={editor} initialValue={initialValue}>
       <Editable
+        aria-label="Editor that accepts pasted HTML"
         renderElement={renderElement}
         renderLeaf={renderLeaf}
         placeholder="Paste in some HTML..."

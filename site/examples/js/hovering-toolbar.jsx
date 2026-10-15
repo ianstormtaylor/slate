@@ -11,6 +11,7 @@ const HoveringMenuExample = () => {
     <Slate editor={editor} initialValue={initialValue}>
       <HoveringToolbar />
       <Editable
+        aria-label="Editor with hovering toolbar"
         renderLeaf={props => <Leaf {...props} />}
         placeholder="Enter some text..."
         onDOMBeforeInput={event => {

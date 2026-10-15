@@ -73,6 +73,7 @@ const RichTextExample = () => {
         <BlockButton format="justify" icon="format_align_justify" />
       </Toolbar>
       <Editable
+        aria-label="Rich text editor"
         renderElement={renderElement}
         renderLeaf={renderLeaf}
         placeholder="Enter some rich text…"

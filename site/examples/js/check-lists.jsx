@@ -72,6 +72,7 @@ const CheckListsExample = () => {
   return (
     <Slate editor={editor} initialValue={initialValue}>
       <Editable
+        aria-label="Checklist"
         renderElement={renderElement}
         placeholder="Get to work…"
         spellCheck
@@ -161,6 +162,7 @@ const CheckListItemElement = ({ attributes, children, element }) => {
       >
         <input
           type="checkbox"
+          aria-label="Done"
           checked={checked}
           onChange={event => {
             const path = ReactEditor.findPath(editor, element)

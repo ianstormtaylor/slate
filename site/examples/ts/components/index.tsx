@@ -23,6 +23,7 @@ export const Button = React.forwardRef(
     ref: Ref<HTMLButtonElement>
   ) => (
     <button
+      aria-pressed={active}
       {...props}
       ref={ref}
       className={cx(

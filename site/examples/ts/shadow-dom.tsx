@@ -33,7 +33,10 @@ const ShadowEditor = () => {
 
   return (
     <Slate editor={editor} initialValue={initialValue}>
-      <Editable placeholder="Enter some plain text..." />
+      <Editable
+        aria-label="Editor in shadow DOM"
+        placeholder="Enter some plain text..."
+      />
     </Slate>
   )
 }

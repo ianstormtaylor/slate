@@ -7,7 +7,10 @@ const PlainTextExample = () => {
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
   return (
     <Slate editor={editor} initialValue={initialValue}>
-      <Editable placeholder="Enter some plain text..." />
+      <Editable
+        aria-label="Plain text editor"
+        placeholder="Enter some plain text..."
+      />
     </Slate>
   )
 }
