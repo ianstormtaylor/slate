@@ -2,7 +2,7 @@ import { RefObject, useEffect, useState } from 'react'
 import { useIsomorphicLayoutEffect } from './use-isomorphic-layout-effect'
 
 export function useMutationObserver(
-  node: RefObject<HTMLElement>,
+  node: RefObject<HTMLElement | null>,
   callback: MutationCallback,
   options: MutationObserverInit
 ) {

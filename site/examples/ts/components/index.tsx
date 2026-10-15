@@ -2,9 +2,9 @@ import { css, cx } from '@emotion/css'
 import React, { PropsWithChildren, ReactNode, Ref } from 'react'
 import ReactDOM from 'react-dom'
 
-interface BaseProps {
-  className: string
-  [key: string]: unknown
+interface BaseProps extends React.HTMLAttributes<HTMLElement> {
+  className?: string
+  [key: `data-${string}`]: unknown
 }
 
 export const Button = React.forwardRef(
@@ -16,8 +16,8 @@ export const Button = React.forwardRef(
       ...props
     }: PropsWithChildren<
       {
-        active: boolean
-        reversed: boolean
+        active?: boolean
+        reversed?: boolean
       } & BaseProps
     >,
     ref: Ref<HTMLButtonElement>

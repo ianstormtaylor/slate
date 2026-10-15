@@ -288,7 +288,7 @@ export const Editable = forwardRef(
      */
     const androidInputManagerRef = useRef<
       AndroidInputManager | null | undefined
-    >()
+    >(undefined)
 
     // Listen on the native `selectionchange` event to be able to update any time
     // the selection changes. This is required because React's `onSelect` is leaky
@@ -1237,7 +1237,7 @@ export const Editable = forwardRef(
                   ...userStyle,
                 }}
                 onBeforeInput={useCallback(
-                  (event: React.FormEvent<HTMLDivElement>) => {
+                  (event: React.InputEvent<HTMLDivElement>) => {
                     // COMPAT: Certain browsers don't support the `beforeinput` event, so we
                     // fall back to React's leaky polyfill instead just for it. It
                     // only works for the `insertText` input type.
@@ -1257,7 +1257,7 @@ export const Editable = forwardRef(
                   [attributes.onBeforeInput, editor, readOnly]
                 )}
                 onInput={useCallback(
-                  (event: React.FormEvent<HTMLDivElement>) => {
+                  (event: React.InputEvent<HTMLDivElement>) => {
                     if (!ReactEditor.hasEditableTarget(editor, event.target)) {
                       return
                     }
