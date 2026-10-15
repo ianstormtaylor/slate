@@ -1,5 +1,15 @@
 # slate
 
+## 0.139.0
+
+### Minor Changes
+
+- [#6300](https://github.com/ianstormtaylor/slate/pull/6300) [`c348692`](https://github.com/ianstormtaylor/slate/commit/c348692e8c623a343fece865519171e75e814d2e) Thanks [@dylans](https://github.com/dylans)! - Add Editor.withRemoteChanges and Editor.isRemoteChange. Bindings can opt into inward affinity for expanded selections while applying remote operations, keeping text inserted at selection edges outside the selected content. Collapsed carets and local editing retain their existing behavior.
+
+### Patch Changes
+
+- [#6301](https://github.com/ianstormtaylor/slate/pull/6301) [`9ac0e7f`](https://github.com/ianstormtaylor/slate/commit/9ac0e7f357b44c5f4ee9dc70ac7200b7f4089c77) Thanks [@dylans](https://github.com/dylans)! - Honor `voids: true` when deleting an expanded target before inserting a fragment, and insert at the surviving start point when the range ends inside an inline element. Include text boundaries after inline voids in position traversal, and restart word segmentation there so `Editor.positions` agrees with `Editor.before` and `Editor.after`.
+
 ## 0.138.2
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # slate-history
 
+## 0.139.0
+
+### Patch Changes
+
+- [#6301](https://github.com/ianstormtaylor/slate/pull/6301) [`9ac0e7f`](https://github.com/ianstormtaylor/slate/commit/9ac0e7f357b44c5f4ee9dc70ac7200b7f4089c77) Thanks [@dylans](https://github.com/dylans)! - Restore a saved history selection on undo and redo even when the current selection is null, including undo after removing the final block.
+
 ## 0.128.1
 
 ### Patch Changes
