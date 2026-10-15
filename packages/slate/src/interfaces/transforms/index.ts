@@ -3,6 +3,8 @@ import { NodeTransforms } from './node'
 import { SelectionTransforms } from './selection'
 import { TextTransforms } from './text'
 
+export { InsertFragmentFilter, InsertFragmentFilterOptions } from './text'
+
 export const Transforms: GeneralTransforms &
   NodeTransforms &
   SelectionTransforms &
