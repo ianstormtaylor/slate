@@ -11,7 +11,7 @@ import { useIsMounted } from '../use-is-mounted'
 import { useMutationObserver } from '../use-mutation-observer'
 
 type UseAndroidInputManagerOptions = {
-  node: RefObject<HTMLElement>
+  node: RefObject<HTMLElement | null>
 } & Omit<
   CreateAndroidInputManagerOptions,
   'editor' | 'onUserInput' | 'receivedUserInput'

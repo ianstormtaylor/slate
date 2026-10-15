@@ -192,7 +192,7 @@ describe('useSelected', () => {
       captureSelected: (selected: boolean) => void
     }) => {
       const editor = useSlateStatic()
-      const elementRef = useRef<Element>()
+      const elementRef = useRef<Element>(undefined)
 
       if (!elementRef.current) {
         const { children } = editor
