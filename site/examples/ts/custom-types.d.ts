@@ -64,6 +64,7 @@ export type HeadingSixElement = {
 export type ImageElement = {
   type: 'image'
   url: string
+  alt?: string
   children: EmptyText[]
 }
 
