@@ -96,6 +96,10 @@ const CollaborativeEditor = ({
     const editor = withReact(
       withYHistory(withYjs(createEditor(), document.get('content', Y.XmlText)))
     )
+    const { applyRemoteEvents } = editor
+    editor.applyRemoteEvents = (events, origin) => {
+      Editor.withRemoteChanges(editor, () => applyRemoteEvents(events, origin))
+    }
     const { normalizeNode } = editor
     editor.normalizeNode = (entry, options) => {
       const [node] = entry

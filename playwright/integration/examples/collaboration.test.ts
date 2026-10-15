@@ -91,3 +91,44 @@ test.describe('collaboration example', () => {
     ).toHaveCount(1)
   })
 })
+
+test('remote typing at a selection edge leaves the selected word unchanged', async ({
+  page,
+}) => {
+  await page.goto('/examples/collaboration')
+  const alice = page.getByRole('textbox', { name: "Alice's document" })
+  const bob = page.getByRole('textbox', { name: "Bob's document" })
+  await alice.click()
+  await alice.pressSequentially('a word z')
+  await expect(bob).toHaveText('a word z')
+  const editor = await getEditorHandle(alice)
+  const selection = {
+    anchor: { path: [0, 0], offset: 2 },
+    focus: { path: [0, 0], offset: 6 },
+  }
+  await editor.evaluate(
+    (editor, selection) => editor.select(selection),
+    selection
+  )
+  await expect
+    .poll(() =>
+      alice.evaluate(element => {
+        const selection = element.ownerDocument.getSelection()!
+        return [selection.anchorOffset, selection.focusOffset]
+      })
+    )
+    .toEqual([2, 6])
+  await selectEnd(bob)
+  await bob.press('ArrowLeft')
+  await bob.press('ArrowLeft')
+  const bobEditor = await getEditorHandle(bob)
+  await expect
+    .poll(() => bobEditor.evaluate(editor => editor.selection?.focus.offset))
+    .toBe(6)
+  await bob.pressSequentially('X')
+  await expect(alice).toHaveText('a wordX z')
+  expect(await editor.evaluate(editor => editor.selection)).toEqual(selection)
+  expect(
+    await editor.evaluate(editor => editor.string(editor.selection!))
+  ).toBe('word')
+})
