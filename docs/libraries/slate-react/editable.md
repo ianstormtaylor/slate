@@ -31,7 +31,7 @@ _NOTE: Detailed breakdown of Props not completed. Refer to the [source code](htt
 
 #### `placeholder?: string = ""`
 
-The text to display as a placeholder when the Editor is empty. A typical value for `placeholder` would be "Enter text here..." or "Start typing...". The placeholder text will not be treated as an actual value and will disappear when the user starts typing in the Editor.
+The text to display as a placeholder when the Editor is empty. A typical value for `placeholder` would be "Enter text here..." or "Start typing...". The placeholder text will not be treated as an actual value and will disappear when the user starts typing in the Editor. While it is shown, the editor root gets an `aria-placeholder` with the same text.
 
 #### `readOnly?: boolean = false`
 
@@ -198,6 +198,7 @@ export type RenderPlaceholderProps = {
   children: any
   attributes: {
     'data-slate-placeholder': boolean
+    'aria-hidden': boolean
     dir?: 'rtl'
     contentEditable: boolean
     ref: React.RefCallback<any>

@@ -1205,6 +1205,7 @@ export const Editable = forwardRef(
               <Component
                 role={readOnly ? undefined : 'textbox'}
                 aria-multiline={readOnly ? undefined : true}
+                aria-placeholder={showPlaceholder ? placeholder : undefined}
                 translate="no"
                 {...attributes}
                 // COMPAT: Certain browsers don't support the `beforeinput` event, so we'd
@@ -2333,6 +2334,7 @@ export type RenderPlaceholderProps = {
   children: any
   attributes: {
     'data-slate-placeholder': boolean
+    'aria-hidden': boolean
     dir?: 'rtl'
     contentEditable: boolean
     ref: React.RefCallback<any>

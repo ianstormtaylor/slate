@@ -43,6 +43,7 @@ const ImagesExample = () => {
         <InsertImageButton />
       </Toolbar>
       <Editable
+        aria-label="Editor with images"
         onKeyDown={event => {
           if (isHotkey('mod+a', event)) {
             event.preventDefault()

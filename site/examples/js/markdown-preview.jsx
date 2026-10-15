@@ -65,6 +65,7 @@ const MarkdownPreviewExample = () => {
   return (
     <Slate editor={editor} initialValue={initialValue}>
       <Editable
+        aria-label="Markdown editor"
         decorate={decorate}
         renderLeaf={renderLeaf}
         placeholder="Write some markdown..."

@@ -27,6 +27,7 @@ const EditableVoidsExample = () => {
       </Toolbar>
 
       <Editable
+        aria-label="Editor with editable voids"
         renderElement={props => <Element {...props} />}
         placeholder="Enter some text..."
       />
@@ -86,6 +87,7 @@ const EditableVoid = ({
       >
         <h4>Name:</h4>
         <input
+          aria-label="Name"
           className={css`
             margin: 8px 0;
           `}
@@ -96,21 +98,25 @@ const EditableVoid = ({
           }}
         />
         <h4>Left or right handed:</h4>
-        <input
-          className={unsetWidthStyle}
-          type="radio"
-          name="handedness"
-          value="left"
-        />{' '}
-        Left
+        <label>
+          <input
+            className={unsetWidthStyle}
+            type="radio"
+            name="handedness"
+            value="left"
+          />{' '}
+          Left
+        </label>
         <br />
-        <input
-          className={unsetWidthStyle}
-          type="radio"
-          name="handedness"
-          value="right"
-        />{' '}
-        Right
+        <label>
+          <input
+            className={unsetWidthStyle}
+            type="radio"
+            name="handedness"
+            value="right"
+          />{' '}
+          Right
+        </label>
         <h4>Tell us about yourself:</h4>
         <div
           className={css`

@@ -93,7 +93,11 @@ const SearchHighlightingExample = () => {
           />
         </div>
       </Toolbar>
-      <Editable decorate={decorate} renderLeaf={props => <Leaf {...props} />} />
+      <Editable
+        aria-label="Searchable document"
+        decorate={decorate}
+        renderLeaf={props => <Leaf {...props} />}
+      />
     </Slate>
   )
 }

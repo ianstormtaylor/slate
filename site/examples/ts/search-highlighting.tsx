@@ -101,6 +101,7 @@ const SearchHighlightingExample = () => {
         </div>
       </Toolbar>
       <Editable
+        aria-label="Searchable document"
         decorate={decorate}
         renderLeaf={(props: RenderLeafProps) => <Leaf {...props} />}
       />

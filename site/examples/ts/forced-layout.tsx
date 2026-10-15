@@ -85,6 +85,7 @@ const ForcedLayoutExample = () => {
   return (
     <Slate editor={editor} initialValue={initialValue}>
       <Editable
+        aria-label="Document with a forced title"
         renderElement={renderElement}
         placeholder="Enter a title…"
         spellCheck

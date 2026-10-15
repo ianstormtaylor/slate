@@ -14,6 +14,7 @@
 - [Using the Bundled Source](walkthroughs/08-using-the-bundled-source.md)
 - [Improving Performance](walkthroughs/09-performance.md)
 - [Collaboration with Yjs](walkthroughs/10-collaboration-with-yjs.md)
+- [Accessibility](walkthroughs/11-accessibility.md)
 
 ## Concepts
 
