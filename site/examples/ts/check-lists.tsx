@@ -113,7 +113,7 @@ const withChecklists = (editor: CustomEditor) => {
           const newProperties: Partial<SlateElement> = {
             type: 'paragraph',
           }
-          Transforms.setNodes(editor, newProperties, {
+          Transforms.setNodes<SlateElement>(editor, newProperties, {
             match: n => Node.isElement(n) && n.type === 'check-list-item',
           })
           return
