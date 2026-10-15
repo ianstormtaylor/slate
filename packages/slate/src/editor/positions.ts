@@ -16,6 +16,7 @@ export function* positions(
   const {
     at = editor.selection,
     unit = 'offset',
+    isWordCharacter,
     reverse = false,
     voids = false,
   } = options
@@ -101,6 +102,26 @@ export function* positions(
       // then we will iterate over their content.
       if (!voids && (editor.isVoid(node) || editor.isElementReadOnly(node))) {
         yield* maybeYield(Editor.start(editor, path))
+        if (editor.isInline(node)) {
+          const [, blockPath] = Editor.above(editor, {
+            at: path,
+            match: n => Node.isElement(n) && Editor.isBlock(editor, n),
+          })!
+          const edge = reverse
+            ? Path.isAncestor(blockPath, start.path)
+              ? start
+              : Editor.start(editor, blockPath)
+            : Path.isAncestor(blockPath, end.path)
+            ? end
+            : Editor.end(editor, blockPath)
+          blockText = Editor.string(
+            editor,
+            { anchor: Editor.start(editor, path), focus: edge },
+            { voids }
+          )
+          distance = 0
+        }
+        isNewBlock = true
         continue
       }
 
@@ -208,7 +229,7 @@ export function* positions(
     if (unit === 'character') {
       return getCharacterDistance(text, reverse)
     } else if (unit === 'word') {
-      return getWordDistance(text, reverse)
+      return getWordDistance(text, reverse, isWordCharacter)
     } else if (unit === 'line' || unit === 'block') {
       return text.length
     }

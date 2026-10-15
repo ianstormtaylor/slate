@@ -3,7 +3,7 @@ import { Editor } from '../interfaces/editor'
 import { matchPath } from '../utils/match-path'
 import { Range } from '../interfaces/range'
 import { Transforms } from '../interfaces/transforms'
-import { Location, Node } from '../interfaces'
+import { Location, Node, Path } from '../interfaces'
 
 export const unwrapNodes: NodeTransforms['unwrapNodes'] = (
   editor,
@@ -30,6 +30,35 @@ export const unwrapNodes: NodeTransforms['unwrapNodes'] = (
       match = Location.isPath(at)
         ? matchPath(editor, at)
         : n => Node.isElement(n) && Editor.isBlock(editor, n)
+    }
+
+    if (split && Range.isRange(at) && Range.isExpanded(at)) {
+      const rangeRef = Editor.rangeRef(editor, at, { affinity: 'inward' })
+      const [start, end] = Range.edges(at)
+      const inlineMatch = (node: Node, path: Path) =>
+        Node.isElement(node) &&
+        Editor.isInline(editor, node) &&
+        match!(node, path)
+      const splitMode = mode === 'all' ? 'highest' : mode
+      const operationCount = editor.operations.length
+
+      Transforms.splitNodes(editor, {
+        at: end,
+        match: inlineMatch,
+        mode: splitMode,
+        voids,
+      })
+      Transforms.splitNodes(editor, {
+        at: start,
+        match: inlineMatch,
+        mode: splitMode,
+        voids,
+      })
+      at = rangeRef.unref()!
+
+      if (options.at == null && editor.operations.length > operationCount) {
+        Transforms.select(editor, at)
+      }
     }
 
     if (Location.isPath(at)) {

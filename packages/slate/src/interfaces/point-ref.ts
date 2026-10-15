@@ -10,6 +10,7 @@ export interface PointRef {
   current: Point | null
   affinity: TextDirection | null
   unref(): Point | null
+  [Symbol.dispose](): void
 }
 
 export interface PointRefInterface {

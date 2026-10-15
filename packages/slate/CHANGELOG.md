@@ -1,5 +1,107 @@
 # slate
 
+## 0.140.0
+
+### Patch Changes
+
+- [#6304](https://github.com/ianstormtaylor/slate/pull/6304) [`cbc9586`](https://github.com/ianstormtaylor/slate/commit/cbc958693139396c84331e0f99baa648a77a16e4) Thanks [@dylans](https://github.com/dylans)! - Insert the empty text required by normalization when fragment replacement leaves an insertion point at a block-leading or trailing inline. Resolve the adjacent text within the block so insertion stays there and works before emptied containers normalize.
+
+  An invalid `mergeNodes` call combining block children with text or inline children now throws with both node paths instead of allowing normalization to discard content. Empty children, text-node merges and the previous-node removal policy keep their existing behavior.
+
+## 0.139.0
+
+### Minor Changes
+
+- [#6300](https://github.com/ianstormtaylor/slate/pull/6300) [`c348692`](https://github.com/ianstormtaylor/slate/commit/c348692e8c623a343fece865519171e75e814d2e) Thanks [@dylans](https://github.com/dylans)! - Add Editor.withRemoteChanges and Editor.isRemoteChange. Bindings can opt into inward affinity for expanded selections while applying remote operations, keeping text inserted at selection edges outside the selected content. Collapsed carets and local editing retain their existing behavior.
+
+### Patch Changes
+
+- [#6301](https://github.com/ianstormtaylor/slate/pull/6301) [`9ac0e7f`](https://github.com/ianstormtaylor/slate/commit/9ac0e7f357b44c5f4ee9dc70ac7200b7f4089c77) Thanks [@dylans](https://github.com/dylans)! - Honor `voids: true` when deleting an expanded target before inserting a fragment, and insert at the surviving start point when the range ends inside an inline element. Include text boundaries after inline voids in position traversal, and restart word segmentation there so `Editor.positions` agrees with `Editor.before` and `Editor.after`.
+
+## 0.138.2
+
+### Patch Changes
+
+- [#6288](https://github.com/ianstormtaylor/slate/pull/6288) [`919cc72`](https://github.com/ianstormtaylor/slate/commit/919cc722d70a3ad5e83f9a59b78569140ed0b186) Thanks [@dylans](https://github.com/dylans)! - Restore the faster `Text.equals` comparison for `loose: true` without `ignore`. 0.138.0 routed every loose comparison through a generic property filter, which made loose comparisons, used when normalization merges adjacent text nodes, about 1.8x slower.
+
+## 0.138.1
+
+### Patch Changes
+
+- [#6287](https://github.com/ianstormtaylor/slate/pull/6287) [`b0462a1`](https://github.com/ianstormtaylor/slate/commit/b0462a1505f7e6025419e8ffbe1f9ce7da0c9800) Thanks [@dylans](https://github.com/dylans)! - Limit whole-block deletion of a hanging selection, and native triple-click selections, to top-level blocks. Nested blocks such as table cells and list items keep the previous behavior, so cutting or dragging across cells in editors without `editor.isIsolated` no longer removes cells. After undoing a whole-block deletion, the default `scrollSelectionIntoView` scrolls to the restored text instead of the start of the following block.
+
+- [#6286](https://github.com/ianstormtaylor/slate/pull/6286) [`4744a82`](https://github.com/ianstormtaylor/slate/commit/4744a824659b3adce0f2050edeb7af5e2d0c2257) Thanks [@dylans](https://github.com/dylans)! - Fix `insertText` leaving the selection past the end of the text when an `apply` override changes the inserted text. By default the selection follows the operation again, as before 0.138.0, and `select: true` selects the end of the text that was actually applied.
+
+## 0.138.0
+
+### Minor Changes
+
+- [#6278](https://github.com/ianstormtaylor/slate/pull/6278) [`1b70b23`](https://github.com/ianstormtaylor/slate/commit/1b70b231f41395f239b89c2a9ded1dd659be7d7b) Thanks [@dylans](https://github.com/dylans)! - Add `isWordCharacter` to `Editor.before`, `Editor.after` and `Editor.positions` options for custom boundaries with `unit: 'word'`, matching the callback supported by `Editor.word`.
+
+- [#6282](https://github.com/ianstormtaylor/slate/pull/6282) [`f64a47f`](https://github.com/ianstormtaylor/slate/commit/f64a47f90911284b6f5f405344c0cdd135bb92b9) Thanks [@dylans](https://github.com/dylans)! - `Editor.deleteFragment` removes wholly selected sibling blocks when the selection starts at the start of a block and ends at the start of a later sibling, instead of emptying them. Ranges inside `editor.isIsolated` elements keep the previous behavior.
+
+- [#6281](https://github.com/ianstormtaylor/slate/pull/6281) [`261fa43`](https://github.com/ianstormtaylor/slate/commit/261fa43f013a6b4072655e04628839b2fad78f3a) Thanks [@dylans](https://github.com/dylans)! - Support `select` on `insertText`, `insertFragment`, `splitNodes`, `moveNodes` and `liftNodes`, complementing `insertNodes`. An explicit `select: true` moves the caret to the result even with an explicit `at`. Insertion and splitting select by default when `at` is omitted; moving retains its existing selection-following behavior by default. `select: false` prevents explicit reselection while operations still transform the existing selection.
+
+  `insertText` preserves a null selection by default; use `select: true` to create a caret after inserting into an unfocused document.
+
+- [#6277](https://github.com/ianstormtaylor/slate/pull/6277) [`3d13180`](https://github.com/ianstormtaylor/slate/commit/3d13180115347d7b5173d4d685b527fd5a961424) Thanks [@dylans](https://github.com/dylans)! - Add `ignore` to `Text.equals` options to exclude selected top-level properties from comparison, independently of the existing `loose` option.
+
+## 0.137.0
+
+### Minor Changes
+
+- [#6272](https://github.com/ianstormtaylor/slate/pull/6272) [`4235516`](https://github.com/ianstormtaylor/slate/commit/4235516b3af1c76b35625050408a275d14fb633e) Thanks [@dylans](https://github.com/dylans)! - `Transforms.setNodes` and `editor.setNodes` accept a function `(node, path) => props` to compute properties per matched node. `editor.setNodes` now also accepts the `replace` option in its type.
+
+## 0.136.0
+
+### Minor Changes
+
+- [#6268](https://github.com/ianstormtaylor/slate/pull/6268) [`1e9e7e1`](https://github.com/ianstormtaylor/slate/commit/1e9e7e1bc1b970af5201c28319145e628981795c) Thanks [@dylans](https://github.com/dylans)! - Add `Editor.word`, which returns the range of the word around a point within its block. Words can cross mark changes and inline links but stop at voids, and `isWordCharacter` lets you define your own word characters. `ReactEditor.getWord` also includes text an input method is still composing.
+
+  The `'word'` unit (word deletion, word movement, and `Editor.before`/`after`/`positions`) now uses `Intl.Segmenter`, where available, to split runs of word characters. Chinese, Japanese and Thai text without spaces now deletes and moves one word at a time instead of a whole phrase. Text with spaces between words is unaffected.
+
+## 0.135.0
+
+### Minor Changes
+
+- [#6269](https://github.com/ianstormtaylor/slate/pull/6269) [`c526ecd`](https://github.com/ianstormtaylor/slate/commit/c526ecd457b85d68692cbc876c91404aa7c2db55) Thanks [@dylans](https://github.com/dylans)! - Add `editor.isIsolated(element)` for elements such as table cells whose content must not flow across their edges. Backspace, Delete and range deletion don't merge across an isolated element's edge, and `insertBreak` doesn't split one.
+
+- [#6267](https://github.com/ianstormtaylor/slate/pull/6267) [`193cd35`](https://github.com/ianstormtaylor/slate/commit/193cd359e76bdc505a5934d2aedd68557c9b8ecc) Thanks [@dylans](https://github.com/dylans)! - Add a `replace` option to `Transforms.setNodes` that removes every property not in `props`, in the same operation, so changing a node's type doesn't carry over properties from the old type. Undo restores them.
+
+## 0.134.1
+
+### Patch Changes
+
+- [#6258](https://github.com/ianstormtaylor/slate/pull/6258) [`d5b2fbd`](https://github.com/ianstormtaylor/slate/commit/d5b2fbd949d9ae5aaf764a1fd01fe72e9e0da425) Thanks [@nabbydude](https://github.com/nabbydude)! - Speed up tree-altering operations by using faster array functions when copying and replacing children.
+
+## 0.134.0
+
+### Minor Changes
+
+- [#6256](https://github.com/ianstormtaylor/slate/pull/6256) [`f5b29a0`](https://github.com/ianstormtaylor/slate/commit/f5b29a0e28850a9b6160df28b8fdc38e6401d06d) Thanks [@dylans](https://github.com/dylans)! - Add Editor.hasRange to core and have DOMEditor.hasRange and ReactEditor.hasRange use it, falling back to the path check with older slate versions.
+
+- [#6259](https://github.com/ianstormtaylor/slate/pull/6259) [`1691cc0`](https://github.com/ianstormtaylor/slate/commit/1691cc0cb1e32b31fecb183b19ab8c9b9161f07f) Thanks [@dylans](https://github.com/dylans)! - Support Symbol.dispose on path, point and range refs so using declarations can release tracked locations automatically. TypeScript consumers now need TypeScript 5.2 or later with `esnext.disposable` in `lib`, or `skipLibCheck`.
+
+- [#6254](https://github.com/ianstormtaylor/slate/pull/6254) [`ff18f28`](https://github.com/ianstormtaylor/slate/commit/ff18f284ecdb54ae30add72dc17bf8cb1a0d973c) Thanks [@dylans](https://github.com/dylans)! - Add a height option to Transforms.liftNodes to lift matched nodes through multiple ancestors.
+
+### Patch Changes
+
+- [#6252](https://github.com/ianstormtaylor/slate/pull/6252) [`2c83cc2`](https://github.com/ianstormtaylor/slate/commit/2c83cc2c82c3c9f903deae98cd00288aac7c8318) Thanks [@dylans](https://github.com/dylans)! - Include the next dirty path in normalization loop errors to help locate the normalizeNode logic that keeps a node invalid.
+
+- [#6244](https://github.com/ianstormtaylor/slate/pull/6244) [`acccce1`](https://github.com/ianstormtaylor/slate/commit/acccce1b10f39432086303ba1f7178f055103c51) Thanks [@dylans](https://github.com/dylans)! - Respect partial inline selections when unwrapping nodes with `split: true`, preserving unselected portions of the inline.
+
+## 0.133.7
+
+### Patch Changes
+
+- [#6230](https://github.com/ianstormtaylor/slate/pull/6230) [`30f0a23`](https://github.com/ianstormtaylor/slate/commit/30f0a23584a7a28976baf907b72c3d4b96644c80) Thanks [@dylans](https://github.com/dylans)! - Keep unselected text outside an inline wrapper when `wrapNodes` splits a selection across an existing inline boundary.
+
+## 0.133.3
+
+### Patch Changes
+
+- [#6213](https://github.com/ianstormtaylor/slate/pull/6213) [`e2c702c`](https://github.com/ianstormtaylor/slate/commit/e2c702c84a6a95ce5b22883a6625932186e236cf) Thanks [@dylans](https://github.com/dylans)! - Preserve selection endpoints at the end of the document when inserting fragments so pasting over select-all removes trailing voids and empty paragraphs.
+
 ## 0.133.1
 
 ### Patch Changes

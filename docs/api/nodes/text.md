@@ -36,9 +36,11 @@ Get the leaves and positions for a text node, given `decorations`.
 
 Check if two text nodes are equal.
 
-Options: `{loose?: boolean}`
+Options: `{loose?: boolean, ignore?: readonly string[]}`
 
 - `loose?`: When `true`, it checks if the properties of the `Text` object are equal except for the `text` property (i.e. the `String` value of the `Text`). When `false` (default), checks all properties including `text`.
+
+- `ignore?`: Top-level property names to exclude from both nodes before comparing, such as `ignore: ['id']` for application-generated IDs. Nested properties are still compared deeply, and neither input node is changed. Combine with `loose: true` to ignore both text content and the named properties. The default is an empty list.
 
 #### `Text.isText(value: any) => value is Text`
 

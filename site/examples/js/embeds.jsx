@@ -13,6 +13,7 @@ const EmbedsExample = () => {
   return (
     <Slate editor={editor} initialValue={initialValue}>
       <Editable
+        aria-label="Editor with embeds"
         renderElement={props => <Element {...props} />}
         placeholder="Enter some text..."
       />
@@ -58,6 +59,7 @@ const VideoElement = ({ attributes, children, element }) => {
           }}
         >
           <iframe
+            title="Embedded video"
             src={`${safeUrl}?title=0&byline=0&portrait=0`}
             frameBorder="0"
             style={{
@@ -90,6 +92,7 @@ const UrlInput = ({ url, onChange }) => {
   const [value, setValue] = React.useState(url)
   return (
     <input
+      aria-label="Video URL"
       type="text"
       value={value}
       onClick={e => e.stopPropagation()}

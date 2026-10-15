@@ -1,11 +1,22 @@
 import { RefObject } from 'react'
 import { ReactEditor } from '../../plugin/react-editor'
-import { isTrackedMutation } from 'slate-dom'
+import { isDOMElement, isTrackedMutation } from 'slate-dom'
 
 export type RestoreDOMManager = {
   registerMutations: (mutations: MutationRecord[]) => void
   restoreDOM: () => void
   clear: () => void
+}
+
+const isPlaceholderNode = (node: Node) =>
+  isDOMElement(node) && node.hasAttribute('data-slate-placeholder')
+
+const changesOnlyPlaceholders = ({
+  addedNodes,
+  removedNodes,
+}: MutationRecord) => {
+  const nodes = [...Array.from(addedNodes), ...Array.from(removedNodes)]
+  return nodes.length > 0 && nodes.every(isPlaceholderNode)
 }
 
 export const createRestoreDomManager = (
@@ -23,8 +34,10 @@ export const createRestoreDomManager = (
       return
     }
 
-    const trackedMutations = mutations.filter(mutation =>
-      isTrackedMutation(editor, mutation, mutations)
+    const trackedMutations = mutations.filter(
+      mutation =>
+        !changesOnlyPlaceholders(mutation) &&
+        isTrackedMutation(editor, mutation, mutations)
     )
 
     bufferedMutations.push(...trackedMutations)

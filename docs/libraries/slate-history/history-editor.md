@@ -35,7 +35,7 @@ Redo to the next saved state.
 
 #### `HistoryEditor.undo(editor: HistoryEditor): void`
 
-Undo to the previous saved state.
+Undo to the previous saved state. A saved `selectionBefore` is restored even if the current selection is null, such as after removing the last block. Redo restores that saved selection before replaying the batch. Standalone selection changes are not saved, so redo does not replay cursor moves made after its operations.
 
 ### Merging and Saving
 
@@ -54,6 +54,8 @@ merged as usual.
 
 Apply a series of changes inside a synchronous `fn`, without merging any of
 the new operations into previous save point in the history.
+
+Each transform called inside `fn` becomes its own undo step, and the normalization it triggers stays in that step. Use `withNewBatch` to make several transforms one step.
 
 #### `HistoryEditor.withoutSaving(editor: HistoryEditor, fn: () => void): void`
 

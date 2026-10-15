@@ -2,6 +2,8 @@ import { Transforms } from '../interfaces/transforms'
 import { Editor } from '../interfaces/editor'
 import { Range } from '../interfaces/range'
 import { Path } from '../interfaces/path'
+import { Point } from '../interfaces/point'
+import { Text } from '../interfaces/text'
 import { Element } from '../interfaces/element'
 import { Descendant, Node, NodeEntry } from '../interfaces/node'
 import { TextTransforms } from '../interfaces/transforms/text'
@@ -14,7 +16,11 @@ export const insertFragment: TextTransforms['insertFragment'] = (
   options = {}
 ) => {
   Editor.withoutNormalizing(editor, () => {
-    const { hanging = false, voids = false } = options
+    const {
+      hanging = false,
+      voids = false,
+      select = options.at == null,
+    } = options
     let { at = getDefaultInsertLocation(editor), batchDirty = true } = options
 
     if (!fragment.length) {
@@ -23,7 +29,12 @@ export const insertFragment: TextTransforms['insertFragment'] = (
 
     if (Location.isRange(at)) {
       if (!hanging) {
-        at = Editor.unhangRange(editor, at, { voids })
+        const [, end] = Range.edges(at)
+        const endOfDoc = Editor.end(editor, [])
+
+        if (!Point.equals(end, endOfDoc)) {
+          at = Editor.unhangRange(editor, at, { voids })
+        }
       }
 
       if (Range.isCollapsed(at)) {
@@ -37,10 +48,10 @@ export const insertFragment: TextTransforms['insertFragment'] = (
 
         const startRef = Editor.pointRef(editor, start)
         const endRef = Editor.pointRef(editor, end)
-        Transforms.delete(editor, { at })
+        Transforms.delete(editor, { at, voids })
         const startPoint = startRef.unref()
         const endPoint = endRef.unref()
-        at = endPoint ?? startPoint!
+        at = startPoint ?? endPoint!
       }
     } else if (Location.isPath(at)) {
       at = Editor.start(editor, at)
@@ -62,12 +73,26 @@ export const insertFragment: TextTransforms['insertFragment'] = (
     if (inlineElementMatch) {
       const [, inlinePath] = inlineElementMatch
 
+      const parent = Node.parent(editor, inlinePath)
+      const index = inlinePath[inlinePath.length - 1]
+
       if (Editor.isEnd(editor, at, inlinePath)) {
-        const after = Editor.after(editor, inlinePath)!
-        at = after
+        const afterPath = Path.next(inlinePath)
+        if (!Text.isText(parent.children[index + 1])) {
+          Transforms.insertNodes(editor, { text: '' }, { at: afterPath, voids })
+        }
+        at = Editor.start(editor, afterPath)
       } else if (Editor.isStart(editor, at, inlinePath)) {
-        const before = Editor.before(editor, inlinePath)!
-        at = before
+        if (Text.isText(parent.children[index - 1])) {
+          at = Editor.end(editor, Path.previous(inlinePath))
+        } else {
+          Transforms.insertNodes(
+            editor,
+            { text: '' },
+            { at: inlinePath, voids }
+          )
+          at = Editor.start(editor, inlinePath)
+        }
       }
     }
 
@@ -246,7 +271,7 @@ export const insertFragment: TextTransforms['insertFragment'] = (
       batchDirty,
     })
 
-    if (!options.at) {
+    if (select) {
       let path
 
       if (ends.length > 0 && endRef.current) {

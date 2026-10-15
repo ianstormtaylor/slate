@@ -11,6 +11,7 @@ interface Editor {
 
   // Schema-specific node behaviors.
   isInline: (element: Element) => boolean
+  isIsolated: (element: Element) => boolean
   isVoid: (element: Element) => boolean
   markableVoid: (element: Element) => boolean
   normalizeNode: (entry: NodeEntry) => void
@@ -79,6 +80,8 @@ If there is no point after the location (e.g. we are at the bottom of the docume
 
 Options: `{distance?: number, unit?: 'offset' | 'character' | 'word' | 'line' | 'block', voids?: boolean}`
 
+For `unit: 'word'`, `isWordCharacter?: (character: string) => boolean` customizes word boundaries. The callback receives a whole grapheme, including a combined character or emoji. For example, `isWordCharacter: character => /[\w-]/.test(character)` treats `foo-bar_baz` as one word. A custom callback replaces the default punctuation rules and language segmentation; it is ignored for other units.
+
 #### `Editor.before(editor: Editor, at: Location, options?) => Point | undefined`
 
 Get the point before a location.
@@ -86,6 +89,8 @@ Get the point before a location.
 If there is no point before the location (e.g. we are at the top of the document) returns `undefined`.
 
 Options: `{distance?: number, unit?: 'offset' | 'character' | 'word' | 'line' | 'block', voids?: boolean}`
+
+For `unit: 'word'`, `isWordCharacter?: (character: string) => boolean` customizes word boundaries. The callback receives a whole grapheme, including a combined character or emoji. For example, `isWordCharacter: character => /[\w-]/.test(character)` treats `foo-bar_baz` as one word. A custom callback replaces the default punctuation rules and language segmentation; it is ignored for other units.
 
 #### `Editor.edges(editor: Editor, at: Location) => [Point, Point]`
 
@@ -181,7 +186,7 @@ Iterate through all of the positions in the document where a `Point` can be plac
 
 Read `options.unit` to see how this method iterates through positions.
 
-Note: By default void nodes are treated as a single point and iteration will not happen inside their content unless the voids option is set, then iteration will occur.
+Note: By default void nodes are treated as a single point and iteration will not happen inside their content unless the voids option is set, then iteration will occur. Text immediately after an inline void starts a new traversal boundary, including when the surrounding text is empty. Word traversal restarts segmentation at that boundary.
 
 Options:
 
@@ -189,10 +194,12 @@ Options:
 - `unit?: 'offset' | 'character' | 'word' | 'line' | 'block' = 'offset'`:
   - `offset`: Moves to the next offset `Point`. It will include the `Point` at the end of a `Text` object and then move onto the first `Point` (at the 0th offset) of the next `Text` object. This may be counter-intuitive because the end of a `Text` and the beginning of the next `Text` might be thought of as the same position.
   - `character`: Moves to the next `character` but is not always the next `index` in the string. This is because Unicode encodings may require multiple bytes to create one character. Unlike `offset`, `character` will not count the end of a `Text` and the beginning of the next `Text` as separate positions to return. Warning: The character offsets for Unicode characters does not appear to be reliable in some cases like a Smiley Emoji will be identified as 2 characters.
-  - `word`: Moves to the position immediately after the next `word`. In `reverse` mode, moves to the position immediately before the previous `word`.
+  - `word`: Moves to the position immediately after the next `word`. In `reverse` mode, moves to the position immediately before the previous `word`. Whitespace and punctuation end a word, and apostrophes inside a word don't. Where `Intl.Segmenter` is available, a run of word characters is split further at its word boundaries, so Chinese, Japanese and Thai text without spaces moves and deletes one word at a time.
   - `line` | `block`: Starts at the beginning position and then the position at the end of the block. Then starts at the beginning of the next block and then the end of the next block.
 - `reverse?: boolean = false`: When `true` returns the positions in reverse order. In the case of the `unit` being `word`, the actual returned positions are different (i.e. we will get the start of a word in reverse instead of the end).
 - `voids?: boolean = false`: When `true` include void Nodes.
+
+For `unit: 'word'`, `isWordCharacter?: (character: string) => boolean` customizes word boundaries. The callback receives a whole grapheme, including a combined character or emoji. For example, `isWordCharacter: character => /[\w-]/.test(character)` treats `foo-bar_baz` as one word. A custom callback replaces the default punctuation rules and language segmentation; it is ignored for other units.
 
 #### `Editor.previous<T extends Node>(editor: Editor, options?) => NodeEntry<T> | undefined`
 
@@ -224,6 +231,23 @@ Match a void node in the current branch of the editor.
 
 Options: `{at?: Location, mode?: 'highest' | 'lowest', voids?: boolean}`
 
+#### `Editor.word(editor: Editor, options?) => Range | undefined`
+
+Get the range of the word around a point, within its block. Defaults to the selection's focus. Returns `undefined` when the point isn't touching a word, is inside a void, or there is no selection.
+
+The word can span text nodes with different marks and inline elements such as links, but stops at inline voids. By default it finds the same words as the `'word'` unit that word deletion and `Editor.before`/`Editor.after` use. Whitespace and punctuation end a word, and apostrophes inside a word don't. Where `Intl.Segmenter` is available, Chinese, Japanese and Thai text without spaces is split into its words. Pass `isWordCharacter` to define your own, for example to treat `foo-bar.baz` or `@name` as one word:
+
+```javascript
+const range = Editor.word(editor, {
+  isWordCharacter: character => /[\w.@-]/.test(character),
+})
+const word = range && Editor.string(editor, range)
+```
+
+Options: `{at?: Point | Range, isWordCharacter?: (character: string) => boolean}`
+
+`Editor.word` reads the editor's value, which doesn't include text an input method is still composing. In React, use [`ReactEditor.getWord`](../../libraries/slate-react/react-editor.md) to include it.
+
 ### Manipulation methods
 
 #### `Editor.addMark(editor: Editor, key: string, value: any) => void`
@@ -247,6 +271,8 @@ Options: `{unit?: 'character' | 'word' | 'line' | 'block'}`
 #### `Editor.deleteFragment(editor: Editor) => void`
 
 Delete the content in the current selection.
+
+A hanging selection from the start of a block to the start of a following sibling removes the fully selected blocks, preserving the following block. Inside an element identified by `editor.isIsolated`, deletion continues to unhang the selection and retain the block structure. Custom `deleteFragment` overrides still control deletion.
 
 #### `Editor.insertBreak(editor: Editor) => void`
 
@@ -297,6 +323,10 @@ Options:
 
 ### Check methods
 
+#### `Editor.hasRange(editor: Editor, range: Range) => boolean`
+
+Check whether both endpoint paths of a range exist in the editor. This checks paths, not whether offsets are within the text. `DOMEditor.hasRange` and `ReactEditor.hasRange` delegate to this method.
+
 #### `Editor.hasBlocks(editor: Editor, element: Element) => boolean`
 
 Check if a node has block children.
@@ -337,6 +367,10 @@ Check if an element is an inline element. It only accepts an `Element`, so check
 
 Check if the editor is currently normalizing after each operation.
 
+#### `Editor.isRemoteChange(editor: Editor) => boolean`
+
+Check whether the editor is currently inside `Editor.withRemoteChanges`. It returns `false` outside that editor's scope.
+
 #### `Editor.isStart(editor: Editor, point: Point, at: Location) => boolean`
 
 Check if a point is the start point of a location.
@@ -357,6 +391,22 @@ Options: `{force?: boolean; operation?: Operation}`
 
 Call a function, deferring normalization until after it completes.
 See [Normalization - Implications for Other Code](../../concepts/11-normalizing.md#implications-for-other-code);
+
+### Remote operations
+
+#### `Editor.withRemoteChanges(editor: Editor, fn: () => void) => void`
+
+Apply remote operations inside a synchronous callback. An expanded selection uses inward affinity, so text inserted at either edge stays outside the selected content. Collapsed carets keep their usual forward behavior. Local operations outside the scope retain their existing selection behavior.
+
+Scopes can nest and restore the previous flag even if the callback throws. The scope covers only the synchronous callback; apply asynchronous updates inside a new scope when they arrive. This helper does not synchronize operations or change history saving. Removing a selected node keeps the existing nearest-point fallback.
+
+```typescript
+Editor.withRemoteChanges(editor, () => {
+  Editor.withoutNormalizing(editor, () => {
+    for (const operation of remoteOperations) editor.apply(operation)
+  })
+})
+```
 
 ### Ref Methods
 
@@ -419,6 +469,23 @@ Check if a value is an inline `Element` object.
 #### `isVoid(element: Element) => boolean`
 
 Check if a value is a void `Element` object.
+
+#### `isIsolated(element: Element) => boolean`
+
+Mark elements whose content must not flow across their edges, such as table cells. Slate's default returns `false`.
+
+For an isolated element:
+
+- Backspace at its start and Delete at its end do nothing, so they don't merge it with a neighbour. Deleting by word or line stops at its edge.
+- Deleting a range that crosses its edge removes the selected text but doesn't merge the blocks on either side. Isolated elements that are entirely inside the range are still removed.
+- `insertBreak`, and `splitNodes` with its default match, don't split it. They still split blocks inside it. `splitNodes` with an explicit `match` that selects the element still splits it.
+- Explicit `mergeNodes` calls aren't affected.
+
+```javascript
+const { isIsolated } = editor
+editor.isIsolated = element =>
+  element.type === 'table-cell' || isIsolated(element)
+```
 
 ### Normalize methods
 

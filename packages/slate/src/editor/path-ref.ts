@@ -1,4 +1,5 @@
 import { Editor, EditorInterface } from '../interfaces/editor'
+import { getSymbolDispose } from '../utils/symbol-dispose'
 import { PathRef } from '../interfaces/path-ref'
 
 export const pathRef: EditorInterface['pathRef'] = (
@@ -10,6 +11,9 @@ export const pathRef: EditorInterface['pathRef'] = (
   const ref: PathRef = {
     current: path,
     affinity,
+    [getSymbolDispose()]() {
+      ref.unref()
+    },
     unref() {
       const { current } = ref
       const pathRefs = Editor.pathRefs(editor)

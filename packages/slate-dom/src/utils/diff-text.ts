@@ -6,6 +6,7 @@ import {
   Point,
   PointTransformingOperation,
   Range,
+  Text,
 } from 'slate'
 import { EDITOR_TO_PENDING_DIFFS } from './weak-maps'
 
@@ -235,6 +236,19 @@ export function transformPendingPoint(
   }
 
   const { diff } = textDiff
+
+  if (
+    op.type === 'insert_node' &&
+    Text.isText(op.node) &&
+    op.node.text === diff.text &&
+    diff.start === diff.end &&
+    Path.equals(op.path, Path.next(point.path)) &&
+    point.offset <= diff.start + diff.text.length &&
+    Node.leaf(editor, point.path).text.length === diff.start
+  ) {
+    return { path: op.path, offset: point.offset - diff.start }
+  }
+
   // Point references location inside the diff => transform the point based on the location
   // the diff will be applied to and add the offset inside the diff.
   if (point.offset <= diff.start + diff.text.length) {

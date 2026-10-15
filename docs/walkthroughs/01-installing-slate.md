@@ -3,7 +3,7 @@
 Slate is a monorepo divided up into multiple npm packages, so to install it you do:
 
 ```text
-yarn add slate slate-react
+yarn add slate slate-react slate-dom
 ```
 
 You'll also need to be sure to install Slate's peer dependencies:
@@ -12,7 +12,7 @@ You'll also need to be sure to install Slate's peer dependencies:
 yarn add react react-dom
 ```
 
-_Note, if you'd rather use a pre-bundled version of Slate, you can `yarn add slate` and retrieve the bundled `dist/slate.js` file! Check out the_ [_Using the Bundled Source_](xx-using-the-bundled-source.md) _guide for more information._
+_Note, if you'd rather use a pre-bundled version of Slate, you can `yarn add slate` and retrieve the bundled `dist/slate.js` file! Check out the_ [_Using the Bundled Source_](08-using-the-bundled-source.md) _guide for more information._
 
 Once you've installed Slate, you'll need to import it.
 
@@ -87,7 +87,7 @@ const App = () => {
 
 You can think of the `<Slate>` component as providing a context to every component underneath it.
 
-> Slate Provider's "value" prop is only used as initial state for editor.children. If your code relies on replacing editor.children you should do so by replacing it directly instead of relying on the "value" prop to do this for you. See [Slate PR 4540](https://github.com/ianstormtaylor/slate/pull/4540) for a more in-depth discussion.
+> Slate Provider's `initialValue` prop is only used as initial state for editor.children. If your code relies on replacing editor.children you should do so by replacing it directly instead of relying on the `initialValue` prop to do this for you. See [Slate PR 4540](https://github.com/ianstormtaylor/slate/pull/4540) for a more in-depth discussion.
 
 This is a slightly different mental model than things like `<input>` or `<textarea>`, because richtext documents are more complex. You'll often want to include toolbars, or live previews, or other complex components next to your editable content.
 
@@ -95,8 +95,10 @@ By having a shared context, those other components can execute commands, query t
 
 The next step is to render the `<Editable>` component itself. The component acts like `contenteditable`; anywhere you render it will render an editable richtext document for the nearest editor context.
 
-```jsx
-const initialValue = [
+The example below uses the TypeScript declarations above and annotates `initialValue` with `Descendant[]`. JavaScript users can omit that annotation. Keep it when adapting the JavaScript examples in the following walkthroughs to TypeScript.
+
+```tsx
+const initialValue: Descendant[] = [
   {
     type: 'paragraph',
     children: [{ text: 'A line of text in a paragraph.' }],

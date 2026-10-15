@@ -31,6 +31,8 @@ export interface NodeTransforms {
     editor: Editor,
     options?: {
       at?: Location
+      select?: boolean
+      height?: number
       match?: NodeMatch<T>
       mode?: MaximizeMode
       voids?: boolean
@@ -59,6 +61,7 @@ export interface NodeTransforms {
     editor: Editor,
     options: {
       at?: Location
+      select?: boolean
       match?: NodeMatch<T>
       mode?: MaximizeMode
       to: Path
@@ -85,7 +88,9 @@ export interface NodeTransforms {
    */
   setNodes: <T extends Node>(
     editor: Editor,
-    props: Partial<NullableProps<T>>,
+    props:
+      | Partial<NullableProps<T>>
+      | ((node: T, path: Path) => Partial<NullableProps<T>>),
     options?: {
       at?: Location
       match?: NodeMatch<T>
@@ -95,6 +100,7 @@ export interface NodeTransforms {
       voids?: boolean
       compare?: PropsCompare
       merge?: PropsMerge
+      replace?: boolean
     }
   ) => void
 
@@ -105,6 +111,7 @@ export interface NodeTransforms {
     editor: Editor,
     options?: {
       at?: Location
+      select?: boolean
       match?: NodeMatch<T>
       mode?: RangeMode
       always?: boolean

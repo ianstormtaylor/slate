@@ -42,6 +42,8 @@ Insert a fragment of nodes at the specified location or (if not defined) the cur
 
 Options: `{at?: Location, hanging?: boolean, voids?: boolean}`
 
+With `voids: true`, replacing an expanded range also deletes within void content instead of removing the void nodes as atomic units. At an inline boundary, insertion uses the surrounding text in that block, adding the empty text required by normalization if replacement temporarily removes it.
+
 #### `Transforms.insertNodes(editor: Editor, nodes: Node | Node[], options?)`
 
 Atomically insert `nodes` at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
@@ -68,6 +70,8 @@ Options supported: `NodeOptions & {hanging?: boolean}`
 
 Merge a node at the specified location with the previous node at the same depth. If no location is specified, use the selection. Resulting empty container nodes are removed.
 
+Merging elements throws if both have children and one contains blocks while the other contains text or inline nodes, unless `shouldMergeNodesRemovePrevNode` removes the previous node instead. The error names both paths and is raised before moving or removing the merge targets. An expanded `at` range can be deleted before this check.
+
 Options supported: `NodeOptions & {hanging?: boolean}`
 
 #### `Transforms.splitNodes(editor: Editor, options?)`
@@ -91,15 +95,25 @@ Unwrap nodes at the specified location. If necessary, the parent node is split. 
 
 Options supported: `NodeOptions & {hanging?: boolean, split?: boolean}`. For `options.mode`, `'all'` is also supported.
 
-#### `Transforms.setNodes(editor: Editor, props: Partial<NullableProps<Node>>, options?)`
+#### `Transforms.setNodes(editor: Editor, props: Partial<NullableProps<Node>> | ((node: Node, path: Path) => Partial<NullableProps<Node>>), options?)`
 
 Set properties of nodes at the specified location. If no location is specified, use the selection. Optional node properties can be set to `null` to unset them.
 
 If `props` contains `undefined` values, the node's corresponding property will also be set to `undefined` as opposed to ignored.
 
+`props` can also be a function that receives each matched node and its path and returns the properties for that node, so new values can depend on old ones. Each node still gets one `set_node` operation, so undo works per node:
+
+```javascript
+Transforms.setNodes(editor, node => ({ indent: (node.indent ?? 0) + 1 }), {
+  match: n => Element.isElement(n) && n.type === 'paragraph',
+})
+```
+
 `children` and `text` in `props` are ignored, since they hold a node's content rather than its properties. To change content, use `insertNodes`, `removeNodes` or the text transforms.
 
-Options supported: `NodeOptions & {hanging?: boolean, split?: boolean}`. For `options.mode`, `'all'` is also supported.
+With `replace: true`, every other property of each matched node is removed in the same operation, so the node ends up with exactly `props` (plus its `children` or `text`). Use it to change a node into a different type without carrying over properties that only made sense for the old type, such as turning `{ type: 'callout', color: 'blue' }` into `{ type: 'paragraph' }`. Undo restores the removed properties.
+
+Options supported: `NodeOptions & {hanging?: boolean, split?: boolean, replace?: boolean}`. For `options.mode`, `'all'` is also supported.
 
 #### `Transforms.unsetNodes(editor: Editor, props: string | string[], options?)`
 
@@ -111,7 +125,7 @@ Options supported: `NodeOptions & {hanging?: boolean, split?: boolean}`. For `op
 
 Lift nodes at the specified location upwards in the document tree. If necessary, the parent node is split. If no location is specified, use the selection.
 
-Options supported: `NodeOptions`. For `options.mode`, `'all'` is also supported.
+Options supported: `NodeOptions & {height?: number}`. `height` defaults to `1` and must be a non-negative integer. A height of `0` does nothing; larger heights lift each matched node through that many ancestors, stopping at the top level. A node that is already at the top level cannot be lifted. For `options.mode`, `'all'` is also supported.
 
 #### `Transforms.moveNodes(editor: Editor, options)`
 
@@ -185,3 +199,22 @@ Options: `{at?: Location, voids?: boolean}`
 #### `Transforms.transform(editor: Editor, transform: Transform)`
 
 Transform the `editor` by an `operation`.
+
+## Selecting transform results
+
+`insertNodes`, `insertFragment`, `insertText`, `splitNodes`, `moveNodes` and `liftNodes` accept `select?: boolean`. Use `select: true` to move the caret to the result even when supplying an explicit `at`:
+
+```js
+Transforms.insertText(editor, 'hello', {
+  at: { path: [1, 0], offset: 0 },
+  select: true,
+})
+```
+
+Insertions select the end of the inserted content. Splitting selects the start of the new content after the split. Moving or lifting selects the end of the last moved node. Insertion and splitting select by default only when `at` is omitted. `moveNodes` and `liftNodes` preserve their existing default: the selection follows moved content, keeping its offsets and direction, without explicitly selecting the end.
+
+With `select: false`, these transforms do not explicitly select their result. The existing selection is still transformed by operations, so its paths and offsets can change when content moves or text is inserted. An explicit `at` without `select: true` leaves an unrelated selection in place.
+
+Other transforms retain their existing selection behavior; property changes and wrapping, unwrapping, merging or removing nodes do not gain a new result-selection option.
+
+`insertText` preserves a null selection by default; use `select: true` to create a caret after inserting into an unfocused document.

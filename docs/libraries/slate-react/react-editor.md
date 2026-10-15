@@ -78,9 +78,9 @@ Find a native DOM range from a Slate `range`.
 
 Find a Slate node from a native DOM `element`.
 
-#### `ReactEditor.findEventRange(editor: ReactEditor, event: any): Range`
+#### `ReactEditor.findEventRange(editor: ReactEditor, event: any, options?: { suppressThrow?: boolean }): Range | null`
 
-Get the target range from a DOM `event`.
+Get the target range from a DOM `event`. The range is resolved from the event's coordinates, which can point outside of the editor even when the event's target lies inside it; with `suppressThrow: true` this returns `null` instead of throwing in that case.
 
 #### `ReactEditor.toSlatePoint(editor: ReactEditor, domPoint: DOMPoint): Point | null`
 
@@ -89,6 +89,12 @@ Find a Slate point from a DOM selection's `domNode` and `domOffset`.
 #### `ReactEditor.toSlateRange(editor: ReactEditor, domRange: DOMRange | DOMStaticRange | DOMSelection, options?: { exactMatch?: boolean } = {}): Range | null`
 
 Find a Slate range from a DOM range or selection.
+
+### Word methods
+
+#### `ReactEditor.getWord(editor: ReactEditor, options?: { at?: Point | Range, isWordCharacter?: (character: string) => boolean }): { range: Range, text: string } | undefined`
+
+Like [`Editor.word`](../../api/nodes/editor.md), but while an input method is composing it reads the composing text from the DOM and uses the DOM caret when `at` isn't given. `text` is the word as currently shown. During a composition, `range` counts the composing characters, so it only matches the editor's value once the composition ends.
 
 ### DataTransfer methods
 

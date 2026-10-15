@@ -7,7 +7,6 @@ import {
   Operation,
   Path,
   Point,
-  PointTransformingOperation,
   Range,
   Scrubber,
   Selection,
@@ -416,11 +415,21 @@ export const GeneralTransforms: GeneralTransforms = {
     }
 
     if (transformSelection && editor.selection) {
-      editor.selection = Range.transform(
-        editor.selection,
-        op as PointTransformingOperation, // transformSelection is only true for ops that transform points
-        { affinity: 'forward' }
-      )
+      const selection = { ...editor.selection }
+      const remoteSelection =
+        Editor.isRemoteChange(editor) && Range.isExpanded(selection)
+          ? Range.transform(selection, op, { affinity: 'inward' })
+          : null
+
+      for (const [point, key] of Range.points(selection)) {
+        selection[key] = remoteSelection
+          ? remoteSelection[key]
+          : Point.transform(point, op)!
+      }
+
+      if (!Range.equals(selection, editor.selection)) {
+        editor.selection = selection
+      }
     }
   },
 }

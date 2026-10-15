@@ -1,6 +1,9 @@
 import {
   BaseEditor,
+  createEditor,
+  Descendant,
   Editor,
+  EditorWordOptions,
   Node,
   Path,
   Point,
@@ -55,7 +58,6 @@ export interface DOMEditor extends BaseEditor {
     editor: DOMEditor,
     target: EventTarget | null
   ) => target is DOMNode
-  hasRange: (editor: DOMEditor, range: Range) => boolean
   hasSelectableTarget: (
     editor: DOMEditor,
     target: EventTarget | null
@@ -105,8 +107,16 @@ export interface DOMEditorInterface {
 
   /**
    * Get the target range from a DOM `event`.
+   *
+   * The range is resolved from the event's coordinates, which can point
+   * outside of the editor even when the event's target lies inside it. With
+   * `suppressThrow`, `null` is returned instead of throwing in that case.
    */
-  findEventRange: (editor: DOMEditor, event: any) => Range
+  findEventRange: <T extends boolean = false>(
+    editor: DOMEditor,
+    event: any,
+    options?: { suppressThrow?: T }
+  ) => T extends true ? Range | null : Range
 
   /**
    * Find a key for a Slate node.
@@ -185,6 +195,11 @@ export interface DOMEditorInterface {
    * Check if the user is currently composing inside the editor.
    */
   isComposing: (editor: DOMEditor) => boolean
+
+  getWord: (
+    editor: DOMEditor,
+    options?: EditorWordOptions
+  ) => { range: Range; text: string } | undefined
 
   /**
    * Check if the editor is focused.
@@ -313,7 +328,13 @@ export const DOMEditor: DOMEditorInterface = {
     return el.ownerDocument
   },
 
-  findEventRange: (editor, event) => {
+  findEventRange: <T extends boolean = false>(
+    editor: DOMEditor,
+    event: any,
+    options: { suppressThrow?: T } = {}
+  ): T extends true ? Range | null : Range => {
+    const { suppressThrow = false } = options
+
     if ('nativeEvent' in event) {
       event = event.nativeEvent
     }
@@ -321,11 +342,30 @@ export const DOMEditor: DOMEditorInterface = {
     const { clientX: x, clientY: y, target } = event
 
     if (x == null || y == null) {
+      if (suppressThrow) {
+        return null as T extends true ? Range | null : Range
+      }
       throw new Error(`Cannot resolve a Slate range from a DOM event: ${event}`)
     }
 
-    const node = DOMEditor.toSlateNode(editor, event.target)
-    const path = DOMEditor.findPath(editor, node)
+    let node
+    try {
+      node = DOMEditor.toSlateNode(editor, event.target)
+    } catch (e) {
+      if (suppressThrow) {
+        return null as T extends true ? Range | null : Range
+      }
+      throw e
+    }
+    let path
+    try {
+      path = DOMEditor.findPath(editor, node)
+    } catch (e) {
+      if (suppressThrow) {
+        return null as T extends true ? Range | null : Range
+      }
+      throw e
+    }
 
     // If the drop target is inside a void node, move it into either the
     // next or previous node, depending on which side the `x` and `y`
@@ -345,7 +385,7 @@ export const DOMEditor: DOMEditorInterface = {
 
       if (point) {
         const range = Editor.range(editor, point)
-        return range
+        return range as T extends true ? Range | null : Range
       }
     }
 
@@ -378,15 +418,18 @@ export const DOMEditor: DOMEditorInterface = {
     }
 
     if (!domRange) {
+      if (suppressThrow) {
+        return null as T extends true ? Range | null : Range
+      }
       throw new Error(`Cannot resolve a Slate range from a DOM event: ${event}`)
     }
 
     // Resolve a Slate range from the DOM range.
     const range = DOMEditor.toSlateRange(editor, domRange, {
       exactMatch: false,
-      suppressThrow: false,
+      suppressThrow,
     })
-    return range
+    return range as T extends true ? Range | null : Range
   },
 
   findKey: (editor, node) => {
@@ -417,12 +460,18 @@ export const DOMEditor: DOMEditorInterface = {
 
       const i = NODE_TO_INDEX.get(child)
 
-      if (i == null) {
+      if (i == null || parent.children[i] !== child) {
         break
       }
 
       path.unshift(i)
       child = parent
+    }
+
+    for (const [descendant, descendantPath] of Node.nodes(editor)) {
+      if (descendant === node) {
+        return descendantPath
+      }
     }
 
     throw new Error(
@@ -517,20 +566,48 @@ export const DOMEditor: DOMEditorInterface = {
       }
     }
 
-    if (!targetEl) {
+    if (
+      !targetEl ||
+      closestShadowAware(targetEl, '[data-slate-editor]') !== editorEl
+    ) {
       return false
     }
 
-    return (
-      closestShadowAware(targetEl, `[data-slate-editor]`) === editorEl &&
-      (!editable || targetEl.isContentEditable
-        ? true
-        : (typeof targetEl.isContentEditable === 'boolean' && // isContentEditable exists only on HTMLElement, and on other nodes it will be undefined
-            // this is the core logic that lets you know you got the right editor.selection instead of null when editor is contenteditable="false"(readOnly)
-            closestShadowAware(targetEl, '[contenteditable="false"]') ===
-              editorEl) ||
-          !!targetEl.getAttribute('data-slate-zero-width'))
+    const editableElement = closestShadowAware(
+      targetEl,
+      '[contenteditable="true" i], [contenteditable=""], [contenteditable="plaintext-only" i]'
     )
+    const nonEditableAncestor =
+      editableElement && editableElement !== editorEl
+        ? closestShadowAware(editableElement, '[contenteditable="false" i]')
+        : null
+
+    if (
+      nonEditableAncestor &&
+      nonEditableAncestor !== editorEl &&
+      closestShadowAware(nonEditableAncestor, '[data-slate-editor]') ===
+        editorEl
+    ) {
+      const slateText =
+        closestShadowAware(targetEl, '[data-slate-node="text"]') ??
+        editableElement?.querySelector('[data-slate-node="text"]')
+
+      if (
+        !slateText ||
+        !editableElement?.contains(slateText) ||
+        closestShadowAware(slateText, '[data-slate-editor]') !== editorEl
+      ) {
+        return false
+      }
+    }
+
+    return !editable || targetEl.isContentEditable
+      ? true
+      : (typeof targetEl.isContentEditable === 'boolean' && // isContentEditable exists only on HTMLElement, and on other nodes it will be undefined
+          // this is the core logic that lets you know you got the right editor.selection instead of null when editor is contenteditable="false"(readOnly)
+          closestShadowAware(targetEl, '[contenteditable="false"]') ===
+            editorEl) ||
+          !!targetEl.getAttribute('data-slate-zero-width')
   },
 
   hasEditableTarget: (editor, target): target is DOMNode =>
@@ -538,6 +615,10 @@ export const DOMEditor: DOMEditorInterface = {
     DOMEditor.hasDOMNode(editor, target, { editable: true }),
 
   hasRange: (editor, range) => {
+    if (typeof editor.hasRange === 'function') {
+      return editor.hasRange(range)
+    }
+
     const { anchor, focus } = range
     return (
       Editor.hasPath(editor, anchor.path) && Editor.hasPath(editor, focus.path)
@@ -561,6 +642,23 @@ export const DOMEditor: DOMEditorInterface = {
 
   isComposing: editor => {
     return !!IS_COMPOSING.get(editor)
+  },
+
+  getWord: (editor, options = {}) => {
+    if (typeof Editor.word !== 'function') {
+      throw new Error('DOMEditor.getWord needs slate 0.136.0 or later')
+    }
+
+    const composing = DOMEditor.isComposing(editor)
+      ? getComposingView(editor)
+      : undefined
+    const view = composing?.view ?? editor
+    const range = Editor.word(view, {
+      ...options,
+      at: options.at ?? composing?.point,
+    })
+
+    return range && { range, text: Editor.string(view, range) }
   },
 
   isFocused: editor => !!IS_FOCUSED.get(editor),
@@ -651,7 +749,10 @@ export const DOMEditor: DOMEditorInterface = {
 
       if (point.offset <= end) {
         const offset = Math.min(length, Math.max(0, point.offset - start))
-        domPoint = [domNode, offset]
+        domPoint =
+          offset === length && text.hasAttribute('data-slate-trailing')
+            ? [text.lastChild!, 0]
+            : [domNode, offset]
         break
       }
 
@@ -764,7 +865,14 @@ export const DOMEditor: DOMEditorInterface = {
           const window = DOMEditor.getWindow(editor)
           const range = window.document.createRange()
           range.setStart(textNode, 0)
-          range.setEnd(nearestNode, nearestOffset)
+          range.setEnd(
+            nearestNode,
+            parentNode.hasAttribute('data-slate-trailing') &&
+              nearestNode === parentNode.lastChild &&
+              nearestNode.textContent === '\n'
+              ? 0
+              : nearestOffset
+          )
 
           const contents = range.cloneContents()
           const removals = [
@@ -1097,6 +1205,7 @@ export const DOMEditor: DOMEditorInterface = {
     // Slate point. (2023/11/01)
     if (
       IS_FIREFOX &&
+      !focusNode.parentElement?.hasAttribute('data-slate-trailing') &&
       focusNode.textContent?.endsWith('\n\n') &&
       focusOffset === focusNode.textContent.length
     ) {
@@ -1142,4 +1251,55 @@ export const DOMEditor: DOMEditorInterface = {
 
     return range as unknown as T extends true ? Range | null : Range
   },
+}
+
+const replaceText = (
+  nodes: Descendant[],
+  path: Path,
+  text: string
+): Descendant[] =>
+  nodes.map((node, index) => {
+    if (index !== path[0]) {
+      return node
+    }
+
+    if (path.length === 1) {
+      return { ...node, text }
+    }
+
+    return {
+      ...node,
+      children: replaceText(
+        (node as { children: Descendant[] }).children,
+        path.slice(1),
+        text
+      ),
+    }
+  })
+
+const getComposingView = (editor: DOMEditor) => {
+  const domSelection = DOMEditor.getWindow(editor).getSelection()
+
+  if (!domSelection?.focusNode) {
+    return undefined
+  }
+
+  const point = DOMEditor.toSlatePoint(
+    editor,
+    [domSelection.focusNode, domSelection.focusOffset],
+    { exactMatch: false, suppressThrow: true }
+  )
+
+  if (!point) {
+    return undefined
+  }
+
+  const textElement = DOMEditor.toDOMNode(editor, Node.get(editor, point.path))
+  const text = (textElement.textContent ?? '').replace(/\uFEFF/g, '')
+  const view = createEditor()
+  view.isInline = editor.isInline
+  view.isVoid = editor.isVoid
+  view.children = replaceText(editor.children, point.path, text)
+
+  return { view, point }
 }

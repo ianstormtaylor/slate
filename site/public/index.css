@@ -40,7 +40,7 @@ blockquote {
   margin-left: 0;
   margin-right: 0;
   padding-left: 10px;
-  color: #aaa;
+  color: #767676;
   font-style: italic;
 }
 
@@ -128,7 +128,7 @@ details > summary {
 .example-header {
   align-items: center;
   background: #000;
-  color: #aaa;
+  color: #767676;
   display: flex;
   height: 42px;
   position: relative;
@@ -146,7 +146,7 @@ details > summary {
 
 .example-link {
   margin-left: 1em;
-  color: #aaa;
+  color: #767676;
   text-decoration: none;
 }
 
@@ -158,7 +158,7 @@ details > summary {
 .example-pill {
   background: #333;
   border-radius: 9999px;
-  color: #aaa;
+  color: #767676;
   padding: 0.2em 0.5em;
 }
 
@@ -217,7 +217,7 @@ details > summary {
 }
 
 .example-tab-button .material-icons {
-  color: #aaa;
+  color: #767676;
   font-size: 24px;
 }
 

@@ -29,6 +29,7 @@ import {
   hasBlocks,
   hasInlines,
   hasPath,
+  hasRange,
   hasTexts,
   isBlock,
   isEdge,
@@ -62,6 +63,7 @@ import {
   string,
   unhangRange,
   withoutNormalizing,
+  word,
 } from './editor'
 import { deleteText } from './transforms-text'
 import {
@@ -95,6 +97,7 @@ export const createEditor = (): Editor => {
     selection: null,
     marks: null,
     isElementReadOnly: () => false,
+    isIsolated: () => false,
     isInline: () => false,
     isSelectable: () => true,
     isVoid: () => false,
@@ -136,6 +139,7 @@ export const createEditor = (): Editor => {
     hasBlocks: (...args) => hasBlocks(editor, ...args),
     hasInlines: (...args) => hasInlines(editor, ...args),
     hasPath: (...args) => hasPath(editor, ...args),
+    hasRange: (...args) => hasRange(editor, ...args),
     hasTexts: (...args) => hasTexts(editor, ...args),
     insertNodes: (...args) => insertNodes(editor, ...args),
     isBlock: (...args) => isBlock(editor, ...args),
@@ -180,6 +184,7 @@ export const createEditor = (): Editor => {
     unsetNodes: (...args) => unsetNodes(editor, ...args),
     unwrapNodes: (...args) => unwrapNodes(editor, ...args),
     void: (...args) => getVoid(editor, ...args),
+    word: (...args) => word(editor, ...args),
     withoutNormalizing: (...args) => withoutNormalizing(editor, ...args),
     wrapNodes: (...args) => wrapNodes(editor, ...args),
     shouldMergeNodesRemovePrevNode: (...args) =>

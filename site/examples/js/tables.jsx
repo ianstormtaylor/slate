@@ -13,7 +13,11 @@ const TablesExample = () => {
   )
   return (
     <Slate editor={editor} initialValue={initialValue}>
-      <Editable renderElement={renderElement} renderLeaf={renderLeaf} />
+      <Editable
+        aria-label="Editor with tables"
+        renderElement={renderElement}
+        renderLeaf={renderLeaf}
+      />
     </Slate>
   )
 }

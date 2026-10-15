@@ -28,6 +28,7 @@ import {
 } from '../types/types'
 import { OmitFirstArg } from '../utils/types'
 import { isEditor } from '../editor/is-editor'
+import { REMOTE_CHANGES } from '../utils/weak-maps'
 import {
   TextInsertFragmentOptions,
   TextInsertTextOptions,
@@ -52,6 +53,7 @@ export interface BaseEditor {
   getDirtyPaths: (operation: Operation) => Path[]
   getFragment: () => Descendant[]
   isElementReadOnly: (element: Element) => boolean
+  isIsolated: (element: Element) => boolean
   isSelectable: (element: Element) => boolean
   markableVoid: (element: Element) => boolean
   normalizeNode: (
@@ -98,7 +100,9 @@ export interface BaseEditor {
   removeNodes: OmitFirstArg<typeof Transforms.removeNodes>
   select: OmitFirstArg<typeof Transforms.select>
   setNodes: <T extends Node>(
-    props: Partial<NullableProps<T>>,
+    props:
+      | Partial<NullableProps<T>>
+      | ((node: T, path: Path) => Partial<NullableProps<T>>),
     options?: {
       at?: Location
       match?: NodeMatch<T>
@@ -108,6 +112,7 @@ export interface BaseEditor {
       voids?: boolean
       compare?: PropsCompare
       merge?: PropsMerge
+      replace?: boolean
     }
   ) => void
   setNormalizing: OmitFirstArg<typeof Editor.setNormalizing>
@@ -135,6 +140,7 @@ export interface BaseEditor {
   hasBlocks: OmitFirstArg<typeof Editor.hasBlocks>
   hasInlines: OmitFirstArg<typeof Editor.hasInlines>
   hasPath: OmitFirstArg<typeof Editor.hasPath>
+  hasRange: OmitFirstArg<typeof Editor.hasRange>
   hasTexts: OmitFirstArg<typeof Editor.hasTexts>
   isBlock: OmitFirstArg<typeof Editor.isBlock>
   isEdge: OmitFirstArg<typeof Editor.isEdge>
@@ -174,6 +180,7 @@ export interface BaseEditor {
   string: OmitFirstArg<typeof Editor.string>
   unhangRange: OmitFirstArg<typeof Editor.unhangRange>
   void: OmitFirstArg<typeof Editor.void>
+  word: OmitFirstArg<typeof Editor.word>
   shouldMergeNodesRemovePrevNode: OmitFirstArg<
     typeof Editor.shouldMergeNodesRemovePrevNode
   >
@@ -195,12 +202,14 @@ export interface EditorAboveOptions<T extends Ancestor> {
 }
 
 export interface EditorAfterOptions {
+  isWordCharacter?: (character: string) => boolean
   distance?: number
   unit?: TextUnitAdjustment
   voids?: boolean
 }
 
 export interface EditorBeforeOptions {
+  isWordCharacter?: (character: string) => boolean
   distance?: number
   unit?: TextUnitAdjustment
   voids?: boolean
@@ -286,6 +295,7 @@ export interface EditorPointRefOptions {
 }
 
 export interface EditorPositionsOptions {
+  isWordCharacter?: (character: string) => boolean
   at?: Location
   unit?: TextUnitAdjustment
   reverse?: boolean
@@ -305,6 +315,11 @@ export interface EditorRangeRefOptions {
 
 export interface EditorStringOptions {
   voids?: boolean
+}
+
+export interface EditorWordOptions {
+  at?: Point | Range
+  isWordCharacter?: (character: string) => boolean
 }
 
 export interface EditorUnhangRangeOptions {
@@ -416,6 +431,8 @@ export interface EditorInterface {
 
   hasPath: (editor: Editor, path: Path) => boolean
 
+  hasRange: (editor: Editor, range: Range) => boolean
+
   /**
    * Check if a node has text children.
    */
@@ -485,6 +502,8 @@ export interface EditorInterface {
    */
   isElementReadOnly: (editor: Editor, element: Element) => boolean
 
+  isIsolated: (editor: Editor, element: Element) => boolean
+
   /**
    * Check if an element is empty, accounting for void nodes.
    */
@@ -504,6 +523,8 @@ export interface EditorInterface {
    * Check if the editor is currently normalizing after each operation.
    */
   isNormalizing: (editor: Editor) => boolean
+
+  isRemoteChange: (editor: Editor) => boolean
 
   /**
    * Check if a value is a selectable `Element` object.
@@ -718,10 +739,14 @@ export interface EditorInterface {
     options?: EditorVoidOptions
   ) => NodeEntry<Element> | undefined
 
+  word: (editor: Editor, options?: EditorWordOptions) => Range | undefined
+
   /**
    * Call a function, deferring normalization until after it completes.
    */
   withoutNormalizing: (editor: Editor, fn: () => void) => void
+
+  withRemoteChanges: (editor: Editor, fn: () => void) => void
 
   /**
    *  Call a function, Determine whether or not remove the previous node when merge.
@@ -797,6 +822,10 @@ export const Editor: EditorInterface = {
     return editor.hasPath(path)
   },
 
+  hasRange(editor, range) {
+    return editor.hasRange(range)
+  },
+
   hasTexts(editor, element) {
     return editor.hasTexts(element)
   },
@@ -835,6 +864,10 @@ export const Editor: EditorInterface = {
     return editor.isElementReadOnly(element)
   },
 
+  isIsolated(editor, element) {
+    return editor.isIsolated(element)
+  },
+
   isEmpty(editor, element) {
     return editor.isEmpty(element)
   },
@@ -849,6 +882,10 @@ export const Editor: EditorInterface = {
 
   isNormalizing(editor) {
     return editor.isNormalizing()
+  },
+
+  isRemoteChange(editor) {
+    return REMOTE_CHANGES.get(editor) === true
   },
 
   isSelectable(editor: Editor, value: Element) {
@@ -970,8 +1007,26 @@ export const Editor: EditorInterface = {
     return editor.void(options)
   },
 
+  word(editor, options) {
+    return editor.word(options)
+  },
+
   withoutNormalizing(editor, fn: () => void) {
     editor.withoutNormalizing(fn)
+  },
+
+  withRemoteChanges(editor, fn) {
+    const previous = REMOTE_CHANGES.get(editor)
+    REMOTE_CHANGES.set(editor, true)
+    try {
+      fn()
+    } finally {
+      if (previous === undefined) {
+        REMOTE_CHANGES.delete(editor)
+      } else {
+        REMOTE_CHANGES.set(editor, previous)
+      }
+    }
   },
   shouldMergeNodesRemovePrevNode: (editor, prevNode, curNode) => {
     return editor.shouldMergeNodesRemovePrevNode(prevNode, curNode)

@@ -4,6 +4,8 @@
 
 The `Editable` component is the main editing component. Note that it must be inside a `Slate` component.
 
+Keyboard focus (Tab or Shift+Tab) restores the editor's existing selection. If there is no selection, the browser chooses the initial caret position. Clicking the editor places the caret at the clicked position.
+
 ### Props
 
 It takes as its props, any props accepted by a Textarea element plus the following props.
@@ -29,11 +31,13 @@ _NOTE: Detailed breakdown of Props not completed. Refer to the [source code](htt
 
 #### `placeholder?: string = ""`
 
-The text to display as a placeholder when the Editor is empty. A typical value for `placeholder` would be "Enter text here..." or "Start typing...". The placeholder text will not be treated as an actual value and will disappear when the user starts typing in the Editor.
+The text to display as a placeholder when the Editor is empty. A typical value for `placeholder` would be "Enter text here..." or "Start typing...". The placeholder text will not be treated as an actual value and will disappear when the user starts typing in the Editor. While it is shown, the editor root gets an `aria-placeholder` with the same text.
 
 #### `readOnly?: boolean = false`
 
 When set to true, renders the editor in a "read-only" state. In this state, user input and interactions will not modify the editor's content.
+
+Caller-provided event handlers still run in read-only mode; Slate skips its own editing behavior. Add `tabIndex={0}` to make a read-only editor keyboard-focusable. Read-only editors do not receive a tab index by default.
 
 If this prop is omitted or set to false, the editor remains in the default "editable" state, allowing users to interact with and modify the content.
 
@@ -194,6 +198,7 @@ export type RenderPlaceholderProps = {
   children: any
   attributes: {
     'data-slate-placeholder': boolean
+    'aria-hidden': boolean
     dir?: 'rtl'
     contentEditable: boolean
     ref: React.RefCallback<any>

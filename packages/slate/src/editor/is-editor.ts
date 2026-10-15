@@ -35,6 +35,7 @@ export const isEditor: EditorInterface['isEditor'] = (
     typeof value.hasBlocks === 'function' &&
     typeof value.hasInlines === 'function' &&
     typeof value.hasPath === 'function' &&
+    typeof value.hasRange === 'function' &&
     typeof value.hasTexts === 'function' &&
     typeof value.insertBreak === 'function' &&
     typeof value.insertFragment === 'function' &&

@@ -1,7 +1,7 @@
 {
   "name": "slate-react",
   "description": "Tools for building completely customizable richtext editors with React.",
-  "version": "0.133.2",
+  "version": "0.140.0",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
   "main": "dist/index.js",
@@ -23,20 +23,21 @@
   },
   "devDependencies": {
     "@babel/runtime": "^7.23.2",
+    "@testing-library/dom": "10.4.1",
     "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "^14.0.0",
+    "@testing-library/react": "16.3.0",
     "@types/is-hotkey": "^0.1.8",
     "@types/jest": "29.5.6",
     "@types/jsdom": "^21.1.4",
     "@types/lodash": "^4.14.200",
-    "@types/react": "^18.2.41",
-    "@types/react-dom": "^18.2.17",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.7",
     "@types/resize-observer-browser": "^0.1.8",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "slate": "^0.133.1",
-    "slate-dom": "^0.133.1",
-    "slate-hyperscript": "^0.129.1",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "slate": "^0.140.0",
+    "slate-dom": "^0.140.0",
+    "slate-hyperscript": "^0.138.3",
     "source-map-loader": "^4.0.1"
   },
   "peerDependencies": {
@@ -45,7 +46,7 @@
     "react": ">=18.2.0",
     "react-dom": ">=18.2.0",
     "slate": ">=0.121.0",
-    "slate-dom": ">=0.119.1"
+    "slate-dom": ">=0.133.6"
   },
   "peerDependenciesMeta": {
     "@types/lodash": {

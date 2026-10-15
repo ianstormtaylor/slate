@@ -1,7 +1,6 @@
 import React, {
   Fragment,
   KeyboardEvent,
-  MouseEvent,
   useCallback,
   useEffect,
   useMemo,
@@ -116,7 +115,7 @@ const MentionExample = () => {
           const beforeText =
             blockStart &&
             Editor.string(editor, Editor.range(editor, blockStart, start))
-          const beforeMatch = beforeText && beforeText.match(/@([\w-]+)$/)
+          const beforeMatch = beforeText && beforeText.match(/@([\w-]*)$/)
           const before =
             beforeMatch &&
             Editor.before(editor, start, {
@@ -148,6 +147,7 @@ const MentionExample = () => {
       }}
     >
       <Editable
+        aria-label="Editor with mentions"
         renderElement={renderElement}
         renderLeaf={renderLeaf}
         onKeyDown={onKeyDown}
@@ -172,7 +172,8 @@ const MentionExample = () => {
             {chars.map((char, i) => (
               <div
                 key={char}
-                onClick={(e: MouseEvent) => {
+                onPointerDown={event => event.preventDefault()}
+                onClick={() => {
                   Transforms.select(editor, target)
                   insertMention(editor, char)
                   setTarget(null)
