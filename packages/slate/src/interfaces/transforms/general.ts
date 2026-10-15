@@ -418,9 +418,15 @@ export const GeneralTransforms: GeneralTransforms = {
 
     if (transformSelection && editor.selection) {
       const selection = { ...editor.selection }
+      const remoteSelection =
+        Editor.isRemoteChange(editor) && Range.isExpanded(selection)
+          ? Range.transform(selection, op, { affinity: 'inward' })
+          : null
 
       for (const [point, key] of Range.points(selection)) {
-        selection[key] = Point.transform(point, op)!
+        selection[key] = remoteSelection
+          ? remoteSelection[key]
+          : Point.transform(point, op)!
       }
 
       if (!Range.equals(selection, editor.selection)) {

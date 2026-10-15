@@ -28,6 +28,7 @@ import {
 } from '../types/types'
 import { OmitFirstArg } from '../utils/types'
 import { isEditor } from '../editor/is-editor'
+import { REMOTE_CHANGES } from '../utils/weak-maps'
 import {
   TextInsertFragmentOptions,
   TextInsertTextOptions,
@@ -523,6 +524,8 @@ export interface EditorInterface {
    */
   isNormalizing: (editor: Editor) => boolean
 
+  isRemoteChange: (editor: Editor) => boolean
+
   /**
    * Check if a value is a selectable `Element` object.
    */
@@ -743,6 +746,8 @@ export interface EditorInterface {
    */
   withoutNormalizing: (editor: Editor, fn: () => void) => void
 
+  withRemoteChanges: (editor: Editor, fn: () => void) => void
+
   /**
    *  Call a function, Determine whether or not remove the previous node when merge.
    */
@@ -879,6 +884,10 @@ export const Editor: EditorInterface = {
     return editor.isNormalizing()
   },
 
+  isRemoteChange(editor) {
+    return REMOTE_CHANGES.get(editor) === true
+  },
+
   isSelectable(editor: Editor, value: Element) {
     return editor.isSelectable(value)
   },
@@ -1004,6 +1013,20 @@ export const Editor: EditorInterface = {
 
   withoutNormalizing(editor, fn: () => void) {
     editor.withoutNormalizing(fn)
+  },
+
+  withRemoteChanges(editor, fn) {
+    const previous = REMOTE_CHANGES.get(editor)
+    REMOTE_CHANGES.set(editor, true)
+    try {
+      fn()
+    } finally {
+      if (previous === undefined) {
+        REMOTE_CHANGES.delete(editor)
+      } else {
+        REMOTE_CHANGES.set(editor, previous)
+      }
+    }
   },
   shouldMergeNodesRemovePrevNode: (editor, prevNode, curNode) => {
     return editor.shouldMergeNodesRemovePrevNode(prevNode, curNode)

@@ -367,6 +367,10 @@ Check if an element is an inline element. It only accepts an `Element`, so check
 
 Check if the editor is currently normalizing after each operation.
 
+#### `Editor.isRemoteChange(editor: Editor) => boolean`
+
+Check whether the editor is currently inside `Editor.withRemoteChanges`. It returns `false` outside that editor's scope.
+
 #### `Editor.isStart(editor: Editor, point: Point, at: Location) => boolean`
 
 Check if a point is the start point of a location.
@@ -387,6 +391,22 @@ Options: `{force?: boolean; operation?: Operation}`
 
 Call a function, deferring normalization until after it completes.
 See [Normalization - Implications for Other Code](../../concepts/11-normalizing.md#implications-for-other-code);
+
+### Remote operations
+
+#### `Editor.withRemoteChanges(editor: Editor, fn: () => void) => void`
+
+Apply remote operations inside a synchronous callback. An expanded selection uses inward affinity, so text inserted at either edge stays outside the selected content. Collapsed carets keep their usual forward behavior. Local operations outside the scope retain their existing selection behavior.
+
+Scopes can nest and restore the previous flag even if the callback throws. The scope covers only the synchronous callback; apply asynchronous updates inside a new scope when they arrive. This helper does not synchronize operations or change history saving. Removing a selected node keeps the existing nearest-point fallback.
+
+```typescript
+Editor.withRemoteChanges(editor, () => {
+  Editor.withoutNormalizing(editor, () => {
+    for (const operation of remoteOperations) editor.apply(operation)
+  })
+})
+```
 
 ### Ref Methods
 

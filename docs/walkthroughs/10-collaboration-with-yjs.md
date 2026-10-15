@@ -22,6 +22,19 @@ const editor = withReact(withYHistory(withYjs(createEditor(), sharedType)))
 
 Keep normalization consistent across clients. The example inserts an empty paragraph if deleting the whole document leaves the editor with no children. A production schema also needs every client to agree on how to normalize its elements.
 
+## Selection during remote changes
+
+Bindings should wrap incoming operations in `Editor.withRemoteChanges(editor, fn)`. The synchronous scope uses inward affinity for an expanded selection: if Bob inserts at the end of Alice's selected word, Alice keeps the same word selected. Collapsed carets and local editing outside the scope keep their existing behavior. The flag is available through `Editor.isRemoteChange(editor)` and is restored when a nested scope or exception exits. This affects selection tracking only, not merging concurrent edits or saving history.
+
+`@slate-yjs/core` 1.0.2 exposes `editor.applyRemoteEvents`. The example wraps that method after creating the editor:
+
+```tsx
+const { applyRemoteEvents } = editor
+editor.applyRemoteEvents = (events, origin) => {
+  Editor.withRemoteChanges(editor, () => applyRemoteEvents(events, origin))
+}
+```
+
 ## Undo
 
 Use `withYHistory` instead of layering `withHistory` onto the collaborative editor. Its undo manager tracks each editor's local origin, so Alice's Undo reverses Alice's edits while retaining Bob's edits. Undo and redo produce shared changes and therefore update every connected view. The example exposes buttons for each editor and destroys each document and its undo manager when the example unmounts.
@@ -36,6 +49,6 @@ Remote cursors are separate from document synchronization. `@slate-yjs/react` pr
 
 ## Versions
 
-The example pins `@slate-yjs/core` to `1.0.2` and `yjs` to `13.6.33`. The binding declares `slate >=0.70.0` and `yjs ^13.5.29`; this repo's Slate `0.136.0` and the pinned Yjs version satisfy those ranges. Those ranges are a compatibility declaration, not a claim that this example has tested every accepted version. The example tests cover this repo's current versions.
+The example pins `@slate-yjs/core` to `1.0.2` and `yjs` to `13.6.33`. The binding declares `slate >=0.70.0` and `yjs ^13.5.29`; this repo's Slate and the pinned Yjs version satisfy those ranges. Those ranges are a compatibility declaration, not a claim that this example has tested every accepted version. The example tests cover this repo's current versions.
 
 Read the [slate-yjs documentation](https://docs.slate-yjs.dev/) and [Yjs update API](https://docs.yjs.dev/api/document-updates) for the binding and transport APIs.
