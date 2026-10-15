@@ -102,6 +102,26 @@ export function* positions(
       // then we will iterate over their content.
       if (!voids && (editor.isVoid(node) || editor.isElementReadOnly(node))) {
         yield* maybeYield(Editor.start(editor, path))
+        if (editor.isInline(node)) {
+          const [, blockPath] = Editor.above(editor, {
+            at: path,
+            match: n => Node.isElement(n) && Editor.isBlock(editor, n),
+          })!
+          const edge = reverse
+            ? Path.isAncestor(blockPath, start.path)
+              ? start
+              : Editor.start(editor, blockPath)
+            : Path.isAncestor(blockPath, end.path)
+            ? end
+            : Editor.end(editor, blockPath)
+          blockText = Editor.string(
+            editor,
+            { anchor: Editor.start(editor, path), focus: edge },
+            { voids }
+          )
+          distance = 0
+        }
+        isNewBlock = true
         continue
       }
 

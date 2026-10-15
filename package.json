@@ -38,7 +38,7 @@
     "watch": "yarn build:rollup --watch",
     "playwright": "playwright test",
     "test:docs": "node ./config/docs/check-typescript.cjs",
-    "test:fuzz": "SLATE_FUZZ=1 mocha --require ./config/babel/register.cjs ./packages/slate/test/properties/core.spec.ts --timeout 60000"
+    "test:fuzz": "SLATE_FUZZ=1 mocha --require ./config/babel/register.cjs \"./packages/slate/test/properties/**/*.spec.ts\" --timeout 60000"
   },
   "devDependencies": {
     "@babel/cli": "^7.23.0",

@@ -20,6 +20,7 @@
     "@types/node": "^25.0.9",
     "fast-check": "4.10.2",
     "lodash": "^4.17.21",
+    "slate-history": "^0.128.1",
     "slate-hyperscript": "^0.138.3",
     "source-map-loader": "^4.0.1"
   },

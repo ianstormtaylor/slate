@@ -58,13 +58,30 @@ const block: fc.Arbitrary<Element> = fc.oneof(
   text.map(child => ({ void: true as const, children: [child] }))
 )
 
+const deepBlock = (depth: number): fc.Arbitrary<Element> =>
+  depth === 0
+    ? paragraph
+    : fc.oneof(
+        paragraph,
+        fc
+          .array(deepBlock(depth - 1), { maxLength: 3 })
+          .map(children => ({ type: 'container', children })),
+        text.map(child => ({ void: true as const, children: [child] }))
+      )
+
+const generatedBlock = process.env.SLATE_FUZZ ? deepBlock(3) : block
+const rootLimit = process.env.SLATE_FUZZ ? 6 : 4
+
 export const rawDocument: fc.Arbitrary<Descendant[]> = fc.array(
-  fc.oneof(text, inline, block),
-  { maxLength: 4 }
+  fc.oneof(text, inline, generatedBlock),
+  { maxLength: rootLimit }
 )
 
 export const document = fc
-  .tuple(text, fc.array(block, { minLength: 1, maxLength: 3 }))
+  .tuple(
+    text,
+    fc.array(generatedBlock, { minLength: 1, maxLength: rootLimit - 1 })
+  )
   .map(([first, rest]) => [
     { type: 'paragraph', children: [{ ...first, text: `a${first.text}` }] },
     ...rest,
