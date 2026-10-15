@@ -18,6 +18,7 @@
     "@types/lodash": "^4.17.23",
     "@types/mocha": "^10.0.10",
     "@types/node": "^25.0.9",
+    "fast-check": "4.10.2",
     "lodash": "^4.17.21",
     "slate-hyperscript": "^0.133.3",
     "source-map-loader": "^4.0.1"
