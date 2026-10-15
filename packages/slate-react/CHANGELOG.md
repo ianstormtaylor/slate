@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.140.1
+
+### Patch Changes
+
+- [#6084](https://github.com/ianstormtaylor/slate/pull/6084) [`dcae734`](https://github.com/ianstormtaylor/slate/commit/dcae734aafd76894ec7f2e39f0545709c92d7602) Thanks [@a-y-ibrahim](https://github.com/a-y-ibrahim)! - Keep the DOM and Slate value in sync when an insertText override rejects native text input, including insertions at decoration boundaries.
+
 ## 0.140.0
 
 ### Patch Changes
