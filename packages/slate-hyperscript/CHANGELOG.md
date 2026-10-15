@@ -1,5 +1,11 @@
 # slate-hyperscript
 
+## 0.138.3
+
+### Patch Changes
+
+- [#6290](https://github.com/ianstormtaylor/slate/pull/6290) [`ee31c77`](https://github.com/ianstormtaylor/slate/commit/ee31c77683d78ed65a1055099965d418c306d87b) Thanks [@dylans](https://github.com/dylans)! - Accept `undefined` explicitly in the optional `Editable`, `Slate`, `useSelected` and `createHyperscript` options, so their published types stay compatible with `exactOptionalPropertyTypes` after the TypeScript 6 upgrade.
+
 ## 0.133.3
 
 ### Patch Changes
