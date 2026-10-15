@@ -271,26 +271,3 @@ export const runTransform = (
   assertNormalized(editor)
   assertValidSelection(editor)
 }
-
-export const isSingleOperation = (
-  editor: Editor,
-  name: (typeof transformNames)[number],
-  input: Command
-) => {
-  if (!editor.children.length || name === 'moveNodes') return true
-  if (name === 'insertNodes') return input.position % 2 === 1
-  if (name === 'insertText')
-    return (
-      input.index % 2 === 0 ||
-      Range.isCollapsed(rangeFrom(points(editor), input.index, input.position))
-    )
-  if (name === 'setNodes' || name === 'unsetNodes')
-    return Element.isElement(
-      pick(Array.from(Node.descendants(editor)), input.index)[0]
-    )
-  if (name === 'removeNodes')
-    return (
-      pick(Array.from(Node.descendants(editor)), input.index)[1].length === 1
-    )
-  return false
-}
