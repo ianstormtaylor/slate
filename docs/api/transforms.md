@@ -42,6 +42,8 @@ Insert a fragment of nodes at the specified location or (if not defined) the cur
 
 Options: `{at?: Location, hanging?: boolean, voids?: boolean}`
 
+With `voids: true`, replacing an expanded range also deletes within void content instead of removing the void nodes as atomic units.
+
 #### `Transforms.insertNodes(editor: Editor, nodes: Node | Node[], options?)`
 
 Atomically insert `nodes` at the specified location or (if not defined) the current selection or (if not defined) the end of the document.

@@ -47,10 +47,10 @@ export const insertFragment: TextTransforms['insertFragment'] = (
 
         const startRef = Editor.pointRef(editor, start)
         const endRef = Editor.pointRef(editor, end)
-        Transforms.delete(editor, { at })
+        Transforms.delete(editor, { at, voids })
         const startPoint = startRef.unref()
         const endPoint = endRef.unref()
-        at = endPoint ?? startPoint!
+        at = startPoint ?? endPoint!
       }
     } else if (Location.isPath(at)) {
       at = Editor.start(editor, at)

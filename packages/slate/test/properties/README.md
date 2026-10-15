@@ -16,7 +16,7 @@ SLATE_FUZZ_RUNS=10000 SLATE_FUZZ_SEED=42 yarn test:fuzz
 
 ## Domains and contracts
 
-Documents are bounded to four top-level blocks, a container level, inline elements and voids. Text includes ASCII, accented characters, a surrogate pair and a combining sequence. Text marks include optional booleans, IDs and nested JSON data. The normalization generator also supplies empty elements, adjacent text nodes and mixed block/inline content, including invalid top-level text.
+Default documents are bounded to four top-level blocks, a container level, inline elements and voids. The fuzz profile raises those limits to six root blocks and three container levels. Text includes ASCII, accented characters, a surrogate pair and a combining sequence. Text marks include optional booleans, IDs and nested JSON data. The normalization generator also supplies empty elements, adjacent text nodes and mixed block/inline content, including invalid top-level text.
 
 Each of the nine operation types has its own document-and-selection inverse property. Operation payloads come from the current tree: removed text and nodes match their source, merge positions and properties match the preceding node, split properties match the source, and moves cannot target their own descendants. Separate generated sequences recompute valid operations after each step.
 

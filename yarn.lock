@@ -10453,7 +10453,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"slate-history@workspace:*, slate-history@workspace:packages/slate-history":
+"slate-history@npm:^0.128.1, slate-history@workspace:*, slate-history@workspace:packages/slate-history":
   version: 0.0.0-use.local
   resolution: "slate-history@workspace:packages/slate-history"
   dependencies:
@@ -10619,6 +10619,7 @@ __metadata:
     "@types/node": "npm:^25.0.9"
     fast-check: "npm:4.10.2"
     lodash: "npm:^4.17.21"
+    slate-history: "npm:^0.128.1"
     slate-hyperscript: "npm:^0.138.3"
     source-map-loader: "npm:^4.0.1"
   languageName: unknown

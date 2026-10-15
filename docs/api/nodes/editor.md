@@ -186,7 +186,7 @@ Iterate through all of the positions in the document where a `Point` can be plac
 
 Read `options.unit` to see how this method iterates through positions.
 
-Note: By default void nodes are treated as a single point and iteration will not happen inside their content unless the voids option is set, then iteration will occur.
+Note: By default void nodes are treated as a single point and iteration will not happen inside their content unless the voids option is set, then iteration will occur. Text immediately after an inline void starts a new traversal boundary, including when the surrounding text is empty. Word traversal restarts segmentation at that boundary.
 
 Options:
 

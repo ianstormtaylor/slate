@@ -25,7 +25,7 @@ export const withHistory = <T extends Editor>(editor: T) => {
       const batch = redos[redos.length - 1]
 
       if (batch.selectionBefore) {
-        Transforms.setSelection(e, batch.selectionBefore)
+        Transforms.select(e, batch.selectionBefore)
       }
 
       HistoryEditor.withoutSaving(e, () => {
@@ -56,7 +56,7 @@ export const withHistory = <T extends Editor>(editor: T) => {
             e.apply(op)
           }
           if (batch.selectionBefore) {
-            Transforms.setSelection(e, batch.selectionBefore)
+            Transforms.select(e, batch.selectionBefore)
           }
         })
       })
