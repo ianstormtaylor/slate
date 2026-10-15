@@ -111,7 +111,7 @@ export interface RangeInterface {
    * Transform a range by an operation.
    * If the range is unaffected by the operation, it is returned as-is.
    * If one of the edges is unaffected by the operation, it is returned as-is, but the other edge is transformed and a new range is returned.
-   * If the resulting range is collapsed, it will be returned with a single point object for both the anchor and focus.
+   * The anchor and focus of a returned range are always separate point objects, even when the range is collapsed.
    *
    * @param range The range to transform
    * @param operation The operation to transform the range by
@@ -286,19 +286,13 @@ export const Range: RangeInterface = {
 
     // collapsed ranges will move identically unless the affinity is outward
     if (affinity !== 'outward' && Range.isCollapsed(range)) {
-      return anchor === range.anchor ? range : { anchor, focus: anchor }
+      return anchor === range.anchor ? range : { anchor, focus: { ...anchor } }
     }
 
     const focus = Point.transform(range.focus, op, { affinity: affinityFocus })
     if (!focus) return null
 
     if (anchor === range.anchor && focus === range.focus) return range
-
-    // if this operation collapses the range, don't keep two refs in memory
-    if (Point.equals(anchor, focus))
-      return focus === range.focus
-        ? { anchor: focus, focus }
-        : { anchor, focus: anchor }
 
     return { anchor, focus }
   }) as RangeInterface['transform'],

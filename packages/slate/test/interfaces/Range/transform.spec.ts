@@ -187,19 +187,8 @@ describe('.transform', () => {
             // matching the input ref if possible is top priority, even if points within the input have duplicate refs.
             if (result === range) continue
             assert.notDeepEqual(result, range, `result`)
-            // matching point refs for collapsed ranges is more important than the output focus matching the input focus.
-            if (result.focus === result.anchor) {
-              const resultPoint = result.anchor
-              if (
-                !(resultPoint === range.anchor || resultPoint === range.focus)
-              ) {
-                // make sure we couldnt have resused an input point ref for the collapse
-                assert.notDeepEqual(resultPoint, range.anchor, `anchor`)
-                assert.notDeepEqual(resultPoint, range.focus, `focus`)
-              }
-              continue
-            }
-            assert.notDeepEqual(result.focus, result.anchor, `edges`)
+            assert.notEqual(result.focus, result.anchor, `edges`)
+            if (Range.isCollapsed(range) && affinity !== 'outward') continue
 
             assertEqualOrDeeplyDifferent(result.anchor, range.anchor, `anchor`)
             assertEqualOrDeeplyDifferent(

@@ -215,7 +215,9 @@ export const GeneralTransforms: GeneralTransforms = {
             }
           }
 
-          editor.selection = selection
+          if (!selection || !Range.equals(selection, editor.selection)) {
+            editor.selection = selection
+          }
         }
 
         break
