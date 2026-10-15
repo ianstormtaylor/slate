@@ -212,15 +212,14 @@ export const insertFragment: TextTransforms['insertFragment'] = (
       editor,
       isBlockEnd && !ends.length ? Path.next(blockPath) : blockPath
     )
-
     const endRef = Editor.pathRef(
       editor,
       isInlineEnd ? Path.next(inlinePath) : inlinePath
     )
 
-    // If the fragment contains inlines in multiple distinct blocks, split the
-    // destination block.
-    const splitBlock = ends.length > 0
+    const isSplittingAroundMiddles =
+      middles.length > 0 && !isBlockStart && !isBlockEnd
+    const splitBlock = ends.length > 0 || isSplittingAroundMiddles
 
     Transforms.splitNodes(editor, {
       at,
@@ -283,8 +282,15 @@ export const insertFragment: TextTransforms['insertFragment'] = (
       }
 
       if (path) {
-        const end = Editor.end(editor, path)
-        Transforms.select(editor, end)
+        const lastInserted = Node.get(editor, path)
+        const point =
+          isSplittingAroundMiddles &&
+          !ends.length &&
+          Node.isElement(lastInserted) &&
+          Editor.isVoid(editor, lastInserted)
+            ? Editor.start(editor, Path.next(path))
+            : Editor.end(editor, path)
+        Transforms.select(editor, point)
       }
     }
 

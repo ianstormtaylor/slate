@@ -1,0 +1,31 @@
+/** @jsx jsx */
+import { Transforms } from 'slate'
+import { jsx } from '../../..'
+
+export const run = (editor, options = {}) => {
+  Transforms.insertFragment(
+    editor,
+    <fragment>
+      <block void>
+        <text />
+      </block>
+    </fragment>,
+    options
+  )
+}
+export const input = (
+  <editor>
+    <block>
+      <cursor />
+      word
+    </block>
+  </editor>
+)
+export const output = (
+  <editor>
+    <block void>
+      <cursor />
+    </block>
+    <block>word</block>
+  </editor>
+)
