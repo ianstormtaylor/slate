@@ -42,7 +42,7 @@ Insert a fragment of nodes at the specified location or (if not defined) the cur
 
 Options: `{at?: Location, hanging?: boolean, voids?: boolean}`
 
-With `voids: true`, replacing an expanded range also deletes within void content instead of removing the void nodes as atomic units.
+With `voids: true`, replacing an expanded range also deletes within void content instead of removing the void nodes as atomic units. At an inline boundary, insertion uses the surrounding text in that block, adding the empty text required by normalization if replacement temporarily removes it.
 
 #### `Transforms.insertNodes(editor: Editor, nodes: Node | Node[], options?)`
 
@@ -69,6 +69,8 @@ Options supported: `NodeOptions & {hanging?: boolean}`
 #### `Transforms.mergeNodes(editor: Editor, options?)`
 
 Merge a node at the specified location with the previous node at the same depth. If no location is specified, use the selection. Resulting empty container nodes are removed.
+
+Merging elements throws if both have children and one contains blocks while the other contains text or inline nodes, unless `shouldMergeNodesRemovePrevNode` removes the previous node instead. The error names both paths and is raised before moving or removing the merge targets. An expanded `at` range can be deleted before this check.
 
 Options supported: `NodeOptions & {hanging?: boolean}`
 

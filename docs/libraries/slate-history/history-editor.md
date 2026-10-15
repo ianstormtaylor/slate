@@ -55,6 +55,8 @@ merged as usual.
 Apply a series of changes inside a synchronous `fn`, without merging any of
 the new operations into previous save point in the history.
 
+Normalization operations become separate undo steps; use `withNewBatch` to make a compound transform one step.
+
 #### `HistoryEditor.withoutSaving(editor: HistoryEditor, fn: () => void): void`
 
 Apply a series of changes inside a synchronous `fn`, without saving any of

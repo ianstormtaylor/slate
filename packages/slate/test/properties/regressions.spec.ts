@@ -117,3 +117,80 @@ it('word traversal restarts segmentation after an inline void', () => {
     }
   }
 })
+
+for (const precedingBlock of [false, true]) {
+  for (const backward of [false, true]) {
+    it(`fragment replacement pads a leading inline with preceding block ${precedingBlock} and backward range ${backward}`, () => {
+      const prefix = precedingBlock ? [{ children: [{ text: 'keep' }] }] : []
+      const index = prefix.length
+      const editor = create([
+        ...prefix,
+        { children: [{ text: 'a' }] },
+        {
+          children: [
+            { inline: true, children: [{ text: 'aa', data: [] }] },
+            { text: 'a' },
+          ],
+        },
+        { type: 'container', children: [] },
+      ])
+      const start = { path: [index, 0], offset: 0 }
+      const end = { path: [index + 1, 1, 0], offset: 1 }
+      Transforms.insertFragment(
+        editor,
+        [
+          { children: [{ text: 'x' }] },
+          { children: [{ text: 'x', bold: true }] },
+        ],
+        {
+          at: backward
+            ? { anchor: end, focus: start }
+            : { anchor: start, focus: end },
+          voids: true,
+        }
+      )
+      assert.strictEqual(
+        Editor.string(editor, [], { voids: true }),
+        `${precedingBlock ? 'keep' : ''}xxaa`
+      )
+      if (precedingBlock) assert.deepStrictEqual(editor.children[0], prefix[0])
+    })
+  }
+}
+
+it('fragment replacement resolves an inline edge before trailing containers normalize', () => {
+  const editor = create([
+    { type: 'paragraph', children: [{ text: 'a' }] },
+    {
+      type: 'paragraph',
+      children: [{ inline: true, children: [{ text: 'a', data: [] }] }],
+    },
+    {
+      type: 'container',
+      children: [
+        {
+          type: 'container',
+          children: [
+            { type: 'container', children: [] },
+            {
+              type: 'paragraph',
+              children: [{ inline: true, children: [{ text: 'aaa' }] }],
+            },
+          ],
+        },
+      ],
+    },
+  ])
+  Transforms.insertFragment(
+    editor,
+    [{ children: [{ text: 'x' }] }, { children: [{ text: 'x', bold: true }] }],
+    {
+      at: {
+        anchor: { path: [1, 1, 0], offset: 0 },
+        focus: { path: [2, 0, 1, 1, 0], offset: 1 },
+      },
+      voids: true,
+    }
+  )
+  assert.strictEqual(Editor.string(editor, [], { voids: true }), 'axxaa')
+})
