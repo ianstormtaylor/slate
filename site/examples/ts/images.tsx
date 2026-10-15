@@ -155,6 +155,7 @@ const Image = ({
       >
         <img
           src={element.url}
+          alt={element.alt ?? ''}
           className={css`
             display: block;
             max-width: 100%;
@@ -222,7 +223,8 @@ const initialValue: Descendant[] = [
   },
   {
     type: 'image',
-    url: 'https://source.unsplash.com/kFrdX5IeQzI',
+    url: 'https://images.unsplash.com/photo-1532450106241-ed30d951fbb5?w=1200&q=80',
+    alt: 'A forested valley below a rocky mountain peak',
     children: [{ text: '' }],
   },
   {
@@ -243,7 +245,8 @@ const initialValue: Descendant[] = [
   },
   {
     type: 'image',
-    url: 'https://source.unsplash.com/zOwZKwZOZq8',
+    url: 'https://images.unsplash.com/photo-1589229137277-70d507f80b8f?w=1200&q=80',
+    alt: 'A sheep bleating in a heather field',
     children: [{ text: '' }],
   },
 ]

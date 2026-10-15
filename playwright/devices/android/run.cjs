@@ -136,7 +136,7 @@ const openExample = async (browser, example, localImages) => {
     await installRecorder(page)
   }
   if (localImages) {
-    await page.route('https://source.unsplash.com/**', route =>
+    await page.route('https://images.unsplash.com/**', route =>
       route.fulfill({
         contentType: 'image/svg+xml',
         body: '<svg xmlns="http://www.w3.org/2000/svg" width="320" height="180"><rect width="320" height="180" fill="teal"/></svg>',
