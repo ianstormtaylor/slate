@@ -4,7 +4,7 @@ import { Range, Transforms } from 'slate'
 import { HistoryEditor, withHistory } from 'slate-history'
 import { create, document, points, rangeFrom } from './generators'
 import { assertNormalized, assertValidSelection, settings } from './checks'
-import { highLevelCommand, isSingleOperation, runTransform } from './high-level'
+import { highLevelCommand, runTransform } from './high-level'
 
 for (const mode of ['default', 'withoutMerging', 'withNewBatch'] as const) {
   it(`history restores generated transform sequences with ${mode}`, () => {
@@ -23,18 +23,9 @@ for (const mode of ['default', 'withoutMerging', 'withNewBatch'] as const) {
           for (const { name, input } of commands) {
             const run = () => runTransform(editor, name, input)
             if (mode === 'default') run()
-            else if (
-              mode === 'withoutMerging' &&
-              isSingleOperation(editor, name, input)
-            ) {
-              const before = editor.operations.length
+            else if (mode === 'withoutMerging')
               HistoryEditor.withoutMerging(editor, run)
-              assert(
-                editor.operations
-                  .slice(before)
-                  .filter(op => op.type !== 'set_selection').length <= 1
-              )
-            } else HistoryEditor.withNewBatch(editor, run)
+            else HistoryEditor.withNewBatch(editor, run)
           }
           const end = structuredClone(editor.children)
           const last = editor.history.undos[editor.history.undos.length - 1]

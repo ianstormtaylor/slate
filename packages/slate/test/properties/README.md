@@ -32,7 +32,7 @@ Loose text equality is checked against Lodash's deep comparison of independently
 
 Fifteen properties apply normalized high-level transforms with valid generated points, ranges and paths: delete, insertText, insertFragment, insertNodes, splitNodes, mergeNodes, inline/block wrap and unwrap, liftNodes, moveNodes, setNodes, unsetNodes and removeNodes. Deletion varies character/word/line/block units, distance and direction. Expanded deletion uses `hanging: true`; collapsed ranges use point deletion rather than an empty-range string oracle. String checks preserve the unaffected prefix/suffix, or all text for structural transforms. Point deletion protects root blocks outside the target and its immediate neighbors to allow void and empty-inline behavior.
 
-Three history properties execute one to ten transforms under default history, `withNewBatch`, or a mix of `withoutMerging` for single-operation transforms and `withNewBatch` for compound transforms. The single-operation classification is computed from the operation and its arguments before execution: root moves/inserts/removals, point text insertion and element metadata updates. An assertion checks that classified calls actually emit at most one saved operation; normalization operations count too. Empty documents are repaired with one root insertion before subsequent commands.
+Three history properties execute one to ten transforms under default history, `withNewBatch`, or `withoutMerging`. Empty documents are repaired with one root insertion before subsequent commands.
 
 Documents must match the starting and ending snapshots after undoing and redoing every batch. Undo restores the first saved batch's selection. Redo starts from the final batch's `selectionBefore` and transforms it through its saved operations with forward affinity, checking equality when those points survive; standalone selection changes are not history entries. Every final selection must resolve to valid text offsets. This selection oracle tests history wiring, not an independent implementation of point transformation.
 
@@ -44,7 +44,7 @@ Seven position properties cover word, line and block with both void modes, plus 
 
 Text-conserving generated merges use adjacent sibling elements with compatible child modes: both have block children, or both have text/inline children. An additional generated property constructs incompatible sibling pairs in both directions and checks that they throw without changing the document, selection, operations or registered refs. Plain regressions also cover inline children, a non-sibling target, empty sides, text-node merging and the previous-node removal policy.
 
-Compound `withoutMerging` undo is tracked in [issue #6302](https://github.com/ianstormtaylor/slate/issues/6302). Its normalization operations become independent undo steps, which can invalidate later inverse paths. The history suite uses `withNewBatch` for those operations as directed. The separate per-operation deletion selection mismatch remains reproducible in the maintenance review package, with its own executable plain repro, failing output and cause; it is not treated as a passing history contract. Slate-history implementation is unchanged by this follow-up.
+The `withoutMerging` property covers [issue #6302](https://github.com/ianstormtaylor/slate/issues/6302): before the fix, a transform's normalization operations became separate undo steps, and undoing them could throw or restore an invalid selection.
 
 ## Scope
 
