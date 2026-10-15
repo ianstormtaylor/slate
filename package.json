@@ -20,7 +20,7 @@
     "lint": "yarn lint:typescript && yarn lint:eslint && yarn lint:prettier",
     "lint:eslint": "eslint \"./{packages,site}/**/*.{js,jsx,ts,tsx}\"",
     "lint:prettier": "prettier --check \"**/*.{css,md,js,jsx,json,ts,tsx}\"",
-    "lint:typescript": "tsc --build ./ --force",
+    "lint:typescript": "tsc --build ./ --force && tsc --noEmit -p site/tsconfig.json",
     "open": "open http://localhost:3000",
     "prerelease": "NODE_ENV=production yarn build:rollup && yarn test && yarn lint",
     "internal:release:next": "yarn prerelease && yarn changeset publish --tag next",
