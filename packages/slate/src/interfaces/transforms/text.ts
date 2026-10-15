@@ -1,4 +1,12 @@
-import { Editor, Location, Node, Range, Transforms } from '../../index'
+import {
+  Editor,
+  Element,
+  Location,
+  Node,
+  NodeEntry,
+  Range,
+  Transforms,
+} from '../../index'
 import { TextUnit } from '../../types/types'
 import { getDefaultInsertLocation } from '../../utils'
 
@@ -11,12 +19,22 @@ export interface TextDeleteOptions {
   voids?: boolean
 }
 
+export interface InsertFragmentFilterOptions {
+  blockEntry: NodeEntry<Element>
+}
+
+export type InsertFragmentFilter = (
+  node: Node,
+  options: InsertFragmentFilterOptions
+) => boolean
+
 export interface TextInsertFragmentOptions {
   select?: boolean
   at?: Location
   hanging?: boolean
   voids?: boolean
   batchDirty?: boolean
+  filter?: InsertFragmentFilter
 }
 
 export interface TextInsertTextOptions {
