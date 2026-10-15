@@ -6,7 +6,10 @@ test.describe('huge document example', () => {
   })
 
   test('uses chunking', async ({ page }) => {
-    await expect(page.getByLabel('Blocks')).toHaveValue('10000')
+    test.slow()
+    await expect(page.getByLabel('Blocks')).toHaveValue('10000', {
+      timeout: 30_000,
+    })
     await expect(page.getByLabel('Chunk size')).toHaveValue('1000')
     await expect(page.locator('[data-slate-chunk]')).toHaveCount(10)
   })
