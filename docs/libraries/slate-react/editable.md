@@ -4,6 +4,8 @@
 
 The `Editable` component is the main editing component. Note that it must be inside a `Slate` component.
 
+Keyboard focus (Tab or Shift+Tab) restores the editor's existing selection. If there is no selection, the browser chooses the initial caret position. Clicking the editor places the caret at the clicked position.
+
 ### Props
 
 It takes as its props, any props accepted by a Textarea element plus the following props.
