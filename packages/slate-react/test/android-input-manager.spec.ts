@@ -117,6 +117,47 @@ describe('Android input flushing', () => {
     expect(manager.hasPendingChanges()).toBe(false)
   })
 
+  test('schedules committed insertion when affinity changes the receiving leaf', () => {
+    const { editor, manager } = setup('code')
+    const code = { text: 'code', code: true }
+    editor.children = [{ children: [code, { text: ' plain' }] }]
+    editor.leafEdgeAffinity = () => 'forward'
+    const node = document.createTextNode('code')
+    document.body.appendChild(node)
+    const range = document.createRange()
+    range.setStart(node, 4)
+    range.collapse(true)
+    const event = new InputEvent('beforeinput', {
+      inputType: 'insertText',
+      data: 'x',
+    })
+    Object.defineProperty(event, 'getTargetRanges', { value: () => [range] })
+    manager.handleDOMBeforeInput(event)
+    node.data = 'codex'
+
+    expect(manager.hasPendingDiffs()).toBe(false)
+    expect(manager.hasPendingAction()).toBe(true)
+    manager.flush()
+
+    expect(editor.children).toEqual([
+      { children: [{ text: 'code', code: true }, { text: 'x plain' }] },
+    ])
+    expect(editor.selection?.anchor).toEqual({ path: [0, 1], offset: 1 })
+    expect(node.data).toBe('code')
+    node.remove()
+  })
+
+  test('keeps composing text in the existing diff path with affinity enabled', () => {
+    const { editor, manager, beforeInput } = setup('code')
+    const code = { text: 'code', code: true }
+    editor.children = [{ children: [code, { text: ' plain' }] }]
+    editor.leafEdgeAffinity = () => 'forward'
+    IS_COMPOSING.set(editor, true)
+    beforeInput('insertCompositionText', 'x')
+
+    expect(manager.hasPendingDiffs()).toBe(true)
+  })
+
   test('keeps typed text without a pending action until FLUSH_DELAY', async () => {
     const { editor, manager, beforeInput } = setup('word')
     const point = { path: [0, 0], offset: 4 }

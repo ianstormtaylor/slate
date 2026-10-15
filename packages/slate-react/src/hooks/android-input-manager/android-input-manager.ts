@@ -15,7 +15,7 @@ import {
   TextDiff,
   verifyDiffState,
 } from 'slate-dom'
-import { isDOMSelection, isTrackedMutation } from 'slate-dom'
+import { isDOMSelection, isDOMNode, isTrackedMutation } from 'slate-dom'
 import {
   EDITOR_TO_FORCE_RENDER,
   EDITOR_TO_PENDING_ACTION,
@@ -795,6 +795,41 @@ export function createAndroidInputManager({
                   Editor.insertSoftBreak(editor)
                 }
               })
+            },
+            {
+              at: targetRange,
+            }
+          )
+        }
+
+        if (
+          type === 'insertText' &&
+          !ReactEditor.isComposing(editor) &&
+          Range.isCollapsed(targetRange) &&
+          typeof Editor.insertionPoint === 'function' &&
+          !Point.equals(
+            Editor.insertionPoint(editor, targetRange.anchor),
+            targetRange.anchor
+          )
+        ) {
+          const node = isDOMSelection(nativeTargetRange)
+            ? nativeTargetRange.anchorNode
+            : nativeTargetRange?.startContainer
+          const snapshot =
+            isDOMNode(node) && node.nodeType === 3
+              ? { node, text: node.textContent }
+              : null
+          event.preventDefault()
+          return scheduleAction(
+            () => {
+              if (
+                snapshot &&
+                snapshot.node.isConnected &&
+                snapshot.node.textContent !== snapshot.text
+              ) {
+                snapshot.node.textContent = snapshot.text
+              }
+              Editor.insertText(editor, text)
             },
             {
               at: targetRange,
