@@ -14,6 +14,11 @@ interface Editor {
   isIsolated: (element: Element) => boolean
   isVoid: (element: Element) => boolean
   markableVoid: (element: Element) => boolean
+  inlineEdgeAffinity: (
+    element: Element,
+    edge: 'start' | 'end'
+  ) => 'inside' | 'outside' | null
+  leafEdgeAffinity: (before: Text, after: Text) => 'backward' | 'forward' | null
   normalizeNode: (entry: NodeEntry) => void
   onChange: (options?: { operation?: Operation }) => void
 
@@ -124,9 +129,17 @@ Iterate through all of the levels at a location.
 
 Options: `{at?: Location, match?: NodeMatch, reverse?: boolean, voids?: boolean}`
 
+#### `Editor.insertionPoint(editor: Editor, point: Point) => Point`
+
+Resolve a caret to the point that implicit insertion will use. Applies `inlineEdgeAffinity` first, then `leafEdgeAffinity`, with at most one move for each rule. Both default to `null`, which preserves the supplied point. The helper does not change the selection.
+
+The rules apply to `editor.insertText`, `insertFragment` and insertion of inline elements with `insertNodes` only when `at` is omitted and the selection is collapsed. Explicit locations, expanded selections, and insertion of text or block nodes through `insertNodes` retain their existing behavior. IME composition remains native; these rules govern committed insertion.
+
 #### `Editor.marks(editor: Editor) => Omit<Text, 'text'> | null`
 
 Get the marks that would be added to text at the current selection.
+
+At a collapsed caret with a non-null edge rule, returns the receiving leaf’s marks, unless explicit `editor.marks` are set. When both edge rules return `null`, the existing previous-leaf behavior at offset zero is preserved.
 
 If `editor.marks` is set (marks toggled with a collapsed selection), those are returned. With an expanded selection, it returns the marks of the first text node in the selection, skipping a node the selection only touches at its end, so it describes what typing over the selection would produce rather than marks shared by the whole selection. To check whether a mark applies to all of the selected text, iterate `Editor.nodes(editor, { match: Text.isText })` and compare each node.
 
@@ -469,6 +482,16 @@ Check if a value is an inline `Element` object.
 #### `isVoid(element: Element) => boolean`
 
 Check if a value is a void `Element` object.
+
+#### `inlineEdgeAffinity(element: Element, edge: 'start' | 'end') => 'inside' | 'outside' | null`
+
+Choose whether insertion at an inline edge belongs inside the inline or in the adjacent text outside it. The rule also applies when the caret names that adjacent text. Defaults to `null`, retaining the current point. An `'inside'` rule never moves a caret into a void, read-only, or non-selectable inline.
+
+At shared boundaries, the outermost inline edge takes precedence. Between adjacent inlines separated by empty text, rules are considered from left to right; the first non-null rule wins. Empty non-void inlines use their start edge, and an outside rule uses the text before the empty inline. These tie rules keep repeated resolution stable.
+
+#### `leafEdgeAffinity(before: Text, after: Text) => 'backward' | 'forward' | null`
+
+Choose which of two sibling text leaves receives insertion at their shared boundary. `'backward'` uses the end of `before`; `'forward'` uses the start of `after`. Defaults to `null`, retaining the current point. This rule runs after inline affinity and determines the receiving leaf’s marks reported by `Editor.marks`.
 
 #### `isIsolated(element: Element) => boolean`
 

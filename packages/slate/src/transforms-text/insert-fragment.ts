@@ -9,6 +9,7 @@ import { Descendant, Node, NodeEntry } from '../interfaces/node'
 import { TextTransforms } from '../interfaces/transforms/text'
 import { getDefaultInsertLocation } from '../utils'
 import { Location } from '../interfaces'
+import { getInsertionPoint } from '../utils/get-insertion-point'
 
 export const insertFragment: TextTransforms['insertFragment'] = (
   editor,
@@ -22,6 +23,17 @@ export const insertFragment: TextTransforms['insertFragment'] = (
       select = options.at == null,
       filter,
     } = options
+    let insertion: ReturnType<typeof getInsertionPoint> | undefined
+    if (
+      fragment.length &&
+      options.at == null &&
+      editor.selection &&
+      Range.isCollapsed(editor.selection)
+    ) {
+      insertion = getInsertionPoint(editor, editor.selection.anchor)
+      if (!Point.equals(insertion.point, editor.selection.anchor))
+        Transforms.select(editor, insertion.point)
+    }
     let { at = getDefaultInsertLocation(editor), batchDirty = true } = options
 
     if (!fragment.length) {
@@ -71,7 +83,7 @@ export const insertFragment: TextTransforms['insertFragment'] = (
       voids,
     })
 
-    if (inlineElementMatch) {
+    if (inlineElementMatch && insertion?.inlineAffinity !== 'inside') {
       const [, inlinePath] = inlineElementMatch
 
       const parent = Node.parent(editor, inlinePath)
@@ -240,7 +252,7 @@ export const insertFragment: TextTransforms['insertFragment'] = (
     const [inlineMatch] = Editor.nodes(editor, {
       at,
       match: n => Node.isText(n) || Editor.isInline(editor, n),
-      mode: 'highest',
+      mode: insertion?.inlineAffinity === 'inside' ? 'lowest' : 'highest',
       voids,
     })!
 
@@ -267,7 +279,10 @@ export const insertFragment: TextTransforms['insertFragment'] = (
         splitBlock
           ? Node.isElement(n) && Editor.isBlock(editor, n)
           : Node.isText(n) || Editor.isInline(editor, n),
-      mode: splitBlock ? 'lowest' : 'highest',
+      mode:
+        splitBlock || insertion?.inlineAffinity === 'inside'
+          ? 'lowest'
+          : 'highest',
       always:
         splitBlock &&
         (!isBlockStart || starts.length > 0) &&

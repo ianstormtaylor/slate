@@ -133,3 +133,38 @@ for (const point of Editor.positions(editor)) {
 ```
 
 > 🤖 For more info, check out the [Editor Static Methods API Reference](../api/nodes/editor.md#static-methods)
+
+## Insertion at inline and mark edges
+
+A visual caret can name either side of an inline or formatting boundary. Keep typing outside links by overriding `inlineEdgeAffinity`:
+
+```javascript
+const { inlineEdgeAffinity } = editor
+editor.inlineEdgeAffinity = (element, edge) =>
+  element.type === 'link' ? 'outside' : inlineEdgeAffinity(element, edge)
+```
+
+For marks, use `leafEdgeAffinity`. This example exits code at its end and otherwise prefers the preceding leaf:
+
+```javascript
+editor.leafEdgeAffinity = (before, after) =>
+  before.code && !after.code ? 'forward' : 'backward'
+```
+
+The same receiving leaf determines `Editor.marks`, keeping toolbar state and typed text in agreement. Explicitly toggled `editor.marks` still win. Both hooks default to `null`, preserving existing behavior until you opt in.
+
+For placement based on movement direction, record your application’s last movement and return that direction. This does not add an extra arrow-key stop:
+
+```javascript
+let direction = 'backward'
+const { move } = editor
+editor.move = (options = {}) => {
+  direction = options.reverse ? 'forward' : 'backward'
+  move(options)
+}
+editor.leafEdgeAffinity = () => direction
+```
+
+A forward movement enters the boundary from the preceding leaf, so subsequent insertion uses `'backward'`; a reverse movement uses `'forward'`. Route your movement commands through `editor.move` (or update the stored direction in your own keyboard handler).
+
+`Editor.insertionPoint(editor, point)` lets plugins resolve the same point without changing selection. Core applies it only for implicit insertion at a collapsed caret: typed text, fragments, and inline nodes. Explicit `at` and expanded selections keep their existing behavior. Native IME composition is unchanged.
