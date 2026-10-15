@@ -1,5 +1,11 @@
 # slate-history
 
+## 0.140.0
+
+### Patch Changes
+
+- [#6308](https://github.com/ianstormtaylor/slate/pull/6308) [`15064b5`](https://github.com/ianstormtaylor/slate/commit/15064b541c9cc066fed40ef988a158c4e4595ea1) Thanks [@dylans](https://github.com/dylans)! - Keep a transform's normalization in the same undo step inside `HistoryEditor.withoutMerging`. Undo steps now start only when the document is normalized, so undoing them no longer throws `Cannot find descendant at path` or restores a selection that points at a missing node.
+
 ## 0.139.0
 
 ### Patch Changes
