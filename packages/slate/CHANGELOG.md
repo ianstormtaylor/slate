@@ -1,5 +1,11 @@
 # slate
 
+## 0.142.1
+
+### Patch Changes
+
+- [#6318](https://github.com/ianstormtaylor/slate/pull/6318) [`f48edfa`](https://github.com/ianstormtaylor/slate/commit/f48edfa3bdd99cf038431afb5e68eca8ffab2323) Thanks [@dylans](https://github.com/dylans)! - Fix insertions at a collapsed selection that isn't in a text node, such as one pointing at an inline element in an unnormalized document, throwing `Cannot get the leaf node`. The opt-in edge affinity now leaves those points to the transform, as before 0.141.
+
 ## 0.142.0
 
 ### Minor Changes
