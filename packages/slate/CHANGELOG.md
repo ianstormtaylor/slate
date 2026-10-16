@@ -1,5 +1,11 @@
 # slate
 
+## 0.142.0
+
+### Minor Changes
+
+- [#6316](https://github.com/ianstormtaylor/slate/pull/6316) [`342facf`](https://github.com/ianstormtaylor/slate/commit/342facf51d75762e4d15d8f0776c3b4a04aef284) Thanks [@dylans](https://github.com/dylans)! - `createEditor` takes an optional type parameter. `createEditor()` still returns `Editor`; `createEditor<BaseEditor>()` returns a plain `BaseEditor`, so a plugin chain is type-checked against the plugins actually applied rather than the fully extended `CustomTypes` editor.
+
 ## 0.141.0
 
 ### Minor Changes

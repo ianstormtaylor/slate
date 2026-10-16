@@ -1,5 +1,17 @@
 # slate-react
 
+## 0.142.0
+
+### Minor Changes
+
+- [#6266](https://github.com/ianstormtaylor/slate/pull/6266) [`bc91dca`](https://github.com/ianstormtaylor/slate/commit/bc91dca60f376c34c7397a86cb7eb1030bbc6573) Thanks [@dylans](https://github.com/dylans)! - Add `editor.onDOMError` and the lookups `DOMEditor.resolveDOMPoint`, `DOMEditor.resolveDOMRange` and `DOMEditor.resolveEventRange`.
+
+  The resolve lookups return `null` instead of throwing. While the DOM is still catching up with the model (the editor isn't mounted, a render is pending, or Android input hasn't been applied yet), a missing point is ordinary and isn't reported. Once the DOM has settled, a point that still can't be found means a broken rendering contract, such as an element that doesn't render its `children`, and is reported through `editor.onDOMError`, which passes it to the browser's `reportError` by default.
+
+  Slate's own handlers now use these lookups with no try/catch. ArrowUp near a trailing newline, the `beforeinput` link-end check, shift-clicking past a selected void and restoring the DOM selection no longer throw out of their handlers. Selection syncing, which used to swallow every failure, now reports only the broken-contract case.
+
+  slate-react now requires slate-dom 0.141.0 or later.
+
 ## 0.141.0
 
 ### Minor Changes

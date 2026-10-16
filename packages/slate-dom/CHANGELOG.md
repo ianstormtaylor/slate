@@ -1,5 +1,30 @@
 # slate-dom
 
+## 0.142.0
+
+### Minor Changes
+
+- [#6266](https://github.com/ianstormtaylor/slate/pull/6266) [`bc91dca`](https://github.com/ianstormtaylor/slate/commit/bc91dca60f376c34c7397a86cb7eb1030bbc6573) Thanks [@dylans](https://github.com/dylans)! - Add `editor.onDOMError` and the lookups `DOMEditor.resolveDOMPoint`, `DOMEditor.resolveDOMRange` and `DOMEditor.resolveEventRange`.
+
+  The resolve lookups return `null` instead of throwing. While the DOM is still catching up with the model (the editor isn't mounted, a render is pending, or Android input hasn't been applied yet), a missing point is ordinary and isn't reported. Once the DOM has settled, a point that still can't be found means a broken rendering contract, such as an element that doesn't render its `children`, and is reported through `editor.onDOMError`, which passes it to the browser's `reportError` by default.
+
+  Slate's own handlers now use these lookups with no try/catch. ArrowUp near a trailing newline, the `beforeinput` link-end check, shift-clicking past a selected void and restoring the DOM selection no longer throw out of their handlers. Selection syncing, which used to swallow every failure, now reports only the broken-contract case.
+
+  slate-react now requires slate-dom 0.141.0 or later.
+
+- [#6265](https://github.com/ianstormtaylor/slate/pull/6265) [`82f6713`](https://github.com/ianstormtaylor/slate/commit/82f671373cecabef3592e519623b0e990b34ff75) Thanks [@dylans](https://github.com/dylans)! - Multi-line plain-text paste now builds the lines into a fragment and calls `editor.insertFragment` once, instead of splitting the block and calling `editor.insertText` for each line. Pasting 22,000 lines runs about eight times faster.
+
+  Changes plugins can see:
+
+  - Outside inlines, `insertFragment` overrides now receive multi-line plain-text pastes, and `insertText` overrides no longer see them. Single-line pastes still go through `insertText`.
+  - The operations are an `insert_node` per middle line instead of a `split_node` per line. Code that matches operation types in `apply` sees the new shape.
+  - Every pasted line gets the block properties and marks at the caret, including pending `editor.marks`.
+  - With the caret inside an inline such as a link, every line still stays inside it, as before. The first and last lines go through `insertText`, and the middle lines are inserted with one `insertNodes` call instead of one split per line.
+
+### Patch Changes
+
+- [#6317](https://github.com/ianstormtaylor/slate/pull/6317) [`69658fa`](https://github.com/ianstormtaylor/slate/commit/69658fa1fd51170c8af041e871948f4146558d00) Thanks [@dylans](https://github.com/dylans)! - Fix `HAS_BEFORE_INPUT_SUPPORT` so legacy Chrome (75 and older) uses the `beforeinput` fallback as intended. The check combined the desktop and Android legacy flags with `||`, which was true for almost every browser.
+
 ## 0.140.0
 
 ### Minor Changes
