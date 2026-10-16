@@ -35,7 +35,11 @@ import { useSlate } from '../hooks/use-slate'
 import { useTrackUserInput } from '../hooks/use-track-user-input'
 import { useCompositionDOM } from '../hooks/use-composition-dom'
 import { getPointAboveTrailingNewline } from '../utils/trailing-newline'
-import { reportError } from '../utils/report-error'
+import {
+  resolveDOMPoint,
+  resolveDOMRange,
+  resolveDOMRangeDuringFlush,
+} from '../utils/resolve-dom'
 import { getCharacterMoveUnit } from '../utils/character-move'
 import { removeStrayComposition } from '../utils/misplaced-composition'
 import { ReactEditor } from '../plugin/react-editor'
@@ -468,7 +472,10 @@ export const Editable = forwardRef(
         return
       }
 
-      const setDomSelection = (forceChange?: boolean) => {
+      const setDomSelection = (
+        forceChange?: boolean,
+        lookUpDOMRange = resolveDOMRange
+      ) => {
         const hasDomSelection = domSelection.type !== 'None'
 
         // If the DOM selection is properly unset, we're done.
@@ -565,13 +572,7 @@ export const Editable = forwardRef(
         // Otherwise the DOM selection is out of sync, so update it.
         state.isUpdatingSelection = true
 
-        let newDomRange: DOMRange | null = null
-
-        try {
-          newDomRange = selection && ReactEditor.toDOMRange(editor, selection)
-        } catch (e) {
-          // Ignore, dom and state might be out of sync
-        }
+        const newDomRange = selection && lookUpDOMRange(editor, selection)
 
         if (newDomRange) {
           if (ReactEditor.isComposing(editor) && !IS_ANDROID) {
@@ -620,14 +621,14 @@ export const Editable = forwardRef(
       const animationFrameId = requestAnimationFrame(() => {
         if (ensureSelection) {
           const ensureDomSelection = (forceChange?: boolean) => {
-            try {
-              const el = ReactEditor.toDOMNode(editor, editor)
-              el.focus()
+            const el = EDITOR_TO_ELEMENT.get(editor)
 
-              setDomSelection(forceChange)
-            } catch (e) {
-              // Ignore, dom and state might be out of sync
+            if (!el) {
+              return
             }
+
+            el.focus()
+            setDomSelection(forceChange, resolveDOMRangeDuringFlush)
           }
 
           // Compat: Android IMEs try to force their selection by manually re-applying it even after we set it.
@@ -773,7 +774,7 @@ export const Editable = forwardRef(
               // Therefore we don't allow native events to insert text at the end of anchor nodes.
               const { anchor } = selection
 
-              const domPoint = toDOMPointOrReport(editor, anchor)
+              const domPoint = resolveDOMPoint(editor, anchor)
 
               if (!domPoint) {
                 native = false
@@ -1562,12 +1563,13 @@ export const Editable = forwardRef(
                           Path.equals(startVoid[1], selectedVoid[1])
                         )
                       ) {
-                        let clicked: Range
+                        const clicked = ReactEditor.findEventRange(
+                          editor,
+                          event,
+                          { suppressThrow: true }
+                        )
 
-                        try {
-                          clicked = ReactEditor.findEventRange(editor, event)
-                        } catch (error) {
-                          reportError(editor, error)
+                        if (!clicked) {
                           return
                         }
 
@@ -2473,15 +2475,6 @@ const isInSlateText = (node: unknown) =>
   node.nodeType === node.TEXT_NODE &&
   !!node.parentElement?.closest('[data-slate-string], [data-slate-zero-width]')
 
-const toDOMPointOrReport = (editor: ReactEditor, point: Point) => {
-  try {
-    return ReactEditor.toDOMPoint(editor, point)
-  } catch (error) {
-    reportError(editor, error)
-    return null
-  }
-}
-
 const restoreDomSelection = (
   editor: ReactEditor,
   domSelection: Selection,
@@ -2491,12 +2484,9 @@ const restoreDomSelection = (
     return
   }
 
-  let domRange: DOMRange
+  const domRange = resolveDOMRange(editor, editor.selection)
 
-  try {
-    domRange = ReactEditor.toDOMRange(editor, editor.selection)
-  } catch (error) {
-    reportError(editor, error)
+  if (!domRange) {
     return
   }
 

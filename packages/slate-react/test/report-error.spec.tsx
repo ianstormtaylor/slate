@@ -25,7 +25,7 @@ describe('reporting DOM mapping failures', () => {
     globalThis.reportError = reportedError => reported.push(reportedError)
 
     try {
-      editor.onError(error)
+      editor.onDOMError(error)
     } finally {
       globalThis.reportError = original
     }
@@ -33,25 +33,25 @@ describe('reporting DOM mapping failures', () => {
     expect(reported).toEqual([error])
   })
 
-  test('reports an unmeasurable caret instead of throwing on ArrowUp', () => {
+  test('measures nothing on ArrowUp before the editor is mounted', () => {
     const editor = withReact(createEditor())
     editor.children = [
       { type: 'paragraph', children: [{ text: 'line\n' }] } as Descendant,
       { type: 'paragraph', children: [{ text: 'next' }] } as Descendant,
     ]
     const errors: unknown[] = []
-    editor.onError = error => errors.push(error)
+    editor.onDOMError = error => errors.push(error)
 
     expect(
       getPointAboveTrailingNewline(editor, { path: [1, 0], offset: 2 })
     ).toBeNull()
-    expect(errors).toHaveLength(1)
+    expect(errors).toEqual([])
   })
 
-  test('keeps selection syncing quiet when a selection cannot be shown in the DOM', async () => {
+  test('reports a selection inside an element that does not render its children', async () => {
     const editor = withReact(createEditor())
     const errors: unknown[] = []
-    editor.onError = error => errors.push(error)
+    editor.onDOMError = error => errors.push(error)
     const initialValue = [
       { type: 'paragraph', children: [{ text: 'shown' }] } as Descendant,
       { type: 'childless', children: [{ text: 'hidden' }] } as Descendant,
@@ -67,6 +67,6 @@ describe('reporting DOM mapping failures', () => {
       Transforms.select(editor, { path: [1, 0], offset: 2 })
     })
 
-    expect(errors).toEqual([])
+    expect(errors).toHaveLength(1)
   })
 })

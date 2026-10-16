@@ -116,15 +116,15 @@ Sets data from the currently selected fragment on a `DataTransfer`.
 
 ## Instance methods
 
-#### `editor.onError(error: unknown): void`
+#### `editor.onDOMError(error: unknown): void`
 
-Called with DOM mapping errors that Slate catches in its own event handlers, such as a caret with no rendered DOM during ArrowUp. Selection syncing still ignores mapping failures, because the DOM can briefly lag behind the model during normal rendering. By default it hands the error to the browser's `reportError`, so it shows in the console and reaches `window.onerror`, without interrupting the handler. Override it to throw, or to send errors to your own logging:
+Called when one of Slate's own handlers can't map the model to the DOM after rendering has settled. That usually means a broken rendering contract, such as a `renderElement` that doesn't render `children`. Lookups made while the DOM is still catching up, before the editor mounts or while a render is pending, return nothing quietly and are not reported. By default it hands the error to the browser's `reportError`, so it shows in the console and reaches `window.onerror`, without interrupting the handler. Override it to throw, or to send errors to your own logging:
 
 ```javascript
-const { onError } = editor
-editor.onError = error => {
+const { onDOMError } = editor
+editor.onDOMError = error => {
   logger.warn(error)
-  onError(error)
+  onDOMError(error)
 }
 ```
 
