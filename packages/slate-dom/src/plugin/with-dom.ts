@@ -280,6 +280,16 @@ export const withDOM = <T extends BaseEditor>(
     }
   }
 
+  e.onDOMError = (error: unknown) => {
+    if (typeof globalThis.reportError === 'function') {
+      globalThis.reportError(error)
+    } else {
+      setTimeout(() => {
+        throw error
+      })
+    }
+  }
+
   e.setFragmentData = (data: Pick<DataTransfer, 'getData' | 'setData'>) => {
     const { selection } = e
 

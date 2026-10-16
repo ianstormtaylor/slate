@@ -37,12 +37,14 @@ import { Key } from '../utils/key'
 import {
   EDITOR_TO_ELEMENT,
   EDITOR_TO_KEY_TO_ELEMENT,
+  EDITOR_TO_PENDING_ACTION,
   EDITOR_TO_PENDING_DIFFS,
   EDITOR_TO_SCHEDULE_FLUSH,
   EDITOR_TO_WINDOW,
   ELEMENT_TO_NODE,
   IS_COMPOSING,
   IS_FOCUSED,
+  IS_NODE_MAP_DIRTY,
   IS_READ_ONLY,
   NODE_TO_INDEX,
   NODE_TO_KEY,
@@ -73,6 +75,7 @@ export interface DOMEditor extends BaseEditor {
     editor: DOMEditor,
     target: EventTarget | null
   ) => boolean
+  onDOMError: (error: unknown) => void
   setFragmentData: (
     data: DataTransfer,
     originEvent?: 'drag' | 'copy' | 'cut'
@@ -229,6 +232,12 @@ export interface DOMEditorInterface {
     data: DataTransfer,
     originEvent?: 'drag' | 'copy' | 'cut'
   ) => void
+
+  resolveDOMPoint: (editor: DOMEditor, point: Point) => DOMPoint | null
+
+  resolveDOMRange: (editor: DOMEditor, range: Range) => DOMRange | null
+
+  resolveEventRange: (editor: DOMEditor, event: any) => Range | null
 
   /**
    * Find the native DOM element from a Slate node.
@@ -695,76 +704,44 @@ export const DOMEditor: DOMEditorInterface = {
     return domNode
   },
 
+  resolveDOMPoint: (editor, point) => {
+    if (!Node.has(editor, point.path)) {
+      return null
+    }
+
+    const el = EDITOR_TO_KEY_TO_ELEMENT.get(editor)?.get(
+      DOMEditor.findKey(editor, Node.get(editor, point.path))
+    )
+    const domPoint = el ? findDOMPointInElement(editor, el, point) : null
+
+    if (!domPoint && isDOMSettled(editor)) {
+      editor.onDOMError(new Error(unresolvedPointMessage(point)))
+    }
+
+    return domPoint
+  },
+
+  resolveDOMRange: (editor, range) => {
+    const domAnchor = DOMEditor.resolveDOMPoint(editor, range.anchor)
+    const domFocus = Range.isCollapsed(range)
+      ? domAnchor
+      : DOMEditor.resolveDOMPoint(editor, range.focus)
+
+    return domAnchor && domFocus
+      ? createDOMRange(editor, domAnchor, domFocus, Range.isBackward(range))
+      : null
+  },
+
+  resolveEventRange: (editor, event) =>
+    DOMEditor.findEventRange(editor, event, { suppressThrow: true }),
+
   toDOMPoint: (editor, point) => {
     const [node] = Editor.node(editor, point.path)
     const el = DOMEditor.toDOMNode(editor, node)
-    let domPoint: DOMPoint | undefined
-
-    // If we're inside a void node, force the offset to 0, otherwise the zero
-    // width spacing character will result in an incorrect offset of 1
-    if (Editor.void(editor, { at: point })) {
-      point = { path: point.path, offset: 0 }
-    }
-
-    // For each leaf, we need to isolate its content, which means filtering
-    // to its direct text and zero-width spans. (We have to filter out any
-    // other siblings that may have been rendered alongside them.)
-    const selector = `[data-slate-string], [data-slate-zero-width]`
-    const texts = Array.from(el.querySelectorAll(selector))
-    let start = 0
-
-    for (let i = 0; i < texts.length; i++) {
-      const text = texts[i]
-      const domNode = text.childNodes[0] as HTMLElement
-
-      if (domNode == null || domNode.textContent == null) {
-        continue
-      }
-
-      const { length } = domNode.textContent
-      const attr = text.getAttribute('data-slate-length')
-      const trueLength = attr == null ? length : parseInt(attr, 10)
-      const end = start + trueLength
-
-      // Prefer putting the selection inside the mark placeholder to ensure
-      // composed text is displayed with the correct marks.
-      const nextText = texts[i + 1]
-      if (
-        point.offset === end &&
-        nextText?.hasAttribute('data-slate-mark-placeholder')
-      ) {
-        const domText = nextText.childNodes[0]
-
-        domPoint = [
-          // COMPAT: If we don't explicity set the dom point to be on the actual
-          // dom text element, chrome will put the selection behind the actual dom
-          // text element, causing domRange.getBoundingClientRect() calls on a collapsed
-          // selection to return incorrect zero values (https://bugs.chromium.org/p/chromium/issues/detail?id=435438)
-          // which will cause issues when scrolling to it.
-          domText instanceof DOMText ? domText : nextText,
-          nextText.textContent?.startsWith('\uFEFF') ? 1 : 0,
-        ]
-        break
-      }
-
-      if (point.offset <= end) {
-        const offset = Math.min(length, Math.max(0, point.offset - start))
-        domPoint =
-          offset === length && text.hasAttribute('data-slate-trailing')
-            ? [text.lastChild!, 0]
-            : [domNode, offset]
-        break
-      }
-
-      start = end
-    }
+    const domPoint = findDOMPointInElement(editor, el, point)
 
     if (!domPoint) {
-      throw new Error(
-        `Cannot resolve a DOM point from Slate point: ${Scrubber.stringify(
-          point
-        )}`
-      )
+      throw new Error(unresolvedPointMessage(point))
     }
 
     return domPoint
@@ -772,32 +749,12 @@ export const DOMEditor: DOMEditorInterface = {
 
   toDOMRange: (editor, range) => {
     const { anchor, focus } = range
-    const isBackward = Range.isBackward(range)
     const domAnchor = DOMEditor.toDOMPoint(editor, anchor)
     const domFocus = Range.isCollapsed(range)
       ? domAnchor
       : DOMEditor.toDOMPoint(editor, focus)
 
-    const window = DOMEditor.getWindow(editor)
-    const domRange = window.document.createRange()
-    const [startNode, startOffset] = isBackward ? domFocus : domAnchor
-    const [endNode, endOffset] = isBackward ? domAnchor : domFocus
-
-    // A slate Point at zero-width Leaf always has an offset of 0 but a native DOM selection at
-    // zero-width node has an offset of 1 so we have to check if we are in a zero-width node and
-    // adjust the offset accordingly.
-    const startEl = (
-      isDOMElement(startNode) ? startNode : startNode.parentElement
-    ) as HTMLElement
-    const isStartAtZeroWidth = !!startEl.getAttribute('data-slate-zero-width')
-    const endEl = (
-      isDOMElement(endNode) ? endNode : endNode.parentElement
-    ) as HTMLElement
-    const isEndAtZeroWidth = !!endEl.getAttribute('data-slate-zero-width')
-
-    domRange.setStart(startNode, isStartAtZeroWidth ? 1 : startOffset)
-    domRange.setEnd(endNode, isEndAtZeroWidth ? 1 : endOffset)
-    return domRange
+    return createDOMRange(editor, domAnchor, domFocus, Range.isBackward(range))
   },
 
   toSlateNode: (editor, domNode) => {
@@ -1302,4 +1259,110 @@ const getComposingView = (editor: DOMEditor) => {
   view.children = replaceText(editor.children, point.path, text)
 
   return { view, point }
+}
+
+const isDOMSettled = (editor: DOMEditor) =>
+  !!EDITOR_TO_ELEMENT.get(editor)?.isConnected &&
+  !IS_NODE_MAP_DIRTY.get(editor) &&
+  !EDITOR_TO_PENDING_DIFFS.get(editor)?.length &&
+  !EDITOR_TO_PENDING_ACTION.get(editor)
+
+const unresolvedPointMessage = (point: Point) =>
+  `Cannot resolve a DOM point from Slate point: ${Scrubber.stringify(point)}`
+
+const findDOMPointInElement = (
+  editor: DOMEditor,
+  el: HTMLElement,
+  point: Point
+): DOMPoint | null => {
+  let domPoint: DOMPoint | null = null
+
+  // If we're inside a void node, force the offset to 0, otherwise the zero
+  // width spacing character will result in an incorrect offset of 1
+  if (Editor.void(editor, { at: point })) {
+    point = { path: point.path, offset: 0 }
+  }
+
+  // For each leaf, we need to isolate its content, which means filtering
+  // to its direct text and zero-width spans. (We have to filter out any
+  // other siblings that may have been rendered alongside them.)
+  const selector = `[data-slate-string], [data-slate-zero-width]`
+  const texts = Array.from(el.querySelectorAll(selector))
+  let start = 0
+
+  for (let i = 0; i < texts.length; i++) {
+    const text = texts[i]
+    const domNode = text.childNodes[0] as HTMLElement
+
+    if (domNode == null || domNode.textContent == null) {
+      continue
+    }
+
+    const { length } = domNode.textContent
+    const attr = text.getAttribute('data-slate-length')
+    const trueLength = attr == null ? length : parseInt(attr, 10)
+    const end = start + trueLength
+
+    // Prefer putting the selection inside the mark placeholder to ensure
+    // composed text is displayed with the correct marks.
+    const nextText = texts[i + 1]
+    if (
+      point.offset === end &&
+      nextText?.hasAttribute('data-slate-mark-placeholder')
+    ) {
+      const domText = nextText.childNodes[0]
+
+      domPoint = [
+        // COMPAT: If we don't explicity set the dom point to be on the actual
+        // dom text element, chrome will put the selection behind the actual dom
+        // text element, causing domRange.getBoundingClientRect() calls on a collapsed
+        // selection to return incorrect zero values (https://bugs.chromium.org/p/chromium/issues/detail?id=435438)
+        // which will cause issues when scrolling to it.
+        domText instanceof DOMText ? domText : nextText,
+        nextText.textContent?.startsWith('\uFEFF') ? 1 : 0,
+      ]
+      break
+    }
+
+    if (point.offset <= end) {
+      const offset = Math.min(length, Math.max(0, point.offset - start))
+      domPoint =
+        offset === length && text.hasAttribute('data-slate-trailing')
+          ? [text.lastChild!, 0]
+          : [domNode, offset]
+      break
+    }
+
+    start = end
+  }
+
+  return domPoint
+}
+
+const createDOMRange = (
+  editor: DOMEditor,
+  domAnchor: DOMPoint,
+  domFocus: DOMPoint,
+  isBackward: boolean
+): DOMRange => {
+  const window = DOMEditor.getWindow(editor)
+  const domRange = window.document.createRange()
+  const [startNode, startOffset] = isBackward ? domFocus : domAnchor
+  const [endNode, endOffset] = isBackward ? domAnchor : domFocus
+
+  // A slate Point at zero-width Leaf always has an offset of 0 but a native DOM selection at
+  // zero-width node has an offset of 1 so we have to check if we are in a zero-width node and
+  // adjust the offset accordingly.
+  const startEl = (
+    isDOMElement(startNode) ? startNode : startNode.parentElement
+  ) as HTMLElement
+  const isStartAtZeroWidth = !!startEl.getAttribute('data-slate-zero-width')
+  const endEl = (
+    isDOMElement(endNode) ? endNode : endNode.parentElement
+  ) as HTMLElement
+  const isEndAtZeroWidth = !!endEl.getAttribute('data-slate-zero-width')
+
+  domRange.setStart(startNode, isStartAtZeroWidth ? 1 : startOffset)
+  domRange.setEnd(endNode, isEndAtZeroWidth ? 1 : endOffset)
+  return domRange
 }
