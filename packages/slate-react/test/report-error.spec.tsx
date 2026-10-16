@@ -48,7 +48,7 @@ describe('reporting DOM mapping failures', () => {
     expect(errors).toHaveLength(1)
   })
 
-  test('reports a selection that cannot be shown in the DOM', async () => {
+  test('keeps selection syncing quiet when a selection cannot be shown in the DOM', async () => {
     const editor = withReact(createEditor())
     const errors: unknown[] = []
     editor.onError = error => errors.push(error)
@@ -67,6 +67,6 @@ describe('reporting DOM mapping failures', () => {
       Transforms.select(editor, { path: [1, 0], offset: 2 })
     })
 
-    expect(errors.length).toBeGreaterThan(0)
+    expect(errors).toEqual([])
   })
 })

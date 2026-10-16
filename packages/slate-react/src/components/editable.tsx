@@ -569,16 +569,8 @@ export const Editable = forwardRef(
 
         try {
           newDomRange = selection && ReactEditor.toDOMRange(editor, selection)
-        } catch (error) {
-          const androidInputManager = androidInputManagerRef.current
-          const isDOMUpdatePending =
-            IS_NODE_MAP_DIRTY.get(editor) ||
-            androidInputManager?.isFlushing() ||
-            androidInputManager?.hasPendingChanges()
-
-          if (!isDOMUpdatePending) {
-            reportError(editor, error)
-          }
+        } catch (e) {
+          // Ignore, dom and state might be out of sync
         }
 
         if (newDomRange) {
@@ -633,8 +625,8 @@ export const Editable = forwardRef(
               el.focus()
 
               setDomSelection(forceChange)
-            } catch (error) {
-              reportError(editor, error)
+            } catch (e) {
+              // Ignore, dom and state might be out of sync
             }
           }
 
@@ -781,12 +773,12 @@ export const Editable = forwardRef(
               // Therefore we don't allow native events to insert text at the end of anchor nodes.
               const { anchor } = selection
 
-              const domAnchor = toDOMPointOrReport(editor, anchor)
+              const domPoint = toDOMPointOrReport(editor, anchor)
 
-              if (!domAnchor) {
+              if (!domPoint) {
                 native = false
               } else {
-                const [node, offset] = domAnchor
+                const [node, offset] = domPoint
                 const anchorNode = node.parentElement?.closest('a')
 
                 const window = ReactEditor.getWindow(editor)
@@ -826,13 +818,13 @@ export const Editable = forwardRef(
                     native = false
                   }
                 }
-              }
 
-              if (native && isTextDOMNode(node)) {
-                nativePoint =
-                  domSelection?.isCollapsed && isTextDOMNode(domAnchor)
-                    ? [domAnchor, domSelection.anchorOffset]
-                    : [node, offset]
+                if (native && isTextDOMNode(node)) {
+                  nativePoint =
+                    domSelection?.isCollapsed && isTextDOMNode(domAnchor)
+                      ? [domAnchor, domSelection.anchorOffset]
+                      : [node, offset]
+                }
               }
             }
           }
