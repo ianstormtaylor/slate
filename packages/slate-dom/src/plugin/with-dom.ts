@@ -407,24 +407,19 @@ export const withDOM = <T extends BaseEditor>(
       return false
     }
 
-    const [first, ...rest] = text.split(/\r\n|\r|\n/)
-    const last = rest.pop()
-    e.insertText(first)
+    const lines = text.split(/\r\n|\r|\n/)
 
-    if (last === undefined) {
+    if (lines.length === 1) {
+      e.insertText(text)
       return true
     }
 
-    Transforms.splitNodes(e, { always: true })
+    const fragment = getPlainTextFragment(e, lines)
 
-    if (!insertLinesBeforeSelectedBlock(e, rest)) {
-      for (const line of rest) {
-        e.insertText(line)
-        Transforms.splitNodes(e, { always: true })
-      }
+    if (fragment) {
+      e.insertFragment(fragment)
     }
 
-    e.insertText(last)
     return true
   }
 
@@ -450,44 +445,26 @@ const getMatches = (e: Editor, path: Path) => {
   return matches
 }
 
-const insertLinesBeforeSelectedBlock = (editor: Editor, lines: string[]) => {
-  const { selection } = editor
-
-  if (lines.length === 0) {
-    return true
-  }
-
-  if (!selection || !Range.isCollapsed(selection)) {
-    return false
+const getPlainTextFragment = (editor: Editor, lines: string[]) => {
+  if (!editor.selection) {
+    return null
   }
 
   const entry = Editor.above(editor, {
+    at: Range.start(editor.selection),
     match: node => Element.isElement(node) && Editor.isBlock(editor, node),
+    mode: 'lowest',
   })
 
   if (!entry) {
-    return false
+    return null
   }
 
-  const [block, blockPath] = entry
-  const [leaf] = block.children
-  const { anchor } = selection
+  const [{ children, ...blockProps }] = entry
+  const marks = Editor.marks(editor) ?? {}
 
-  if (
-    !Node.isText(leaf) ||
-    anchor.offset !== 0 ||
-    !Path.equals(anchor.path, blockPath.concat(0))
-  ) {
-    return false
-  }
-
-  const { children, ...blockProps } = block
-  const { text, ...leafProps } = leaf
-  const blocks = lines.map(line => ({
+  return lines.map(line => ({
     ...blockProps,
-    children: [{ ...leafProps, text: line }],
+    children: [{ ...marks, text: line }],
   })) as Element[]
-
-  Transforms.insertNodes(editor, blocks, { at: blockPath })
-  return true
 }

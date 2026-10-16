@@ -109,9 +109,15 @@ const texts = [
   '\n',
 ]
 
+const differsFromLineByLine = (fixture: Fixture, text: string) =>
+  text.includes('\n') || text.includes('\r')
+    ? fixture.name === 'a caret inside a link' ||
+      (fixture.marks !== undefined && /^[\r\n]/.test(text))
+    : false
+
 describe('insertTextData with several lines', () => {
   for (const fixture of fixtures) {
-    for (const text of texts) {
+    for (const text of texts.filter(t => !differsFromLineByLine(fixture, t))) {
       test(`matches line-by-line pasting of ${JSON.stringify(text)} into ${
         fixture.name
       }`, () => {
@@ -134,6 +140,60 @@ describe('insertTextData with several lines', () => {
       })
     }
   }
+
+  test('pastes several lines next to a link instead of inside it', () => {
+    const editor = withReact(createEditor())
+    editor.isInline = element => (element as { type?: string }).type === 'link'
+    editor.children = [
+      {
+        type: 'paragraph',
+        children: [
+          { text: 'go ' },
+          { type: 'link', children: [{ text: 'here' }] },
+          { text: '' },
+        ],
+      } as Descendant,
+    ]
+    editor.selection = caret([0, 1, 0], 2)
+
+    editor.insertTextData(dataTransfer('one\ntwo'))
+
+    expect(editor.children).toEqual([
+      {
+        type: 'paragraph',
+        children: [
+          { text: 'go ' },
+          { type: 'link', children: [{ text: 'he' }] },
+          { text: 'one' },
+        ],
+      },
+      {
+        type: 'paragraph',
+        children: [
+          { text: 'two' },
+          { type: 'link', children: [{ text: 're' }] },
+          { text: '' },
+        ],
+      },
+    ])
+    expect(editor.selection).toEqual(caret([1, 0], 3))
+  })
+
+  test('applies pending marks to every pasted line', () => {
+    const editor = withReact(createEditor())
+    editor.children = [
+      { type: 'paragraph', children: [{ text: 'plain' }] } as Descendant,
+    ]
+    editor.selection = caret([0, 0], 5)
+    editor.marks = { italic: true }
+
+    editor.insertTextData(dataTransfer('\nnext'))
+
+    expect(editor.children).toEqual([
+      { type: 'paragraph', children: [{ text: 'plain' }] },
+      { type: 'paragraph', children: [{ text: 'next', italic: true }] },
+    ])
+  })
 
   test('applies one operation per pasted line', () => {
     const editor = withReact(createEditor())
