@@ -97,6 +97,10 @@ const inlineInsertionPoint = (editor: Editor, point: Point) => {
 }
 
 export const getInsertionPoint = (editor: Editor, point: Point) => {
+  if (!Text.isText(Node.getIf(editor, point.path))) {
+    return { point, affinity: false, inlineAffinity: null }
+  }
+
   const inline = inlineInsertionPoint(editor, point)
   let result = inline?.point ?? point
   let affinity = inline !== null
