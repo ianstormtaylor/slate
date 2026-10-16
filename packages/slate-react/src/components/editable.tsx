@@ -35,11 +35,6 @@ import { useSlate } from '../hooks/use-slate'
 import { useTrackUserInput } from '../hooks/use-track-user-input'
 import { useCompositionDOM } from '../hooks/use-composition-dom'
 import { getPointAboveTrailingNewline } from '../utils/trailing-newline'
-import {
-  resolveDOMPoint,
-  resolveDOMRange,
-  resolveDOMRangeDuringFlush,
-} from '../utils/resolve-dom'
 import { getCharacterMoveUnit } from '../utils/character-move'
 import { removeStrayComposition } from '../utils/misplaced-composition'
 import { ReactEditor } from '../plugin/react-editor'
@@ -472,10 +467,7 @@ export const Editable = forwardRef(
         return
       }
 
-      const setDomSelection = (
-        forceChange?: boolean,
-        lookUpDOMRange = resolveDOMRange
-      ) => {
+      const setDomSelection = (forceChange?: boolean) => {
         const hasDomSelection = domSelection.type !== 'None'
 
         // If the DOM selection is properly unset, we're done.
@@ -572,7 +564,8 @@ export const Editable = forwardRef(
         // Otherwise the DOM selection is out of sync, so update it.
         state.isUpdatingSelection = true
 
-        const newDomRange = selection && lookUpDOMRange(editor, selection)
+        const newDomRange =
+          selection && ReactEditor.resolveDOMRange(editor, selection)
 
         if (newDomRange) {
           if (ReactEditor.isComposing(editor) && !IS_ANDROID) {
@@ -628,7 +621,7 @@ export const Editable = forwardRef(
             }
 
             el.focus()
-            setDomSelection(forceChange, resolveDOMRangeDuringFlush)
+            setDomSelection(forceChange)
           }
 
           // Compat: Android IMEs try to force their selection by manually re-applying it even after we set it.
@@ -774,7 +767,7 @@ export const Editable = forwardRef(
               // Therefore we don't allow native events to insert text at the end of anchor nodes.
               const { anchor } = selection
 
-              const domPoint = resolveDOMPoint(editor, anchor)
+              const domPoint = ReactEditor.resolveDOMPoint(editor, anchor)
 
               if (!domPoint) {
                 native = false
@@ -1563,10 +1556,9 @@ export const Editable = forwardRef(
                           Path.equals(startVoid[1], selectedVoid[1])
                         )
                       ) {
-                        const clicked = ReactEditor.findEventRange(
+                        const clicked = ReactEditor.resolveEventRange(
                           editor,
-                          event,
-                          { suppressThrow: true }
+                          event
                         )
 
                         if (!clicked) {
@@ -2484,7 +2476,7 @@ const restoreDomSelection = (
     return
   }
 
-  const domRange = resolveDOMRange(editor, editor.selection)
+  const domRange = ReactEditor.resolveDOMRange(editor, editor.selection)
 
   if (!domRange) {
     return

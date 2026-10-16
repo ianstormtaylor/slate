@@ -1,9 +1,11 @@
 import { Editor, Node, Point } from 'slate'
 import { ReactEditor } from '../plugin/react-editor'
-import { resolveDOMRange } from './resolve-dom'
 
 const caretTop = (editor: ReactEditor, point: Point) => {
-  const range = resolveDOMRange(editor, { anchor: point, focus: point })
+  const range = ReactEditor.resolveDOMRange(editor, {
+    anchor: point,
+    focus: point,
+  })
 
   if (!range) {
     return null
