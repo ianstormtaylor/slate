@@ -178,7 +178,7 @@ for (const fixture of fixtures) {
     )
     const errors: string[] = []
     page.on('pageerror', error => errors.push(error.message))
-    await page.goto(`http://localhost:3000/examples/${fixture.example}`)
+    await page.goto(`/examples/${fixture.example}`)
     const element = page.getByRole('textbox')
     await element.click()
     const editor = await getEditorHandle(element)

@@ -13,7 +13,7 @@ const placeCaretAtEnd = async (page: Page) => {
 
 test.describe('input events dispatched by script', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('http://localhost:3000/examples/plaintext')
+    await page.goto('/examples/plaintext')
     await placeCaretAtEnd(page)
   })
 

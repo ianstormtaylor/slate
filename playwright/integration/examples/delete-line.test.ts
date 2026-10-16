@@ -18,7 +18,7 @@ test.describe('delete backward by line', () => {
       testInfo.project.name === 'mobile',
       'Synthetic beforeinput does not simulate a soft keyboard'
     )
-    await page.goto('http://localhost:3000/examples/richtext')
+    await page.goto('/examples/richtext')
   })
 
   for (const text of ['', 'next']) {
@@ -112,7 +112,7 @@ test.describe('delete backward by line', () => {
   })
 
   test('preserves table cell boundaries', async ({ page }) => {
-    await page.goto('http://localhost:3000/examples/tables')
+    await page.goto('/examples/tables')
     const element = page.getByRole('textbox')
     await element.click()
     const editor = await getEditorHandle(element)
@@ -153,7 +153,7 @@ test.describe('delete backward by line', () => {
   test('preserves a preceding void when removing an empty block', async ({
     page,
   }) => {
-    await page.goto('http://localhost:3000/examples/images')
+    await page.goto('/examples/images')
     const element = page.getByRole('textbox')
     await clearEditor(element)
     const editor = await getEditorHandle(element)

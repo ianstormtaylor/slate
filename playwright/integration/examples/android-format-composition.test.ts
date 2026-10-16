@@ -9,7 +9,7 @@ test.describe('formatting a block while composing on Android', () => {
       info.project.name !== 'mobile',
       'Uses the Android input path and the Chromium DevTools protocol'
     )
-    await page.goto('http://localhost:3000/examples/richtext')
+    await page.goto('/examples/richtext')
     const element = page.getByRole('textbox')
     const editor = await getEditorHandle(element)
     await editor.evaluate(editor => {

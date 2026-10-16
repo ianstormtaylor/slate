@@ -3,8 +3,7 @@ import { getEditorHandle } from '../support/editor'
 
 test.describe('search highlighting', () => {
   test.beforeEach(
-    async ({ page }) =>
-      await page.goto('http://localhost:3000/examples/search-highlighting')
+    async ({ page }) => await page.goto('/examples/search-highlighting')
   )
 
   test('highlights the searched text', async ({ page }) => {

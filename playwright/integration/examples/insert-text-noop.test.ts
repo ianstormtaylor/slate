@@ -33,7 +33,7 @@ test.describe('native insertText overrides', () => {
   test.skip(({ isMobile }) => isMobile, 'Android uses a separate input manager')
 
   test.beforeEach(async ({ page }) => {
-    await page.goto('http://localhost:3000/examples/insert-text-noop')
+    await page.goto('/examples/insert-text-noop')
   })
 
   for (const { name, leaf, offset, expected } of [

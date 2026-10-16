@@ -3,7 +3,7 @@ import { getEditorHandle } from '../support/editor'
 
 test.describe('shift-clicking around a mention', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('http://localhost:3000/examples/mentions')
+    await page.goto('/examples/mentions')
   })
 
   test('extends a selection from the mention to later text', async ({

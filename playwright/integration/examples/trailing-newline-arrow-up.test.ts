@@ -8,7 +8,7 @@ const paragraph = (text: string) => ({
 })
 
 const setup = async (page: Page, texts: string[]) => {
-  await page.goto('http://localhost:3000/examples/richtext')
+  await page.goto('/examples/richtext')
   const element = page.getByRole('textbox')
   await element.click()
   const editor = await getEditorHandle(element)
