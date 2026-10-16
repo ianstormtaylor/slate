@@ -52,6 +52,12 @@ export function* positions(
   let leafTextRemaining = 0
   let leafTextOffset = 0
   const skippedPaths: Path[] = []
+  const isSelectablePoint = (point: Point) =>
+    !Editor.above(editor, {
+      at: point,
+      voids: true,
+      match: n => Node.isElement(n) && !editor.isSelectable(n),
+    })
 
   // Iterate through all nodes in range, grabbing entire textual content
   // of block nodes in blockText, and text nodes in leafText.
@@ -85,13 +91,19 @@ export function* positions(
         skippedPaths.push(path)
         if (reverse) {
           if (Path.hasPrevious(path)) {
-            yield* maybeYield(Editor.end(editor, Path.previous(path)))
+            const point = Editor.end(editor, Path.previous(path))
+            if (isSelectablePoint(point)) {
+              yield* maybeYield(point)
+            }
           }
           continue
         } else {
           const nextPath = Path.next(path)
           if (Editor.hasPath(editor, nextPath)) {
-            yield* maybeYield(Editor.start(editor, nextPath))
+            const point = Editor.start(editor, nextPath)
+            if (isSelectablePoint(point)) {
+              yield* maybeYield(point)
+            }
           }
           continue
         }
