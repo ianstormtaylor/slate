@@ -1,6 +1,7 @@
 import {
   addMark,
   deleteFragment,
+  BaseEditor,
   Editor,
   getDirtyPaths,
   getFragment,
@@ -91,7 +92,7 @@ import {
 /**
  * Create a new Slate `Editor` object.
  */
-export const createEditor = (): Editor => {
+export const createEditor = <E extends BaseEditor = Editor>(): E => {
   const editor: Editor = {
     children: [],
     operations: [],
@@ -195,5 +196,5 @@ export const createEditor = (): Editor => {
       shouldMergeNodesRemovePrevNode(editor, ...args),
   }
 
-  return editor
+  return editor as unknown as E
 }
