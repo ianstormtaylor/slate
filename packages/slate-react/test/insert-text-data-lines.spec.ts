@@ -111,8 +111,7 @@ const texts = [
 
 const differsFromLineByLine = (fixture: Fixture, text: string) =>
   text.includes('\n') || text.includes('\r')
-    ? fixture.name === 'a caret inside a link' ||
-      (fixture.marks !== undefined && /^[\r\n]/.test(text))
+    ? fixture.marks !== undefined && /^[\r\n]/.test(text)
     : false
 
 describe('insertTextData with several lines', () => {
@@ -141,7 +140,7 @@ describe('insertTextData with several lines', () => {
     }
   }
 
-  test('pastes several lines next to a link instead of inside it', () => {
+  test('keeps every pasted line inside a link', () => {
     const editor = withReact(createEditor())
     editor.isInline = element => (element as { type?: string }).type === 'link'
     editor.children = [
@@ -149,34 +148,42 @@ describe('insertTextData with several lines', () => {
         type: 'paragraph',
         children: [
           { text: 'go ' },
-          { type: 'link', children: [{ text: 'here' }] },
+          { type: 'link', url: 'x', children: [{ text: 'here' }] },
           { text: '' },
         ],
       } as Descendant,
     ]
     editor.selection = caret([0, 1, 0], 2)
 
-    editor.insertTextData(dataTransfer('one\ntwo'))
+    editor.insertTextData(dataTransfer('one\ntwo\nthree'))
 
     expect(editor.children).toEqual([
       {
         type: 'paragraph',
         children: [
           { text: 'go ' },
-          { type: 'link', children: [{ text: 'he' }] },
-          { text: 'one' },
+          { type: 'link', url: 'x', children: [{ text: 'heone' }] },
+          { text: '' },
         ],
       },
       {
         type: 'paragraph',
         children: [
-          { text: 'two' },
-          { type: 'link', children: [{ text: 're' }] },
+          { text: '' },
+          { type: 'link', url: 'x', children: [{ text: 'two' }] },
+          { text: '' },
+        ],
+      },
+      {
+        type: 'paragraph',
+        children: [
+          { text: '' },
+          { type: 'link', url: 'x', children: [{ text: 'threere' }] },
           { text: '' },
         ],
       },
     ])
-    expect(editor.selection).toEqual(caret([1, 0], 3))
+    expect(editor.selection).toEqual(caret([2, 1, 0], 5))
   })
 
   test('applies pending marks to every pasted line', () => {

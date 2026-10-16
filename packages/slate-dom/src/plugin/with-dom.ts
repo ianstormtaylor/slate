@@ -1,5 +1,6 @@
 import {
   BaseEditor,
+  Descendant,
   Editor,
   Element,
   Location,
@@ -414,6 +415,11 @@ export const withDOM = <T extends BaseEditor>(
       return true
     }
 
+    if (isInsideInline(e)) {
+      insertLinesInsideInline(e, lines)
+      return true
+    }
+
     const fragment = getPlainTextFragment(e, lines)
 
     if (fragment) {
@@ -443,6 +449,53 @@ const getMatches = (e: Editor, path: Path) => {
     matches.push([p, key])
   }
   return matches
+}
+
+const isInsideInline = (editor: Editor) =>
+  !!editor.selection &&
+  !!Editor.above(editor, {
+    at: Range.start(editor.selection),
+    match: node => Element.isElement(node) && Editor.isInline(editor, node),
+  })
+
+const insertLinesInsideInline = (editor: Editor, lines: string[]) => {
+  const marks = Editor.marks(editor) ?? {}
+  const middle = lines.slice(1, -1)
+
+  editor.insertText(lines[0])
+  Transforms.splitNodes(editor, { always: true })
+
+  if (middle.length && editor.selection) {
+    const { anchor } = editor.selection
+    const [[{ children, ...blockProps }, blockPath]] = Editor.nodes(editor, {
+      at: anchor,
+      match: node => Element.isElement(node) && Editor.isBlock(editor, node),
+      mode: 'lowest',
+    })
+    const inlines = Array.from(
+      Editor.nodes(editor, {
+        at: anchor,
+        match: node => Element.isElement(node) && Editor.isInline(editor, node),
+      }),
+      ([{ children, ...inlineProps }]) => inlineProps
+    )
+    const wrap = (line: string) =>
+      inlines.reduceRight<Descendant>(
+        (child, inlineProps) =>
+          ({ ...inlineProps, children: [child] }) as Element,
+        { ...marks, text: line }
+      )
+
+    Transforms.insertNodes(
+      editor,
+      middle.map(
+        line => ({ ...blockProps, children: [wrap(line)] }) as Element
+      ),
+      { at: blockPath, select: false }
+    )
+  }
+
+  editor.insertText(lines[lines.length - 1])
 }
 
 const getPlainTextFragment = (editor: Editor, lines: string[]) => {
