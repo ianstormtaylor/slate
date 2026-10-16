@@ -11,7 +11,7 @@ test.describe('composing in an empty editor on Android', () => {
     )
     const errors: string[] = []
     page.on('pageerror', error => errors.push(error.message))
-    await page.goto('http://localhost:3000/examples/plaintext')
+    await page.goto('/examples/plaintext')
     const element = page.getByRole('textbox')
     await element.click()
 

@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test'
 
 test.describe('hovering toolbar example', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('http://localhost:3000/examples/hovering-toolbar')
+    await page.goto('/examples/hovering-toolbar')
   })
 
   test('hovering toolbar appears', async ({ page }) => {

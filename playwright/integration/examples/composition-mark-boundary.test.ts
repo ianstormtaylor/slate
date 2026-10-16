@@ -12,7 +12,7 @@ test.describe('composing at the end of marked text', () => {
     )
     const errors: string[] = []
     page.on('pageerror', error => errors.push(error.message))
-    await page.goto('http://localhost:3000/examples/richtext')
+    await page.goto('/examples/richtext')
     const element = page.getByRole('textbox')
     await element.click()
 

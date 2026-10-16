@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test'
 import { getEditorHandle } from './support/editor'
 
 test('onClick sees the selection the click just made', async ({ page }) => {
-  await page.goto('http://localhost:3000/playwright/onclick-selection')
+  await page.goto('/playwright/onclick-selection')
   const element = page.getByRole('textbox')
   const editor = await getEditorHandle(element)
   const text = element.locator('[data-slate-string]')

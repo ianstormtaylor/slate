@@ -24,7 +24,7 @@ for (const contentEditable of ['true', '', 'plaintext-only']) {
   test(`nested contenteditable=${JSON.stringify(
     contentEditable
   )} keeps typing and selection`, async ({ page }) => {
-    await page.goto('http://localhost:3000/examples/images')
+    await page.goto('/examples/images')
     const outer = page.locator('[data-slate-editor]')
     const editor = await getEditorHandle(outer)
     const before = await editor.evaluate(editor => editor.children)
@@ -65,7 +65,7 @@ for (const eventType of ['beforeinput', 'input']) {
   test(`nested ${eventType} history events do not undo the outer editor`, async ({
     page,
   }) => {
-    await page.goto('http://localhost:3000/examples/images')
+    await page.goto('/examples/images')
     const outer = page.locator('[data-slate-editor]')
     const editor = await getEditorHandle(outer)
     await editor.evaluate(editor => {

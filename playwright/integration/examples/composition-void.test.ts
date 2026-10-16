@@ -12,7 +12,7 @@ test.describe('composing while a block void is selected', () => {
     )
     const errors: string[] = []
     page.on('pageerror', error => errors.push(error.message))
-    await page.goto('http://localhost:3000/examples/images')
+    await page.goto('/examples/images')
     const element = page.getByRole('textbox')
     await element.locator('img').first().click()
 

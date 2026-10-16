@@ -21,7 +21,7 @@ const selectInModel = async (page: Page, range: Range) => {
 const openRichtext = async (page: Page) => {
   const errors: string[] = []
   page.on('pageerror', error => errors.push(error.message))
-  await page.goto('http://localhost:3000/examples/richtext')
+  await page.goto('/examples/richtext')
   return errors
 }
 

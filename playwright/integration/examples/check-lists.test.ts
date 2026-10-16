@@ -4,7 +4,7 @@ import { clearEditor, getEditorHandle } from '../support/editor'
 
 test.describe('Check-lists example', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('http://localhost:3000/examples/check-lists')
+    await page.goto('/examples/check-lists')
   })
 
   for (const scenario of [
