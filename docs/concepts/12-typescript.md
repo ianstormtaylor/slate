@@ -60,6 +60,14 @@ const App = () => {
 }
 ```
 
+## Type-Checking Plugin Order
+
+`createEditor()` returns `Editor`, the fully extended type from `CustomTypes`, so a plugin that requires another plugin's fields type-checks even when that plugin wasn't applied. To check the chain against the plugins actually applied, start from `BaseEditor`:
+
+```typescript
+const editor = withPlugin2(withPlugin1(createEditor<BaseEditor>()))
+```
+
 ## Best Practices for `Element` and `Text` Types
 
 While you can define types directly in the `CustomTypes` interface, best practice is to define and export each type separately so that you can reference individual types like a `ParagraphElement`.
