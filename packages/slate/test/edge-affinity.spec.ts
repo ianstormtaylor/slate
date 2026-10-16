@@ -286,3 +286,17 @@ for (const offset of [0, 4]) {
     assert(Node.has(editor, editor.selection.anchor.path))
   })
 }
+
+it('leaves a caret that is not in a text node to the transform', () => {
+  const editor = createEditor()
+  editor.isInline = element => element.inline === true
+  editor.children = [
+    { children: [{ inline: true, children: [{ text: '1' }] }] } as Element,
+  ]
+  const point = { path: [0, 0], offset: 5 }
+  editor.selection = { anchor: point, focus: point }
+
+  assert.deepEqual(Editor.insertionPoint(editor, point), point)
+  Transforms.insertNodes(editor, { inline: true, children: [{ text: '' }] })
+  assert.equal(Node.string(editor), '1')
+})
