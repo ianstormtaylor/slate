@@ -16,7 +16,6 @@
 - [Collaboration with Yjs](walkthroughs/10-collaboration-with-yjs.md)
 - [Accessibility](walkthroughs/11-accessibility.md)
 
-
 ## Concepts
 
 - [Interfaces](concepts/01-interfaces.md)

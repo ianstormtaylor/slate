@@ -42,6 +42,7 @@ export interface TextInsertFragmentOptions {
    */
   at?: Location
   hanging?: boolean
+  select?: boolean
   voids?: boolean
   batchDirty?: boolean
   filter?: InsertFragmentFilter

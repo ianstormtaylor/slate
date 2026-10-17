@@ -892,14 +892,6 @@ export const Editable: (props: EditableProps) => ReactNode = forwardRef(
               native = false
             }
 
-            const domAnchor = getSelection(
-              ReactEditor.findDocumentOrShadowRoot(editor)
-            )?.anchorNode
-
-            if (!isInSlateText(domAnchor)) {
-              native = false
-            }
-
             // If the NODE_MAP is dirty, we can't trust the selection anchor (eg ReactEditor.toDOMPoint)
             if (!IS_NODE_MAP_DIRTY.get(editor)) {
               // Chrome also has issues correctly editing the end of anchor elements: https://bugs.chromium.org/p/chromium/issues/detail?id=1259100
@@ -2584,33 +2576,6 @@ export type RenderPlaceholderProps = {
     ref: React.RefCallback<any>
     style: React.CSSProperties
   }
-}
-
-const isInSlateText = (node: unknown) =>
-  isDOMNode(node) &&
-  node.nodeType === node.TEXT_NODE &&
-  !!node.parentElement?.closest('[data-slate-string], [data-slate-zero-width]')
-
-const restoreDomSelection = (
-  editor: ReactEditor,
-  domSelection: Selection,
-  state: { isUpdatingSelection: boolean }
-) => {
-  if (!editor.selection) {
-    return
-  }
-
-  const domRange = ReactEditor.toDOMRange(editor, editor.selection)
-  state.isUpdatingSelection = true
-  domSelection.setBaseAndExtent(
-    domRange.startContainer,
-    domRange.startOffset,
-    domRange.endContainer,
-    domRange.endOffset
-  )
-  setTimeout(() => {
-    state.isUpdatingSelection = false
-  })
 }
 
 const isDeletingInVoid = (editor: Editor, event: KeyboardEvent) => {
