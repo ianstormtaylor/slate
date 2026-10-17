@@ -52,6 +52,20 @@ export function* positions(
   let leafTextRemaining = 0
   let leafTextOffset = 0
   const skippedPaths: Path[] = []
+  const isSelectablePoint = (point: Point) =>
+    !Editor.above(editor, {
+      at: point,
+      voids: true,
+      match: n => Node.isElement(n) && !editor.isSelectable(n),
+    })
+  const firstSelectablePoint = (node: Node, path: Path) => {
+    for (const [, textPath] of Node.texts(node)) {
+      const point = { path: [...path, ...textPath], offset: 0 }
+      if (isSelectablePoint(point)) {
+        return point
+      }
+    }
+  }
 
   // Iterate through all nodes in range, grabbing entire textual content
   // of block nodes in blockText, and text nodes in leafText.
@@ -85,13 +99,19 @@ export function* positions(
         skippedPaths.push(path)
         if (reverse) {
           if (Path.hasPrevious(path)) {
-            yield* maybeYield(Editor.end(editor, Path.previous(path)))
+            const point = Editor.end(editor, Path.previous(path))
+            if (isSelectablePoint(point)) {
+              yield* maybeYield(point)
+            }
           }
           continue
         } else {
           const nextPath = Path.next(path)
           if (Editor.hasPath(editor, nextPath)) {
-            yield* maybeYield(Editor.start(editor, nextPath))
+            const point = Editor.start(editor, nextPath)
+            if (isSelectablePoint(point)) {
+              yield* maybeYield(point)
+            }
           }
           continue
         }
@@ -101,7 +121,10 @@ export function* positions(
       // yield their first point. If the `voids` option is set to true,
       // then we will iterate over their content.
       if (!voids && (editor.isVoid(node) || editor.isElementReadOnly(node))) {
-        yield* maybeYield(Editor.start(editor, path))
+        const point = firstSelectablePoint(node, path)
+        if (point) {
+          yield* maybeYield(point)
+        }
         if (editor.isInline(node)) {
           const [, blockPath] = Editor.above(editor, {
             at: path,
