@@ -4,6 +4,7 @@ import { withHistory } from './with-history'
 
 // Weakmaps for attaching state to the editor.
 
+export const HISTORY = new WeakMap<Editor, History>()
 export const SAVING = new WeakMap<Editor, boolean | undefined>()
 export const MERGING = new WeakMap<Editor, boolean | undefined>()
 export const SPLITTING_ONCE = new WeakMap<Editor, boolean | undefined>()
