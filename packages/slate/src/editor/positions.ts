@@ -58,6 +58,14 @@ export function* positions(
       voids: true,
       match: n => Node.isElement(n) && !editor.isSelectable(n),
     })
+  const firstSelectablePoint = (node: Node, path: Path) => {
+    for (const [, textPath] of Node.texts(node)) {
+      const point = { path: [...path, ...textPath], offset: 0 }
+      if (isSelectablePoint(point)) {
+        return point
+      }
+    }
+  }
 
   // Iterate through all nodes in range, grabbing entire textual content
   // of block nodes in blockText, and text nodes in leafText.
@@ -113,7 +121,10 @@ export function* positions(
       // yield their first point. If the `voids` option is set to true,
       // then we will iterate over their content.
       if (!voids && (editor.isVoid(node) || editor.isElementReadOnly(node))) {
-        yield* maybeYield(Editor.start(editor, path))
+        const point = firstSelectablePoint(node, path)
+        if (point) {
+          yield* maybeYield(point)
+        }
         if (editor.isInline(node)) {
           const [, blockPath] = Editor.above(editor, {
             at: path,
