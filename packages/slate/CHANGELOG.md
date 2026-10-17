@@ -1,5 +1,13 @@
 # slate
 
+## 0.143.0
+
+### Minor Changes
+
+- [#6321](https://github.com/ianstormtaylor/slate/pull/6321) [`9ed1e7d`](https://github.com/ianstormtaylor/slate/commit/9ed1e7da9f78345d190afafb2d0b899247d923f4) Thanks [@dylans](https://github.com/dylans)! - Add `editor.getSplitProperties(node, path)` to choose the properties copied to the new right-hand node by `Transforms.splitNodes`. The default remains `Node.extractProps(node)`. Applications can omit or replace IDs while preserving text marks for Enter, fragment insertion and partial-range transforms.
+
+  `BaseEditor` now requires `getSplitProperties`; `createEditor` supplies it. Structural editor implementations and mocks must add the method.
+
 ## 0.142.1
 
 ### Patch Changes
