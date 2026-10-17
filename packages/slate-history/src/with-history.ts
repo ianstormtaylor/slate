@@ -1,6 +1,7 @@
 import { Editor, Operation, Path, Transforms } from 'slate'
 
 import { HistoryEditor } from './history-editor'
+import { rebaseHistory } from './rebase'
 
 /**
  * The `withHistory` plugin keeps track of the operation history of a Slate
@@ -16,6 +17,7 @@ export const withHistory = <T extends Editor>(editor: T) => {
   const e = editor as T & HistoryEditor
   const { apply, normalize } = e
   let isSettled = true
+  let isReplaying = false
   e.history = { undos: [], redos: [] }
 
   e.redo = () => {
@@ -29,13 +31,18 @@ export const withHistory = <T extends Editor>(editor: T) => {
         Transforms.select(e, batch.selectionBefore)
       }
 
-      HistoryEditor.withoutSaving(e, () => {
-        Editor.withoutNormalizing(e, () => {
-          for (const op of batch.operations) {
-            e.apply(op)
-          }
+      isReplaying = true
+      try {
+        HistoryEditor.withoutSaving(e, () => {
+          Editor.withoutNormalizing(e, () => {
+            for (const op of batch.operations) {
+              e.apply(op)
+            }
+          })
         })
-      })
+      } finally {
+        isReplaying = false
+      }
 
       history.redos.pop()
       e.writeHistory('undos', batch)
@@ -49,18 +56,23 @@ export const withHistory = <T extends Editor>(editor: T) => {
     if (undos.length > 0) {
       const batch = undos[undos.length - 1]
 
-      HistoryEditor.withoutSaving(e, () => {
-        Editor.withoutNormalizing(e, () => {
-          const inverseOps = batch.operations.map(Operation.inverse).reverse()
+      isReplaying = true
+      try {
+        HistoryEditor.withoutSaving(e, () => {
+          Editor.withoutNormalizing(e, () => {
+            const inverseOps = batch.operations.map(Operation.inverse).reverse()
 
-          for (const op of inverseOps) {
-            e.apply(op)
-          }
-          if (batch.selectionBefore) {
-            Transforms.select(e, batch.selectionBefore)
-          }
+            for (const op of inverseOps) {
+              e.apply(op)
+            }
+            if (batch.selectionBefore) {
+              Transforms.select(e, batch.selectionBefore)
+            }
+          })
         })
-      })
+      } finally {
+        isReplaying = false
+      }
 
       e.writeHistory('redos', batch)
       history.undos.pop()
@@ -115,6 +127,8 @@ export const withHistory = <T extends Editor>(editor: T) => {
       }
 
       history.redos = []
+    } else if (!isReplaying && op.type !== 'set_selection') {
+      rebaseHistory(history, op)
     }
 
     isSettled = false
