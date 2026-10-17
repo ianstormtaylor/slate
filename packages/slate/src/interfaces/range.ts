@@ -5,9 +5,11 @@ import {
   Path,
   Point,
   PointEntry,
+  RemoveNodeOperation,
+  SplitNodeOperation,
   isObject,
 } from '..'
-import { RangeDirection } from '../types/types'
+import { RangeDirection, TextDirection } from '../types/types'
 
 /**
  * `Range` objects are a set of points that refer to a specific span of a Slate
@@ -107,12 +109,30 @@ export interface RangeInterface {
 
   /**
    * Transform a range by an operation.
+   * If the range is unaffected by the operation, it is returned as-is.
+   * If one of the edges is unaffected by the operation, it is returned as-is, but the other edge is transformed and a new range is returned.
+   * The anchor and focus of a returned range are always separate point objects, even when the range is collapsed.
+   *
+   * @param range The range to transform
+   * @param operation The operation to transform the range by
+   * @param options.affinity If the range is split, which side of the split to return, or to return `null` (passing `null` on `insert_text` coerces to "backward"). Defaults to `"forward"`.
+   * @returns A range representing where the input range would be after the operation is applied, or `null` if the range woould be removed.
    */
-  transform: (
+  transform(
+    range: Range,
+    operation: Exclude<Operation, RemoveNodeOperation | SplitNodeOperation>,
+    options?: RangeTransformOptions
+  ): Range
+  transform(
+    range: Range,
+    operation: SplitNodeOperation,
+    options?: RangeTransformOptions & { affinity?: TextDirection }
+  ): Range
+  transform(
     range: Range,
     op: Operation,
     options?: RangeTransformOptions
-  ) => Range | null
+  ): Range | null
 }
 
 // eslint-disable-next-line no-redeclare
@@ -137,8 +157,9 @@ export const Range: RangeInterface = {
 
   equals(range: Range, another: Range): boolean {
     return (
-      Point.equals(range.anchor, another.anchor) &&
-      Point.equals(range.focus, another.focus)
+      range === another ||
+      (Point.equals(range.anchor, another.anchor) &&
+        Point.equals(range.focus, another.focus))
     )
   },
 
@@ -229,30 +250,22 @@ export const Range: RangeInterface = {
     return start
   },
 
-  transform(
-    range: Range | null,
+  transform: ((
+    range: Range,
     op: Operation,
     options: RangeTransformOptions = {}
-  ): Range | null {
-    if (range === null) {
-      return null
-    }
-
+  ): Range | null => {
     const { affinity = 'inward' } = options
-    let affinityAnchor: 'forward' | 'backward' | null
-    let affinityFocus: 'forward' | 'backward' | null
+    let affinityAnchor: TextDirection | null
+    let affinityFocus: TextDirection | null
 
     if (affinity === 'inward') {
-      // If the range is collapsed, make sure to use the same affinity to
-      // avoid the two points passing each other and expanding in the opposite
-      // direction
-      const isCollapsed = Range.isCollapsed(range)
       if (Range.isForward(range)) {
         affinityAnchor = 'forward'
-        affinityFocus = isCollapsed ? affinityAnchor : 'backward'
+        affinityFocus = 'backward'
       } else {
         affinityAnchor = 'backward'
-        affinityFocus = isCollapsed ? affinityAnchor : 'forward'
+        affinityFocus = 'forward'
       }
     } else if (affinity === 'outward') {
       if (Range.isForward(range)) {
@@ -269,12 +282,18 @@ export const Range: RangeInterface = {
     const anchor = Point.transform(range.anchor, op, {
       affinity: affinityAnchor,
     })
-    const focus = Point.transform(range.focus, op, { affinity: affinityFocus })
+    if (!anchor) return null
 
-    if (!anchor || !focus) {
-      return null
+    // collapsed ranges will move identically unless the affinity is outward
+    if (affinity !== 'outward' && Range.isCollapsed(range)) {
+      return anchor === range.anchor ? range : { anchor, focus: { ...anchor } }
     }
 
+    const focus = Point.transform(range.focus, op, { affinity: affinityFocus })
+    if (!focus) return null
+
+    if (anchor === range.anchor && focus === range.focus) return range
+
     return { anchor, focus }
-  },
+  }) as RangeInterface['transform'],
 }
