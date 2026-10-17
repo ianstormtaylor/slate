@@ -11,7 +11,7 @@ Transforms are helper functions operating on the document. They can be used in d
 
 ## Node options
 
-All transforms support a parameter `options`. This includes options specific to the transform and general `NodeOptions` to specify which Nodes in the document the transform is applied to.
+Transforms that target a location support a parameter `options`. This includes options specific to the transform and general `NodeOptions` to specify which Nodes in the document the transform is applied to.
 
 ```typescript
 interface NodeOptions {
@@ -35,6 +35,16 @@ interface NodeOptions {
 ### Node transforms
 
 These transforms operate on nodes.
+
+#### `Transforms.setChildren(editor: Editor, children: Descendant[])`
+
+Apply an external document through Slate operations. Delegates to `editor.setChildren`, so plugins can override the transform. Unchanged child prefixes and suffixes are retained, matched by identity or by deep equality, so a refetched copy of the document with one new block emits a single `insert_node`. Compatible nodes are updated recursively; text edits replace only the changed string middle. Deep-equal cloned values emit no operations.
+
+Nodes shared by object identity can move within or across parents with a `move_node`, preserving selections inside them. Cloned moves are treated as content edits or replacements. Normalization is held until the diff is complete, and selection and refs follow the emitted operations through their normal rules.
+
+With `withHistory`, each external change forms one undo step and is separate from typing before and after it.
+
+To clear an editable document, pass a schema-valid empty block, for example `[{ type: 'paragraph', children: [{ text: '' }] }]`. `setChildren` itself accepts an empty root; it does not invent a block or reset history.
 
 #### `Transforms.insertFragment(editor: Editor, fragment: Node[], options?)`
 

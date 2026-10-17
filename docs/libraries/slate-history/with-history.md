@@ -11,3 +11,5 @@ When used with `withReact`, `withHistory` should be applied inside. For example:
 ```javascript
 const [editor] = useState(() => withReact(withHistory(createEditor())))
 ```
+
+The plugin also overrides `editor.setChildren`. Each `Transforms.setChildren` call starts its own undo batch, including normalization, and does not merge with typing before or after the external update. A deep-equal update creates no history entry.
