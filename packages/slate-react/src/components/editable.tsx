@@ -83,7 +83,7 @@ import {
 } from 'slate-dom'
 import { RestoreDOM } from './restore-dom/restore-dom'
 import { AndroidInputManager } from '../hooks/android-input-manager/android-input-manager'
-import { ComposingContext } from '../hooks/use-composing'
+import { ComposingContext, EDITOR_TO_COMPOSING } from '../hooks/use-composing'
 import { useFlushDeferredSelectorsOnRender } from '../hooks/use-slate-selector'
 
 type DeferredOperation = () => void
@@ -228,6 +228,12 @@ export const Editable = forwardRef(
     const editor = useSlate()
     // Rerender editor when composition status changed
     const [isComposing, setIsComposing] = useState(false)
+    useIsomorphicLayoutEffect(() => {
+      EDITOR_TO_COMPOSING.set(editor, isComposing)
+      return () => {
+        EDITOR_TO_COMPOSING.delete(editor)
+      }
+    }, [editor, isComposing])
     const ref = useRef<HTMLDivElement | null>(null)
     const previousChildren = useRef(editor.children)
     const previousSelection = useRef(editor.selection)
@@ -1614,12 +1620,10 @@ export const Editable = forwardRef(
                       return
                     }
                     if (ReactEditor.hasSelectableTarget(editor, event.target)) {
-                      if (ReactEditor.isComposing(editor)) {
-                        Promise.resolve().then(() => {
-                          setIsComposing(false)
-                          IS_COMPOSING.set(editor, false)
-                        })
-                      }
+                      Promise.resolve().then(() => {
+                        setIsComposing(false)
+                        IS_COMPOSING.set(editor, false)
+                      })
 
                       androidInputManagerRef.current?.handleCompositionEnd(
                         event

@@ -37,6 +37,7 @@
     "react-dom": "19.2.8",
     "slate": "^0.144.0",
     "slate-dom": "^0.142.0",
+    "slate-history": "^0.144.0",
     "slate-hyperscript": "^0.138.3",
     "source-map-loader": "^4.0.1"
   },

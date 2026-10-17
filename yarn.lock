@@ -10591,6 +10591,7 @@ __metadata:
     scroll-into-view-if-needed: "npm:^3.1.0"
     slate: "npm:^0.144.0"
     slate-dom: "npm:^0.142.0"
+    slate-history: "npm:^0.144.0"
     slate-hyperscript: "npm:^0.138.3"
     source-map-loader: "npm:^4.0.1"
     tiny-invariant: "npm:1.3.1"
