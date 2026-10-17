@@ -601,3 +601,9 @@ Insert text at the current selection. If the selection is currently expanded, de
 #### `apply(operation: Operation) => void`
 
 Apply an operation in the editor.
+
+### External value method
+
+#### `setChildren(children: Descendant[]) => void`
+
+Overridable implementation used by `Transforms.setChildren` to apply external document changes through operations. `withHistory` wraps it in an isolated undo batch. Editors created by `createEditor` provide this method; structural editor implementations and mocks must add it.

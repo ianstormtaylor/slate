@@ -14,7 +14,7 @@ import { HistoryEditor } from './history-editor'
 
 export const withHistory = <T extends Editor>(editor: T) => {
   const e = editor as T & HistoryEditor
-  const { apply, normalize } = e
+  const { apply, normalize, setChildren } = e
   let isSettled = true
   e.history = { undos: [], redos: [] }
 
@@ -126,6 +126,16 @@ export const withHistory = <T extends Editor>(editor: T) => {
 
     if (Editor.isNormalizing(e)) {
       isSettled = true
+    }
+  }
+
+  e.setChildren = children => {
+    const previous = e.history.undos[e.history.undos.length - 1]
+    const count = previous?.operations.length
+    HistoryEditor.withNewBatch(e, () => setChildren(children))
+    const current = e.history.undos[e.history.undos.length - 1]
+    if (current !== previous || current?.operations.length !== count) {
+      HistoryEditor.setSplittingOnce(e, true)
     }
   }
 

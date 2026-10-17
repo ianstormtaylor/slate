@@ -1,4 +1,4 @@
-import { Editor, Element, Location, Node, Path } from '../../index'
+import { Descendant, Editor, Element, Location, Node, Path } from '../../index'
 import { NodeMatch, NullableProps, PropsCompare, PropsMerge } from '../editor'
 import { MaximizeMode, RangeMode } from '../../types/types'
 
@@ -13,6 +13,8 @@ export interface NodeInsertNodesOptions<T extends Node> {
 }
 
 export interface NodeTransforms {
+  setChildren: (editor: Editor, children: Descendant[]) => void
+
   /**
    * Insert nodes in the editor
    * at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
@@ -172,6 +174,9 @@ export interface NodeTransforms {
 
 // eslint-disable-next-line no-redeclare
 export const NodeTransforms: NodeTransforms = {
+  setChildren(editor, children) {
+    editor.setChildren(children)
+  },
   insertNodes(editor, nodes, options) {
     editor.insertNodes(nodes, options)
   },

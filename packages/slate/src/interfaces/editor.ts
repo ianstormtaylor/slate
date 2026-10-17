@@ -121,6 +121,7 @@ export interface BaseEditor {
       replace?: boolean
     }
   ) => void
+  setChildren: OmitFirstArg<typeof Transforms.setChildren>
   setNormalizing: OmitFirstArg<typeof Editor.setNormalizing>
   setPoint: OmitFirstArg<typeof Transforms.setPoint>
   setSelection: OmitFirstArg<typeof Transforms.setSelection>
