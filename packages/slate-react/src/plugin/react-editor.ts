@@ -3,8 +3,8 @@ import { DOMEditor, type DOMEditorInterface } from 'slate-dom'
 
 /**
  * A React and DOM-specific version of the `Editor` interface.
+ * @noInheritDoc
  */
-
 export interface ReactEditor extends DOMEditor {
   /**
    * Determines the chunk size used by the children chunking optimization. If

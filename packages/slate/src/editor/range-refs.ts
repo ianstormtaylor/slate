@@ -1,6 +1,7 @@
 import { EditorInterface } from '../interfaces/editor'
 import { RANGE_REFS } from '../utils/weak-maps'
 
+/** @ignore */
 export const rangeRefs: EditorInterface['rangeRefs'] = editor => {
   let refs = RANGE_REFS.get(editor)
 

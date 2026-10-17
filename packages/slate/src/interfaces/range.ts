@@ -14,7 +14,6 @@ import { RangeDirection } from '../types/types'
  * document. They can define a span inside a single node or a can span across
  * multiple nodes.
  */
-
 export interface BaseRange {
   anchor: Point
   focus: Point
@@ -22,97 +21,125 @@ export interface BaseRange {
 
 export type Range = ExtendedType<'Range', BaseRange>
 
+/** @hidden @inline */
 export interface RangeEdgesOptions {
   reverse?: boolean
 }
 
+/** @hidden @inline */
 export interface RangeTransformOptions {
   affinity?: RangeDirection | null
 }
 
 export interface RangeInterface {
+  /**
+   * Get the direction of a `range`: `'forward'` when the focus point comes after the anchor point, `'backward'` when it comes before, and `'collapsed'` when they're at the same position.
+   */
   direction: (range: Range) => 'forward' | 'backward' | 'collapsed'
 
   /**
    * Get the start and end points of a range, in the order in which they appear
    * in the document.
+   * @param options Type also exported as `RangeEdgesOptions`
+   * @category Queries
    */
-  edges: (range: Range, options?: RangeEdgesOptions) => [Point, Point]
+  edges(range: Range, options?: RangeEdgesOptions): [Point, Point]
 
   /**
-   * Get the end point of a range.
+   * Get the end point of a range according to the order in which it appears in
+   * the document.
+   * @category Queries
    */
-  end: (range: Range) => Point
+  end(range: Range): Point
 
   /**
    * Check if a range is exactly equal to another.
+   * @category Comparison
    */
-  equals: (range: Range, another: Range) => boolean
+  equals(range: Range, another: Range): boolean
 
   /**
-   * Check if a range includes a path, a point or part of another range.
+   * Check if a `range` includes a path, a point, or part of another range.
+   *
+   * For clarity the definition of `includes` can mean partially includes.
+   * Another way to describe this is if one Range intersects the other Range.
+   * @category Comparison
    */
-  includes: (range: Range, target: Location) => boolean
+  includes(range: Range, target: Location): boolean
 
   /**
    * Check if a range includes another range.
+   * @category Comparison
    */
-  surrounds: (range: Range, target: Range) => boolean
+  surrounds(range: Range, target: Range): boolean
 
   /**
-   * Get the intersection of a range with another.
+   * Get the intersection of one `range` with `another`. If the two ranges do
+   * not overlap, return `null`.
+   * @category Relational
    */
-  intersection: (range: Range, another: Range) => Range | null
+  intersection(range: Range, another: Range): Range | null
 
   /**
    * Check if a range is backward, meaning that its anchor point appears in the
-   * document _after_ its focus point.
+   * document _after_ its focus point. A collapsed range is not backward.
+   * @category Queries
    */
-  isBackward: (range: Range) => boolean
+  isBackward(range: Range): boolean
 
   /**
    * Check if a range is collapsed, meaning that both its anchor and focus
    * points refer to the exact same position in the document.
+   * @category Queries
    */
-  isCollapsed: (range: Range) => boolean
+  isCollapsed(range: Range): boolean
 
   /**
    * Check if a range is expanded.
    *
-   * This is the opposite of [[Range.isCollapsed]] and is provided for legibility.
+   * This is the opposite of {@link isCollapsed} and is provided for
+   * legibility.
+   * @category Queries
    */
-  isExpanded: (range: Range) => boolean
+  isExpanded(range: Range): boolean
 
   /**
-   * Check if a range is forward.
-   *
-   * This is the opposite of [[Range.isBackward]] and is provided for legibility.
+   * Check if a range is forward, meaning that its anchor point appears in the
+   * document _before_ its focus point, so a collapsed range counts as forward. Use {@link RangeInterface#direction} to tell collapsed ranges apart.
+   * @category Queries
    */
-  isForward: (range: Range) => boolean
+  isForward(range: Range): boolean
 
   /**
-   * Check if a value implements the [[Range]] interface.
+   * Check if a value implements the {@link Range} interface.
+   * @category Type Guards
    */
-  isRange: (value: any) => value is Range
+  isRange(value: any): value is Range
 
   /**
-   * Iterate through all of the point entries in a range.
+   * Iterate through the two point entries in a `Range`. First it will yield a
+   * {@link PointEntry} representing the `anchor`, then the `focus`.
+   * @category Queries
    */
-  points: (range: Range) => Generator<PointEntry, void, undefined>
+  points(range: Range): Generator<PointEntry, void, undefined>
 
   /**
-   * Get the start point of a range.
+   * Get the start point of a range according to the order in which it appears
+   * in the document.
+   * @category Queries
    */
-  start: (range: Range) => Point
+  start(range: Range): Point
 
   /**
    * Transform a range by an operation.
+   * @param options Type also exported as `RangeTransformOptions`
+   * @category Relational
    */
-  transform: (
+  transform(
     range: Range,
     op: Operation,
     options?: RangeTransformOptions
-  ) => Range | null
+  ): Range | null
 }
 
 // eslint-disable-next-line no-redeclare

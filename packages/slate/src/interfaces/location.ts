@@ -8,34 +8,41 @@ import { Path, Point, Range } from '..'
  * `Point` or `Range`. This eliminates the need for developers to manage
  * converting between the different interfaces in their own code base.
  */
-
 export type Location = Path | Point | Range
 
+/**
+ * A colleection of static helper methods for {@link Location} objects.
+ */
 export interface LocationInterface {
   /**
    * Check if a value implements the `Location` interface.
+   * @category Type Guards
    */
-  isLocation: (value: any) => value is Location
+  isLocation(value: any): value is Location
 
   /**
    * Check if a location is a `Path`.
+   * @category Type Guards
    */
-  isPath: (at: Location) => at is Path
+  isPath(at: Location): at is Path
 
   /**
    * Check if a location is a `Point`.
+   * @category Type Guards
    */
-  isPoint: (at: Location) => at is Point
+  isPoint(at: Location): at is Point
 
   /**
    * Check if a location is a `Range`.
+   * @category Type Guards
    */
-  isRange: (at: Location) => at is Range
+  isRange(at: Location): at is Range
 
   /**
    * Differentiate between a normal `Location` and a `Span`.
+   * @category Type Guards
    */
-  isSpan: (at: Location | Span) => at is Span
+  isSpan(at: Location | Span): at is Span
 }
 
 // eslint-disable-next-line no-redeclare
@@ -65,14 +72,14 @@ export const Location: LocationInterface = {
  * The `Span` interface is a low-level way to refer to locations in nodes
  * without using `Point` which requires leaf text nodes to be present.
  */
-
 export type Span = [Path, Path]
 
 export interface SpanInterface {
   /**
    * Check if a value implements the `Span` interface.
+   * @category Type Guards
    */
-  isSpan: (value: any) => value is Span
+  isSpan(value: any): value is Span
 }
 
 // eslint-disable-next-line no-redeclare

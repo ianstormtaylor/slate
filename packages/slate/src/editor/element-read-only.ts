@@ -1,6 +1,7 @@
 import { Editor, EditorInterface } from '../interfaces/editor'
 import { Node } from '../interfaces/node'
 
+/** @ignore */
 export const elementReadOnly: EditorInterface['elementReadOnly'] = (
   editor,
   options = {}

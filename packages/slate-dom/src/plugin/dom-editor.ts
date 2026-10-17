@@ -21,7 +21,6 @@ import {
   DOMRange,
   DOMSelection,
   DOMStaticRange,
-  DOMText,
   getSelection,
   hasShadowRoot,
   isAfter,
@@ -53,60 +52,69 @@ import {
 
 /**
  * A DOM-specific version of the `Editor` interface.
+ * @noInheritDoc
  */
-
 export interface DOMEditor extends BaseEditor {
-  hasEditableTarget: (
+  hasEditableTarget(
     editor: DOMEditor,
     target: EventTarget | null
-  ) => target is DOMNode
-  hasSelectableTarget: (
+  ): target is DOMNode
+  hasSelectableTarget(editor: DOMEditor, target: EventTarget | null): boolean
+  hasTarget(editor: DOMEditor, target: EventTarget | null): target is DOMNode
+  insertData(data: DataTransfer): void
+  insertFragmentData(data: DataTransfer): boolean
+  insertTextData(data: DataTransfer): boolean
+  isTargetInsideNonReadonlyVoid(
     editor: DOMEditor,
     target: EventTarget | null
-  ) => boolean
-  hasTarget: (
-    editor: DOMEditor,
-    target: EventTarget | null
-  ) => target is DOMNode
-  insertData: (data: DataTransfer) => void
-  insertFragmentData: (data: DataTransfer) => boolean
-  insertTextData: (data: DataTransfer) => boolean
-  isTargetInsideNonReadonlyVoid: (
-    editor: DOMEditor,
-    target: EventTarget | null
-  ) => boolean
-  onDOMError: (error: unknown) => void
-  setFragmentData: (
+  ): boolean
+
+  /**
+   * Called when `resolveDOMPoint` or `resolveDOMRange`, which Slate's own handlers use, can't map the model to the DOM after rendering has settled. That usually means a broken rendering contract, such as a `renderElement` that doesn't render `children`. Lookups made while the DOM is still catching up, before the editor mounts or while a render is pending, return nothing quietly and are not reported. By default it hands the error to the browser's `reportError`, so it shows in the console and reaches `window.onerror`, without interrupting the handler. Override it to throw, or to send errors to your own logging:
+   *
+   * ```javascript
+   * const { onDOMError } = editor
+   * editor.onDOMError = error => {
+   *   logger.warn(error)
+   *   onDOMError(error)
+   * }
+   * ```
+   *
+   * `ReactEditor.toDOMPoint` and `ReactEditor.toDOMRange` still throw; use the `resolve` versions to get `null` instead.
+   */
+  onDOMError(error: unknown): void
+
+  setFragmentData(
     data: DataTransfer,
     originEvent?: 'drag' | 'copy' | 'cut'
-  ) => void
+  ): void
 }
 
 export interface DOMEditorInterface {
   /**
    * Experimental and android specific: Get pending diffs
    */
-  androidPendingDiffs: (editor: Editor) => TextDiff[] | undefined
+  androidPendingDiffs(editor: Editor): TextDiff[] | undefined
 
   /**
    * Experimental and android specific: Flush all pending diffs and cancel composition at the next possible time.
    */
-  androidScheduleFlush: (editor: Editor) => void
+  androidScheduleFlush(editor: Editor): void
 
   /**
    * Blur the editor.
    */
-  blur: (editor: DOMEditor) => void
+  blur(editor: DOMEditor): void
 
   /**
    * Deselect the editor.
    */
-  deselect: (editor: DOMEditor) => void
+  deselect(editor: DOMEditor): void
 
   /**
    * Find the DOM node that implements DocumentOrShadowRoot for the editor.
    */
-  findDocumentOrShadowRoot: (editor: DOMEditor) => Document | ShadowRoot
+  findDocumentOrShadowRoot(editor: DOMEditor): Document | ShadowRoot
 
   /**
    * Get the target range from a DOM `event`.
@@ -115,90 +123,87 @@ export interface DOMEditorInterface {
    * outside of the editor even when the event's target lies inside it. With
    * `suppressThrow`, `null` is returned instead of throwing in that case.
    */
-  findEventRange: <T extends boolean = false>(
+  findEventRange<T extends boolean = false>(
     editor: DOMEditor,
     event: any,
     options?: { suppressThrow?: T }
-  ) => T extends true ? Range | null : Range
+  ): T extends true ? Range | null : Range
 
   /**
    * Find a key for a Slate node.
    */
-  findKey: (editor: DOMEditor, node: Node) => Key
+  findKey(editor: DOMEditor, node: Node): Key
 
   /**
    * Find the path of Slate node.
    */
-  findPath: (editor: DOMEditor, node: Node) => Path
+  findPath(editor: DOMEditor, node: Node): Path
 
   /**
    * Focus the editor.
    */
-  focus: (editor: DOMEditor, options?: { retries: number }) => void
+  focus(editor: DOMEditor, options?: { retries: number }): void
 
   /**
    * Return the host window of the current editor.
    */
-  getWindow: (editor: DOMEditor) => Window
+  getWindow(editor: DOMEditor): Window
 
   /**
    * Check if a DOM node is within the editor.
    */
-  hasDOMNode: (
+  hasDOMNode(
     editor: DOMEditor,
     target: DOMNode,
     options?: { editable?: boolean }
-  ) => boolean
+  ): boolean
 
   /**
    * Check if the target is editable and in the editor.
    */
-  hasEditableTarget: (
+  hasEditableTarget(
     editor: DOMEditor,
     target: EventTarget | null
-  ) => target is DOMNode
+  ): target is DOMNode
 
   /**
    *
    */
-  hasRange: (editor: DOMEditor, range: Range) => boolean
+  hasRange(editor: DOMEditor, range: Range): boolean
 
   /**
    * Check if the target can be selectable
    */
-  hasSelectableTarget: (
-    editor: DOMEditor,
-    target: EventTarget | null
-  ) => boolean
+  hasSelectableTarget(editor: DOMEditor, target: EventTarget | null): boolean
 
   /**
    * Check if the target is in the editor.
    */
-  hasTarget: (
-    editor: DOMEditor,
-    target: EventTarget | null
-  ) => target is DOMNode
+  hasTarget(editor: DOMEditor, target: EventTarget | null): target is DOMNode
 
   /**
    * Insert data from a `DataTransfer` into the editor.
    */
-  insertData: (editor: DOMEditor, data: DataTransfer) => void
+  insertData(editor: DOMEditor, data: DataTransfer): void
 
   /**
    * Insert fragment data from a `DataTransfer` into the editor.
    */
-  insertFragmentData: (editor: DOMEditor, data: DataTransfer) => boolean
+  insertFragmentData(editor: DOMEditor, data: DataTransfer): boolean
 
   /**
    * Insert text data from a `DataTransfer` into the editor.
    */
-  insertTextData: (editor: DOMEditor, data: DataTransfer) => boolean
+  insertTextData(editor: DOMEditor, data: DataTransfer): boolean
 
   /**
    * Check if the user is currently composing inside the editor.
    */
-  isComposing: (editor: DOMEditor) => boolean
+  isComposing(editor: DOMEditor): boolean
 
+  /**
+   * Like [`Editor.word`](../../api/nodes/editor.md), but while an input method is composing it reads the composing text from the DOM and uses the DOM caret when `at` isn't given. `text` is the word as currently shown. During a composition, `range` counts the composing characters, so it only matches the editor's value once the composition ends.
+   */
   getWord: (
     editor: DOMEditor,
     options?: EditorWordOptions
@@ -207,47 +212,59 @@ export interface DOMEditorInterface {
   /**
    * Check if the editor is focused.
    */
-  isFocused: (editor: DOMEditor) => boolean
+  isFocused(editor: DOMEditor): boolean
 
+  /**
+   * Check if the editor is mounted, meaning it is rendered and has a DOM element. Methods that resolve DOM nodes, such as `toDOMNode`, throw for an editor that is not mounted.
+   */
   isMounted: (editor: DOMEditor) => boolean
 
   /**
    * Check if the editor is in read-only mode.
    */
-  isReadOnly: (editor: DOMEditor) => boolean
+  isReadOnly(editor: DOMEditor): boolean
 
   /**
    * Check if the target is inside void and in an non-readonly editor.
    */
-  isTargetInsideNonReadonlyVoid: (
+  isTargetInsideNonReadonlyVoid(
     editor: DOMEditor,
     target: EventTarget | null
-  ) => boolean
+  ): boolean
 
   /**
    * Sets data from the currently selected fragment on a `DataTransfer`.
    */
-  setFragmentData: (
+  setFragmentData(
     editor: DOMEditor,
     data: DataTransfer,
     originEvent?: 'drag' | 'copy' | 'cut'
-  ) => void
+  ): void
 
+  /**
+   * Like `toDOMPoint`, but returns `null` instead of throwing. A point that the settled DOM should contain but doesn't is reported through `editor.onDOMError`. While the DOM is still catching up with the model, a missing point is not reported.
+   */
   resolveDOMPoint: (editor: DOMEditor, point: Point) => DOMPoint | null
 
+  /**
+   * Like `toDOMRange`, but returns `null` instead of throwing, and reports the same way as `resolveDOMPoint`.
+   */
   resolveDOMRange: (editor: DOMEditor, range: Range) => DOMRange | null
 
+  /**
+   * Like `findEventRange`, but returns `null` when the event doesn't map to a range in the editor.
+   */
   resolveEventRange: (editor: DOMEditor, event: any) => Range | null
 
   /**
    * Find the native DOM element from a Slate node.
    */
-  toDOMNode: (editor: DOMEditor, node: Node) => HTMLElement
+  toDOMNode(editor: DOMEditor, node: Node): HTMLElement
 
   /**
    * Find a native DOM selection point from a Slate point.
    */
-  toDOMPoint: (editor: DOMEditor, point: Point) => DOMPoint
+  toDOMPoint(editor: DOMEditor, point: Point): DOMPoint
 
   /**
    * Find a native DOM range from a Slate `range`.
@@ -257,17 +274,17 @@ export interface DOMEditorInterface {
    * there is no way to create a reverse DOM Range using Range.setStart/setEnd
    * according to https://dom.spec.whatwg.org/#concept-range-bp-set.
    */
-  toDOMRange: (editor: DOMEditor, range: Range) => DOMRange
+  toDOMRange(editor: DOMEditor, range: Range): DOMRange
 
   /**
    * Find a Slate node from a native DOM `element`.
    */
-  toSlateNode: (editor: DOMEditor, domNode: DOMNode) => Node
+  toSlateNode(editor: DOMEditor, domNode: DOMNode): Node
 
   /**
    * Find a Slate point from a DOM selection's `domNode` and `domOffset`.
    */
-  toSlatePoint: <T extends boolean>(
+  toSlatePoint<T extends boolean>(
     editor: DOMEditor,
     domPoint: DOMPoint,
     options: {
@@ -279,19 +296,19 @@ export interface DOMEditorInterface {
        */
       searchDirection?: 'forward' | 'backward'
     }
-  ) => T extends true ? Point | null : Point
+  ): T extends true ? Point | null : Point
 
   /**
    * Find a Slate range from a DOM range or selection.
    */
-  toSlateRange: <T extends boolean>(
+  toSlateRange<T extends boolean>(
     editor: DOMEditor,
     domRange: DOMRange | DOMStaticRange | DOMSelection,
     options: {
       exactMatch: boolean
       suppressThrow: T
     }
-  ) => T extends true ? Range | null : Range
+  ): T extends true ? Range | null : Range
 }
 
 // eslint-disable-next-line no-redeclare
@@ -1318,7 +1335,7 @@ const findDOMPointInElement = (
         // text element, causing domRange.getBoundingClientRect() calls on a collapsed
         // selection to return incorrect zero values (https://bugs.chromium.org/p/chromium/issues/detail?id=435438)
         // which will cause issues when scrolling to it.
-        domText instanceof DOMText ? domText : nextText,
+        domText instanceof window.Text ? domText : nextText,
         nextText.textContent?.startsWith('\uFEFF') ? 1 : 0,
       ]
       break

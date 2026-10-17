@@ -3,6 +3,7 @@ import { Range } from '../interfaces/range'
 import { Path } from '../interfaces/path'
 import { Node } from '../interfaces'
 
+/** @ignore */
 export const unhangRange: EditorInterface['unhangRange'] = (
   editor,
   range,

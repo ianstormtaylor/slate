@@ -6,6 +6,7 @@ import { Range } from '../interfaces/range'
 import { Transforms } from '../interfaces/transforms'
 import { Location, Node, Point } from '../interfaces'
 
+/** @ignore */
 export const wrapNodes: NodeTransforms['wrapNodes'] = (
   editor,
   element,

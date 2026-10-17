@@ -10,7 +10,11 @@ import {
 import { TextUnit } from '../../types/types'
 import { getDefaultInsertLocation } from '../../utils'
 
+/** @hidden @inline */
 export interface TextDeleteOptions {
+  /**
+   * The location to delete content from. Defaults to the current selection. If there is no selection, nothing is deleted.
+   */
   at?: Location
   distance?: number
   unit?: TextUnit
@@ -19,27 +23,39 @@ export interface TextDeleteOptions {
   voids?: boolean
 }
 
+/** @hidden @inline */
 export interface InsertFragmentFilterOptions {
   blockEntry: NodeEntry<Element>
 }
 
+/** @hidden @inline */
 export type InsertFragmentFilter = (
   node: Node,
   options: InsertFragmentFilterOptions
 ) => boolean
 
+/** @hidden @inline */
 export interface TextInsertFragmentOptions {
-  select?: boolean
+  /**
+   * The location to insert the fragment.
+   * @default The current selection. If there is no selection, nothing is deleted.
+   */
   at?: Location
   hanging?: boolean
+  select?: boolean
   voids?: boolean
   batchDirty?: boolean
   filter?: InsertFragmentFilter
 }
 
+/** @hidden @inline */
 export interface TextInsertTextOptions {
   select?: boolean
   at?: Location
+
+  /**
+   * With `voids: true`, replacing an expanded range also deletes within void content instead of removing the void nodes as atomic units. At an inline boundary, insertion uses the surrounding text in that block, adding the empty text required by normalization if replacement temporarily removes it.
+   */
   voids?: boolean
 }
 
@@ -47,27 +63,27 @@ export interface TextTransforms {
   /**
    * Delete content in the editor.
    */
-  delete: (editor: Editor, options?: TextDeleteOptions) => void
+  delete(editor: Editor, options?: TextDeleteOptions): void
 
   /**
    * Insert a fragment in the editor
    * at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
    */
-  insertFragment: (
+  insertFragment(
     editor: Editor,
     fragment: Node[],
     options?: TextInsertFragmentOptions
-  ) => void
+  ): void
 
   /**
    * Insert a string of text in the editor
    * at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
    */
-  insertText: (
+  insertText(
     editor: Editor,
     text: string,
     options?: TextInsertTextOptions
-  ) => void
+  ): void
 }
 
 // eslint-disable-next-line no-redeclare

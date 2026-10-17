@@ -2,6 +2,7 @@ import { Editor, EditorInterface } from '../interfaces/editor'
 import { Location } from '../interfaces'
 import { Path } from '../interfaces/path'
 
+/** @ignore */
 export const above: EditorInterface['above'] = (editor, options = {}) => {
   const {
     voids = false,

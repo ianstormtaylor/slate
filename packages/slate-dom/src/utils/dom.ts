@@ -1,28 +1,12 @@
-/**
- * Types.
- */
-
-// COMPAT: This is required to prevent TypeScript aliases from doing some very
-// weird things for Slate's types with the same name as globals. (2019/11/27)
-// https://github.com/microsoft/TypeScript/issues/35002
-import DOMNode = globalThis.Node
-import DOMComment = globalThis.Comment
-import DOMElement = globalThis.Element
-import DOMText = globalThis.Text
-import DOMRange = globalThis.Range
-import DOMSelection = globalThis.Selection
-import DOMStaticRange = globalThis.StaticRange
 import { DOMEditor } from '../plugin/dom-editor'
 
-export {
-  DOMNode,
-  DOMComment,
-  DOMElement,
-  DOMText,
-  DOMRange,
-  DOMSelection,
-  DOMStaticRange,
-}
+export type DOMNode = globalThis.Node
+export type DOMComment = globalThis.Comment
+export type DOMElement = globalThis.Element
+export type DOMText = globalThis.Text
+export type DOMRange = globalThis.Range
+export type DOMSelection = globalThis.Selection
+export type DOMStaticRange = globalThis.StaticRange
 
 declare global {
   interface Window {
@@ -360,8 +344,7 @@ export const getActiveElement = () => {
  */
 export const isBefore = (node: DOMNode, otherNode: DOMNode): boolean =>
   Boolean(
-    node.compareDocumentPosition(otherNode) &
-      DOMNode.DOCUMENT_POSITION_PRECEDING
+    node.compareDocumentPosition(otherNode) & Node.DOCUMENT_POSITION_PRECEDING
   )
 
 /**
@@ -369,8 +352,7 @@ export const isBefore = (node: DOMNode, otherNode: DOMNode): boolean =>
  */
 export const isAfter = (node: DOMNode, otherNode: DOMNode): boolean =>
   Boolean(
-    node.compareDocumentPosition(otherNode) &
-      DOMNode.DOCUMENT_POSITION_FOLLOWING
+    node.compareDocumentPosition(otherNode) & Node.DOCUMENT_POSITION_FOLLOWING
   )
 
 /**

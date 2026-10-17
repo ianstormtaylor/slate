@@ -1,10 +1,12 @@
 import { Editor, Location, Point, Selection } from '../../index'
 import { MoveUnit, SelectionEdge } from '../../types/types'
 
+/** @hidden @inline */
 export interface SelectionCollapseOptions {
   edge?: SelectionEdge
 }
 
+/** @hidden @inline */
 export interface SelectionMoveOptions {
   distance?: number
   unit?: MoveUnit
@@ -12,6 +14,7 @@ export interface SelectionMoveOptions {
   edge?: SelectionEdge
 }
 
+/** @hidden @inline */
 export interface SelectionSetPointOptions {
   edge?: SelectionEdge
 }
@@ -20,31 +23,40 @@ export interface SelectionTransforms {
   /**
    * Collapse the selection.
    */
-  collapse: (editor: Editor, options?: SelectionCollapseOptions) => void
+  collapse(editor: Editor, options?: SelectionCollapseOptions): void
 
   /**
    * Unset the selection.
    */
-  deselect: (editor: Editor) => void
+  deselect(editor: Editor): void
 
   /**
    * Move the selection's point forward or backward.
    */
-  move: (editor: Editor, options?: SelectionMoveOptions) => void
+  move(editor: Editor, options?: SelectionMoveOptions): void
 
   /**
    * Set the selection to a new value.
+   *
+   * @example
+   * For example, to set the selection to the entire contents of the editor:
+   * ```javascript
+   * Transforms.select(editor, {
+   *   anchor: Editor.start(editor, []),
+   *   focus: Editor.end(editor, []),
+   * })
+   * ```
    */
-  select: (editor: Editor, target: Location) => void
+  select(editor: Editor, target: Location): void
 
   /**
    * Set new properties on one of the selection's points.
    */
-  setPoint: (
+  setPoint(
     editor: Editor,
     props: Partial<Point>,
     options?: SelectionSetPointOptions
-  ) => void
+  ): void
 
   /**
    * Set new properties on the selection.

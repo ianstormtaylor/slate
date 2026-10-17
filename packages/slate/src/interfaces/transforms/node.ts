@@ -2,6 +2,7 @@ import { Editor, Element, Location, Node, Path } from '../../index'
 import { NodeMatch, NullableProps, PropsCompare, PropsMerge } from '../editor'
 import { MaximizeMode, RangeMode } from '../../types/types'
 
+/** @hidden @inline */
 export interface NodeInsertNodesOptions<T extends Node> {
   at?: Location
   match?: NodeMatch<T>
@@ -14,36 +15,50 @@ export interface NodeInsertNodesOptions<T extends Node> {
 
 export interface NodeTransforms {
   /**
-   * Insert nodes in the editor
-   * at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
+   * Insert nodes in the editor at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
+   *
+   * @example
+   * For example, to insert at the very end, without replacing the current selection and regardless of block nesting, use
+   * ```javascript
+   * Transforms.insertNodes(
+   *   editor,
+   *   { type: targetType, children: [{ text: '' }] },
+   *   { at: [editor.children.length] }
+   * )
+   * ```
    */
-  insertNodes: <T extends Node>(
+  insertNodes<T extends Node>(
     editor: Editor,
     nodes: Node | Node[],
     options?: NodeInsertNodesOptions<T>
-  ) => void
+  ): void
 
   /**
    * Lift nodes at a specific location upwards in the document tree, splitting
    * their parent in two if necessary.
    */
-  liftNodes: <T extends Node>(
+  liftNodes<T extends Node>(
     editor: Editor,
     options?: {
       at?: Location
       select?: boolean
+      /**
+       * Defaults to `1` and must be a non-negative integer. A height of `0` does nothing; larger heights lift each matched node through that many ancestors, stopping at the top level. A node that is already at the top level cannot be lifted. For `options.mode`, `'all'` is also supported.
+       */
       height?: number
       match?: NodeMatch<T>
       mode?: MaximizeMode
       voids?: boolean
     }
-  ) => void
+  ): void
 
   /**
    * Merge a node at a location with the previous node of the same depth,
    * removing any empty containing nodes after the merge if necessary.
+   *
+   * Merging elements throws if both have children and one contains blocks while the other contains text or inline nodes, unless `shouldMergeNodesRemovePrevNode` removes the previous node instead. The error names both paths and is raised before moving or removing the merge targets. An expanded `at` range can be deleted before this check.
    */
-  mergeNodes: <T extends Node>(
+  mergeNodes<T extends Node>(
     editor: Editor,
     options?: {
       at?: Location
@@ -52,12 +67,14 @@ export interface NodeTransforms {
       hanging?: boolean
       voids?: boolean
     }
-  ) => void
+  ): void
 
   /**
-   * Move the nodes at a location to a new location.
+   * Move the nodes from an origin to a destination. A destination must be specified in the `options`. If no origin is specified, move the selection.
+   *
+   * `to` is the path the node ends up at once the move is done, not the path it is inserted before. For example, with four blocks `1 2 3 4`, moving `[0]` to `[2]` gives `2 3 1 4`. When `match` selects several nodes, they are moved one at a time, each to `to`.
    */
-  moveNodes: <T extends Node>(
+  moveNodes<T extends Node>(
     editor: Editor,
     options: {
       at?: Location
@@ -67,12 +84,12 @@ export interface NodeTransforms {
       to: Path
       voids?: boolean
     }
-  ) => void
+  ): void
 
   /**
    * Remove the nodes at a specific location in the document.
    */
-  removeNodes: <T extends Node>(
+  removeNodes<T extends Node>(
     editor: Editor,
     options?: {
       at?: Location
@@ -81,13 +98,27 @@ export interface NodeTransforms {
       hanging?: boolean
       voids?: boolean
     }
-  ) => void
+  ): void
 
   /**
-   * Set new properties on the nodes at a location.
+   * Set properties of nodes at the specified location. If no location is specified, use the selection. Optional node properties can be set to `null` to unset them.
+   *
+   * If `props` contains `undefined` values, the node's corresponding property will also be set to `undefined` as opposed to ignored.
+   *
+   * `children` and `text` in `props` are ignored, since they hold a node's content rather than its properties. To change content, use `insertNodes`, `removeNodes` or the text transforms.
    */
-  setNodes: <T extends Node>(
+  setNodes<T extends Node>(
     editor: Editor,
+    /**
+     * `props` can also be a function that receives each matched node and its path and returns the properties for that node, so new values can depend on old ones. Each node still gets one `set_node` operation, so undo works per node:
+     *
+     * @example
+     * ```javascript
+     * Transforms.setNodes(editor, node => ({ indent: (node.indent ?? 0) + 1 }), {
+     *   match: n => Element.isElement(n) && n.type === 'paragraph',
+     * })
+     * ```
+     */
     props:
       | Partial<NullableProps<T>>
       | ((node: T, path: Path) => Partial<NullableProps<T>>),
@@ -100,14 +131,18 @@ export interface NodeTransforms {
       voids?: boolean
       compare?: PropsCompare
       merge?: PropsMerge
+
+      /**
+       * With `replace: true`, every other property of each matched node is removed in the same operation, so the node ends up with exactly `props` (plus its `children` or `text`). Use it to change a node into a different type without carrying over properties that only made sense for the old type, such as turning `{ type: 'callout', color: 'blue' }` into `{ type: 'paragraph' }`. Undo restores the removed properties.
+       */
       replace?: boolean
     }
-  ) => void
+  ): void
 
   /**
    * Split the nodes at a specific location.
    */
-  splitNodes: <T extends Node>(
+  splitNodes<T extends Node>(
     editor: Editor,
     options?: {
       at?: Location
@@ -118,12 +153,12 @@ export interface NodeTransforms {
       height?: number
       voids?: boolean
     }
-  ) => void
+  ): void
 
   /**
    * Unset properties on the nodes at a location.
    */
-  unsetNodes: <T extends Node>(
+  unsetNodes<T extends Node>(
     editor: Editor,
     props: string | string[],
     options?: {
@@ -134,13 +169,13 @@ export interface NodeTransforms {
       split?: boolean
       voids?: boolean
     }
-  ) => void
+  ): void
 
   /**
    * Unwrap the nodes at a location from a parent node, splitting the parent if
    * necessary to ensure that only the content in the range is unwrapped.
    */
-  unwrapNodes: <T extends Node>(
+  unwrapNodes<T extends Node>(
     editor: Editor,
     options?: {
       at?: Location
@@ -150,13 +185,13 @@ export interface NodeTransforms {
       split?: boolean
       voids?: boolean
     }
-  ) => void
+  ): void
 
   /**
    * Wrap the nodes at a location in a new container node, splitting the edges
    * of the range first to ensure that only the content in the range is wrapped.
    */
-  wrapNodes: <T extends Node>(
+  wrapNodes<T extends Node>(
     editor: Editor,
     element: Element,
     options?: {
@@ -167,7 +202,7 @@ export interface NodeTransforms {
       split?: boolean
       voids?: boolean
     }
-  ) => void
+  ): void
 }
 
 // eslint-disable-next-line no-redeclare
