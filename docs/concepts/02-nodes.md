@@ -120,7 +120,7 @@ const withNodeIds = (editor, createId) => {
 
 Pass an ID generator that produces unique values. Return `rest` instead if another part of your application assigns missing IDs. Return the other properties too: the hook supplies the new node's complete property set, rather than a patch. Do not include `children` or `text` in the returned properties.
 
-The hook receives the node and its current path for every node actually split by `Transforms.splitNodes`, including text nodes and multiple ancestor levels. It also covers commands that use that transform, such as Enter, fragment insertion and `setNodes` with `split: true`. Keep text properties when overriding it so formatting survives these operations.
+The hook receives the node and its current path for every node actually split by `Transforms.splitNodes`, including text nodes and multiple ancestor levels. It also covers commands that use that transform, such as Enter, fragment insertion and `setNodes` with `split: true`, and inline elements split by `Transforms.wrapNodes`. Keep text properties when overriding it so formatting survives these operations.
 
 With `slate-history`, undo restores the original node and its ID; redo reuses the properties recorded in the split operation. The hook does not assign or deduplicate IDs on incoming content that is inserted without a split. Apply your ID policy to initial and pasted content separately.
 

@@ -186,4 +186,42 @@ describe('split properties', () => {
         ])
     })
   }
+
+  it('is used when wrapNodes splits an inline ancestor', () => {
+    const editor = createEditor()
+    editor.isInline = element =>
+      element.type === 'link' || element.type === 'mark'
+    editor.children = [
+      {
+        type: 'paragraph',
+        children: [
+          { text: 'A' },
+          { type: 'link', id: 'link', children: [{ text: 'BCDE' }] },
+          { text: 'FG' },
+        ],
+      },
+    ]
+    const seen: Path[] = []
+    editor.getSplitProperties = (node, path) => {
+      if (Element.isElement(node)) seen.push(path)
+      return withoutId(node)
+    }
+    Transforms.wrapNodes(
+      editor,
+      { type: 'mark', children: [] },
+      {
+        at: {
+          anchor: { path: [0, 1, 0], offset: 2 },
+          focus: { path: [0, 2], offset: 1 },
+        },
+        split: true,
+        match: Text.isText,
+      }
+    )
+    const ids = Array.from(Node.elements(editor), ([node]) => node.id).filter(
+      id => id !== undefined
+    )
+    assert.deepStrictEqual(ids, ['link'])
+    assert.deepStrictEqual(seen, [[0, 1]])
+  })
 })
