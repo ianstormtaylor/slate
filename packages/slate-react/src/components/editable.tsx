@@ -260,6 +260,7 @@ export const Editable = forwardRef(
     // Keep track of some state for the event handler logic.
     const state = useMemo(
       () => ({
+        isBlurring: false,
         isDraggingInternally: false,
         isTabbing: false,
         pendingSelection: null as {
@@ -370,7 +371,7 @@ export const Editable = forwardRef(
             if (
               anchorNodeSelectable &&
               focusNodeInEditor &&
-              (readOnly || isFocusInEditor)
+              (readOnly || isFocusInEditor || state.isBlurring)
             ) {
               const range = ReactEditor.toSlateRange(editor, domSelection, {
                 exactMatch: false,
@@ -1462,6 +1463,13 @@ export const Editable = forwardRef(
                       }
                     }
 
+                    state.isBlurring = true
+                    try {
+                      flushDOMSelectionChange()
+                    } finally {
+                      state.isBlurring = false
+                    }
+
                     // COMPAT: Safari doesn't always remove the selection even if the content-
                     // editable element no longer has focus. Refer to:
                     // https://stackoverflow.com/questions/12353247/force-contenteditable-div-to-stop-accepting-input-after-it-loses-focus-under-web
@@ -1474,10 +1482,10 @@ export const Editable = forwardRef(
                   },
                   [
                     readOnly,
-                    state.isUpdatingSelection,
-                    state.latestElement,
+                    state,
                     editor,
                     attributes.onBlur,
+                    flushDOMSelectionChange,
                   ]
                 )}
                 onClick={useCallback(
