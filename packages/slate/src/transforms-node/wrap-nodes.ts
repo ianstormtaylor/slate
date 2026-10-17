@@ -119,7 +119,7 @@ export const wrapNodes: NodeTransforms['wrapNodes'] = (
               type: 'split_node',
               path,
               position,
-              properties: Node.extractProps(node),
+              properties: editor.getSplitProperties(node, path),
             })
           } else if (edge === 'start' ? before : after) {
             const outside =

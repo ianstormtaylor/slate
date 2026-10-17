@@ -94,6 +94,36 @@ const paragraph = {
 
 All that matters is that elements always have a `children` property.
 
+## Node IDs
+
+IDs are custom properties. Slate does not assign them or enforce their uniqueness. By default, splitting a node copies its properties onto the new right-hand node, including its `id`. The left-hand node keeps its original properties.
+
+Override `editor.getSplitProperties` to choose the new node's properties. This example gives each new element a fresh ID while keeping text marks and other split policies:
+
+```javascript
+import { Element } from 'slate'
+
+const withNodeIds = (editor, createId) => {
+  const { getSplitProperties } = editor
+
+  editor.getSplitProperties = (node, path) => {
+    const properties = getSplitProperties(node, path)
+    if (!Element.isElement(node)) return properties
+
+    const { id, ...rest } = properties
+    return { ...rest, id: createId() }
+  }
+
+  return editor
+}
+```
+
+Pass an ID generator that produces unique values. Return `rest` instead if another part of your application assigns missing IDs. Return the other properties too: the hook supplies the new node's complete property set, rather than a patch. Do not include `children` or `text` in the returned properties.
+
+The hook receives the node and its current path for every node actually split by `Transforms.splitNodes`, including text nodes and multiple ancestor levels. It also covers commands that use that transform, such as Enter, fragment insertion and `setNodes` with `split: true`, and inline elements split by `Transforms.wrapNodes`. Keep text properties when overriding it so formatting survives these operations.
+
+With `slate-history`, undo restores the original node and its ID; redo reuses the properties recorded in the split operation. The hook does not assign or deduplicate IDs on incoming content that is inserted without a split. Apply your ID policy to initial and pasted content separately.
+
 ## Blocks vs. Inlines
 
 Depending on your use case, you might want to define another behavior for `Element` nodes which determines their editing "flow".

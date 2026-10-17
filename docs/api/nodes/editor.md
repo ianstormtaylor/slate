@@ -19,6 +19,7 @@ interface Editor {
     edge: 'start' | 'end'
   ) => 'inside' | 'outside' | null
   leafEdgeAffinity: (before: Text, after: Text) => 'backward' | 'forward' | null
+  getSplitProperties: (node: Element | Text, path: Path) => Partial<Node>
   normalizeNode: (entry: NodeEntry) => void
   onChange: (options?: { operation?: Operation }) => void
 
@@ -46,6 +47,7 @@ interface Editor {
 - [Instance methods](editor.md#instance-methods)
   - [Schema-specific methods to override](editor.md#schema-specific-instance-methods-to-override)
   - [Element Type Methods](editor.md/#element-type-methods)
+  - [Split properties](editor.md/#split-properties)
   - [Normalize Methods](editor.md/#normalize-methods)
   - [Callback Method](editor.md/#callback-method)
   - [Mark Methods](editor.md/#mark-methods)
@@ -509,6 +511,14 @@ const { isIsolated } = editor
 editor.isIsolated = element =>
   element.type === 'table-cell' || isIsolated(element)
 ```
+
+### Split properties
+
+#### `getSplitProperties(node: Element | Text, path: Path) => Partial<Node>`
+
+Return the properties for the new right-hand node when `Transforms.splitNodes` splits `node` at its current `path`. The default is `Node.extractProps(node)`, which copies every property except `children` and `text`. The original left-hand node keeps its properties.
+
+Override this method to drop or replace properties such as element IDs. Return the full set of properties to keep, including text marks when splitting a text node; omit `children` and `text`. Commands that use `splitNodes`, including `insertBreak`, `insertFragment` and `setNodes` with `split: true`, use this method too, as does `wrapNodes` when it splits an inline element. See [Node IDs](../../concepts/02-nodes.md#node-ids) for a plugin example.
 
 ### Normalize methods
 

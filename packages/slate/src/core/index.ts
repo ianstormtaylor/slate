@@ -1,5 +1,6 @@
 export * from './apply'
 export * from './get-dirty-paths'
 export * from './get-fragment'
+export * from './get-split-properties'
 export * from './normalize-node'
 export * from './should-normalize'
