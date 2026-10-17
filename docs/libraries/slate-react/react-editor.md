@@ -42,6 +42,8 @@ Blur the editor.
 
 Focus the editor.
 
+In tests that run in jsdom, use `ReactEditor.focus(editor)` instead of calling `focus()` on the editable element. `Editable` doesn't treat a native focus event in jsdom as a focus of the editor, partly because jsdom doesn't implement `isContentEditable`, so `ReactEditor.isFocused` and `useFocused` stay `false`. `ReactEditor.focus` sets the focused state itself.
+
 #### `ReactEditor.deselect(editor: ReactEditor): void`
 
 Deselect the editor.
