@@ -1,5 +1,17 @@
 # slate-history
 
+## 0.144.0
+
+### Minor Changes
+
+- [#6323](https://github.com/ianstormtaylor/slate/pull/6323) [`075a4a0`](https://github.com/ianstormtaylor/slate/commit/075a4a05ff53d649b582e492350d5b82a6fad4c3) Thanks [@dylans](https://github.com/dylans)! - Undo and redo now account for changes applied with `HistoryEditor.withoutSaving`. Saved steps are moved past each unsaved operation, so inserting a block above earlier typing, or inserting text before it, no longer makes undo remove the wrong characters. Steps whose content was removed, or that can no longer be applied, are dropped instead of changing other content.
+
+- [#6314](https://github.com/ianstormtaylor/slate/pull/6314) [`64b036b`](https://github.com/ianstormtaylor/slate/commit/64b036b10d2b75017ba6562db868e7b0bcb0cdef) Thanks [@dylans](https://github.com/dylans)! - Add `Transforms.setChildren(editor, children)` and the overridable `editor.setChildren` method, which apply an outside document through Slate operations instead of replacing `editor.children`. Unchanged nodes are kept, matched by identity or deep equality; shared nodes move with `move_node`; and text changes become `insert_text`/`remove_text`, so the selection, refs and history stay valid.
+
+  `withHistory` records each `setChildren` call as one undo step, separate from typing before and after it.
+
+  `BaseEditor` now requires `setChildren`. `createEditor` supplies it, but editors built by hand and test mocks must add it.
+
 ## 0.140.0
 
 ### Patch Changes

@@ -1,5 +1,19 @@
 # slate
 
+## 0.144.0
+
+### Minor Changes
+
+- [#6314](https://github.com/ianstormtaylor/slate/pull/6314) [`64b036b`](https://github.com/ianstormtaylor/slate/commit/64b036b10d2b75017ba6562db868e7b0bcb0cdef) Thanks [@dylans](https://github.com/dylans)! - Add `Transforms.setChildren(editor, children)` and the overridable `editor.setChildren` method, which apply an outside document through Slate operations instead of replacing `editor.children`. Unchanged nodes are kept, matched by identity or deep equality; shared nodes move with `move_node`; and text changes become `insert_text`/`remove_text`, so the selection, refs and history stay valid.
+
+  `withHistory` records each `setChildren` call as one undo step, separate from typing before and after it.
+
+  `BaseEditor` now requires `setChildren`. `createEditor` supplies it, but editors built by hand and test mocks must add it.
+
+### Patch Changes
+
+- [#6320](https://github.com/ianstormtaylor/slate/pull/6320) [`a21292f`](https://github.com/ianstormtaylor/slate/commit/a21292f93f8f3c1e7a6318687d932c66cb5563f7) Thanks [@Marve10s](https://github.com/Marve10s)! - Fix `Editor.positions` and `Transforms.move` returning points inside consecutive non-selectable elements, or inside a non-selectable first child of a void or read-only element. Deleting beside two non-selectable blocks, or beside a read-only block whose content is all non-selectable, now removes them instead of merging their text.
+
 ## 0.143.0
 
 ### Minor Changes
