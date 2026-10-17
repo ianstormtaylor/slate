@@ -15,7 +15,11 @@ export const SPLITTING_ONCE = new WeakMap<Editor, boolean | undefined>()
 export interface HistoryEditor extends BaseEditor {
   history: History
 
-  /** Undo to the previous saved state. */
+  /**
+   * Undo to the previous saved state.
+   *
+   * A saved `selectionBefore` is restored even if the current selection is null, such as after removing the last block. Redo restores that saved selection before replaying the batch. Standalone selection changes are not saved, so redo does not replay cursor moves made after its operations.
+   */
   undo(): void
 
   /** Redo to the next saved state. */
@@ -68,6 +72,8 @@ export const HistoryEditor = {
 
   /**
    * Undo to the previous saved state.
+   *
+   * A saved `selectionBefore` is restored even if the current selection is null, such as after removing the last block. Redo restores that saved selection before replaying the batch. Standalone selection changes are not saved, so redo does not replay cursor moves made after its operations.
    */
   undo(editor: HistoryEditor): void {
     editor.undo()
@@ -110,6 +116,8 @@ export const HistoryEditor = {
   /**
    * Apply a series of changes inside a synchronous `fn`, without merging any of
    * the new operations into previous save point in the history.
+   *
+   * Each transform called inside `fn` becomes its own undo step, and the normalization it triggers stays in that step. Use `withNewBatch` to make several transforms one step.
    */
   withoutMerging(editor: HistoryEditor, fn: () => void): void {
     const prev = HistoryEditor.isMerging(editor)

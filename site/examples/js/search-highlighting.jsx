@@ -8,17 +8,28 @@ import { Icon, Toolbar } from './components'
 const SearchHighlightingExample = () => {
   const [search, setSearch] = useState('')
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
+  const searchPattern = useMemo(
+    () =>
+      search
+        ? new RegExp(search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'giu')
+        : null,
+    [search]
+  )
   const decorate = useCallback(
     ([node, path]) => {
       const ranges = []
-      if (search && Node.isElement(node) && node.children.every(Node.isText)) {
+      if (
+        searchPattern &&
+        Node.isElement(node) &&
+        node.children.every(Node.isText)
+      ) {
         const texts = node.children.map(it => it.text)
         const str = texts.join('')
-        const length = search.length
-        let start = str.indexOf(search)
         let index = 0
         let iterated = 0
-        while (start !== -1) {
+        for (const match of str.matchAll(searchPattern)) {
+          const start = match.index
+          const length = match[0].length
           // Skip already iterated strings
           while (
             index < texts.length &&
@@ -47,13 +58,11 @@ const SearchHighlightingExample = () => {
               index++
             }
           }
-          // Looking for next search block
-          start = str.indexOf(search, start + search.length)
         }
       }
       return ranges
     },
-    [search]
+    [searchPattern]
   )
   return (
     <Slate editor={editor} initialValue={initialValue}>
@@ -84,7 +93,11 @@ const SearchHighlightingExample = () => {
           />
         </div>
       </Toolbar>
-      <Editable decorate={decorate} renderLeaf={props => <Leaf {...props} />} />
+      <Editable
+        aria-label="Searchable document"
+        decorate={decorate}
+        renderLeaf={props => <Leaf {...props} />}
+      />
     </Slate>
   )
 }

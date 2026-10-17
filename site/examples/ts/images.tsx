@@ -3,7 +3,14 @@ import imageExtensions from 'image-extensions'
 import isHotkey from 'is-hotkey'
 import isUrl from 'is-url'
 import React, { PointerEvent, useMemo } from 'react'
-import { Descendant, Transforms, createEditor } from 'slate'
+import {
+  Descendant,
+  Editor,
+  Path,
+  Range,
+  Transforms,
+  createEditor,
+} from 'slate'
 import { withHistory } from 'slate-history'
 import {
   Editable,
@@ -36,6 +43,7 @@ const ImagesExample = () => {
         <InsertImageButton />
       </Toolbar>
       <Editable
+        aria-label="Editor with images"
         onKeyDown={event => {
           if (isHotkey('mod+a', event)) {
             event.preventDefault()
@@ -50,10 +58,32 @@ const ImagesExample = () => {
 }
 
 const withImages = (editor: CustomEditor) => {
-  const { insertData, isVoid } = editor
+  const { insertBreak, insertData, isVoid } = editor
 
   editor.isVoid = element => {
     return element.type === 'image' ? true : isVoid(element)
+  }
+
+  editor.insertBreak = () => {
+    const { selection } = editor
+
+    if (selection && Range.isCollapsed(selection)) {
+      const match = Editor.void(editor, { at: selection })
+
+      if (match && Editor.isBlock(editor, match[0])) {
+        const paragraph: ParagraphElement = {
+          type: 'paragraph',
+          children: [{ text: '' }],
+        }
+        Transforms.insertNodes(editor, paragraph, {
+          at: Path.next(match[1]),
+          select: true,
+        })
+        return
+      }
+    }
+
+    insertBreak()
   }
 
   editor.insertData = data => {
@@ -126,6 +156,7 @@ const Image = ({
       >
         <img
           src={element.url}
+          alt={element.alt ?? ''}
           className={css`
             display: block;
             max-width: 100%;
@@ -193,7 +224,8 @@ const initialValue: Descendant[] = [
   },
   {
     type: 'image',
-    url: 'https://source.unsplash.com/kFrdX5IeQzI',
+    url: 'https://images.unsplash.com/photo-1532450106241-ed30d951fbb5?w=1200&q=80',
+    alt: 'A forested valley below a rocky mountain peak',
     children: [{ text: '' }],
   },
   {
@@ -214,7 +246,8 @@ const initialValue: Descendant[] = [
   },
   {
     type: 'image',
-    url: 'https://source.unsplash.com/zOwZKwZOZq8',
+    url: 'https://images.unsplash.com/photo-1589229137277-70d507f80b8f?w=1200&q=80',
+    alt: 'A sheep bleating in a heather field',
     children: [{ text: '' }],
   },
 ]

@@ -41,6 +41,11 @@ export interface NodeTransforms {
     editor: Editor,
     options?: {
       at?: Location
+      select?: boolean
+      /**
+       * Defaults to `1` and must be a non-negative integer. A height of `0` does nothing; larger heights lift each matched node through that many ancestors, stopping at the top level. A node that is already at the top level cannot be lifted. For `options.mode`, `'all'` is also supported.
+       */
+      height?: number
       match?: NodeMatch<T>
       mode?: MaximizeMode
       voids?: boolean
@@ -50,6 +55,8 @@ export interface NodeTransforms {
   /**
    * Merge a node at a location with the previous node of the same depth,
    * removing any empty containing nodes after the merge if necessary.
+   *
+   * Merging elements throws if both have children and one contains blocks while the other contains text or inline nodes, unless `shouldMergeNodesRemovePrevNode` removes the previous node instead. The error names both paths and is raised before moving or removing the merge targets. An expanded `at` range can be deleted before this check.
    */
   mergeNodes<T extends Node>(
     editor: Editor,
@@ -71,6 +78,7 @@ export interface NodeTransforms {
     editor: Editor,
     options: {
       at?: Location
+      select?: boolean
       match?: NodeMatch<T>
       mode?: MaximizeMode
       to: Path
@@ -101,7 +109,19 @@ export interface NodeTransforms {
    */
   setNodes<T extends Node>(
     editor: Editor,
-    props: Partial<NullableProps<T>>,
+    /**
+     * `props` can also be a function that receives each matched node and its path and returns the properties for that node, so new values can depend on old ones. Each node still gets one `set_node` operation, so undo works per node:
+     *
+     * @example
+     * ```javascript
+     * Transforms.setNodes(editor, node => ({ indent: (node.indent ?? 0) + 1 }), {
+     *   match: n => Element.isElement(n) && n.type === 'paragraph',
+     * })
+     * ```
+     */
+    props:
+      | Partial<NullableProps<T>>
+      | ((node: T, path: Path) => Partial<NullableProps<T>>),
     options?: {
       at?: Location
       match?: NodeMatch<T>
@@ -111,6 +131,11 @@ export interface NodeTransforms {
       voids?: boolean
       compare?: PropsCompare
       merge?: PropsMerge
+
+      /**
+       * With `replace: true`, every other property of each matched node is removed in the same operation, so the node ends up with exactly `props` (plus its `children` or `text`). Use it to change a node into a different type without carrying over properties that only made sense for the old type, such as turning `{ type: 'callout', color: 'blue' }` into `{ type: 'paragraph' }`. Undo restores the removed properties.
+       */
+      replace?: boolean
     }
   ): void
 
@@ -121,6 +146,7 @@ export interface NodeTransforms {
     editor: Editor,
     options?: {
       at?: Location
+      select?: boolean
       match?: NodeMatch<T>
       mode?: RangeMode
       always?: boolean

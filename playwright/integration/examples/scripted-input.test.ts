@@ -13,7 +13,7 @@ const placeCaretAtEnd = async (page: Page) => {
 
 test.describe('input events dispatched by script', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('http://localhost:3000/examples/plaintext')
+    await page.goto('/examples/plaintext')
     await placeCaretAtEnd(page)
   })
 
@@ -54,5 +54,24 @@ test.describe('input events dispatched by script', () => {
       )
     })
     await expect(page.getByRole('textbox')).toContainText('<textarea>!pasted')
+  })
+
+  test('inserts at a selection set right before the beforeinput', async ({
+    page,
+  }) => {
+    await page.evaluate(() => {
+      const text = document.querySelector('[data-slate-string]')!.firstChild!
+      window.getSelection()!.setBaseAndExtent(text, 4, text, 4)
+      document.querySelector('[data-slate-editor]')!.dispatchEvent(
+        new InputEvent('beforeinput', {
+          inputType: 'insertText',
+          data: 'Zed',
+          bubbles: true,
+          cancelable: true,
+        })
+      )
+    })
+    await expect(page.getByRole('textbox')).toContainText('ThisZed is')
+    await expect(page.getByRole('textbox')).toContainText('<textarea>!')
   })
 })

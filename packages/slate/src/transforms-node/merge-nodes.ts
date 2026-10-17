@@ -99,9 +99,9 @@ export const mergeNodes: NodeTransforms['mergeNodes'] = (
       match: n => levels.includes(n) && hasSingleChildNest(editor, n),
     })
 
-    const emptyRef = emptyAncestor && Editor.pathRef(editor, emptyAncestor[1])
     let properties
     let position
+    let removePrevious: boolean | undefined
 
     // Ensure that the nodes are equivalent, and figure out what the position
     // and extra properties of the merge will be.
@@ -110,6 +110,22 @@ export const mergeNodes: NodeTransforms['mergeNodes'] = (
       position = prevNode.text.length
       properties = rest as Partial<Text>
     } else if (Node.isElement(node) && Node.isElement(prevNode)) {
+      if (
+        node.children.length > 0 &&
+        prevNode.children.length > 0 &&
+        Editor.hasInlines(editor, node) !== Editor.hasInlines(editor, prevNode)
+      ) {
+        removePrevious = Editor.shouldMergeNodesRemovePrevNode(
+          editor,
+          prev,
+          current
+        )
+        if (!removePrevious) {
+          throw new Error(
+            `Cannot merge the node at path [${path}] with the previous node at path [${prevPath}] because their children are not the same kind: one contains blocks and the other contains text or inline nodes.`
+          )
+        }
+      }
       const { children, ...rest } = node
       position = prevNode.children.length
       properties = rest as Partial<Element>
@@ -120,6 +136,8 @@ export const mergeNodes: NodeTransforms['mergeNodes'] = (
         )} ${Scrubber.stringify(prevNode)}`
       )
     }
+
+    const emptyRef = emptyAncestor && Editor.pathRef(editor, emptyAncestor[1])
 
     // If the node isn't already the next sibling of the previous node, move
     // it so that it is before merging.
@@ -133,7 +151,10 @@ export const mergeNodes: NodeTransforms['mergeNodes'] = (
       Transforms.removeNodes(editor, { at: emptyRef.current!, voids })
     }
 
-    if (Editor.shouldMergeNodesRemovePrevNode(editor, prev, current)) {
+    if (
+      removePrevious ??
+      Editor.shouldMergeNodesRemovePrevNode(editor, prev, current)
+    ) {
       Transforms.removeNodes(editor, { at: prevPath, voids })
     } else {
       editor.apply({

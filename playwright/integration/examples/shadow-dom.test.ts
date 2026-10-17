@@ -2,10 +2,7 @@ import { test, expect } from '@playwright/test'
 import { clearEditor } from '../support/editor'
 
 test.describe('shadow-dom example', () => {
-  test.beforeEach(
-    async ({ page }) =>
-      await page.goto('http://localhost:3000/examples/shadow-dom')
-  )
+  test.beforeEach(async ({ page }) => await page.goto('/examples/shadow-dom'))
 
   test('renders slate editor inside nested shadow', async ({ page }) => {
     const outerShadow = page.locator('[data-cy="outer-shadow-root"]')

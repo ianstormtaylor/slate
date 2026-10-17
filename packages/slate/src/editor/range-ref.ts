@@ -1,4 +1,5 @@
 import { Editor, EditorInterface } from '../interfaces/editor'
+import { getSymbolDispose } from '../utils/symbol-dispose'
 import { RangeRef } from '../interfaces/range-ref'
 
 /** @ignore */
@@ -11,6 +12,9 @@ export const rangeRef: EditorInterface['rangeRef'] = (
   const ref: RangeRef = {
     current: range,
     affinity,
+    [getSymbolDispose()]() {
+      ref.unref()
+    },
     unref() {
       const { current } = ref
       const rangeRefs = Editor.rangeRefs(editor)

@@ -1,4 +1,12 @@
-import { Editor, Location, Node, Range, Transforms } from '../../index'
+import {
+  Editor,
+  Element,
+  Location,
+  Node,
+  NodeEntry,
+  Range,
+  Transforms,
+} from '../../index'
 import { TextUnit } from '../../types/types'
 import { getDefaultInsertLocation } from '../../utils'
 
@@ -16,6 +24,17 @@ export interface TextDeleteOptions {
 }
 
 /** @hidden @inline */
+export interface InsertFragmentFilterOptions {
+  blockEntry: NodeEntry<Element>
+}
+
+/** @hidden @inline */
+export type InsertFragmentFilter = (
+  node: Node,
+  options: InsertFragmentFilterOptions
+) => boolean
+
+/** @hidden @inline */
 export interface TextInsertFragmentOptions {
   /**
    * The location to insert the fragment.
@@ -25,11 +44,17 @@ export interface TextInsertFragmentOptions {
   hanging?: boolean
   voids?: boolean
   batchDirty?: boolean
+  filter?: InsertFragmentFilter
 }
 
 /** @hidden @inline */
 export interface TextInsertTextOptions {
+  select?: boolean
   at?: Location
+
+  /**
+   * With `voids: true`, replacing an expanded range also deletes within void content instead of removing the void nodes as atomic units. At an inline boundary, insertion uses the surrounding text in that block, adding the empty text required by normalization if replacement temporarily removes it.
+   */
   voids?: boolean
 }
 
@@ -74,7 +99,7 @@ export const TextTransforms: TextTransforms = {
     options: TextInsertTextOptions = {}
   ): void {
     Editor.withoutNormalizing(editor, () => {
-      const { voids = false } = options
+      const { voids = false, select = false } = options
       let { at = getDefaultInsertLocation(editor) } = options
 
       if (Location.isPath(at)) {
@@ -97,7 +122,8 @@ export const TextTransforms: TextTransforms = {
           const endPoint = endRef.unref()
 
           at = startPoint || endPoint!
-          Transforms.setSelection(editor, { anchor: at, focus: at })
+          if (options.select !== false)
+            Transforms.setSelection(editor, { anchor: at, focus: at })
         }
       }
 
@@ -108,9 +134,12 @@ export const TextTransforms: TextTransforms = {
         return
       }
 
+      const endRef = select ? Editor.pointRef(editor, at) : undefined
       const { path, offset } = at
       if (text.length > 0)
         editor.apply({ type: 'insert_text', path, offset, text })
+      const end = endRef?.unref()
+      if (end) Transforms.select(editor, end)
     })
   },
 }

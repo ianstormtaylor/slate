@@ -1,5 +1,7 @@
 import { Transforms } from '../interfaces/transforms'
-import { EditorInterface } from '../interfaces/editor'
+import { Point } from '../interfaces/point'
+import { Range } from '../interfaces/range'
+import { Editor, EditorInterface } from '../interfaces/editor'
 
 /** @ignore */
 export const insertText: EditorInterface['insertText'] = (
@@ -10,6 +12,11 @@ export const insertText: EditorInterface['insertText'] = (
   const { selection, marks } = editor
 
   if (selection) {
+    if (options.at == null && Range.isCollapsed(selection)) {
+      const point = Editor.insertionPoint(editor, selection.anchor)
+      if (!Point.equals(point, selection.anchor))
+        Transforms.select(editor, point)
+    }
     if (marks) {
       const node = { text, ...marks }
       Transforms.insertNodes(editor, node, {

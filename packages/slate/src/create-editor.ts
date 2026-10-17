@@ -1,6 +1,7 @@
 import {
   addMark,
   deleteFragment,
+  BaseEditor,
   Editor,
   getDirtyPaths,
   getFragment,
@@ -29,7 +30,9 @@ import {
   hasBlocks,
   hasInlines,
   hasPath,
+  hasRange,
   hasTexts,
+  insertionPoint,
   isBlock,
   isEdge,
   isEmpty,
@@ -62,6 +65,7 @@ import {
   string,
   unhangRange,
   withoutNormalizing,
+  word,
 } from './editor'
 import { deleteText } from './transforms-text'
 import {
@@ -88,13 +92,16 @@ import {
 /**
  * Create a new Slate `Editor` object.
  */
-export const createEditor = (): Editor => {
+export const createEditor = <E extends BaseEditor = Editor>(): E => {
   const editor: Editor = {
     children: [],
     operations: [],
     selection: null,
     marks: null,
     isElementReadOnly: () => false,
+    isIsolated: () => false,
+    inlineEdgeAffinity: () => null,
+    leafEdgeAffinity: () => null,
     isInline: () => false,
     isSelectable: () => true,
     isVoid: () => false,
@@ -136,8 +143,10 @@ export const createEditor = (): Editor => {
     hasBlocks: (...args) => hasBlocks(editor, ...args),
     hasInlines: (...args) => hasInlines(editor, ...args),
     hasPath: (...args) => hasPath(editor, ...args),
+    hasRange: (...args) => hasRange(editor, ...args),
     hasTexts: (...args) => hasTexts(editor, ...args),
     insertNodes: (...args) => insertNodes(editor, ...args),
+    insertionPoint: (...args) => insertionPoint(editor, ...args),
     isBlock: (...args) => isBlock(editor, ...args),
     isEdge: (...args) => isEdge(editor, ...args),
     isEmpty: (...args) => isEmpty(editor, ...args),
@@ -180,11 +189,12 @@ export const createEditor = (): Editor => {
     unsetNodes: (...args) => unsetNodes(editor, ...args),
     unwrapNodes: (...args) => unwrapNodes(editor, ...args),
     void: (...args) => getVoid(editor, ...args),
+    word: (...args) => word(editor, ...args),
     withoutNormalizing: (...args) => withoutNormalizing(editor, ...args),
     wrapNodes: (...args) => wrapNodes(editor, ...args),
     shouldMergeNodesRemovePrevNode: (...args) =>
       shouldMergeNodesRemovePrevNode(editor, ...args),
   }
 
-  return editor
+  return editor as unknown as E
 }

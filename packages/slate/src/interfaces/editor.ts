@@ -28,6 +28,7 @@ import {
   TextUnitAdjustment,
 } from '../types/types'
 import { isEditor } from '../editor/is-editor'
+import { REMOTE_CHANGES } from '../utils/weak-maps'
 import {
   TextDeleteOptions,
   TextInsertFragmentOptions,
@@ -66,6 +67,40 @@ export interface BaseEditor {
    * @see {@link EditorInterface#isElementReadOnly} - A static version of this method.
    */
   isElementReadOnly(element: Element): boolean
+
+  /**
+   * Mark elements whose content must not flow across their edges, such as table cells. Slate's default returns `false`.
+   *
+   * For an isolated element:
+   *
+   * - Backspace at its start and Delete at its end do nothing, so they don't merge it with a neighbour. Deleting by word or line stops at its edge.
+   * - Deleting a range that crosses its edge removes the selected text but doesn't merge the blocks on either side. Isolated elements that are entirely inside the range are still removed.
+   * - `insertBreak`, and `splitNodes` with its default match, don't split it. They still split blocks inside it. `splitNodes` with an explicit `match` that selects the element still splits it.
+   * - Explicit `mergeNodes` calls aren't affected.
+   *
+   * @example
+   * ```javascript
+   * const { isIsolated } = editor
+   * editor.isIsolated = element =>
+   *   element.type === 'table-cell' || isIsolated(element)
+   * ```
+   */
+  isIsolated(element: Element): boolean
+
+  /**
+   * Choose whether insertion at an inline edge belongs inside the inline or in the adjacent text outside it. The rule also applies when the caret names that adjacent text. Defaults to `null`, retaining the current point. An `'inside'` rule never moves a caret into a void, read-only, or non-selectable inline.
+
+   * At shared boundaries, the outermost inline edge takes precedence. Between adjacent inlines separated by empty text, rules are considered from left to right; the first non-null rule wins. Empty non-void inlines use their start edge, and an outside rule uses the text before the empty inline. These tie rules keep repeated resolution stable.
+   */
+  inlineEdgeAffinity(
+    element: Element,
+    edge: 'start' | 'end'
+  ): 'inside' | 'outside' | null
+
+  /**
+   * Choose which of two sibling text leaves receives insertion at their shared boundary. `'backward'` uses the end of `before`; `'forward'` uses the start of `after`. Defaults to `null`, retaining the current point. This rule runs after inline affinity and determines the receiving leaf’s marks reported by `Editor.marks`.
+   */
+  leafEdgeAffinity(before: Text, after: Text): 'backward' | 'forward' | null
 
   /**
    * Check if a value is a selectable `Element` object.
@@ -304,7 +339,9 @@ export interface BaseEditor {
    * `children` and `text` in `props` are ignored, since they hold a node's content rather than its properties. To change content, use `insertNodes`, `removeNodes` or the text transforms.
    */
   setNodes<T extends Node>(
-    props: Partial<NullableProps<T>>,
+    props:
+      | Partial<NullableProps<T>>
+      | ((node: T, path: Path) => Partial<NullableProps<T>>),
     options?: {
       at?: Location
       match?: NodeMatch<T>
@@ -314,6 +351,7 @@ export interface BaseEditor {
       voids?: boolean
       compare?: PropsCompare
       merge?: PropsMerge
+      replace?: boolean
     }
   ): void
 
@@ -485,11 +523,15 @@ export interface BaseEditor {
    */
   hasPath(path: Path): boolean
 
+  hasRange(range: Range): boolean
+
   /**
    * Check if a node has text children.
    * @see {@link EditorInterface#hasTexts} - A static version of this method.
    */
   hasTexts(element: Element): boolean
+
+  insertionPoint(point: Point): Point
 
   /**
    * Check if an element is a block element. It only accepts an `Element`, so check other values with `Element.isElement` first.
@@ -702,6 +744,13 @@ export interface BaseEditor {
   void(options?: EditorVoidOptions): NodeEntry<Element> | undefined
 
   /**
+   * Get the range of the word around a point, within its block. Defaults to the selection's focus. Returns `undefined` when the point isn't touching a word, is inside a void, or there is no selection.
+   *
+   * `Editor.word` reads the editor's value, which doesn't include text an input method is still composing. In React, use {@link ReactEditor#getWord} to include it.
+   */
+  word(options?: EditorWordOptions): Range | undefined
+
+  /**
    * Determine whether or not to remove the previous node when merging.
    * @see {@link EditorInterface#shouldMergeNodesRemovePrevNode} - A static version of this method.
    */
@@ -729,6 +778,11 @@ export interface EditorAboveOptions<T extends Ancestor> {
 
 /** @hidden @inline */
 export interface EditorAfterOptions {
+  /**
+   * Customizes word boundaries when `unit` is `word`. The callback receives a whole grapheme, including a combined character or emoji. A custom callback replaces the default punctuation rules and language segmentation; it is ignored for other units.
+   * @example `isWordCharacter: character => /[\w-]/.test(character)` treats `foo-bar_baz` as one word.
+   */
+  isWordCharacter?: (character: string) => boolean
   distance?: number
   unit?: TextUnitAdjustment
   voids?: boolean
@@ -736,6 +790,11 @@ export interface EditorAfterOptions {
 
 /** @hidden @inline */
 export interface EditorBeforeOptions {
+  /**
+   * Customizes word boundaries when `unit` is `word`. The callback receives a whole grapheme, including a combined character or emoji. A custom callback replaces the default punctuation rules and language segmentation; it is ignored for other units.
+   * @example `isWordCharacter: character => /[\w-]/.test(character)` treats `foo-bar_baz` as one word.
+   */
+  isWordCharacter?: (character: string) => boolean
   distance?: number
   unit?: TextUnitAdjustment
   voids?: boolean
@@ -857,11 +916,13 @@ export interface EditorPositionsOptions {
   /**
    * - `offset`: Moves to the next offset `Point`. It will include the `Point` at the end of a `Text` object and then move onto the first `Point` (at the 0th offset) of the next `Text` object. This may be counter-intuitive because the end of a `Text` and the beginning of the next `Text` might be thought of as the same position.
    * - `character`: Moves to the next `character` but is not always the next `index` in the string. This is because Unicode encodings may require multiple bytes to create one character. Unlike `offset`, `character` will not count the end of a `Text` and the beginning of the next `Text` as separate positions to return. Warning: The character offsets for Unicode characters does not appear to be reliable in some cases like a Smiley Emoji will be identified as 2 characters.
-   * - `word`: Moves to the position immediately after the next `word`. In `reverse` mode, moves to the position immediately before the previous `word`.
+   * - `word`: Moves to the position immediately after the next `word`. In `reverse` mode, moves to the position immediately before the previous `word`. Whitespace and punctuation end a word, and apostrophes inside a word don't. Where `Intl.Segmenter` is available, a run of word characters is split further at its word boundaries, so Chinese, Japanese and Thai text without spaces moves and deletes one word at a time.
    * - `line` | `block`: Starts at the beginning position and then the position at the end of the block. Then starts at the beginning of the next block and then the end of the next block.
    * @defaultValue 'offset'
    */
   unit?: TextUnitAdjustment
+
+  isWordCharacter?: (character: string) => boolean
 
   /**
    * When `true` returns the positions in reverse order. In the case of the `unit` being `word`, the actual returned positions are different (i.e. we will get the start of a word in reverse instead of the end).
@@ -892,6 +953,12 @@ export interface EditorRangeRefOptions {
 /** @hidden @inline */
 export interface EditorStringOptions {
   voids?: boolean
+}
+
+/** @hidden @inline */
+export interface EditorWordOptions {
+  at?: Point | Range
+  isWordCharacter?: (character: string) => boolean
 }
 
 /** @hidden @inline */
@@ -969,6 +1036,8 @@ export interface EditorInterface {
 
   /**
    * Delete the content in the current selection.
+   *
+   * A hanging selection from the start of a block to the start of a following sibling removes the fully selected blocks, preserving the following block. Inside an element identified by `editor.isIsolated`, deletion continues to unhang the selection and retain the block structure. Custom `deleteFragment` overrides still control deletion.
    * @param options Type also exported as `EditorFragmentDeletionOptions`
    * @category Commands
    */
@@ -1025,6 +1094,11 @@ export interface EditorInterface {
    * @category Queries
    */
   hasPath(editor: Editor, path: Path): boolean
+
+  /**
+   * Check whether both endpoint paths of a range exist in the editor. This checks paths, not whether offsets are within the text.
+   */
+  hasRange: (editor: Editor, range: Range) => boolean
 
   /**
    * Check if a node has text children.
@@ -1112,6 +1186,16 @@ export interface EditorInterface {
   isElementReadOnly(editor: Editor, element: Element): boolean
 
   /**
+   * Resolve a caret to the point that implicit insertion will use. Applies `inlineEdgeAffinity` first, then `leafEdgeAffinity`, with at most one move for each rule. Both default to `null`, which preserves the supplied point. The helper does not change the selection.
+   *
+   * The rules apply to `editor.insertText`, `insertFragment` and insertion of inline elements with `insertNodes` only when `at` is omitted and the selection is collapsed. Explicit locations, expanded selections, and insertion of text or block nodes through `insertNodes` retain their existing behavior. IME composition remains native; these rules govern committed insertion.
+   * @category Queries
+   */
+  insertionPoint: (editor: Editor, point: Point) => Point
+
+  isIsolated: (editor: Editor, element: Element) => boolean
+
+  /**
    * Check if an element is empty, accounting for void nodes.
    * @category Queries
    */
@@ -1134,6 +1218,11 @@ export interface EditorInterface {
    * @category Queries
    */
   isNormalizing(editor: Editor): boolean
+
+  /**
+   * Check whether the editor is currently inside `Editor.withRemoteChanges`. It returns `false` outside that editor's scope.
+   */
+  isRemoteChange: (editor: Editor) => boolean
 
   /**
    * Check if a value is a selectable `Element` object.
@@ -1182,6 +1271,8 @@ export interface EditorInterface {
 
   /**
    * Get the marks that would be added to text at the current selection.
+   *
+   * At a collapsed caret with a non-null edge rule, returns the receiving leaf’s marks, unless explicit `editor.marks` are set. When both edge rules return `null`, the existing previous-leaf behavior at offset zero is preserved.
    *
    * If `editor.marks` is set (marks toggled with a collapsed selection), those are returned. With an expanded selection, it returns the marks of the first text node in the selection, skipping a node the selection only touches at its end, so it describes what typing over the selection would produce rather than marks shared by the whole selection. To check whether a mark applies to all of the selected text, iterate `Editor.nodes(editor, { match: Text.isText })` and compare each node.
    * @category Queries
@@ -1287,7 +1378,7 @@ export interface EditorInterface {
    *
    * Note: By default void nodes are treated as a single point and iteration
    * will not happen inside their content unless you pass in true for the
-   * `voids` option, then iteration will occur.
+   * `voids` option, then iteration will occur. Text immediately after an inline void starts a new traversal boundary, including when the surrounding text is empty. Word traversal restarts segmentation at that boundary.
    */
   positions(
     editor: Editor,
@@ -1390,10 +1481,28 @@ export interface EditorInterface {
     options?: EditorVoidOptions
   ): NodeEntry<Element> | undefined
 
+  word: (editor: Editor, options?: EditorWordOptions) => Range | undefined
+
   /**
    * Call a function, deferring normalization until after it completes.
    */
   withoutNormalizing(editor: Editor, fn: () => void): void
+
+  /**
+   * Apply remote operations inside a synchronous callback. An expanded selection uses inward affinity, so text inserted at either edge stays outside the selected content. Collapsed carets keep their usual forward behavior. Local operations outside the scope retain their existing selection behavior.
+   *
+   * Scopes can nest and restore the previous flag even if the callback throws. The scope covers only the synchronous callback; apply asynchronous updates inside a new scope when they arrive. This helper does not synchronize operations or change history saving. Removing a selected node keeps the existing nearest-point fallback.
+   *
+   * @example
+   * ```typescript
+   * Editor.withRemoteChanges(editor, () => {
+   *   Editor.withoutNormalizing(editor, () => {
+   *     for (const operation of remoteOperations) editor.apply(operation)
+   *   })
+   * })
+   * ```
+   */
+  withRemoteChanges: (editor: Editor, fn: () => void) => void
 
   /**
    *  Call a function, Determine whether or not remove the previous node when merge.
@@ -1470,6 +1579,10 @@ export const Editor: EditorInterface = {
     return editor.hasPath(path)
   },
 
+  hasRange(editor, range) {
+    return editor.hasRange(range)
+  },
+
   hasTexts(editor, element) {
     return editor.hasTexts(element)
   },
@@ -1508,6 +1621,14 @@ export const Editor: EditorInterface = {
     return editor.isElementReadOnly(element)
   },
 
+  insertionPoint(editor, point) {
+    return editor.insertionPoint(point)
+  },
+
+  isIsolated(editor, element) {
+    return editor.isIsolated(element)
+  },
+
   isEmpty(editor, element) {
     return editor.isEmpty(element)
   },
@@ -1522,6 +1643,10 @@ export const Editor: EditorInterface = {
 
   isNormalizing(editor) {
     return editor.isNormalizing()
+  },
+
+  isRemoteChange(editor) {
+    return REMOTE_CHANGES.get(editor) === true
   },
 
   isSelectable(editor: Editor, value: Element) {
@@ -1643,11 +1768,29 @@ export const Editor: EditorInterface = {
     return editor.void(options)
   },
 
+  word(editor, options) {
+    return editor.word(options)
+  },
+
   withoutNormalizing(editor, fn: () => void) {
     editor.withoutNormalizing(fn)
   },
 
-  shouldMergeNodesRemovePrevNode(editor, prevNode, curNode) {
+  withRemoteChanges(editor, fn) {
+    const previous = REMOTE_CHANGES.get(editor)
+    REMOTE_CHANGES.set(editor, true)
+    try {
+      fn()
+    } finally {
+      if (previous === undefined) {
+        REMOTE_CHANGES.delete(editor)
+      } else {
+        REMOTE_CHANGES.set(editor, previous)
+      }
+    }
+  },
+
+  shouldMergeNodesRemovePrevNode: (editor, prevNode, curNode) => {
     return editor.shouldMergeNodesRemovePrevNode(prevNode, curNode)
   },
 }

@@ -97,6 +97,28 @@ export const deserialize = el => {
   }
   if (ELEMENT_TAGS[nodeName]) {
     const attrs = ELEMENT_TAGS[nodeName](el)
+    if (
+      nodeName === 'P' &&
+      children.some(child => Node.isElement(child) && child.type === 'image')
+    ) {
+      const blocks = []
+      let paragraphChildren = []
+      for (const child of children) {
+        if (Node.isElement(child) && child.type === 'image') {
+          if (paragraphChildren.length > 0) {
+            blocks.push(jsx('element', attrs, paragraphChildren))
+            paragraphChildren = []
+          }
+          blocks.push(child)
+        } else {
+          paragraphChildren.push(child)
+        }
+      }
+      if (paragraphChildren.length > 0) {
+        blocks.push(jsx('element', attrs, paragraphChildren))
+      }
+      return blocks
+    }
     return jsx('element', attrs, children)
   }
   if (TEXT_TAGS[nodeName]) {
@@ -115,6 +137,7 @@ const PasteHtmlExample = () => {
   return (
     <Slate editor={editor} initialValue={initialValue}>
       <Editable
+        aria-label="Editor that accepts pasted HTML"
         renderElement={renderElement}
         renderLeaf={renderLeaf}
         placeholder="Paste in some HTML..."

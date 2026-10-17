@@ -250,6 +250,7 @@ const TestCase = ({ value }) => {
   return (
     <Slate editor={editor} initialValue={value}>
       <Editable
+        aria-label="Android test editor"
         renderLeaf={renderLeaf}
         placeholder="Enter some text…"
         spellCheck

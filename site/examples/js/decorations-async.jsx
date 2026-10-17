@@ -94,6 +94,7 @@ const AsyncDecorationsExample = () => {
         onChange={handleChange}
       >
         <Editable
+          aria-label="Editor with async decorations"
           decorate={decorate}
           renderLeaf={props => <Leaf {...props} />}
           className={css`

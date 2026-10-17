@@ -2,10 +2,7 @@ import { test, expect, Page } from '@playwright/test'
 import { clearEditor, getEditorHandle } from '../support/editor'
 
 test.describe('paste html example', () => {
-  test.beforeEach(
-    async ({ page }) =>
-      await page.goto('http://localhost:3000/examples/paste-html')
-  )
+  test.beforeEach(async ({ page }) => await page.goto('/examples/paste-html'))
 
   const pasteHtml = async (page: Page, htmlContent: string) => {
     await clearEditor(page.getByRole('textbox'))
@@ -24,6 +21,85 @@ test.describe('paste html example', () => {
         el.dispatchEvent(clipboardEvent)
       }, htmlContent)
   }
+
+  const imageUrl =
+    'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
+  const image = `<img src="${imageUrl}">`
+
+  for (const [name, html, text, imageCount] of [
+    ['between text', `<p>before${image}after</p>`, ['before', 'after'], 1],
+    ['at the start', `<p>${image}after</p>`, ['after'], 1],
+    ['at the end', `<p>before${image}</p>`, ['before'], 1],
+    ['alone', `<p>${image}</p>`, [], 1],
+    [
+      'consecutive',
+      `<p>before${image}${image}after</p>`,
+      ['before', 'after'],
+      2,
+    ],
+    ['standalone', image, [], 1],
+    [
+      'between blocks',
+      `<p>before</p>${image}<p>after</p>`,
+      ['before', 'after'],
+      1,
+    ],
+  ] as const) {
+    test(`pasted image ${name} preserves the surrounding text`, async ({
+      page,
+    }) => {
+      await pasteHtml(page, html)
+      const element = page.getByRole('textbox')
+      await expect(element.locator('img')).toHaveCount(imageCount)
+      await expect(element.locator('p')).toHaveText([...text])
+      const editor = await getEditorHandle(element)
+      const contents = await editor.evaluate(editor =>
+        editor.children.map(node => {
+          if (!('children' in node)) return node.text
+          if ('url' in node) return node.url
+          return node.children
+            .map(child => ('text' in child ? child.text : ''))
+            .join('')
+        })
+      )
+      const expected =
+        name === 'at the start'
+          ? [imageUrl, 'after']
+          : name === 'at the end'
+          ? ['before', imageUrl]
+          : name === 'alone' || name === 'standalone'
+          ? [imageUrl]
+          : name === 'consecutive'
+          ? ['before', imageUrl, imageUrl, 'after']
+          : ['before', imageUrl, 'after']
+      expect(contents).toEqual(expected)
+      await editor.dispose()
+    })
+  }
+
+  test('splitting a paragraph around an image keeps marks and links', async ({
+    page,
+  }) => {
+    await pasteHtml(
+      page,
+      `<p><strong>before${image}after</strong><a href="https://example.com">link</a></p>`
+    )
+    const element = page.getByRole('textbox')
+    await expect(element.locator('img')).toHaveCount(1)
+    await expect(element.locator('p strong')).toHaveText(['before', 'after'])
+    await expect(element.locator('p a')).toHaveText('link')
+    await expect(element.locator('p')).toHaveText(['before', 'afterlink'])
+  })
+
+  test('splitting an image paragraph inside a list keeps one list item', async ({
+    page,
+  }) => {
+    await pasteHtml(page, `<ul><li><p>before${image}after</p></li></ul>`)
+    const element = page.getByRole('textbox')
+    await expect(element.locator('ul > li')).toHaveCount(1)
+    await expect(element.locator('li img')).toHaveCount(1)
+    await expect(element.locator('li > p')).toHaveText(['before', 'after'])
+  })
 
   test('pasted bold text uses <strong>', async ({ page }) => {
     await pasteHtml(page, '<strong>Hello Bold</strong>')

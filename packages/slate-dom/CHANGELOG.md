@@ -1,5 +1,72 @@
 # slate-dom
 
+## 0.142.0
+
+### Minor Changes
+
+- [#6266](https://github.com/ianstormtaylor/slate/pull/6266) [`bc91dca`](https://github.com/ianstormtaylor/slate/commit/bc91dca60f376c34c7397a86cb7eb1030bbc6573) Thanks [@dylans](https://github.com/dylans)! - Add `editor.onDOMError` and the lookups `DOMEditor.resolveDOMPoint`, `DOMEditor.resolveDOMRange` and `DOMEditor.resolveEventRange`.
+
+  The resolve lookups return `null` instead of throwing. While the DOM is still catching up with the model (the editor isn't mounted, a render is pending, or Android input hasn't been applied yet), a missing point is ordinary and isn't reported. Once the DOM has settled, a point that still can't be found means a broken rendering contract, such as an element that doesn't render its `children`, and is reported through `editor.onDOMError`, which passes it to the browser's `reportError` by default.
+
+  Slate's own handlers now use these lookups with no try/catch. ArrowUp near a trailing newline, the `beforeinput` link-end check, shift-clicking past a selected void and restoring the DOM selection no longer throw out of their handlers. Selection syncing, which used to swallow every failure, now reports only the broken-contract case.
+
+  slate-react now requires slate-dom 0.141.0 or later.
+
+- [#6265](https://github.com/ianstormtaylor/slate/pull/6265) [`82f6713`](https://github.com/ianstormtaylor/slate/commit/82f671373cecabef3592e519623b0e990b34ff75) Thanks [@dylans](https://github.com/dylans)! - Multi-line plain-text paste now builds the lines into a fragment and calls `editor.insertFragment` once, instead of splitting the block and calling `editor.insertText` for each line. Pasting 22,000 lines runs about eight times faster.
+
+  Changes plugins can see:
+
+  - Outside inlines, `insertFragment` overrides now receive multi-line plain-text pastes, and `insertText` overrides no longer see them. Single-line pastes still go through `insertText`.
+  - The operations are an `insert_node` per middle line instead of a `split_node` per line. Code that matches operation types in `apply` sees the new shape.
+  - Every pasted line gets the block properties and marks at the caret, including pending `editor.marks`.
+  - With the caret inside an inline such as a link, every line still stays inside it, as before. The first and last lines go through `insertText`, and the middle lines are inserted with one `insertNodes` call instead of one split per line.
+
+### Patch Changes
+
+- [#6317](https://github.com/ianstormtaylor/slate/pull/6317) [`69658fa`](https://github.com/ianstormtaylor/slate/commit/69658fa1fd51170c8af041e871948f4146558d00) Thanks [@dylans](https://github.com/dylans)! - Fix `HAS_BEFORE_INPUT_SUPPORT` so legacy Chrome (75 and older) uses the `beforeinput` fallback as intended. The check combined the desktop and Android legacy flags with `||`, which was true for almost every browser.
+
+## 0.140.0
+
+### Minor Changes
+
+- [#6105](https://github.com/ianstormtaylor/slate/pull/6105) [`a07df52`](https://github.com/ianstormtaylor/slate/commit/a07df527916fe6439c1c39a9512889a9b33c00dc) Thanks [@janpaepke](https://github.com/janpaepke)! - Stop drops from throwing when the browser resolves the drop position outside of the editor. `<Editable>` resolved the target range from the drop coordinates via `caretRangeFromPoint`, which can land on a DOM node outside of the editor even though the event's target is inside it (e.g. when the page scrolled between the last `dragover` and the `drop`); the resulting "Cannot resolve a Slate point from DOM point" error escaped the event handler and the drop was lost. The dropped data now goes to the current selection instead (the end of the document without one), and internally dragged content stays where it is. `DOMEditor.findEventRange` gained a `suppressThrow` option for this and returns `null` when the range cannot be resolved.
+
+## 0.136.0
+
+### Minor Changes
+
+- [#6268](https://github.com/ianstormtaylor/slate/pull/6268) [`1e9e7e1`](https://github.com/ianstormtaylor/slate/commit/1e9e7e1bc1b970af5201c28319145e628981795c) Thanks [@dylans](https://github.com/dylans)! - Add `Editor.word`, which returns the range of the word around a point within its block. Words can cross mark changes and inline links but stop at voids, and `isWordCharacter` lets you define your own word characters. `ReactEditor.getWord` also includes text an input method is still composing.
+
+  The `'word'` unit (word deletion, word movement, and `Editor.before`/`after`/`positions`) now uses `Intl.Segmenter`, where available, to split runs of word characters. Chinese, Japanese and Thai text without spaces now deletes and moves one word at a time instead of a whole phrase. Text with spaces between words is unaffected.
+
+## 0.134.0
+
+### Patch Changes
+
+- [#6250](https://github.com/ianstormtaylor/slate/pull/6250) [`b70a400`](https://github.com/ianstormtaylor/slate/commit/b70a4001b25e603ebfde866c3ae86d9786d40ce2) Thanks [@dylans](https://github.com/dylans)! - Fix typing on Android right after toggling a mark with a collapsed selection. The first letter no longer moves the caret past the end of the previous leaf, which closed the soft keyboard and scattered the following letters, and a composition into the new marked text is no longer interrupted by a re-render.
+
+- [#6256](https://github.com/ianstormtaylor/slate/pull/6256) [`f5b29a0`](https://github.com/ianstormtaylor/slate/commit/f5b29a0e28850a9b6160df28b8fdc38e6401d06d) Thanks [@dylans](https://github.com/dylans)! - Add Editor.hasRange to core and have DOMEditor.hasRange and ReactEditor.hasRange use it, falling back to the path check with older slate versions.
+
+- [#6241](https://github.com/ianstormtaylor/slate/pull/6241) [`ea6e643`](https://github.com/ianstormtaylor/slate/commit/ea6e643d68146a6a6908ca450d1ed8d3332d8d46) Thanks [@dylans](https://github.com/dylans)! - Keep list containers and list items around copied HTML when the selection spans list items, including nested lists and inline void boundaries. Copies within one item retain their existing HTML and plain text.
+
+## 0.133.6
+
+### Patch Changes
+
+- [#6228](https://github.com/ianstormtaylor/slate/pull/6228) [`3a5e736`](https://github.com/ianstormtaylor/slate/commit/3a5e736e3818f46bed66afa342690120797b5e67) Thanks [@dylans](https://github.com/dylans)! - Return the correct path from `findPath` when it is called after an operation but before the editor re-renders, such as in `onChange`, instead of throwing or returning the old path.
+
+- [#6226](https://github.com/ianstormtaylor/slate/pull/6226) [`a8329a2`](https://github.com/ianstormtaylor/slate/commit/a8329a27140fe468c306933a8ed1bebd610d88b9) Thanks [@dylans](https://github.com/dylans)! - Copy `initialValue` nodes that another editor is already using, so two `Slate` components given the same value render and edit independently instead of throwing "Unable to find the path for Slate node". Requires slate-dom 0.133.6 or newer.
+
+## 0.133.5
+
+### Patch Changes
+
+- [#6220](https://github.com/ianstormtaylor/slate/pull/6220) [`3eed905`](https://github.com/ianstormtaylor/slate/commit/3eed9053d1058cfab8744a965be6156fec259cac) Thanks [@dylans](https://github.com/dylans)! - Keep input, selection and history events from native contenteditable regions nested inside non-editable containers out of the surrounding Slate editor. Preserve Slate text and event hosts inside custom editable islands.
+
+- [#6223](https://github.com/ianstormtaylor/slate/pull/6223) [`8c929a8`](https://github.com/ianstormtaylor/slate/commit/8c929a8fd83bb9f96e758a22a3f005351adc089b) Thanks [@dylans](https://github.com/dylans)! - Keep the Firefox caret on the new line after a trailing soft break without adding zero-width characters to the document. Preserve selection offsets and copied text around the extra rendering newline.
+
+  Requires slate-dom 0.133.5 or newer for the matching DOM selection mapping.
+
 ## 0.133.1
 
 ### Patch Changes

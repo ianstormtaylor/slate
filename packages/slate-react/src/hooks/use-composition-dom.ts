@@ -13,15 +13,17 @@ export const useCompositionDOM = (editor: ReactEditor) => {
       manager.clear()
     }
 
-    const track = (text: string | null) => {
-      if (!observer) {
-        if (!text?.includes('\n')) return
-        observer = new MutationObserver(manager.registerMutations)
-      }
+    const observe = () => {
+      observer ??= new MutationObserver(manager.registerMutations)
       observer.observe(ReactEditor.toDOMNode(editor, editor), {
         childList: true,
         subtree: true,
       })
+    }
+
+    const track = (text: string | null) => {
+      if (!observer && !text?.includes('\n')) return
+      observe()
     }
 
     const pause = () => {
@@ -35,7 +37,7 @@ export const useCompositionDOM = (editor: ReactEditor) => {
       manager.restoreDOM()
     }
 
-    return { track, pause, restore, clear }
+    return { observe, track, pause, restore, clear }
   }, [editor])
 
   useEffect(() => () => compositionDOM.clear(), [compositionDOM])

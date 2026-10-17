@@ -34,6 +34,17 @@ const App = () => {
 
 Now let's add "code blocks" to our editor.
 
+For TypeScript, replace the earlier `CustomElement` definition with one that allows both block types:
+
+```typescript
+type CustomElement = {
+  type: 'paragraph' | 'code'
+  children: CustomText[]
+}
+```
+
+Import `RenderElementProps` from `slate-react` and use it for the `props` parameter of `CodeElement`, `DefaultElement` and the `renderElement` callback.
+
 The problem is, code blocks won't just be rendered as a plain paragraph, they'll need to be rendered differently. To make that happen, we need to define a "renderer" for `code` element nodes.
 
 Element renderers are just simple React components, like so:
@@ -208,7 +219,7 @@ const App = () => {
             event.preventDefault()
             // Determine whether any of the currently selected blocks are code blocks.
             const [match] = Editor.nodes(editor, {
-              match: n => n.type === 'code',
+              match: n => Element.isElement(n) && n.type === 'code',
             })
             // Toggle the block type depending on whether there's already a match.
             Transforms.setNodes(

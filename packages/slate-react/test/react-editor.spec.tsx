@@ -123,5 +123,88 @@ describe('slate-react', () => {
         expect(onValueChange).not.toHaveBeenCalled()
       })
     })
+
+    describe('.findEventRange', () => {
+      const initialValue = [{ type: 'block', children: [{ text: 'test' }] }]
+
+      let outside: HTMLElement | null = null
+
+      afterEach(() => {
+        outside?.remove()
+        outside = null
+      })
+
+      const renderEditor = () => {
+        const editor = withReact(createEditor())
+
+        act(() => {
+          render(
+            <Slate editor={editor} initialValue={initialValue}>
+              <Editable />
+            </Slate>
+          )
+        })
+
+        return editor
+      }
+
+      const renderEditorAndOutsideTarget = () => {
+        const editor = renderEditor()
+        outside = document.body.appendChild(document.createElement('p'))
+        const event = { clientX: 1, clientY: 1, target: outside }
+
+        return { editor, event }
+      }
+
+      // Calls `findEventRange` after the block changed but before React
+      // re-rendered it, so its DOM element still maps to the replaced node.
+      const findEventRangeOnStaleTarget = async (
+        editor: ReactEditor,
+        options?: { suppressThrow: true }
+      ) => {
+        const target = ReactEditor.toDOMNode(editor, editor.children[0])
+        const event = { clientX: 1, clientY: 1, target }
+        let range
+
+        await act(async () => {
+          Transforms.setNodes(editor, { type: 'other' } as any, { at: [0] })
+          range = ReactEditor.findEventRange(editor, event, options)
+        })
+
+        return range
+      }
+
+      test('should return null for a target outside of the editor with suppressThrow', () => {
+        const { editor, event } = renderEditorAndOutsideTarget()
+
+        expect(
+          ReactEditor.findEventRange(editor, event, { suppressThrow: true })
+        ).toBeNull()
+      })
+
+      test('should throw for a target outside of the editor without suppressThrow', () => {
+        const { editor, event } = renderEditorAndOutsideTarget()
+
+        expect(() => ReactEditor.findEventRange(editor, event)).toThrow(
+          'Cannot resolve a Slate node from DOM node'
+        )
+      })
+
+      test('should return null for a target with a stale node with suppressThrow', async () => {
+        const editor = renderEditor()
+
+        expect(
+          await findEventRangeOnStaleTarget(editor, { suppressThrow: true })
+        ).toBeNull()
+      })
+
+      test('should throw for a target with a stale node without suppressThrow', async () => {
+        const editor = renderEditor()
+
+        await expect(findEventRangeOnStaleTarget(editor)).rejects.toThrow(
+          'Unable to find the path for Slate node'
+        )
+      })
+    })
   })
 })

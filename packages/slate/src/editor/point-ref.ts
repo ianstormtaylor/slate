@@ -1,4 +1,5 @@
 import { Editor, EditorInterface } from '../interfaces/editor'
+import { getSymbolDispose } from '../utils/symbol-dispose'
 import { PointRef } from '../interfaces/point-ref'
 
 /** @ignore */
@@ -11,6 +12,9 @@ export const pointRef: EditorInterface['pointRef'] = (
   const ref: PointRef = {
     current: point,
     affinity,
+    [getSymbolDispose()]() {
+      ref.unref()
+    },
     unref() {
       const { current } = ref
       const pointRefs = Editor.pointRefs(editor)

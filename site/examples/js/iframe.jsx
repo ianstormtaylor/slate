@@ -30,6 +30,7 @@ const IFrameExample = () => {
       </Toolbar>
       <IFrame onBlur={handleBlur}>
         <Editable
+          aria-label="Rich text editor in an iframe"
           renderElement={renderElement}
           renderLeaf={renderLeaf}
           placeholder="Enter some rich text…"
@@ -98,7 +99,12 @@ const IFrame = ({ children, ...props }) => {
     setIframeBody(iframe.contentDocument.body)
   }
   return (
-    <iframe srcDoc={`<!DOCTYPE html>`} {...props} onLoad={handleLoad}>
+    <iframe
+      title="Editor frame"
+      srcDoc={`<!DOCTYPE html>`}
+      {...props}
+      onLoad={handleLoad}
+    >
       {iframeBody && createPortal(children, iframeBody)}
     </iframe>
   )

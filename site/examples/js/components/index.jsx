@@ -5,6 +5,7 @@ import ReactDOM from 'react-dom'
 export const Button = React.forwardRef(
   ({ className, active, reversed, ...props }, ref) => (
     <button
+      aria-pressed={active}
       {...props}
       ref={ref}
       className={cx(

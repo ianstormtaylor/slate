@@ -6,14 +6,15 @@ Want to contribute to Slate? That would be awesome!
   - [Reporting Bugs](contributing.md#reporting-bugs)
   - [Asking Questions](contributing.md#asking-questions)
   - [Submitting Pull Requests](contributing.md#submitting-pull-requests)
+    - [Reviewing and Merging](contributing.md#reviewing-and-merging)
   - [Repository Setup](contributing.md#repository-setup)
   - [Running Examples](contributing.md#running-examples)
   - [Running Tests](contributing.md#running-tests)
   - [Testing Input Methods](contributing.md#testing-input-methods)
   - [Publishing Releases](contributing.md#publishing-releases)
-    - [Publishing Normal `@latest` Release](contributing.md#publishing-normal-latest-release)
-    - [Publishing `@next` Release](contributing.md#publishing-next-release)
-    - [Publishing `@experimental` Release](contributing.md#publishing-experimental-release)
+    - [Adding a Changeset](contributing.md#adding-a-changeset)
+    - [Publishing to `@latest`](contributing.md#publishing-to-latest)
+    - [Publishing to `@dev`](contributing.md#publishing-to-dev)
     - [Running Prerelease Script](contributing.md#running-prerelease-script)
 
 ## Reporting Bugs
@@ -45,6 +46,18 @@ Please use the Slack instead of asking questions in issues, since we want to res
 All pull requests are super welcomed and greatly appreciated! Issues in need of a solution are marked with a [`♥ help`](https://github.com/ianstormtaylor/slate/issues?q=is%3Aissue+is%3Aopen+label%3A%22%E2%99%A5+help%22) label if you're looking for somewhere to start.
 
 Please include tests and docs with every pull request!
+
+### Reviewing and Merging
+
+Before merging a pull request:
+
+- Check that the description explains the problem, the resulting behavior, and any compatibility changes. Agree on breaking changes or substantial API and architecture changes with the maintainers before merging.
+- Require a regression test for a bug fix that fails without the fix. Check affected examples and editing behaviors, including selections, nested blocks, voids, and input methods where relevant.
+- Keep the implementation consistent with existing patterns and easy to follow. Keep documentation concise and update it when behavior or APIs change.
+- Confirm that tests, type checking, formatting, and linting pass on the version being merged, and resolve outstanding review feedback.
+- Include a [changeset](contributing.md#adding-a-changeset) for changes to published packages. Changes limited to documentation, examples, or tests do not need one.
+
+Passing CI is part of review, not a substitute for checking the behavior and compatibility of the change.
 
 ## Repository Setup
 

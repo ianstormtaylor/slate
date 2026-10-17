@@ -1,9 +1,17 @@
 import ReactDOM from 'react-dom'
-import { BaseEditor, Node } from 'slate'
+import { BaseEditor, Node, Operation } from 'slate'
 import { withDOM, IS_ANDROID, EDITOR_TO_PENDING_SELECTION } from 'slate-dom'
 import { ReactEditor } from './react-editor'
 import { REACT_MAJOR_VERSION } from '../utils/environment'
 import { getChunkTreeForNode } from '../chunking'
+import { EDITOR_TO_FLUSH_DEFERRED_DIFFS } from '../hooks/android-input-manager/android-input-manager'
+
+const RERENDERING_OPERATIONS = new Set<Operation['type']>([
+  'insert_node',
+  'move_node',
+  'remove_node',
+  'set_node',
+])
 
 /**
  * `withReact` adds React and DOM specific behaviors to the editor.
@@ -70,6 +78,10 @@ export const withReact = <T extends BaseEditor>(
   // node being moved, add the moved node to the movedNodeKeys set of the
   // parent's chunk tree.
   e.apply = operation => {
+    if (IS_ANDROID && RERENDERING_OPERATIONS.has(operation.type)) {
+      EDITOR_TO_FLUSH_DEFERRED_DIFFS.get(e)?.()
+    }
+
     if (operation.type === 'move_node') {
       const parent = Node.parent(e, operation.path)
       const chunking = !!e.getChunkSize(parent)

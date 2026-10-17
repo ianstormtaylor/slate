@@ -16,7 +16,8 @@ import { HistoryEditor } from './history-editor'
  */
 export const withHistory = <T extends Editor>(editor: T) => {
   const e = editor as T & HistoryEditor
-  const { apply } = e
+  const { apply, normalize } = e
+  let isSettled = true
   e.history = { undos: [], redos: [] }
 
   e.redo = () => {
@@ -27,7 +28,7 @@ export const withHistory = <T extends Editor>(editor: T) => {
       const batch = redos[redos.length - 1]
 
       if (batch.selectionBefore) {
-        Transforms.setSelection(e, batch.selectionBefore)
+        Transforms.select(e, batch.selectionBefore)
       }
 
       HistoryEditor.withoutSaving(e, () => {
@@ -58,7 +59,7 @@ export const withHistory = <T extends Editor>(editor: T) => {
             e.apply(op)
           }
           if (batch.selectionBefore) {
-            Transforms.setSelection(e, batch.selectionBefore)
+            Transforms.select(e, batch.selectionBefore)
           }
         })
       })
@@ -92,6 +93,10 @@ export const withHistory = <T extends Editor>(editor: T) => {
         }
       }
 
+      if (!merge && !isSettled && lastBatch && operations.includes(lastOp)) {
+        merge = true
+      }
+
       if (HistoryEditor.isSplittingOnce(e)) {
         merge = false
         HistoryEditor.setSplittingOnce(e, undefined)
@@ -114,7 +119,16 @@ export const withHistory = <T extends Editor>(editor: T) => {
       history.redos = []
     }
 
+    isSettled = false
     apply(op)
+  }
+
+  e.normalize = options => {
+    normalize(options)
+
+    if (Editor.isNormalizing(e)) {
+      isSettled = true
+    }
   }
 
   e.writeHistory = (stack: 'undos' | 'redos', batch: any) => {

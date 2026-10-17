@@ -14,7 +14,7 @@ import { ReactEditor } from '../plugin/react-editor'
 
 export const useSelected = ({
   suppressThrow = false,
-}: { suppressThrow?: boolean } = {}): boolean => {
+}: { suppressThrow?: boolean | undefined } = {}): boolean => {
   const element = useElementIf()
 
   // Breaking the rules of hooks is fine here since `!element` will remain true

@@ -1,9 +1,9 @@
 import { test, expect } from '@playwright/test'
+import { getEditorHandle } from '../support/editor'
 
 test.describe('search highlighting', () => {
   test.beforeEach(
-    async ({ page }) =>
-      await page.goto('http://localhost:3000/examples/search-highlighting')
+    async ({ page }) => await page.goto('/examples/search-highlighting')
   )
 
   test('highlights the searched text', async ({ page }) => {
@@ -12,6 +12,59 @@ test.describe('search highlighting', () => {
 
     await page.locator(searchField).fill('text')
     await expect(page.locator(`[data-cy="${highlightedText}"]`)).toHaveCount(2)
+  })
+
+  test('ignores case across formatted leaves and preserves offsets', async ({
+    page,
+  }) => {
+    const element = page.getByRole('textbox')
+    const editor = await getEditorHandle(element)
+    await editor.evaluate(editor => {
+      editor.children = [
+        {
+          children: [
+            { text: 'İ prefix Te' },
+            { text: 'XT', bold: true },
+            { text: ' text TEXT' },
+          ],
+        },
+      ]
+      editor.onChange()
+    })
+    await editor.dispose()
+    await expect(element).toHaveText('İ prefix TeXT text TEXT')
+    await page.locator('input[type="search"]').fill('tExT')
+    await expect(page.locator('[data-cy="search-highlighted"]')).toHaveText([
+      'Te',
+      'XT',
+      'text',
+      'TEXT',
+    ])
+    await expect(element).toHaveText('İ prefix TeXT text TEXT')
+    await page.locator('input[type="search"]').fill('')
+    await expect(page.locator('[data-cy="search-highlighted"]')).toHaveCount(0)
+  })
+
+  test('treats regular expression characters as literal search text', async ({
+    page,
+  }) => {
+    const element = page.getByRole('textbox')
+    const editor = await getEditorHandle(element)
+    await editor.evaluate(editor => {
+      editor.children = [{ children: [{ text: 'A+B [Text] a+b [text]' }] }]
+      editor.onChange()
+    })
+    await editor.dispose()
+    await page.locator('input[type="search"]').fill('a+b')
+    await expect(page.locator('[data-cy="search-highlighted"]')).toHaveText([
+      'A+B',
+      'a+b',
+    ])
+    await page.locator('input[type="search"]').fill('[TEXT]')
+    await expect(page.locator('[data-cy="search-highlighted"]')).toHaveText([
+      '[Text]',
+      '[text]',
+    ])
   })
 
   test('a re-render right after a click keeps the clicked selection', async ({

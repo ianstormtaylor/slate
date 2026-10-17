@@ -15,7 +15,7 @@ import {
   TextDiff,
   verifyDiffState,
 } from 'slate-dom'
-import { isDOMSelection, isTrackedMutation } from 'slate-dom'
+import { isDOMSelection, isDOMNode, isTrackedMutation } from 'slate-dom'
 import {
   EDITOR_TO_FORCE_RENDER,
   EDITOR_TO_PENDING_ACTION,
@@ -61,8 +61,11 @@ export type CreateAndroidInputManagerOptions = {
   onDOMSelectionChange: DebouncedFunc<() => void>
 }
 
+export const EDITOR_TO_FLUSH_DEFERRED_DIFFS = new WeakMap<Editor, () => void>()
+
 export type AndroidInputManager = {
   flush(): void
+  flushDeferredDiffs(): void
   scheduleFlush(): void
 
   hasPendingDiffs(): boolean
@@ -86,11 +89,13 @@ export function createAndroidInputManager({
   onDOMSelectionChange,
 }: CreateAndroidInputManagerOptions): AndroidInputManager {
   let flushing: 'action' | boolean = false
+  let flushingDeferredDiffs = false
   let compositionEndTimeoutId: ReturnType<typeof setTimeout> | null = null
   let flushTimeoutId: ReturnType<typeof setTimeout> | null = null
   let actionTimeoutId: ReturnType<typeof setTimeout> | null = null
   let lastCompositionActivity = 0
   let compositionCleared = false
+  let hasUnrenderedMutations = false
 
   let idCounter = 0
   let insertPositionHint: StringDiff | null | false = false
@@ -112,6 +117,16 @@ export function createAndroidInputManager({
   }
 
   const performAction = () => {
+    const { children } = editor
+    runPendingAction()
+
+    if (hasUnrenderedMutations && editor.children === children) {
+      EDITOR_TO_FORCE_RENDER.get(editor)?.()
+    }
+    hasUnrenderedMutations = false
+  }
+
+  const runPendingAction = () => {
     const action = EDITOR_TO_PENDING_ACTION.get(editor)
     EDITOR_TO_PENDING_ACTION.delete(editor)
     if (!action) {
@@ -175,6 +190,11 @@ export function createAndroidInputManager({
       }
     })
 
+  const hasPendingDiffsInNewLeaf = () =>
+    hasPendingDiffsInEmptyLeaf() ||
+    (hasPendingDiffs() &&
+      EDITOR_TO_PENDING_INSERTION_MARKS.get(editor) !== undefined)
+
   const flush = () => {
     if (flushTimeoutId) {
       clearTimeout(flushTimeoutId)
@@ -191,8 +211,12 @@ export function createAndroidInputManager({
     // Composing into a leaf that already has text is unaffected: applying the
     // diff there only updates `textContent`, so the value still updates on
     // every `compositionupdate`.
-    if (isCompositionLive() && hasPendingDiffsInEmptyLeaf()) {
-      debug('deferring flush during composition in empty leaf')
+    if (
+      !flushingDeferredDiffs &&
+      isCompositionLive() &&
+      hasPendingDiffsInNewLeaf()
+    ) {
+      debug('deferring flush during composition in new leaf')
       flushTimeoutId = setTimeout(flush, COMPOSITION_RECHECK_DELAY)
       return
     }
@@ -309,6 +333,20 @@ export function createAndroidInputManager({
     }
   }
 
+  const flushDeferredDiffs = () => {
+    if (flushing || !isCompositionLive() || !hasPendingDiffsInNewLeaf()) {
+      return
+    }
+
+    debug('flushing deferred diffs before a structural change')
+    flushingDeferredDiffs = true
+    try {
+      flush()
+    } finally {
+      flushingDeferredDiffs = false
+    }
+  }
+
   const handleCompositionEnd = (
     _event: React.CompositionEvent<HTMLDivElement>
   ) => {
@@ -320,7 +358,7 @@ export function createAndroidInputManager({
     // that compose one syllable at a time (Hangul, kana) start the next
     // composition in the same tick as this event, so an asynchronous render
     // would replace the text node that composition has already started in.
-    if (hasPendingDiffsInEmptyLeaf() && !flushing) {
+    if (hasPendingDiffsInNewLeaf() && !flushing) {
       ReactDOM.flushSync(() => {
         IS_COMPOSING.set(editor, false)
         flush()
@@ -762,6 +800,41 @@ export function createAndroidInputManager({
           )
         }
 
+        if (
+          type === 'insertText' &&
+          !ReactEditor.isComposing(editor) &&
+          Range.isCollapsed(targetRange) &&
+          typeof Editor.insertionPoint === 'function' &&
+          !Point.equals(
+            Editor.insertionPoint(editor, targetRange.anchor),
+            targetRange.anchor
+          )
+        ) {
+          const node = isDOMSelection(nativeTargetRange)
+            ? nativeTargetRange.anchorNode
+            : nativeTargetRange?.startContainer
+          const snapshot =
+            isDOMNode(node) && node.nodeType === 3
+              ? { node, text: node.textContent }
+              : null
+          event.preventDefault()
+          return scheduleAction(
+            () => {
+              if (
+                snapshot &&
+                snapshot.node.isConnected &&
+                snapshot.node.textContent !== snapshot.text
+              ) {
+                snapshot.node.textContent = snapshot.text
+              }
+              Editor.insertText(editor, text)
+            },
+            {
+              at: targetRange,
+            }
+          )
+        }
+
         if (Path.equals(targetRange.anchor.path, targetRange.focus.path)) {
           const [start, end] = Range.edges(targetRange)
 
@@ -824,15 +897,7 @@ export function createAndroidInputManager({
                 offset: start.offset + text.length,
               }
 
-              scheduleAction(
-                () => {
-                  Transforms.select(editor, {
-                    anchor: newPoint,
-                    focus: newPoint,
-                  })
-                },
-                { at: newPoint }
-              )
+              scheduleAction(() => {}, { at: newPoint })
             }
             return
           }
@@ -921,21 +986,31 @@ export function createAndroidInputManager({
   }
 
   const handleDomMutations = (mutations: MutationRecord[]) => {
-    if (hasPendingDiffs() || hasPendingAction()) {
+    if (hasPendingDiffs()) {
       return
     }
 
     if (
-      mutations.some(mutation => isTrackedMutation(editor, mutation, mutations))
+      !mutations.some(mutation =>
+        isTrackedMutation(editor, mutation, mutations)
+      )
     ) {
-      // Cause a re-render to restore the dom state if we encounter tracked mutations without
-      // a corresponding pending action.
-      EDITOR_TO_FORCE_RENDER.get(editor)?.()
+      return
     }
+
+    if (hasPendingAction()) {
+      hasUnrenderedMutations = true
+      return
+    }
+
+    // Cause a re-render to restore the dom state if we encounter tracked mutations without
+    // a corresponding pending action.
+    EDITOR_TO_FORCE_RENDER.get(editor)?.()
   }
 
   return {
     flush,
+    flushDeferredDiffs,
     scheduleFlush,
 
     hasPendingDiffs,

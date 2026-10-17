@@ -192,6 +192,7 @@ const HugeDocumentExample = () => {
   ) : (
     <Slate key={editorVersion} editor={editor} initialValue={initialValue}>
       <Editable
+        aria-label="Huge document"
         placeholder="Enter some text…"
         renderElement={renderElement}
         renderChunk={config.chunkDivs ? renderChunk : undefined}
@@ -252,7 +253,7 @@ const Heading = React.forwardRef<
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const selected = showSelectedHeadings ? useSelected() : false
   const style = { ...styleProp, color: selected ? 'green' : undefined }
-  return <h1 ref={ref} {...props} aria-selected={selected} style={style} />
+  return <h1 ref={ref} {...props} data-selected={selected} style={style} />
 })
 
 const Paragraph = 'p'

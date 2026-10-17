@@ -15,6 +15,7 @@ const PlainTextExample = () => {
   return (
     <Slate editor={editor} initialValue={initialValue}>
       <Editable
+        aria-label="Editor with custom placeholder"
         placeholder="Type something"
         renderPlaceholder={({
           children,

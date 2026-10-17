@@ -22,6 +22,15 @@ export interface LeafPosition {
 
 /** @hidden @inline */
 export interface TextEqualsOptions {
+  /**
+   * Top-level property names to exclude from both nodes before comparing, such as `ignore: ['id']` for application-generated IDs. Nested properties are still compared deeply, and neither input node is changed. Combine with `loose: true` to ignore both text content and the named properties. The default is an empty list.
+   */
+  ignore?: readonly string[]
+  /**
+   * When `true`, it checks if the properties of the `Text` object are equal except for the `text` property (i.e. the `String` value of the `Text`). When `false` (default), checks all properties including `text`.
+   *
+   * This is used to check whether sibling text nodes can be merged.
+   */
   loose?: boolean
 }
 
@@ -37,10 +46,6 @@ export interface TextInterface {
   /**
    * Check if two text nodes are equal.
    *
-   * When loose is set, the text is not compared. This is
-   * used to check whether sibling text nodes can be merged.
-   *
-   * @param options.loose When `true`, it checks if the properties of the `Text` object are equal except for the `text` property (i.e. the `String` value of the `Text`). When `false` (default), checks all properties including `text`. Defaults to `false`.
    * @param options Type also exported as `TextEqualsOptions`
    * @category Queries
    */
@@ -84,21 +89,27 @@ export interface TextInterface {
   ): { leaf: Text; position?: LeafPosition }[]
 }
 
+const omitText = ({ text, ...rest }: Text) => rest
+
 // eslint-disable-next-line no-redeclare
 export const Text: TextInterface = {
   equals(text: Text, another: Text, options: TextEqualsOptions = {}): boolean {
-    const { loose = false } = options
+    const { loose = false, ignore = [] } = options
 
-    function omitText(obj: Record<any, any>) {
-      const { text, ...rest } = obj
-
-      return rest
+    if (ignore.length === 0) {
+      return loose
+        ? isDeepEqual(omitText(text), omitText(another))
+        : isDeepEqual(text, another)
     }
 
-    return isDeepEqual(
-      loose ? omitText(text) : text,
-      loose ? omitText(another) : another
-    )
+    const comparable = (node: Text) =>
+      Object.fromEntries(
+        Object.entries(node).filter(
+          ([key]) => !(loose && key === 'text') && !ignore.includes(key)
+        )
+      )
+
+    return isDeepEqual(comparable(text), comparable(another))
   },
 
   isText(value: any): value is Text {

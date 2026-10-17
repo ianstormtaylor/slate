@@ -2,7 +2,7 @@ import { NodeTransforms } from '../interfaces/transforms/node'
 import { Editor } from '../interfaces/editor'
 import { Path } from '../interfaces/path'
 import { matchPath } from '../utils/match-path'
-import { Location, Node } from '../interfaces'
+import { Location, Node, Transforms } from '../interfaces'
 
 /** @ignore */
 export const moveNodes: NodeTransforms['moveNodes'] = (editor, options) => {
@@ -11,6 +11,7 @@ export const moveNodes: NodeTransforms['moveNodes'] = (editor, options) => {
       to,
       at = editor.selection,
       mode = 'lowest',
+      select = false,
       voids = false,
     } = options
     let { match } = options
@@ -29,12 +30,17 @@ export const moveNodes: NodeTransforms['moveNodes'] = (editor, options) => {
     const targets = Editor.nodes(editor, { at, match, mode, voids })
     const pathRefs = Array.from(targets, ([, p]) => Editor.pathRef(editor, p))
 
+    let movedPath: Path | undefined
+
     for (const pathRef of pathRefs) {
       const path = pathRef.unref()!
       const newPath = toRef.current!
 
       if (path.length !== 0) {
         editor.apply({ type: 'move_node', path, newPath })
+        movedPath =
+          Path.transform(path, { type: 'move_node', path, newPath }) ??
+          undefined
       }
 
       if (
@@ -50,5 +56,7 @@ export const moveNodes: NodeTransforms['moveNodes'] = (editor, options) => {
     }
 
     toRef.unref()
+    if (select && movedPath)
+      Transforms.select(editor, Editor.end(editor, movedPath))
   })
 }

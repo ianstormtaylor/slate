@@ -1,6 +1,8 @@
 import {
   BaseEditor,
+  Descendant,
   Editor,
+  Element,
   Location,
   Node,
   Operation,
@@ -37,29 +39,9 @@ import {
   EDITOR_TO_USER_MARKS,
   EDITOR_TO_USER_SELECTION,
   NODE_TO_KEY,
-  NODE_TO_PARENT,
 } from '../utils/weak-maps'
+import { copyNodeInUse } from '../utils/node-identity'
 import { DOMEditor } from './dom-editor'
-
-const INSERTED_NODES: WeakSet<Node> = new WeakSet()
-
-const isNodeInUse = (node: Node): boolean =>
-  NODE_TO_PARENT.has(node) ||
-  INSERTED_NODES.has(node) ||
-  (Node.isElement(node) && node.children.some(isNodeInUse))
-
-const copyNode = <N extends Node>(node: N): N =>
-  Node.isElement(node)
-    ? { ...node, children: node.children.map(copyNode) }
-    : { ...node }
-
-const markInserted = (node: Node) => {
-  INSERTED_NODES.add(node)
-
-  if (Node.isElement(node)) {
-    node.children.forEach(markInserted)
-  }
-}
 
 /**
  * `withDOM` adds DOM specific behaviors to the editor.
@@ -70,11 +52,13 @@ const markInserted = (node: Node) => {
  * See https://docs.slatejs.org/concepts/11-typescript to learn how.
  */
 
-const wrapInInlineAncestors = (
+const wrapInClipboardAncestors = (
   contents: DocumentFragment,
   start: DOMNode,
-  editorElement: DOMElement
+  editorElement: DOMElement,
+  includeInlines: boolean
 ): DocumentFragment => {
+  const includeLists = contents.querySelector('li') !== null
   let wrapped = contents
 
   for (
@@ -83,8 +67,10 @@ const wrapInInlineAncestors = (
     ancestor = ancestor.parentElement
   ) {
     if (
-      ancestor.getAttribute('data-slate-inline') === 'true' &&
-      !ancestor.hasAttribute('data-slate-void')
+      (includeLists && ['OL', 'UL', 'LI'].includes(ancestor.nodeName)) ||
+      (includeInlines &&
+        ancestor.getAttribute('data-slate-inline') === 'true' &&
+        !ancestor.hasAttribute('data-slate-void'))
     ) {
       const shell = ancestor.cloneNode(false)
       shell.appendChild(wrapped)
@@ -105,14 +91,8 @@ export const withDOM = <T extends BaseEditor>(
     e
 
   e.insertNodes = (nodes, options) => {
-    const prepare = <N extends Node>(node: N): N => {
-      const prepared = isNodeInUse(node) ? copyNode(node) : node
-      markInserted(prepared)
-      return prepared
-    }
-
     insertNodes(
-      Node.isNode(nodes) ? prepare(nodes) : nodes.map(prepare),
+      Node.isNode(nodes) ? copyNodeInUse(nodes) : nodes.map(copyNodeInUse),
       options
     )
   }
@@ -300,6 +280,16 @@ export const withDOM = <T extends BaseEditor>(
     }
   }
 
+  e.onDOMError = (error: unknown) => {
+    if (typeof globalThis.reportError === 'function') {
+      globalThis.reportError(error)
+    } else {
+      setTimeout(() => {
+        throw error
+      })
+    }
+  }
+
   e.setFragmentData = (data: Pick<DataTransfer, 'getData' | 'setData'>) => {
     const { selection } = e
 
@@ -319,6 +309,7 @@ export const withDOM = <T extends BaseEditor>(
     // fragment to the HTML, to decode on future pastes.
     const domRange = DOMEditor.toDOMRange(e, selection)
     let contents = domRange.cloneContents()
+    let commonAncestor = domRange.commonAncestorContainer
     let attach = contents.childNodes[0] as HTMLElement
 
     // Make sure attach is non-empty, since empty nodes will not get copied.
@@ -337,6 +328,7 @@ export const withDOM = <T extends BaseEditor>(
       const domNode = DOMEditor.toDOMNode(e, voidNode)
       r.setEndAfter(domNode)
       contents = r.cloneContents()
+      commonAncestor = r.commonAncestorContainer
     }
 
     // COMPAT: If the start node is a void node, we need to attach the encoded
@@ -378,13 +370,12 @@ export const withDOM = <T extends BaseEditor>(
     attach.setAttribute('data-slate-fragment', encoded)
     data.setData(`application/${clipboardFormatKey}`, encoded)
 
-    if (!startVoid && !endVoid) {
-      contents = wrapInInlineAncestors(
-        contents,
-        domRange.commonAncestorContainer,
-        DOMEditor.toDOMNode(e, e)
-      )
-    }
+    contents = wrapInClipboardAncestors(
+      contents,
+      commonAncestor,
+      DOMEditor.toDOMNode(e, e),
+      !startVoid && !endVoid
+    )
 
     // Add the content to a <div> so that we can get its inner HTML.
     const div = contents.ownerDocument.createElement('div')
@@ -423,21 +414,29 @@ export const withDOM = <T extends BaseEditor>(
   e.insertTextData = (data: DataTransfer): boolean => {
     const text = data.getData('text/plain')
 
-    if (text) {
-      const lines = text.split(/\r\n|\r|\n/)
-      let split = false
+    if (!text) {
+      return false
+    }
 
-      for (const line of lines) {
-        if (split) {
-          Transforms.splitNodes(e, { always: true })
-        }
+    const lines = text.split(/\r\n|\r|\n/)
 
-        e.insertText(line)
-        split = true
-      }
+    if (lines.length === 1) {
+      e.insertText(text)
       return true
     }
-    return false
+
+    if (isInsideInline(e)) {
+      insertLinesInsideInline(e, lines)
+      return true
+    }
+
+    const fragment = getPlainTextFragment(e, lines)
+
+    if (fragment) {
+      e.insertFragment(fragment)
+    }
+
+    return true
   }
 
   e.onChange = options => {
@@ -460,4 +459,75 @@ const getMatches = (e: Editor, path: Path) => {
     matches.push([p, key])
   }
   return matches
+}
+
+const isInsideInline = (editor: Editor) =>
+  !!editor.selection &&
+  !!Editor.above(editor, {
+    at: Range.start(editor.selection),
+    match: node => Element.isElement(node) && Editor.isInline(editor, node),
+  })
+
+const insertLinesInsideInline = (editor: Editor, lines: string[]) => {
+  const marks = Editor.marks(editor) ?? {}
+  const middle = lines.slice(1, -1)
+
+  editor.insertText(lines[0])
+  Transforms.splitNodes(editor, { always: true })
+
+  if (middle.length && editor.selection) {
+    const { anchor } = editor.selection
+    const [[{ children, ...blockProps }, blockPath]] = Editor.nodes(editor, {
+      at: anchor,
+      match: node => Element.isElement(node) && Editor.isBlock(editor, node),
+      mode: 'lowest',
+    })
+    const inlines = Array.from(
+      Editor.nodes(editor, {
+        at: anchor,
+        match: node => Element.isElement(node) && Editor.isInline(editor, node),
+      }),
+      ([{ children, ...inlineProps }]) => inlineProps
+    )
+    const wrap = (line: string) =>
+      inlines.reduceRight<Descendant>(
+        (child, inlineProps) =>
+          ({ ...inlineProps, children: [child] }) as Element,
+        { ...marks, text: line }
+      )
+
+    Transforms.insertNodes(
+      editor,
+      middle.map(
+        line => ({ ...blockProps, children: [wrap(line)] }) as Element
+      ),
+      { at: blockPath, select: false }
+    )
+  }
+
+  editor.insertText(lines[lines.length - 1])
+}
+
+const getPlainTextFragment = (editor: Editor, lines: string[]) => {
+  if (!editor.selection) {
+    return null
+  }
+
+  const entry = Editor.above(editor, {
+    at: Range.start(editor.selection),
+    match: node => Element.isElement(node) && Editor.isBlock(editor, node),
+    mode: 'lowest',
+  })
+
+  if (!entry) {
+    return null
+  }
+
+  const [{ children, ...blockProps }] = entry
+  const marks = Editor.marks(editor) ?? {}
+
+  return lines.map(line => ({
+    ...blockProps,
+    children: [{ ...marks, text: line }],
+  })) as Element[]
 }

@@ -1,6 +1,7 @@
 import { NodeTransforms } from '../interfaces/transforms/node'
 import { Editor } from '../interfaces/editor'
 import { Node } from '../interfaces/node'
+import { Point } from '../interfaces/point'
 import { Range } from '../interfaces/range'
 import { Transforms } from '../interfaces/transforms'
 import { Path } from '../interfaces/path'
@@ -35,6 +36,16 @@ export const insertNodes: NodeTransforms['insertNodes'] = (
     const [node] = nodes
 
     if (!at) {
+      if (
+        Node.isElement(node) &&
+        editor.isInline(node) &&
+        editor.selection &&
+        Range.isCollapsed(editor.selection)
+      ) {
+        const point = Editor.insertionPoint(editor, editor.selection.anchor)
+        if (!Point.equals(point, editor.selection.anchor))
+          Transforms.select(editor, point)
+      }
       at = getDefaultInsertLocation(editor)
       if (select !== false) {
         select = true

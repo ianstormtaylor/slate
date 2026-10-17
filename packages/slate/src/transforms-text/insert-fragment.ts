@@ -2,11 +2,14 @@ import { Transforms } from '../interfaces/transforms'
 import { Editor } from '../interfaces/editor'
 import { Range } from '../interfaces/range'
 import { Path } from '../interfaces/path'
+import { Point } from '../interfaces/point'
+import { Text } from '../interfaces/text'
 import { Element } from '../interfaces/element'
 import { Descendant, Node, NodeEntry } from '../interfaces/node'
 import { TextTransforms } from '../interfaces/transforms/text'
 import { getDefaultInsertLocation } from '../utils'
 import { Location } from '../interfaces'
+import { getInsertionPoint } from '../utils/get-insertion-point'
 
 /** @ignore */
 export const insertFragment: TextTransforms['insertFragment'] = (
@@ -15,7 +18,23 @@ export const insertFragment: TextTransforms['insertFragment'] = (
   options = {}
 ) => {
   Editor.withoutNormalizing(editor, () => {
-    const { hanging = false, voids = false } = options
+    const {
+      hanging = false,
+      voids = false,
+      select = options.at == null,
+      filter,
+    } = options
+    let insertion: ReturnType<typeof getInsertionPoint> | undefined
+    if (
+      fragment.length &&
+      options.at == null &&
+      editor.selection &&
+      Range.isCollapsed(editor.selection)
+    ) {
+      insertion = getInsertionPoint(editor, editor.selection.anchor)
+      if (!Point.equals(insertion.point, editor.selection.anchor))
+        Transforms.select(editor, insertion.point)
+    }
     let { at = getDefaultInsertLocation(editor), batchDirty = true } = options
 
     if (!fragment.length) {
@@ -24,7 +43,12 @@ export const insertFragment: TextTransforms['insertFragment'] = (
 
     if (Location.isRange(at)) {
       if (!hanging) {
-        at = Editor.unhangRange(editor, at, { voids })
+        const [, end] = Range.edges(at)
+        const endOfDoc = Editor.end(editor, [])
+
+        if (!Point.equals(end, endOfDoc)) {
+          at = Editor.unhangRange(editor, at, { voids })
+        }
       }
 
       if (Range.isCollapsed(at)) {
@@ -38,10 +62,10 @@ export const insertFragment: TextTransforms['insertFragment'] = (
 
         const startRef = Editor.pointRef(editor, start)
         const endRef = Editor.pointRef(editor, end)
-        Transforms.delete(editor, { at })
+        Transforms.delete(editor, { at, voids })
         const startPoint = startRef.unref()
         const endPoint = endRef.unref()
-        at = endPoint ?? startPoint!
+        at = startPoint ?? endPoint!
       }
     } else if (Location.isPath(at)) {
       at = Editor.start(editor, at)
@@ -60,15 +84,29 @@ export const insertFragment: TextTransforms['insertFragment'] = (
       voids,
     })
 
-    if (inlineElementMatch) {
+    if (inlineElementMatch && insertion?.inlineAffinity !== 'inside') {
       const [, inlinePath] = inlineElementMatch
 
+      const parent = Node.parent(editor, inlinePath)
+      const index = inlinePath[inlinePath.length - 1]
+
       if (Editor.isEnd(editor, at, inlinePath)) {
-        const after = Editor.after(editor, inlinePath)!
-        at = after
+        const afterPath = Path.next(inlinePath)
+        if (!Text.isText(parent.children[index + 1])) {
+          Transforms.insertNodes(editor, { text: '' }, { at: afterPath, voids })
+        }
+        at = Editor.start(editor, afterPath)
       } else if (Editor.isStart(editor, at, inlinePath)) {
-        const before = Editor.before(editor, inlinePath)!
-        at = before
+        if (Text.isText(parent.children[index - 1])) {
+          at = Editor.end(editor, Path.previous(inlinePath))
+        } else {
+          Transforms.insertNodes(
+            editor,
+            { text: '' },
+            { at: inlinePath, voids }
+          )
+          at = Editor.start(editor, inlinePath)
+        }
       }
     }
 
@@ -78,6 +116,45 @@ export const insertFragment: TextTransforms['insertFragment'] = (
       voids,
     })!
     const [, blockPath] = blockMatch
+
+    const filterOptions = { blockEntry: blockMatch }
+    const filterNode = (node: Node): Node | null => {
+      if (!filter) return node
+
+      if (Node.isText(node)) {
+        return filter(node, filterOptions) ? node : null
+      }
+
+      if (Node.isElement(node)) {
+        if (!filter(node, filterOptions)) {
+          return null
+        }
+
+        const filteredChildren = node.children
+          .map(filterNode)
+          .filter((child): child is Descendant => child !== null)
+
+        if (filteredChildren.length === 0 && !editor.isVoid(node)) {
+          return null
+        }
+
+        return { ...node, children: filteredChildren }
+      }
+
+      return node
+    }
+
+    const filteredFragment = filter
+      ? (fragment
+          .map(filterNode)
+          .filter((node): node is Descendant => node !== null) as Node[])
+      : fragment
+
+    if (!filteredFragment.length) {
+      return
+    }
+
+    fragment = filteredFragment
     const isBlockStart = Editor.isStart(editor, at, blockPath)
     const isBlockEnd = Editor.isEnd(editor, at, blockPath)
     const isBlockEmpty = isBlockStart && isBlockEnd
@@ -176,7 +253,7 @@ export const insertFragment: TextTransforms['insertFragment'] = (
     const [inlineMatch] = Editor.nodes(editor, {
       at,
       match: n => Node.isText(n) || Editor.isInline(editor, n),
-      mode: 'highest',
+      mode: insertion?.inlineAffinity === 'inside' ? 'lowest' : 'highest',
       voids,
     })!
 
@@ -188,15 +265,14 @@ export const insertFragment: TextTransforms['insertFragment'] = (
       editor,
       isBlockEnd && !ends.length ? Path.next(blockPath) : blockPath
     )
-
     const endRef = Editor.pathRef(
       editor,
       isInlineEnd ? Path.next(inlinePath) : inlinePath
     )
 
-    // If the fragment contains inlines in multiple distinct blocks, split the
-    // destination block.
-    const splitBlock = ends.length > 0
+    const isSplittingAroundMiddles =
+      middles.length > 0 && !isBlockStart && !isBlockEnd
+    const splitBlock = ends.length > 0 || isSplittingAroundMiddles
 
     Transforms.splitNodes(editor, {
       at,
@@ -204,7 +280,10 @@ export const insertFragment: TextTransforms['insertFragment'] = (
         splitBlock
           ? Node.isElement(n) && Editor.isBlock(editor, n)
           : Node.isText(n) || Editor.isInline(editor, n),
-      mode: splitBlock ? 'lowest' : 'highest',
+      mode:
+        splitBlock || insertion?.inlineAffinity === 'inside'
+          ? 'lowest'
+          : 'highest',
       always:
         splitBlock &&
         (!isBlockStart || starts.length > 0) &&
@@ -247,7 +326,7 @@ export const insertFragment: TextTransforms['insertFragment'] = (
       batchDirty,
     })
 
-    if (!options.at) {
+    if (select) {
       let path
 
       if (ends.length > 0 && endRef.current) {
@@ -259,8 +338,15 @@ export const insertFragment: TextTransforms['insertFragment'] = (
       }
 
       if (path) {
-        const end = Editor.end(editor, path)
-        Transforms.select(editor, end)
+        const lastInserted = Node.get(editor, path)
+        const point =
+          isSplittingAroundMiddles &&
+          !ends.length &&
+          Node.isElement(lastInserted) &&
+          Editor.isVoid(editor, lastInserted)
+            ? Editor.start(editor, Path.next(path))
+            : Editor.end(editor, path)
+        Transforms.select(editor, point)
       }
     }
 
