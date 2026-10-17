@@ -5,6 +5,7 @@ import {
   Editor,
   getDirtyPaths,
   getFragment,
+  getSplitProperties,
   insertBreak,
   insertFragment,
   insertNode,
@@ -125,6 +126,7 @@ export const createEditor = <E extends BaseEditor = Editor>(): E => {
     normalizeNode: (...args) => normalizeNode(editor, ...args),
     removeMark: (...args) => removeMark(editor, ...args),
     getDirtyPaths: (...args) => getDirtyPaths(editor, ...args),
+    getSplitProperties: (...args) => getSplitProperties(editor, ...args),
     shouldNormalize: (...args) => shouldNormalize(editor, ...args),
 
     // Editor interface

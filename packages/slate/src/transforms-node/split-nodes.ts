@@ -124,7 +124,7 @@ export const splitNodes: NodeTransforms['splitNodes'] = (
 
         if (always || !beforeRef || !Editor.isEdge(editor, point, path)) {
           split = true
-          const properties = Node.extractProps(node)
+          const properties = editor.getSplitProperties(node, path)
           editor.apply({
             type: 'split_node',
             path,

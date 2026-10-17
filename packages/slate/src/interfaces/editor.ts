@@ -52,6 +52,7 @@ export interface BaseEditor {
   apply: (operation: Operation) => void
   getDirtyPaths: (operation: Operation) => Path[]
   getFragment: () => Descendant[]
+  getSplitProperties: (node: Element | Text, path: Path) => Partial<Node>
   isElementReadOnly: (element: Element) => boolean
   isIsolated: (element: Element) => boolean
   inlineEdgeAffinity: (
