@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.145.1
+
+### Patch Changes
+
+- [#6329](https://github.com/ianstormtaylor/slate/pull/6329) [`3d7b2fa`](https://github.com/ianstormtaylor/slate/commit/3d7b2fa4b624916f8beae1eb089c25271c4c0a9a) Thanks [@dylans](https://github.com/dylans)! - A click inside the editor whose handler changes the clicked node, for example a `<select>` that calls `setNodes` on its element or a suggestion that inserts text, no longer throws "Unable to find the path for Slate node". `Editable`'s click handling now returns when the clicked node is no longer in the document, which its existing check intended but `findPath` started throwing before it since 0.142.
+
 ## 0.145.0
 
 ### Minor Changes
