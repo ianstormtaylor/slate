@@ -1,5 +1,15 @@
 # slate
 
+## 0.146.0
+
+### Minor Changes
+
+- [#6332](https://github.com/ianstormtaylor/slate/pull/6332) [`4e73172`](https://github.com/ianstormtaylor/slate/commit/4e7317263b4e70fabbc408bd687537e092729a4d) Thanks [@dylans](https://github.com/dylans)! - Add `Node.findPath(root, node)`, which finds a node's path by walking the tree and returns `undefined` if the node isn't there. It doesn't depend on rendering, so it works without slate-react, for example on a server. `DOMEditor.findPath` uses it as its fallback when the rendered node maps are stale.
+
+### Patch Changes
+
+- [#6331](https://github.com/ianstormtaylor/slate/pull/6331) [`cfd8049`](https://github.com/ianstormtaylor/slate/commit/cfd804918bd1eebe566349c68b45d94fe2821a81) Thanks [@dylans](https://github.com/dylans)! - Batches inside `Editor.withoutNormalizing` spend less time on dirty path bookkeeping. An operation that can't map two dirty paths onto one, which is every path-changing operation except `merge_node`, no longer rebuilds the dirty path key set. 5,000 splits of one block in a batch go from about 7.9 s to 3.7 s. The dirty paths and their order are unchanged.
+
 ## 0.144.0
 
 ### Minor Changes
