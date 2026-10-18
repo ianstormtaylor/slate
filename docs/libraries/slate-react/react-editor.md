@@ -132,7 +132,7 @@ Like `findEventRange`, but returns `null` when the event doesn't map to a range 
 
 #### `editor.onDOMError(error: unknown): void`
 
-Where Slate sends DOM mapping errors it doesn't throw. The `resolve` lookups don't report here, since a miss is often ordinary. By default it hands the error to the browser's `reportError`, so it shows in the console and reaches `window.onerror`. Override it to send errors to your own logging:
+Where DOM mapping errors can be reported without throwing. Slate itself doesn't report anything here at the moment: the `resolve` lookups return `null` quietly, since a miss is often ordinary. By default it hands the error to the browser's `reportError`, so it shows in the console and reaches `window.onerror`. Override it to send errors to your own logging:
 
 ```javascript
 const { onDOMError } = editor
@@ -141,7 +141,5 @@ editor.onDOMError = error => {
   onDOMError(error)
 }
 ```
-
-Throwing from it is only safe in tests, since it can be called during rendering.
 
 `ReactEditor.toDOMPoint` and `ReactEditor.toDOMRange` still throw; use the `resolve` versions to get `null` instead.
