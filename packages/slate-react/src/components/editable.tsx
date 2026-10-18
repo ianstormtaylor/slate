@@ -2560,7 +2560,7 @@ export const defaultScrollSelectionIntoView = (
       : selection
   const domFocusPoint =
     unhung && selection && !Range.equals(unhung, selection)
-      ? ReactEditor.toDOMRange(editor, unhung)
+      ? ReactEditor.resolveDOMRange(editor, unhung) ?? domRange.cloneRange()
       : domRange.cloneRange()
   domFocusPoint.collapse(isBackward)
 

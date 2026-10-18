@@ -118,11 +118,11 @@ Sets data from the currently selected fragment on a `DataTransfer`.
 
 #### `ReactEditor.resolveDOMPoint(editor: ReactEditor, point: Point): DOMPoint | null`
 
-Like `toDOMPoint`, but returns `null` instead of throwing. A point that the settled DOM should contain but doesn't is reported through `editor.onDOMError`. While the DOM is still catching up with the model, a missing point is not reported.
+Like `toDOMPoint`, but returns `null` instead of throwing. A point can be missing for ordinary reasons, for example during a React commit, before `Editable` mounts, or after `editor.children` was replaced, so a miss isn't reported.
 
 #### `ReactEditor.resolveDOMRange(editor: ReactEditor, range: Range): DOMRange | null`
 
-Like `toDOMRange`, but returns `null` instead of throwing, and reports the same way as `resolveDOMPoint`.
+Like `toDOMRange`, but returns `null` instead of throwing, including when either point is missing or the editor's window isn't known yet.
 
 #### `ReactEditor.resolveEventRange(editor: ReactEditor, event: any): Range | null`
 
@@ -132,7 +132,7 @@ Like `findEventRange`, but returns `null` when the event doesn't map to a range 
 
 #### `editor.onDOMError(error: unknown): void`
 
-Called when `resolveDOMPoint` or `resolveDOMRange`, which Slate's own handlers use, can't map the model to the DOM after rendering has settled. That usually means a broken rendering contract, such as a `renderElement` that doesn't render `children`. Lookups made while the DOM is still catching up, before the editor mounts or while a render is pending, return nothing quietly and are not reported. By default it hands the error to the browser's `reportError`, so it shows in the console and reaches `window.onerror`, without interrupting the handler. Override it to throw, or to send errors to your own logging:
+Where Slate sends DOM mapping errors it doesn't throw. The `resolve` lookups don't report here, since a miss is often ordinary. By default it hands the error to the browser's `reportError`, so it shows in the console and reaches `window.onerror`. Override it to send errors to your own logging:
 
 ```javascript
 const { onDOMError } = editor
@@ -141,5 +141,7 @@ editor.onDOMError = error => {
   onDOMError(error)
 }
 ```
+
+Throwing from it is only safe in tests, since it can be called during rendering.
 
 `ReactEditor.toDOMPoint` and `ReactEditor.toDOMRange` still throw; use the `resolve` versions to get `null` instead.
