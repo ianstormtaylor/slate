@@ -1,5 +1,15 @@
 # slate-react
 
+## 0.145.0
+
+### Minor Changes
+
+- [#6327](https://github.com/ianstormtaylor/slate/pull/6327) [`89a74de`](https://github.com/ianstormtaylor/slate/commit/89a74dee54bcbe03dcf84ad6a5cb3da9b856d486) Thanks [@dylans](https://github.com/dylans)! - Add a controlled `value` prop to `Slate`. Pass the value from `onValueChange` back in, and Slate recognizes that exact object and doesn't apply it again. Any other value is applied as a change from outside the editor through `editor.setChildren`, in a layout effect, so the selection and history stay valid. Values passed in aren't reported through `onValueChange`. Updates wait while the user is composing text or Android has pending input, and only the latest is applied. `value` and `initialValue` together throw.
+
+### Patch Changes
+
+- [#6325](https://github.com/ianstormtaylor/slate/pull/6325) [`6cb0eb4`](https://github.com/ianstormtaylor/slate/commit/6cb0eb4388a69b30bcf4ce7635d29a321d97f684) Thanks [@dylans](https://github.com/dylans)! - A DOM selection change made just before the editor loses focus now reaches `editor.selection`. Selection changes are processed a little later than they happen, and since 0.142 changes processed after blur were ignored, so for example clicking an element whose handler blurs the editor could leave `editor.selection` where it was before the click. Blur now processes any pending selection change first.
+
 ## 0.142.0
 
 ### Minor Changes
