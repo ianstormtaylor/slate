@@ -81,6 +81,10 @@ Get the first node entry in a root node from a `path`.
 
 Get the sliced fragment represented by the `range`.
 
+#### `Node.findPath(root: Node, node: Node) => Path | undefined`
+
+Find the path of `node` inside `root` by walking the tree, comparing nodes by identity. Returns `[]` for the root itself and `undefined` if `node` isn't in the tree. It doesn't need a rendered editor, so it works on the server too; `ReactEditor.findPath` is faster for rendered nodes and falls back to this.
+
 #### `Node.get(root: Node, path: Path) => Node`
 
 Get the descendant node referred to by a specific `path`. If the path is an empty array, get the root node itself.

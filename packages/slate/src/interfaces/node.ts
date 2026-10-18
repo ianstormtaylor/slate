@@ -136,6 +136,8 @@ export interface NodeInterface {
    * Get the descendant node referred to by a specific path. If the path is an
    * empty array, it refers to the root node itself.
    */
+  findPath: (root: Node, node: Node) => Path | undefined
+
   get: (root: Node, path: Path) => Node
 
   /**
@@ -424,6 +426,14 @@ export const Node: NodeInterface = {
     }
 
     return newRoot.children
+  },
+
+  findPath(root: Node, node: Node): Path | undefined {
+    for (const [descendant, path] of Node.nodes(root)) {
+      if (descendant === node) {
+        return path
+      }
+    }
   },
 
   get(root: Node, path: Path): Node {
