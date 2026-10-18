@@ -1506,7 +1506,13 @@ export const Editable = forwardRef(
                       isDOMNode(event.target)
                     ) {
                       const node = ReactEditor.toSlateNode(editor, event.target)
-                      const path = ReactEditor.findPath(editor, node)
+                      let path: Path
+
+                      try {
+                        path = ReactEditor.findPath(editor, node)
+                      } catch {
+                        return
+                      }
 
                       // At this time, the Slate document may be arbitrarily different,
                       // because onClick handlers can change the document before we get here.
