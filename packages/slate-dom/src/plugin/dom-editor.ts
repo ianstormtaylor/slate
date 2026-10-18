@@ -477,10 +477,10 @@ export const DOMEditor: DOMEditorInterface = {
       child = parent
     }
 
-    for (const [descendant, descendantPath] of Node.nodes(editor)) {
-      if (descendant === node) {
-        return descendantPath
-      }
+    const found = Node.findPath(editor, node)
+
+    if (found) {
+      return found
     }
 
     throw new Error(
