@@ -37,14 +37,12 @@ import { Key } from '../utils/key'
 import {
   EDITOR_TO_ELEMENT,
   EDITOR_TO_KEY_TO_ELEMENT,
-  EDITOR_TO_PENDING_ACTION,
   EDITOR_TO_PENDING_DIFFS,
   EDITOR_TO_SCHEDULE_FLUSH,
   EDITOR_TO_WINDOW,
   ELEMENT_TO_NODE,
   IS_COMPOSING,
   IS_FOCUSED,
-  IS_NODE_MAP_DIRTY,
   IS_READ_ONLY,
   NODE_TO_INDEX,
   NODE_TO_KEY,
@@ -712,24 +710,36 @@ export const DOMEditor: DOMEditorInterface = {
     const el = EDITOR_TO_KEY_TO_ELEMENT.get(editor)?.get(
       DOMEditor.findKey(editor, Node.get(editor, point.path))
     )
-    const domPoint = el ? findDOMPointInElement(editor, el, point) : null
-
-    if (!domPoint && isDOMSettled(editor)) {
-      editor.onDOMError(new Error(unresolvedPointMessage(point)))
-    }
-
-    return domPoint
+    return el ? findDOMPointInElement(editor, el, point) : null
   },
 
   resolveDOMRange: (editor, range) => {
     const domAnchor = DOMEditor.resolveDOMPoint(editor, range.anchor)
+
+    if (!domAnchor) {
+      return null
+    }
+
     const domFocus = Range.isCollapsed(range)
       ? domAnchor
       : DOMEditor.resolveDOMPoint(editor, range.focus)
+    const window =
+      EDITOR_TO_WINDOW.get(editor) ?? domAnchor[0].ownerDocument?.defaultView
 
-    return domAnchor && domFocus
-      ? createDOMRange(editor, domAnchor, domFocus, Range.isBackward(range))
-      : null
+    if (!domFocus || !window) {
+      return null
+    }
+
+    try {
+      return createDOMRange(
+        window,
+        domAnchor,
+        domFocus,
+        Range.isBackward(range)
+      )
+    } catch {
+      return null
+    }
   },
 
   resolveEventRange: (editor, event) =>
@@ -754,7 +764,12 @@ export const DOMEditor: DOMEditorInterface = {
       ? domAnchor
       : DOMEditor.toDOMPoint(editor, focus)
 
-    return createDOMRange(editor, domAnchor, domFocus, Range.isBackward(range))
+    return createDOMRange(
+      DOMEditor.getWindow(editor),
+      domAnchor,
+      domFocus,
+      Range.isBackward(range)
+    )
   },
 
   toSlateNode: (editor, domNode) => {
@@ -1261,12 +1276,6 @@ const getComposingView = (editor: DOMEditor) => {
   return { view, point }
 }
 
-const isDOMSettled = (editor: DOMEditor) =>
-  !!EDITOR_TO_ELEMENT.get(editor)?.isConnected &&
-  !IS_NODE_MAP_DIRTY.get(editor) &&
-  !EDITOR_TO_PENDING_DIFFS.get(editor)?.length &&
-  !EDITOR_TO_PENDING_ACTION.get(editor)
-
 const unresolvedPointMessage = (point: Point) =>
   `Cannot resolve a DOM point from Slate point: ${Scrubber.stringify(point)}`
 
@@ -1340,12 +1349,11 @@ const findDOMPointInElement = (
 }
 
 const createDOMRange = (
-  editor: DOMEditor,
+  window: Window,
   domAnchor: DOMPoint,
   domFocus: DOMPoint,
   isBackward: boolean
 ): DOMRange => {
-  const window = DOMEditor.getWindow(editor)
   const domRange = window.document.createRange()
   const [startNode, startOffset] = isBackward ? domFocus : domAnchor
   const [endNode, endOffset] = isBackward ? domAnchor : domFocus
