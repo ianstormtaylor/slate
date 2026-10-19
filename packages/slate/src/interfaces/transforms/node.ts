@@ -1,4 +1,4 @@
-import { Editor, Element, Location, Node, Path } from '../../index'
+import { Descendant, Editor, Element, Location, Node, Path } from '../../index'
 import { NodeMatch, NullableProps, PropsCompare, PropsMerge } from '../editor'
 import { MaximizeMode, RangeMode } from '../../types/types'
 
@@ -14,6 +14,17 @@ export interface NodeInsertNodesOptions<T extends Node> {
 }
 
 export interface NodeTransforms {
+  /**
+   * Apply an external document through Slate operations. Delegates to `editor.setChildren`, so plugins can override the transform. Unchanged child prefixes and suffixes are retained, matched by identity or by deep equality, so a refetched copy of the document with one new block emits a single `insert_node`. Compatible nodes are updated recursively; text edits replace only the changed string middle. Deep-equal cloned values emit no operations.
+   *
+   * Nodes shared by object identity can move within or across parents with a `move_node`, preserving selections inside them. Cloned moves are treated as content edits or replacements. Normalization is held until the diff is complete, and selection and refs follow the emitted operations through their normal rules.
+   *
+   * With `withHistory`, each external change forms one undo step and is separate from typing before and after it.
+   *
+   * To clear an editable document, pass a schema-valid empty block, for example `[{ type: 'paragraph', children: [{ text: '' }] }]`. `setChildren` itself accepts an empty root; it does not invent a block or reset history.
+   */
+  setChildren(editor: Editor, children: Descendant[]): void
+
   /**
    * Insert nodes in the editor at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
    *
@@ -207,6 +218,9 @@ export interface NodeTransforms {
 
 // eslint-disable-next-line no-redeclare
 export const NodeTransforms: NodeTransforms = {
+  setChildren(editor, children) {
+    editor.setChildren(children)
+  },
   insertNodes(editor, nodes, options) {
     editor.insertNodes(nodes, options)
   },

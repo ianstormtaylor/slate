@@ -36,14 +36,12 @@ import { Key } from '../utils/key'
 import {
   EDITOR_TO_ELEMENT,
   EDITOR_TO_KEY_TO_ELEMENT,
-  EDITOR_TO_PENDING_ACTION,
   EDITOR_TO_PENDING_DIFFS,
   EDITOR_TO_SCHEDULE_FLUSH,
   EDITOR_TO_WINDOW,
   ELEMENT_TO_NODE,
   IS_COMPOSING,
   IS_FOCUSED,
-  IS_NODE_MAP_DIRTY,
   IS_READ_ONLY,
   NODE_TO_INDEX,
   NODE_TO_KEY,
@@ -70,7 +68,7 @@ export interface DOMEditor extends BaseEditor {
   ): boolean
 
   /**
-   * Called when `resolveDOMPoint` or `resolveDOMRange`, which Slate's own handlers use, can't map the model to the DOM after rendering has settled. That usually means a broken rendering contract, such as a `renderElement` that doesn't render `children`. Lookups made while the DOM is still catching up, before the editor mounts or while a render is pending, return nothing quietly and are not reported. By default it hands the error to the browser's `reportError`, so it shows in the console and reaches `window.onerror`, without interrupting the handler. Override it to throw, or to send errors to your own logging:
+   * Where DOM mapping errors can be reported without throwing. Slate itself doesn't report anything here at the moment: the `resolve` lookups return `null` quietly, since a miss is often ordinary. By default it hands the error to the browser's `reportError`, so it shows in the console and reaches `window.onerror`. Override it to send errors to your own logging:
    *
    * ```javascript
    * const { onDOMError } = editor
@@ -80,7 +78,7 @@ export interface DOMEditor extends BaseEditor {
    * }
    * ```
    *
-   * `ReactEditor.toDOMPoint` and `ReactEditor.toDOMRange` still throw; use the `resolve` versions to get `null` instead.
+   * The `toDOM*` and `toSlate*` lookups still throw; use the `resolve` versions to get `null` instead.
    */
   onDOMError(error: unknown): void
 
@@ -141,6 +139,8 @@ export interface DOMEditorInterface {
 
   /**
    * Focus the editor.
+   *
+   * In tests that run in jsdom, use `DOMEditor.focus(editor)` instead of calling `focus()` on the editable element. `Editable` doesn't treat a native focus event in jsdom as a focus of the editor, partly because jsdom doesn't implement `isContentEditable`, so `DOMEditor.isFocused` and `useFocused` stay `false`. `DOMEditor.focus` sets the focused state itself.
    */
   focus(editor: DOMEditor, options?: { retries: number }): void
 
@@ -242,19 +242,50 @@ export interface DOMEditorInterface {
   ): void
 
   /**
-   * Like `toDOMPoint`, but returns `null` instead of throwing. A point that the settled DOM should contain but doesn't is reported through `editor.onDOMError`. While the DOM is still catching up with the model, a missing point is not reported.
+   * Like `toDOMPoint`, but returns `null` instead of throwing. A point can be missing for ordinary reasons, for example during a React commit, before `Editable` mounts, or after `editor.children` was replaced, so a miss isn't reported.
    */
-  resolveDOMPoint: (editor: DOMEditor, point: Point) => DOMPoint | null
+  resolveDOMPoint(editor: DOMEditor, point: Point): DOMPoint | null
 
   /**
-   * Like `toDOMRange`, but returns `null` instead of throwing, and reports the same way as `resolveDOMPoint`.
+   * Like `toDOMRange`, but returns `null` instead of throwing, including when either point is missing or the editor's window isn't known yet.
    */
-  resolveDOMRange: (editor: DOMEditor, range: Range) => DOMRange | null
+  resolveDOMRange(editor: DOMEditor, range: Range): DOMRange | null
 
   /**
    * Like `findEventRange`, but returns `null` when the event doesn't map to a range in the editor.
    */
-  resolveEventRange: (editor: DOMEditor, event: any) => Range | null
+  resolveEventRange(editor: DOMEditor, event: any): Range | null
+
+  /**
+   * Like `toDOMNode`, but returns `null` when the node isn't rendered.
+   */
+  resolveDOMNode(editor: DOMEditor, node: Node): HTMLElement | null
+
+  /**
+   * Like `toSlateNode`, but returns `null` when the DOM node isn't inside a Slate node.
+   */
+  resolveSlateNode(editor: DOMEditor, domNode: DOMNode): Node | null
+
+  /**
+   * Like `toSlatePoint`, but returns `null` instead of throwing, including in the cases where `suppressThrow: true` still throws, such as before `Editable` mounts. `exactMatch` defaults to `false`.
+   */
+  resolveSlatePoint(
+    editor: DOMEditor,
+    domPoint: DOMPoint,
+    options?: {
+      exactMatch?: boolean
+      searchDirection?: 'forward' | 'backward'
+    }
+  ): Point | null
+
+  /**
+   * Like `toSlateRange`, but returns `null` instead of throwing, including for a selection with no range. `exactMatch` defaults to `false`.
+   */
+  resolveSlateRange(
+    editor: DOMEditor,
+    domRange: DOMRange | DOMStaticRange | DOMSelection,
+    options?: { exactMatch?: boolean }
+  ): Range | null
 
   /**
    * Find the native DOM element from a Slate node.
@@ -494,10 +525,10 @@ export const DOMEditor: DOMEditorInterface = {
       child = parent
     }
 
-    for (const [descendant, descendantPath] of Node.nodes(editor)) {
-      if (descendant === node) {
-        return descendantPath
-      }
+    const found = Node.findPath(editor, node)
+
+    if (found) {
+      return found
     }
 
     throw new Error(
@@ -705,12 +736,7 @@ export const DOMEditor: DOMEditorInterface = {
     editor.setFragmentData(data, originEvent),
 
   toDOMNode: (editor, node) => {
-    const domNode =
-      node === editor
-        ? EDITOR_TO_ELEMENT.get(editor)
-        : EDITOR_TO_KEY_TO_ELEMENT.get(editor)?.get(
-            DOMEditor.findKey(editor, node)
-          )
+    const domNode = DOMEditor.resolveDOMNode(editor, node)
 
     if (!domNode) {
       throw new Error(
@@ -729,28 +755,76 @@ export const DOMEditor: DOMEditorInterface = {
     const el = EDITOR_TO_KEY_TO_ELEMENT.get(editor)?.get(
       DOMEditor.findKey(editor, Node.get(editor, point.path))
     )
-    const domPoint = el ? findDOMPointInElement(editor, el, point) : null
-
-    if (!domPoint && isDOMSettled(editor)) {
-      editor.onDOMError(new Error(unresolvedPointMessage(point)))
-    }
-
-    return domPoint
+    return el ? findDOMPointInElement(editor, el, point) : null
   },
 
   resolveDOMRange: (editor, range) => {
     const domAnchor = DOMEditor.resolveDOMPoint(editor, range.anchor)
+
+    if (!domAnchor) {
+      return null
+    }
+
     const domFocus = Range.isCollapsed(range)
       ? domAnchor
       : DOMEditor.resolveDOMPoint(editor, range.focus)
+    const window =
+      EDITOR_TO_WINDOW.get(editor) ?? domAnchor[0].ownerDocument?.defaultView
 
-    return domAnchor && domFocus
-      ? createDOMRange(editor, domAnchor, domFocus, Range.isBackward(range))
-      : null
+    if (!domFocus || !window) {
+      return null
+    }
+
+    try {
+      return createDOMRange(
+        window,
+        domAnchor,
+        domFocus,
+        Range.isBackward(range)
+      )
+    } catch {
+      return null
+    }
   },
 
   resolveEventRange: (editor, event) =>
     DOMEditor.findEventRange(editor, event, { suppressThrow: true }),
+
+  resolveDOMNode: (editor, node) =>
+    (node === editor
+      ? EDITOR_TO_ELEMENT.get(editor)
+      : EDITOR_TO_KEY_TO_ELEMENT.get(editor)?.get(
+          DOMEditor.findKey(editor, node)
+        )) ?? null,
+
+  resolveSlateNode: (editor, domNode) => {
+    const domEl = closestSlateElement(domNode)
+
+    return (domEl && ELEMENT_TO_NODE.get(domEl)) ?? null
+  },
+
+  resolveSlatePoint: (editor, domPoint, options = {}) => {
+    try {
+      return DOMEditor.toSlatePoint(editor, domPoint, {
+        exactMatch: options.exactMatch ?? false,
+        searchDirection: options.searchDirection,
+        suppressThrow: true,
+      })
+    } catch {
+      return null
+    }
+  },
+
+  resolveSlateRange: (editor, domRange, options = {}) => {
+    try {
+      return DOMEditor.toSlateRange(editor, domRange, {
+        exactMatch: options.exactMatch ?? false,
+        suppressThrow: true,
+      })
+    } catch {
+      return null
+    }
+  },
 
   toDOMPoint: (editor, point) => {
     const [node] = Editor.node(editor, point.path)
@@ -771,17 +845,17 @@ export const DOMEditor: DOMEditorInterface = {
       ? domAnchor
       : DOMEditor.toDOMPoint(editor, focus)
 
-    return createDOMRange(editor, domAnchor, domFocus, Range.isBackward(range))
+    return createDOMRange(
+      DOMEditor.getWindow(editor),
+      domAnchor,
+      domFocus,
+      Range.isBackward(range)
+    )
   },
 
   toSlateNode: (editor, domNode) => {
-    let domEl = isDOMElement(domNode) ? domNode : domNode.parentElement
-
-    if (domEl && !domEl.hasAttribute('data-slate-node')) {
-      domEl = domEl.closest(`[data-slate-node]`)
-    }
-
-    const node = domEl ? ELEMENT_TO_NODE.get(domEl as HTMLElement) : null
+    const domEl = closestSlateElement(domNode)
+    const node = domEl ? ELEMENT_TO_NODE.get(domEl) : null
 
     if (!node) {
       throw new Error(`Cannot resolve a Slate node from DOM node: ${domEl}`)
@@ -1278,11 +1352,13 @@ const getComposingView = (editor: DOMEditor) => {
   return { view, point }
 }
 
-const isDOMSettled = (editor: DOMEditor) =>
-  !!EDITOR_TO_ELEMENT.get(editor)?.isConnected &&
-  !IS_NODE_MAP_DIRTY.get(editor) &&
-  !EDITOR_TO_PENDING_DIFFS.get(editor)?.length &&
-  !EDITOR_TO_PENDING_ACTION.get(editor)
+const closestSlateElement = (domNode: DOMNode) => {
+  const domEl = isDOMElement(domNode) ? domNode : domNode.parentElement
+
+  return domEl?.hasAttribute('data-slate-node')
+    ? (domEl as HTMLElement)
+    : domEl?.closest<HTMLElement>('[data-slate-node]') ?? null
+}
 
 const unresolvedPointMessage = (point: Point) =>
   `Cannot resolve a DOM point from Slate point: ${Scrubber.stringify(point)}`
@@ -1357,12 +1433,11 @@ const findDOMPointInElement = (
 }
 
 const createDOMRange = (
-  editor: DOMEditor,
+  window: Window,
   domAnchor: DOMPoint,
   domFocus: DOMPoint,
   isBackward: boolean
 ): DOMRange => {
-  const window = DOMEditor.getWindow(editor)
   const domRange = window.document.createRange()
   const [startNode, startOffset] = isBackward ? domFocus : domAnchor
   const [endNode, endOffset] = isBackward ? domAnchor : domFocus

@@ -124,4 +124,39 @@ test.describe('plaintext example', () => {
     expect(await insertWhileBlurred('+')).toBe(lineLength + 2)
     await expect(textbox).toContainText('<textarea>!-+')
   })
+
+  test('a selection made just before blur reaches the editor', async ({
+    page,
+  }) => {
+    const textbox = page.getByRole('textbox')
+    await textbox.click()
+    await page.waitForTimeout(200)
+
+    const offset = await page.evaluate(async () => {
+      const element = document.querySelector('[data-slate-editor]')!
+      const fiberKey = Object.keys(element).find(key =>
+        key.startsWith('__reactFiber$')
+      )!
+      let fiber = (element as any)[fiberKey]
+      while (fiber && !fiber.memoizedProps?.editor) {
+        fiber = fiber.return
+      }
+      const editor = fiber.memoizedProps.editor
+      const text = document.querySelector('[data-slate-string]')!.firstChild!
+      const wait = (ms: number) =>
+        new Promise(resolve => setTimeout(resolve, ms))
+      window.getSelection()!.setBaseAndExtent(text, 1, text, 1)
+      await wait(20)
+      window.getSelection()!.setBaseAndExtent(text, 5, text, 5)
+      await wait(20)
+      const outside = document.createElement('button')
+      outside.textContent = 'outside'
+      document.body.appendChild(outside)
+      outside.focus()
+      await wait(300)
+      return editor.selection?.anchor.offset
+    })
+
+    expect(offset).toBe(5)
+  })
 })

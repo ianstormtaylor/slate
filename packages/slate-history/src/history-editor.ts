@@ -133,6 +133,12 @@ export const HistoryEditor = {
   /**
    * Apply a series of changes inside a synchronous `fn`, without saving any of
    * their operations into the history.
+   *
+   * Undo and redo steps already in the history are moved past these changes, so a
+   * later undo still reverts the user's own edit even when the unsaved change
+   * inserted, removed or edited content around it. A step whose content was
+   * removed, or that can no longer be applied, such as a split whose halves are no
+   * longer next to each other, is dropped.
    */
   withoutSaving(editor: HistoryEditor, fn: () => void): void {
     const prev = HistoryEditor.isSaving(editor)

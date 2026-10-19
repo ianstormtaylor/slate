@@ -28,7 +28,12 @@ export const apply: WithEditorFirstArg<Editor['apply']> = (editor, op) => {
     const transform = Path.operationCanTransformPath(op)
       ? (p: Path) => Path.transform(p, op)
       : undefined
-    updateDirtyPaths(editor, editor.getDirtyPaths(op), transform)
+    updateDirtyPaths(
+      editor,
+      editor.getDirtyPaths(op),
+      transform,
+      op.type !== 'merge_node'
+    )
   }
 
   Transforms.transform(editor, op)

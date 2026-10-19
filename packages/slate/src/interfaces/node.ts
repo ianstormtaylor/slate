@@ -174,6 +174,11 @@ export interface NodeInterface {
   fragment<T extends Ancestor = Editor>(root: T, range: Range): T['children']
 
   /**
+   * Find the path of `node` inside `root` by walking the tree, comparing nodes by identity. Returns `[]` for the root itself and `undefined` if `node` isn't in the tree. It doesn't need a rendered editor, so it works on the server too; `ReactEditor.findPath` is faster for rendered nodes and falls back to this.
+   */
+  findPath(root: Node, node: Node): Path | undefined
+
+  /**
    * Get the descendant node referred to by a specific path. If the path is an
    * empty array, it refers to the root node itself.
    * @category Retrieval
@@ -497,6 +502,14 @@ export const Node: NodeInterface = {
     }
 
     return newRoot.children
+  },
+
+  findPath(root: Node, node: Node): Path | undefined {
+    for (const [descendant, path] of Node.nodes(root)) {
+      if (descendant === node) {
+        return path
+      }
+    }
   },
 
   get(root: Node, path: Path): Node {

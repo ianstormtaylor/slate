@@ -1,5 +1,29 @@
 # slate-react
 
+## 0.146.1
+
+### Patch Changes
+
+- [#6334](https://github.com/ianstormtaylor/slate/pull/6334) [`0f99057`](https://github.com/ianstormtaylor/slate/commit/0f9905778ffb983c10ede0a4d0efecb61c4c0032) Thanks [@dylans](https://github.com/dylans)! - `resolveDOMPoint` and `resolveDOMRange` no longer report a miss through `editor.onDOMError`. A miss is often ordinary: a layout effect that measures the selection runs before the edited text's DOM is attached, and replacing `editor.children` can leave the selection past the end of the new text, so these were reported as broken rendering when nothing was wrong. Slate no longer calls `editor.onDOMError` itself; the hook stays for apps and plugins.
+
+  `resolveDOMRange` also returns `null` instead of throwing when the editor's window isn't registered yet, for example from a layout effect inside the first render, and checks the focus only when the anchor resolves. Scrolling the selection into view no longer throws when the unhung range ends in an element that doesn't render its children.
+
+## 0.145.1
+
+### Patch Changes
+
+- [#6329](https://github.com/ianstormtaylor/slate/pull/6329) [`3d7b2fa`](https://github.com/ianstormtaylor/slate/commit/3d7b2fa4b624916f8beae1eb089c25271c4c0a9a) Thanks [@dylans](https://github.com/dylans)! - A click inside the editor whose handler changes the clicked node, for example a `<select>` that calls `setNodes` on its element or a suggestion that inserts text, no longer throws "Unable to find the path for Slate node". `Editable`'s click handling now returns when the clicked node is no longer in the document, which its existing check intended but `findPath` started throwing before it since 0.142.
+
+## 0.145.0
+
+### Minor Changes
+
+- [#6327](https://github.com/ianstormtaylor/slate/pull/6327) [`89a74de`](https://github.com/ianstormtaylor/slate/commit/89a74dee54bcbe03dcf84ad6a5cb3da9b856d486) Thanks [@dylans](https://github.com/dylans)! - Add a controlled `value` prop to `Slate`. Pass the value from `onValueChange` back in, and Slate recognizes that exact object and doesn't apply it again. Any other value is applied as a change from outside the editor through `editor.setChildren`, in a layout effect, so the selection and history stay valid. Values passed in aren't reported through `onValueChange`. Updates wait while the user is composing text or Android has pending input, and only the latest is applied. `value` and `initialValue` together throw.
+
+### Patch Changes
+
+- [#6325](https://github.com/ianstormtaylor/slate/pull/6325) [`6cb0eb4`](https://github.com/ianstormtaylor/slate/commit/6cb0eb4388a69b30bcf4ce7635d29a321d97f684) Thanks [@dylans](https://github.com/dylans)! - A DOM selection change made just before the editor loses focus now reaches `editor.selection`. Selection changes are processed a little later than they happen, and since 0.142 changes processed after blur were ignored, so for example clicking an element whose handler blurs the editor could leave `editor.selection` where it was before the click. Blur now processes any pending selection change first.
+
 ## 0.142.0
 
 ### Minor Changes

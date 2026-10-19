@@ -1,5 +1,19 @@
 # slate-dom
 
+## 0.146.1
+
+### Patch Changes
+
+- [#6334](https://github.com/ianstormtaylor/slate/pull/6334) [`0f99057`](https://github.com/ianstormtaylor/slate/commit/0f9905778ffb983c10ede0a4d0efecb61c4c0032) Thanks [@dylans](https://github.com/dylans)! - `resolveDOMPoint` and `resolveDOMRange` no longer report a miss through `editor.onDOMError`. A miss is often ordinary: a layout effect that measures the selection runs before the edited text's DOM is attached, and replacing `editor.children` can leave the selection past the end of the new text, so these were reported as broken rendering when nothing was wrong. Slate no longer calls `editor.onDOMError` itself; the hook stays for apps and plugins.
+
+  `resolveDOMRange` also returns `null` instead of throwing when the editor's window isn't registered yet, for example from a layout effect inside the first render, and checks the focus only when the anchor resolves. Scrolling the selection into view no longer throws when the unhung range ends in an element that doesn't render its children.
+
+## 0.146.0
+
+### Patch Changes
+
+- [#6332](https://github.com/ianstormtaylor/slate/pull/6332) [`4e73172`](https://github.com/ianstormtaylor/slate/commit/4e7317263b4e70fabbc408bd687537e092729a4d) Thanks [@dylans](https://github.com/dylans)! - Add `Node.findPath(root, node)`, which finds a node's path by walking the tree and returns `undefined` if the node isn't there. It doesn't depend on rendering, so it works without slate-react, for example on a server. `DOMEditor.findPath` uses it as its fallback when the rendered node maps are stale.
+
 ## 0.142.0
 
 ### Minor Changes

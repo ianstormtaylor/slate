@@ -1,11 +1,14 @@
 import { Editor, Operation, Path, Transforms } from 'slate'
 
 import { HistoryEditor } from './history-editor'
+import { rebaseHistory } from './rebase'
 
 /**
  * Adds the `HistoryEditor` interface to an `Editor` instance and keeps track of each operation applied to it, so they can be undone and redone.
  *
  * If you are using TypeScript, you must extend Slate's CustomTypes to use this plugin. See https://docs.slatejs.org/concepts/11-typescript to learn how.
+ *
+ * The plugin also overrides `editor.setChildren`. Each `Transforms.setChildren` call starts its own undo batch, including normalization, and does not merge with typing before or after the external update. A deep-equal update creates no history entry.
  *
  * When used with `withReact`, `withHistory` should be applied inside, see example below.
  *
@@ -16,8 +19,9 @@ import { HistoryEditor } from './history-editor'
  */
 export const withHistory = <T extends Editor>(editor: T) => {
   const e = editor as T & HistoryEditor
-  const { apply, normalize } = e
+  const { apply, normalize, setChildren } = e
   let isSettled = true
+  let isReplaying = false
   e.history = { undos: [], redos: [] }
 
   e.redo = () => {
@@ -31,13 +35,18 @@ export const withHistory = <T extends Editor>(editor: T) => {
         Transforms.select(e, batch.selectionBefore)
       }
 
-      HistoryEditor.withoutSaving(e, () => {
-        Editor.withoutNormalizing(e, () => {
-          for (const op of batch.operations) {
-            e.apply(op)
-          }
+      isReplaying = true
+      try {
+        HistoryEditor.withoutSaving(e, () => {
+          Editor.withoutNormalizing(e, () => {
+            for (const op of batch.operations) {
+              e.apply(op)
+            }
+          })
         })
-      })
+      } finally {
+        isReplaying = false
+      }
 
       history.redos.pop()
       e.writeHistory('undos', batch)
@@ -51,18 +60,23 @@ export const withHistory = <T extends Editor>(editor: T) => {
     if (undos.length > 0) {
       const batch = undos[undos.length - 1]
 
-      HistoryEditor.withoutSaving(e, () => {
-        Editor.withoutNormalizing(e, () => {
-          const inverseOps = batch.operations.map(Operation.inverse).reverse()
+      isReplaying = true
+      try {
+        HistoryEditor.withoutSaving(e, () => {
+          Editor.withoutNormalizing(e, () => {
+            const inverseOps = batch.operations.map(Operation.inverse).reverse()
 
-          for (const op of inverseOps) {
-            e.apply(op)
-          }
-          if (batch.selectionBefore) {
-            Transforms.select(e, batch.selectionBefore)
-          }
+            for (const op of inverseOps) {
+              e.apply(op)
+            }
+            if (batch.selectionBefore) {
+              Transforms.select(e, batch.selectionBefore)
+            }
+          })
         })
-      })
+      } finally {
+        isReplaying = false
+      }
 
       e.writeHistory('redos', batch)
       history.undos.pop()
@@ -117,6 +131,8 @@ export const withHistory = <T extends Editor>(editor: T) => {
       }
 
       history.redos = []
+    } else if (!isReplaying && op.type !== 'set_selection') {
+      rebaseHistory(history, op)
     }
 
     isSettled = false
@@ -128,6 +144,16 @@ export const withHistory = <T extends Editor>(editor: T) => {
 
     if (Editor.isNormalizing(e)) {
       isSettled = true
+    }
+  }
+
+  e.setChildren = children => {
+    const previous = e.history.undos[e.history.undos.length - 1]
+    const count = previous?.operations.length
+    HistoryEditor.withNewBatch(e, () => setChildren(children))
+    const current = e.history.undos[e.history.undos.length - 1]
+    if (current !== previous || current?.operations.length !== count) {
+      HistoryEditor.setSplittingOnce(e, true)
     }
   }
 

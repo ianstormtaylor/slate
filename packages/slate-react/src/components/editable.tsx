@@ -83,7 +83,7 @@ import {
 } from 'slate-dom'
 import { RestoreDOM } from './restore-dom/restore-dom'
 import { AndroidInputManager } from '../hooks/android-input-manager/android-input-manager'
-import { ComposingContext } from '../hooks/use-composing'
+import { ComposingContext, EDITOR_TO_COMPOSING } from '../hooks/use-composing'
 import { useFlushDeferredSelectorsOnRender } from '../hooks/use-slate-selector'
 import { Slate } from './slate'
 
@@ -359,6 +359,12 @@ export const Editable: (props: EditableProps) => ReactNode = forwardRef(
     const editor = useSlate()
     // Rerender editor when composition status changed
     const [isComposing, setIsComposing] = useState(false)
+    useIsomorphicLayoutEffect(() => {
+      EDITOR_TO_COMPOSING.set(editor, isComposing)
+      return () => {
+        EDITOR_TO_COMPOSING.delete(editor)
+      }
+    }, [editor, isComposing])
     const ref = useRef<HTMLDivElement | null>(null)
     const previousChildren = useRef(editor.children)
     const previousSelection = useRef(editor.selection)
@@ -391,6 +397,7 @@ export const Editable: (props: EditableProps) => ReactNode = forwardRef(
     // Keep track of some state for the event handler logic.
     const state = useMemo(
       () => ({
+        isBlurring: false,
         isDraggingInternally: false,
         isTabbing: false,
         pendingSelection: null as {
@@ -501,7 +508,7 @@ export const Editable: (props: EditableProps) => ReactNode = forwardRef(
             if (
               anchorNodeSelectable &&
               focusNodeInEditor &&
-              (readOnly || isFocusInEditor)
+              (readOnly || isFocusInEditor || state.isBlurring)
             ) {
               const range = ReactEditor.toSlateRange(editor, domSelection, {
                 exactMatch: false,
@@ -1593,6 +1600,13 @@ export const Editable: (props: EditableProps) => ReactNode = forwardRef(
                       }
                     }
 
+                    state.isBlurring = true
+                    try {
+                      flushDOMSelectionChange()
+                    } finally {
+                      state.isBlurring = false
+                    }
+
                     // COMPAT: Safari doesn't always remove the selection even if the content-
                     // editable element no longer has focus. Refer to:
                     // https://stackoverflow.com/questions/12353247/force-contenteditable-div-to-stop-accepting-input-after-it-loses-focus-under-web
@@ -1605,10 +1619,10 @@ export const Editable: (props: EditableProps) => ReactNode = forwardRef(
                   },
                   [
                     readOnly,
-                    state.isUpdatingSelection,
-                    state.latestElement,
+                    state,
                     editor,
                     attributes.onBlur,
+                    flushDOMSelectionChange,
                   ]
                 )}
                 onClick={useCallback(
@@ -1623,7 +1637,13 @@ export const Editable: (props: EditableProps) => ReactNode = forwardRef(
                       isDOMNode(event.target)
                     ) {
                       const node = ReactEditor.toSlateNode(editor, event.target)
-                      const path = ReactEditor.findPath(editor, node)
+                      let path: Path
+
+                      try {
+                        path = ReactEditor.findPath(editor, node)
+                      } catch {
+                        return
+                      }
 
                       // At this time, the Slate document may be arbitrarily different,
                       // because onClick handlers can change the document before we get here.
@@ -1745,12 +1765,10 @@ export const Editable: (props: EditableProps) => ReactNode = forwardRef(
                       return
                     }
                     if (ReactEditor.hasSelectableTarget(editor, event.target)) {
-                      if (ReactEditor.isComposing(editor)) {
-                        Promise.resolve().then(() => {
-                          setIsComposing(false)
-                          IS_COMPOSING.set(editor, false)
-                        })
-                      }
+                      Promise.resolve().then(() => {
+                        setIsComposing(false)
+                        IS_COMPOSING.set(editor, false)
+                      })
 
                       androidInputManagerRef.current?.handleCompositionEnd(
                         event
@@ -2673,7 +2691,7 @@ export const defaultScrollSelectionIntoView = (
       : selection
   const domFocusPoint =
     unhung && selection && !Range.equals(unhung, selection)
-      ? ReactEditor.toDOMRange(editor, unhung)
+      ? ReactEditor.resolveDOMRange(editor, unhung) ?? domRange.cloneRange()
       : domRange.cloneRange()
   domFocusPoint.collapse(isBackward)
 

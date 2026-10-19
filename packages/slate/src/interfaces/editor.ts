@@ -63,6 +63,13 @@ export interface BaseEditor {
   getFragment(): Descendant[]
 
   /**
+   * Return the properties for the new right-hand node when `Transforms.splitNodes` splits `node` at its current `path`. The default is `Node.extractProps(node)`, which copies every property except `children` and `text`. The original left-hand node keeps its properties.
+   *
+   * Override this method to drop or replace properties such as element IDs. Return the full set of properties to keep, including text marks when splitting a text node; omit `children` and `text`. Commands that use `splitNodes`, including `insertBreak`, `insertFragment` and `setNodes` with `split: true`, use this method too, as does `wrapNodes` when it splits an inline element. See [Node IDs](../../concepts/02-nodes.md#node-ids) for a plugin example.
+   */
+  getSplitProperties: (node: Element | Text, path: Path) => Partial<Node>
+
+  /**
    * Check if a value is a read-only `Element` object.
    * @see {@link EditorInterface#isElementReadOnly} - A static version of this method.
    */
@@ -354,6 +361,18 @@ export interface BaseEditor {
       replace?: boolean
     }
   ): void
+
+  /**
+   * Apply an external document through Slate operations. Delegates to `editor.setChildren`, so plugins can override the transform. Unchanged child prefixes and suffixes are retained, matched by identity or by deep equality, so a refetched copy of the document with one new block emits a single `insert_node`. Compatible nodes are updated recursively; text edits replace only the changed string middle. Deep-equal cloned values emit no operations.
+   *
+   * Nodes shared by object identity can move within or across parents with a `move_node`, preserving selections inside them. Cloned moves are treated as content edits or replacements. Normalization is held until the diff is complete, and selection and refs follow the emitted operations through their normal rules.
+   *
+   * With `withHistory`, each external change forms one undo step and is separate from typing before and after it.
+   *
+   * To clear an editable document, pass a schema-valid empty block, for example `[{ type: 'paragraph', children: [{ text: '' }] }]`. `setChildren` itself accepts an empty root; it does not invent a block or reset history.
+   * @see {@link TransformsInterface#setChildren} - A static version of this method.
+   */
+  setChildren(children: Descendant[]): void
 
   /**
    * Manually set if the editor should currently be normalizing.
@@ -678,7 +697,14 @@ export interface BaseEditor {
   pointRefs(): Set<PointRef>
 
   /**
-   * Return all the positions in `at` range where a `Point` can be placed.
+   * Iterate through all of the positions in the document where a `Point` can be placed. The first `Point` returns is always the starting point followed by the next `Point` as determined by the `unit` option.
+   *
+   * Points inside non-selectable elements are skipped in both directions, including consecutive non-selectable elements.
+   *
+   * Read `options.unit` to see how this method iterates through positions.
+   *
+   * Note: By default void nodes are treated as a single point and iteration will not happen inside their content unless the voids option is set, then iteration will occur. Text immediately after an inline void starts a new traversal boundary, including when the surrounding text is empty. Word traversal restarts segmentation at that boundary.
+   *
    * @param options Type also exported as `EditorPositionsOptions`
    * @see {@link EditorInterface#positions} - A static version of this method.
    */

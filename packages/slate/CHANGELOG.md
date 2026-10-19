@@ -1,5 +1,37 @@
 # slate
 
+## 0.146.0
+
+### Minor Changes
+
+- [#6332](https://github.com/ianstormtaylor/slate/pull/6332) [`4e73172`](https://github.com/ianstormtaylor/slate/commit/4e7317263b4e70fabbc408bd687537e092729a4d) Thanks [@dylans](https://github.com/dylans)! - Add `Node.findPath(root, node)`, which finds a node's path by walking the tree and returns `undefined` if the node isn't there. It doesn't depend on rendering, so it works without slate-react, for example on a server. `DOMEditor.findPath` uses it as its fallback when the rendered node maps are stale.
+
+### Patch Changes
+
+- [#6331](https://github.com/ianstormtaylor/slate/pull/6331) [`cfd8049`](https://github.com/ianstormtaylor/slate/commit/cfd804918bd1eebe566349c68b45d94fe2821a81) Thanks [@dylans](https://github.com/dylans)! - Batches inside `Editor.withoutNormalizing` spend less time on dirty path bookkeeping. An operation that can't map two dirty paths onto one, which is every path-changing operation except `merge_node`, no longer rebuilds the dirty path key set. 5,000 splits of one block in a batch go from about 7.9 s to 3.7 s. The dirty paths and their order are unchanged.
+
+## 0.144.0
+
+### Minor Changes
+
+- [#6314](https://github.com/ianstormtaylor/slate/pull/6314) [`64b036b`](https://github.com/ianstormtaylor/slate/commit/64b036b10d2b75017ba6562db868e7b0bcb0cdef) Thanks [@dylans](https://github.com/dylans)! - Add `Transforms.setChildren(editor, children)` and the overridable `editor.setChildren` method, which apply an outside document through Slate operations instead of replacing `editor.children`. Unchanged nodes are kept, matched by identity or deep equality; shared nodes move with `move_node`; and text changes become `insert_text`/`remove_text`, so the selection, refs and history stay valid.
+
+  `withHistory` records each `setChildren` call as one undo step, separate from typing before and after it.
+
+  `BaseEditor` now requires `setChildren`. `createEditor` supplies it, but editors built by hand and test mocks must add it.
+
+### Patch Changes
+
+- [#6320](https://github.com/ianstormtaylor/slate/pull/6320) [`a21292f`](https://github.com/ianstormtaylor/slate/commit/a21292f93f8f3c1e7a6318687d932c66cb5563f7) Thanks [@Marve10s](https://github.com/Marve10s)! - Fix `Editor.positions` and `Transforms.move` returning points inside consecutive non-selectable elements, or inside a non-selectable first child of a void or read-only element. Deleting beside two non-selectable blocks, or beside a read-only block whose content is all non-selectable, now removes them instead of merging their text.
+
+## 0.143.0
+
+### Minor Changes
+
+- [#6321](https://github.com/ianstormtaylor/slate/pull/6321) [`9ed1e7d`](https://github.com/ianstormtaylor/slate/commit/9ed1e7da9f78345d190afafb2d0b899247d923f4) Thanks [@dylans](https://github.com/dylans)! - Add `editor.getSplitProperties(node, path)` to choose the properties copied to the new right-hand node by `Transforms.splitNodes`. The default remains `Node.extractProps(node)`. Applications can omit or replace IDs while preserving text marks for Enter, fragment insertion and partial-range transforms.
+
+  `BaseEditor` now requires `getSplitProperties`; `createEditor` supplies it. Structural editor implementations and mocks must add the method.
+
 ## 0.142.1
 
 ### Patch Changes

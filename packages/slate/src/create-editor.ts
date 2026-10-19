@@ -5,6 +5,7 @@ import {
   Editor,
   getDirtyPaths,
   getFragment,
+  getSplitProperties,
   insertBreak,
   insertFragment,
   insertNode,
@@ -82,6 +83,7 @@ import {
   mergeNodes,
   moveNodes,
   removeNodes,
+  setChildren,
   setNodes,
   splitNodes,
   unsetNodes,
@@ -125,6 +127,7 @@ export const createEditor = <E extends BaseEditor = Editor>(): E => {
     normalizeNode: (...args) => normalizeNode(editor, ...args),
     removeMark: (...args) => removeMark(editor, ...args),
     getDirtyPaths: (...args) => getDirtyPaths(editor, ...args),
+    getSplitProperties: (...args) => getSplitProperties(editor, ...args),
     shouldNormalize: (...args) => shouldNormalize(editor, ...args),
 
     // Editor interface
@@ -178,6 +181,7 @@ export const createEditor = <E extends BaseEditor = Editor>(): E => {
     rangeRefs: (...args) => rangeRefs(editor, ...args),
     removeNodes: (...args) => removeNodes(editor, ...args),
     select: (...args) => select(editor, ...args),
+    setChildren: (...args) => setChildren(editor, ...args),
     setNodes: (...args) => setNodes(editor, ...args),
     setNormalizing: (...args) => setNormalizing(editor, ...args),
     setPoint: (...args) => setPoint(editor, ...args),
