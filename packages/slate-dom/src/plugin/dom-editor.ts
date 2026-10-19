@@ -237,6 +237,25 @@ export interface DOMEditorInterface {
 
   resolveEventRange: (editor: DOMEditor, event: any) => Range | null
 
+  resolveDOMNode: (editor: DOMEditor, node: Node) => HTMLElement | null
+
+  resolveSlateNode: (editor: DOMEditor, domNode: DOMNode) => Node | null
+
+  resolveSlatePoint: (
+    editor: DOMEditor,
+    domPoint: DOMPoint,
+    options?: {
+      exactMatch?: boolean
+      searchDirection?: 'forward' | 'backward'
+    }
+  ) => Point | null
+
+  resolveSlateRange: (
+    editor: DOMEditor,
+    domRange: DOMRange | DOMStaticRange | DOMSelection,
+    options?: { exactMatch?: boolean }
+  ) => Range | null
+
   /**
    * Find the native DOM element from a Slate node.
    */
@@ -686,12 +705,7 @@ export const DOMEditor: DOMEditorInterface = {
     editor.setFragmentData(data, originEvent),
 
   toDOMNode: (editor, node) => {
-    const domNode =
-      node === editor
-        ? EDITOR_TO_ELEMENT.get(editor)
-        : EDITOR_TO_KEY_TO_ELEMENT.get(editor)?.get(
-            DOMEditor.findKey(editor, node)
-          )
+    const domNode = DOMEditor.resolveDOMNode(editor, node)
 
     if (!domNode) {
       throw new Error(
@@ -745,6 +759,42 @@ export const DOMEditor: DOMEditorInterface = {
   resolveEventRange: (editor, event) =>
     DOMEditor.findEventRange(editor, event, { suppressThrow: true }),
 
+  resolveDOMNode: (editor, node) =>
+    (node === editor
+      ? EDITOR_TO_ELEMENT.get(editor)
+      : EDITOR_TO_KEY_TO_ELEMENT.get(editor)?.get(
+          DOMEditor.findKey(editor, node)
+        )) ?? null,
+
+  resolveSlateNode: (editor, domNode) => {
+    const domEl = closestSlateElement(domNode)
+
+    return (domEl && ELEMENT_TO_NODE.get(domEl)) ?? null
+  },
+
+  resolveSlatePoint: (editor, domPoint, options = {}) => {
+    try {
+      return DOMEditor.toSlatePoint(editor, domPoint, {
+        exactMatch: options.exactMatch ?? false,
+        searchDirection: options.searchDirection,
+        suppressThrow: true,
+      })
+    } catch {
+      return null
+    }
+  },
+
+  resolveSlateRange: (editor, domRange, options = {}) => {
+    try {
+      return DOMEditor.toSlateRange(editor, domRange, {
+        exactMatch: options.exactMatch ?? false,
+        suppressThrow: true,
+      })
+    } catch {
+      return null
+    }
+  },
+
   toDOMPoint: (editor, point) => {
     const [node] = Editor.node(editor, point.path)
     const el = DOMEditor.toDOMNode(editor, node)
@@ -773,13 +823,8 @@ export const DOMEditor: DOMEditorInterface = {
   },
 
   toSlateNode: (editor, domNode) => {
-    let domEl = isDOMElement(domNode) ? domNode : domNode.parentElement
-
-    if (domEl && !domEl.hasAttribute('data-slate-node')) {
-      domEl = domEl.closest(`[data-slate-node]`)
-    }
-
-    const node = domEl ? ELEMENT_TO_NODE.get(domEl as HTMLElement) : null
+    const domEl = closestSlateElement(domNode)
+    const node = domEl ? ELEMENT_TO_NODE.get(domEl) : null
 
     if (!node) {
       throw new Error(`Cannot resolve a Slate node from DOM node: ${domEl}`)
@@ -1274,6 +1319,14 @@ const getComposingView = (editor: DOMEditor) => {
   view.children = replaceText(editor.children, point.path, text)
 
   return { view, point }
+}
+
+const closestSlateElement = (domNode: DOMNode) => {
+  const domEl = isDOMElement(domNode) ? domNode : domNode.parentElement
+
+  return domEl?.hasAttribute('data-slate-node')
+    ? (domEl as HTMLElement)
+    : domEl?.closest<HTMLElement>('[data-slate-node]') ?? null
 }
 
 const unresolvedPointMessage = (point: Point) =>

@@ -128,6 +128,22 @@ Like `toDOMRange`, but returns `null` instead of throwing, including when either
 
 Like `findEventRange`, but returns `null` when the event doesn't map to a range in the editor.
 
+#### `ReactEditor.resolveDOMNode(editor: ReactEditor, node: Node): HTMLElement | null`
+
+Like `toDOMNode`, but returns `null` when the node isn't rendered.
+
+#### `ReactEditor.resolveSlateNode(editor: ReactEditor, domNode: DOMNode): Node | null`
+
+Like `toSlateNode`, but returns `null` when the DOM node isn't inside a Slate node.
+
+#### `ReactEditor.resolveSlatePoint(editor: ReactEditor, domPoint: DOMPoint, options?: { exactMatch?: boolean, searchDirection?: 'forward' | 'backward' }): Point | null`
+
+Like `toSlatePoint`, but returns `null` instead of throwing, including in the cases where `suppressThrow: true` still throws, such as before `Editable` mounts. `exactMatch` defaults to `false`.
+
+#### `ReactEditor.resolveSlateRange(editor: ReactEditor, domRange: DOMRange | DOMStaticRange | DOMSelection, options?: { exactMatch?: boolean }): Range | null`
+
+Like `toSlateRange`, but returns `null` instead of throwing, including for a selection with no range. `exactMatch` defaults to `false`.
+
 ## Instance methods
 
 #### `editor.onDOMError(error: unknown): void`
@@ -142,4 +158,4 @@ editor.onDOMError = error => {
 }
 ```
 
-`ReactEditor.toDOMPoint` and `ReactEditor.toDOMRange` still throw; use the `resolve` versions to get `null` instead.
+The `to` lookups still throw; use the `resolve` versions to get `null` instead.
