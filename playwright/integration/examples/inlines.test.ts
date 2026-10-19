@@ -80,32 +80,28 @@ test.describe('Inlines example', () => {
     })
   }
 
-  // FIXME: unstable, has issues with selection.anchorNode
-  test.skip('arrow keys skip over read-only inline', async ({ page }) => {
-    const badge = page.locator('text=Approved >> xpath=../../..')
-
-    // Put cursor after the badge
-    await badge.evaluate(badgeElement => {
-      const range = document.createRange()
-      range.setStartAfter(badgeElement)
-      range.setEndAfter(badgeElement)
-      const selection = window.getSelection()!
-      selection.removeAllRanges()
-      selection.addRange(range)
-    })
-
-    const getSelectionContainerText = () =>
-      page.evaluate(() => {
-        const selection = window.getSelection()!
-        return selection.anchorNode!.textContent
+  test('arrow keys skip over read-only inline', async ({ page }) => {
+    const element = page.getByRole('textbox')
+    const editor = await getEditorHandle(element)
+    await element.click()
+    const [before, after] = await editor.evaluate(editor => {
+      const [[, path]] = editor.nodes({
+        at: [],
+        match: node => 'type' in node && node.type === 'badge',
       })
+      const before = editor.end(editor.before(path)!.path)
+      const after = editor.start(editor.after(path)!.path)
+      editor.select(after)
+      return [before, after]
+    })
+    const selection = () =>
+      editor.evaluate(editor => editor.selection && editor.selection.anchor)
 
-    expect(await getSelectionContainerText()).toBe('.')
+    await expect.poll(selection).toEqual(after)
     await page.keyboard.press('ArrowLeft')
-    expect(await getSelectionContainerText()).toBe(
-      '! Here is a read-only inline: '
-    )
+    await expect.poll(selection).toEqual(before)
     await page.keyboard.press('ArrowRight')
-    expect(await getSelectionContainerText()).toBe('.')
+    await expect.poll(selection).toEqual(after)
+    await editor.dispose()
   })
 })
