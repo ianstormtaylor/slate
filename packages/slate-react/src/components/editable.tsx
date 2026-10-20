@@ -177,15 +177,15 @@ export interface RenderTextProps {
  * @inline
  */
 export interface EditableProps extends React.HTMLAttributes<HTMLDivElement> {
-  decorate?: (entry: NodeEntry) => DecoratedRange[]
-  onDOMBeforeInput?: (event: InputEvent) => void
+  decorate?: ((entry: NodeEntry) => DecoratedRange[]) | undefined
+  onDOMBeforeInput?: ((event: InputEvent) => void) | undefined
 
   /**
    * The text to display as a placeholder when the Editor is empty. A typical value for `placeholder` would be "Enter text here..." or "Start typing...". The placeholder text will not be treated as an actual value and will disappear when the user starts typing in the Editor.
    *
    * While it is shown, the editor root gets an `aria-placeholder` with the same text.
    */
-  placeholder?: string
+  placeholder?: string | undefined
 
   /**
    * When set to true, renders the editor in a "read-only" state. In this state, user input and interactions will not modify the editor's content.
@@ -196,9 +196,9 @@ export interface EditableProps extends React.HTMLAttributes<HTMLDivElement> {
    *
    * This prop is particularly useful when you want to display text or rich media content without allowing users to edit it, such as when displaying published content or a preview of the user's input.
    */
-  readOnly?: boolean
-  role?: string
-  style?: React.CSSProperties
+  readOnly?: boolean | undefined
+  role?: string | undefined
+  style?: React.CSSProperties | undefined
 
   /**
    * The `renderElement` prop is a function used to render a custom component for a specific type of Element node in the Slate.js document model.
@@ -224,8 +224,8 @@ export interface EditableProps extends React.HTMLAttributes<HTMLDivElement> {
    * }, [])
    * ```
    */
-  renderElement?: (props: RenderElementProps) => React.JSX.Element
-  renderChunk?: (props: RenderChunkProps) => React.JSX.Element
+  renderElement?: ((props: RenderElementProps) => React.JSX.Element) | undefined
+  renderChunk?: ((props: RenderChunkProps) => React.JSX.Element) | undefined
 
   /**
    * The `renderLeaf` prop allows you to customize the rendering of leaf nodes in the document tree of your Slate editor. A "leaf" in Slate is the smallest chunk of text and its associated formatting attributes.
@@ -246,7 +246,7 @@ export interface EditableProps extends React.HTMLAttributes<HTMLDivElement> {
    * />
    * ```
    */
-  renderLeaf?: (props: RenderLeafProps) => React.JSX.Element
+  renderLeaf?: ((props: RenderLeafProps) => React.JSX.Element) | undefined
 
   /**
    * The `renderText` prop allows you to customize the rendering of the container element for a Text node in the Slate editor. This is useful when you need to wrap the entire text node content or add elements associated with the text node as a whole, regardless of how decorations might split the text into multiple leaves.
@@ -264,7 +264,7 @@ export interface EditableProps extends React.HTMLAttributes<HTMLDivElement> {
    *   }}
    * />
    */
-  renderText?: (props: RenderTextProps) => React.JSX.Element
+  renderText?: ((props: RenderTextProps) => React.JSX.Element) | undefined
 
   /**
    * The `renderPlaceholder` prop allows you to customize how the placeholder of the Slate.js `Editable` component is rendered when the editor is empty. The placeholder will only be shown when the editor's content is empty.
@@ -287,18 +287,22 @@ export interface EditableProps extends React.HTMLAttributes<HTMLDivElement> {
    * />
    * ```
    */
-  renderPlaceholder?: (props: RenderPlaceholderProps) => React.JSX.Element
+  renderPlaceholder?:
+    | ((props: RenderPlaceholderProps) => React.JSX.Element)
+    | undefined
 
   /**
    * Slate has its own default method to scroll a DOM selection into view that works for most cases; however, if the default behavior isn't working for you, possible due to some complex styling, you may need to override the default behavior by providing a different function here.
    */
-  scrollSelectionIntoView?: (editor: ReactEditor, domRange: DOMRange) => void
+  scrollSelectionIntoView?:
+    | ((editor: ReactEditor, domRange: DOMRange) => void)
+    | undefined
 
   /**
    * The as prop specifies the type of element that will be used to render the Editable component in your React application.
    * @defaultValue 'div'
    */
-  as?: React.ElementType
+  as?: React.ElementType | undefined
 
   /**
    * The `disableDefaultStyles` prop determines whether the default styles of the Slate.js `Editable` component are applied or not.
@@ -320,7 +324,7 @@ export interface EditableProps extends React.HTMLAttributes<HTMLDivElement> {
    * }
    * ```
    */
-  disableDefaultStyles?: boolean
+  disableDefaultStyles?: boolean | undefined
 }
 
 /**

@@ -44,7 +44,7 @@ interface SlateProps {
    *
    * Each editor must have its own node objects. To render several editors from the same value, give each one a deep copy, for example with `structuredClone(value)`. Sharing the same objects between editors breaks the lookups Slate uses to map nodes to the DOM.
    */
-  initialValue?: Descendant[]
+  initialValue?: Descendant[] | undefined
 
   /**
    * Control the document with a value from your app, and store the user's edits with `onValueChange`. Passing both `value` and `initialValue` throws. The first value loads the editor as `initialValue` does. Later values are applied in a layout effect through `editor.setChildren` (`Transforms.setChildren`), so the selection and history stay valid.
@@ -71,19 +71,19 @@ interface SlateProps {
    *
    * To switch to a different document, remount `Slate` with a new `key` instead of passing the new document as `value`. Applying a whole new document records it as an undo step and diffs it against the old one.
    */
-  value?: Descendant[]
+  value?: Descendant[] | undefined
 
   /** The `children` which must contain an `Editable` component. */
   children: React.ReactNode
 
   /** An optional callback function which you can use to be notified of changes in the editor's selection and/or value. */
-  onChange?: (value: Descendant[]) => void
+  onChange?: ((value: Descendant[]) => void) | undefined
 
   /** An optional callback function which you can use to be notified of changes in the editor's selection. */
-  onSelectionChange?: (selection: Selection) => void
+  onSelectionChange?: ((selection: Selection) => void) | undefined
 
   /** An optional callback function which you can use to be notified of changes in the editor's value. */
-  onValueChange?: (value: Descendant[]) => void
+  onValueChange?: ((value: Descendant[]) => void) | undefined
 }
 
 /**
