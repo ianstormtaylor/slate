@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.147.1
+
+### Patch Changes
+
+- [#6340](https://github.com/ianstormtaylor/slate/pull/6340) [`ca37117`](https://github.com/ianstormtaylor/slate/commit/ca37117d2102517aafd0b3642a53bab33a1daeb9) Thanks [@dylans](https://github.com/dylans)! - Report an element whose `renderElement` didn't render its `children` through `editor.onDOMError` when it mounts, naming the element's `type` and path. Before, nothing was reported, and lookups into the element returned `null` with no hint why.
+
 ## 0.147.0
 
 ### Minor Changes
