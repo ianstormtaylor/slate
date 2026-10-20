@@ -67,7 +67,7 @@ export interface BaseEditor {
    *
    * Override this method to drop or replace properties such as element IDs. Return the full set of properties to keep, including text marks when splitting a text node; omit `children` and `text`. Commands that use `splitNodes`, including `insertBreak`, `insertFragment` and `setNodes` with `split: true`, use this method too, as does `wrapNodes` when it splits an inline element. See [Node IDs](/concepts/02-nodes.md#node-ids) for a plugin example.
    */
-  getSplitProperties: (node: Element | Text, path: Path) => Partial<Node>
+  getSplitProperties(node: Element | Text, path: Path): Partial<Node>
 
   /**
    * Check if a value is a read-only `Element` object.
@@ -1124,7 +1124,7 @@ export interface EditorInterface {
   /**
    * Check whether both endpoint paths of a range exist in the editor. This checks paths, not whether offsets are within the text.
    */
-  hasRange: (editor: Editor, range: Range) => boolean
+  hasRange(editor: Editor, range: Range): boolean
 
   /**
    * Check if a node has text children.
@@ -1217,9 +1217,9 @@ export interface EditorInterface {
    * The rules apply to `editor.insertText`, `insertFragment` and insertion of inline elements with `insertNodes` only when `at` is omitted and the selection is collapsed. Explicit locations, expanded selections, and insertion of text or block nodes through `insertNodes` retain their existing behavior. IME composition remains native; these rules govern committed insertion.
    * @category Queries
    */
-  insertionPoint: (editor: Editor, point: Point) => Point
+  insertionPoint(editor: Editor, point: Point): Point
 
-  isIsolated: (editor: Editor, element: Element) => boolean
+  isIsolated(editor: Editor, element: Element): boolean
 
   /**
    * Check if an element is empty, accounting for void nodes.
@@ -1248,7 +1248,7 @@ export interface EditorInterface {
   /**
    * Check whether the editor is currently inside `Editor.withRemoteChanges`. It returns `false` outside that editor's scope.
    */
-  isRemoteChange: (editor: Editor) => boolean
+  isRemoteChange(editor: Editor): boolean
 
   /**
    * Check if a value is a selectable `Element` object.
@@ -1507,7 +1507,7 @@ export interface EditorInterface {
     options?: EditorVoidOptions
   ): NodeEntry<Element> | undefined
 
-  word: (editor: Editor, options?: EditorWordOptions) => Range | undefined
+  word(editor: Editor, options?: EditorWordOptions): Range | undefined
 
   /**
    * Call a function, deferring normalization until after it completes.
@@ -1528,7 +1528,7 @@ export interface EditorInterface {
    * })
    * ```
    */
-  withRemoteChanges: (editor: Editor, fn: () => void) => void
+  withRemoteChanges(editor: Editor, fn: () => void): void
 
   /**
    *  Call a function, Determine whether or not remove the previous node when merge.

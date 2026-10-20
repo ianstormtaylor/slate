@@ -61,7 +61,7 @@ export interface SelectionTransforms {
   /**
    * Set new properties on the selection.
    */
-  setSelection: (editor: Editor, props: Partial<Selection>) => void
+  setSelection(editor: Editor, props: Partial<Selection>): void
 }
 
 // eslint-disable-next-line no-redeclare

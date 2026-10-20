@@ -2584,7 +2584,7 @@ export const Editable: (props: EditableProps) => ReactNode = forwardRef(
 /**
  * The props that get passed to renderPlaceholder
  */
-export type RenderPlaceholderProps = {
+export interface RenderPlaceholderProps {
   children: any
   attributes: {
     'data-slate-placeholder': boolean

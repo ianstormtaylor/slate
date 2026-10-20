@@ -11,7 +11,7 @@ export interface ReactEditor extends DOMEditor {
    * null is returned (which is the default), the chunking optimization is
    * disabled.
    */
-  getChunkSize: (node: Ancestor) => number | null
+  getChunkSize(node: Ancestor): number | null
 }
 
 export interface ReactEditorInterface extends DOMEditorInterface {}

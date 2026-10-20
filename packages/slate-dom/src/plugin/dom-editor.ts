@@ -218,7 +218,7 @@ export interface DOMEditorInterface {
   /**
    * Check if the editor is mounted, meaning it is rendered and has a DOM element. Methods that resolve DOM nodes, such as `toDOMNode`, throw for an editor that is not mounted.
    */
-  isMounted: (editor: DOMEditor) => boolean
+  isMounted(editor: DOMEditor): boolean
 
   /**
    * Check if the editor is in read-only mode.

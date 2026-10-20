@@ -35,7 +35,7 @@ export interface RangeInterface {
   /**
    * Get the direction of a `range`: `'forward'` when the focus point comes after the anchor point, `'backward'` when it comes before, and `'collapsed'` when they're at the same position.
    */
-  direction: (range: Range) => 'forward' | 'backward' | 'collapsed'
+  direction(range: Range): 'forward' | 'backward' | 'collapsed'
 
   /**
    * Get the start and end points of a range, in the order in which they appear
