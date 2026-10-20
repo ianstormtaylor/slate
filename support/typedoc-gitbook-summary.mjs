@@ -1,7 +1,7 @@
 import { readFile, writeFile } from 'fs/promises'
 
 /**
- * Small plugin to generate a summary.md file for GitBook based on the TypeDoc navigation
+ * Small plugin to generate a SUMMARY.md file for GitBook based on the TypeDoc navigation
  * Reads docs/summary-template.md and replaces the <!-- API PAGES --> placeholder
  */
 
