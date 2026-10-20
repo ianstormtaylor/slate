@@ -1,12 +1,32 @@
 import { DOMEditor } from '../plugin/dom-editor'
 
 export type DOMNode = globalThis.Node
+// eslint-disable-next-line no-redeclare
+export const DOMNode = globalThis.Node
+
 export type DOMComment = globalThis.Comment
+// eslint-disable-next-line no-redeclare
+export const DOMComment = globalThis.Comment
+
 export type DOMElement = globalThis.Element
+// eslint-disable-next-line no-redeclare
+export const DOMElement = globalThis.Element
+
 export type DOMText = globalThis.Text
+// eslint-disable-next-line no-redeclare
+export const DOMText = globalThis.Text
+
 export type DOMRange = globalThis.Range
+// eslint-disable-next-line no-redeclare
+export const DOMRange = globalThis.Range
+
 export type DOMSelection = globalThis.Selection
+// eslint-disable-next-line no-redeclare
+export const DOMSelection = globalThis.Selection
+
 export type DOMStaticRange = globalThis.StaticRange
+// eslint-disable-next-line no-redeclare
+export const DOMStaticRange = globalThis.StaticRange
 
 declare global {
   interface Window {
@@ -344,7 +364,8 @@ export const getActiveElement = () => {
  */
 export const isBefore = (node: DOMNode, otherNode: DOMNode): boolean =>
   Boolean(
-    node.compareDocumentPosition(otherNode) & Node.DOCUMENT_POSITION_PRECEDING
+    node.compareDocumentPosition(otherNode) &
+      DOMNode.DOCUMENT_POSITION_PRECEDING
   )
 
 /**
@@ -352,7 +373,8 @@ export const isBefore = (node: DOMNode, otherNode: DOMNode): boolean =>
  */
 export const isAfter = (node: DOMNode, otherNode: DOMNode): boolean =>
   Boolean(
-    node.compareDocumentPosition(otherNode) & Node.DOCUMENT_POSITION_FOLLOWING
+    node.compareDocumentPosition(otherNode) &
+      DOMNode.DOCUMENT_POSITION_FOLLOWING
   )
 
 /**

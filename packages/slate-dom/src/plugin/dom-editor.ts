@@ -22,6 +22,7 @@ import {
   DOMRange,
   DOMSelection,
   DOMStaticRange,
+  DOMText,
   getSelection,
   hasShadowRoot,
   isAfter,
@@ -1412,7 +1413,7 @@ const findDOMPointInElement = (
         // text element, causing domRange.getBoundingClientRect() calls on a collapsed
         // selection to return incorrect zero values (https://bugs.chromium.org/p/chromium/issues/detail?id=435438)
         // which will cause issues when scrolling to it.
-        domText instanceof window.Text ? domText : nextText,
+        domText instanceof DOMText ? domText : nextText,
         nextText.textContent?.startsWith('\uFEFF') ? 1 : 0,
       ]
       break
