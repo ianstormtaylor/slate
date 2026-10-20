@@ -5,8 +5,8 @@ import { Editor } from '../interfaces/editor'
 
 /**
  * Get the "dirty" paths generated from an operation.
+ * @ignore
  */
-/** @ignore */
 export const getDirtyPaths: WithEditorFirstArg<Editor['getDirtyPaths']> = (
   editor,
   op

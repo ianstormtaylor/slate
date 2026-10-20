@@ -65,7 +65,7 @@ export interface BaseEditor {
   /**
    * Return the properties for the new right-hand node when `Transforms.splitNodes` splits `node` at its current `path`. The default is `Node.extractProps(node)`, which copies every property except `children` and `text`. The original left-hand node keeps its properties.
    *
-   * Override this method to drop or replace properties such as element IDs. Return the full set of properties to keep, including text marks when splitting a text node; omit `children` and `text`. Commands that use `splitNodes`, including `insertBreak`, `insertFragment` and `setNodes` with `split: true`, use this method too, as does `wrapNodes` when it splits an inline element. See [Node IDs](../../concepts/02-nodes.md#node-ids) for a plugin example.
+   * Override this method to drop or replace properties such as element IDs. Return the full set of properties to keep, including text marks when splitting a text node; omit `children` and `text`. Commands that use `splitNodes`, including `insertBreak`, `insertFragment` and `setNodes` with `split: true`, use this method too, as does `wrapNodes` when it splits an inline element. See [Node IDs](/concepts/02-nodes.md#node-ids) for a plugin example.
    */
   getSplitProperties: (node: Element | Text, path: Path) => Partial<Node>
 
@@ -772,7 +772,7 @@ export interface BaseEditor {
   /**
    * Get the range of the word around a point, within its block. Defaults to the selection's focus. Returns `undefined` when the point isn't touching a word, is inside a void, or there is no selection.
    *
-   * `Editor.word` reads the editor's value, which doesn't include text an input method is still composing. In React, use {@link ReactEditor#getWord} to include it.
+   * `Editor.word` reads the editor's value, which doesn't include text an input method is still composing. In React, use `DOMEditor.getWord` to include it.
    */
   word(options?: EditorWordOptions): Range | undefined
 
