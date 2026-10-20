@@ -33,7 +33,7 @@ export function load(app) {
 
     const file = await readFile('./docs/summary-template.md', 'utf8')
     await writeFile(
-      './docs/summary.md',
+      './docs/SUMMARY.md',
       file.replace('<!-- API PAGES -->', lines),
       'utf8'
     )
