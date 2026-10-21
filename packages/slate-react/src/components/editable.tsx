@@ -34,6 +34,7 @@ import { ReadOnlyContext } from '../hooks/use-read-only'
 import { useSlate } from '../hooks/use-slate'
 import { useTrackUserInput } from '../hooks/use-track-user-input'
 import { useCompositionDOM } from '../hooks/use-composition-dom'
+import { useNativeFormatDOM } from '../hooks/use-native-format-dom'
 import { getPointAboveTrailingNewline } from '../utils/trailing-newline'
 import { getCharacterMoveUnit } from '../utils/character-move'
 import { removeStrayComposition } from '../utils/misplaced-composition'
@@ -253,6 +254,7 @@ export const Editable = forwardRef(
     >()
     const processing = useRef(false)
     const compositionDOM = useCompositionDOM(editor)
+    const nativeFormatDOM = useNativeFormatDOM(editor)
     const deleteOnCompositionEndRef = useRef(false)
 
     const { onUserInput, receivedUserInput } = useTrackUserInput()
@@ -1357,6 +1359,25 @@ export const Editable = forwardRef(
                       return
                     }
 
+                    if (
+                      (event.nativeEvent as InputEvent).inputType?.startsWith(
+                        'format'
+                      )
+                    ) {
+                      const domSelection = getSelection(
+                        ReactEditor.findDocumentOrShadowRoot(editor)
+                      )
+                      const range =
+                        domSelection &&
+                        ReactEditor.resolveSlateRange(editor, domSelection)
+                      nativeFormatDOM.revert()
+                      if (domSelection && range) {
+                        Transforms.select(editor, range)
+                        restoreDomSelection(editor, domSelection, state)
+                      }
+                      return
+                    }
+
                     // Flush native operations, as native events will have propogated
                     // and we can correctly compare DOM text values in components
                     // to stop rendering, so that browser functions like autocorrect
@@ -1406,7 +1427,13 @@ export const Editable = forwardRef(
                       )
                     }
                   },
-                  [readOnly, attributes.onInput, editor, compositionDOM]
+                  [
+                    readOnly,
+                    attributes.onInput,
+                    editor,
+                    compositionDOM,
+                    nativeFormatDOM,
+                  ]
                 )}
                 onBlur={useCallback(
                   (event: React.FocusEvent<HTMLDivElement>) => {
