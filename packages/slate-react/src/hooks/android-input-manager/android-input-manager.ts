@@ -64,23 +64,25 @@ export type CreateAndroidInputManagerOptions = {
 export const EDITOR_TO_FLUSH_DEFERRED_DIFFS = new WeakMap<Editor, () => void>()
 
 export type AndroidInputManager = {
-  flush(): void
-  flushDeferredDiffs(): void
-  scheduleFlush(): void
+  flush: () => void
+  flushDeferredDiffs: () => void
+  scheduleFlush: () => void
 
-  hasPendingDiffs(): boolean
-  hasPendingAction(): boolean
-  hasPendingChanges(): boolean
-  isFlushing(): boolean | 'action'
+  hasPendingDiffs: () => boolean
+  hasPendingAction: () => boolean
+  hasPendingChanges: () => boolean
+  isFlushing: () => boolean | 'action'
 
-  handleUserSelect(range: Range | null): void
-  handleCompositionEnd(event: React.CompositionEvent<HTMLDivElement>): void
-  handleCompositionStart(event: React.CompositionEvent<HTMLDivElement>): void
-  handleDOMBeforeInput(event: InputEvent): void
-  handleKeyDown(event: React.KeyboardEvent<HTMLDivElement>): void
+  handleUserSelect: (range: Range | null) => void
+  handleCompositionEnd: (event: React.CompositionEvent<HTMLDivElement>) => void
+  handleCompositionStart: (
+    event: React.CompositionEvent<HTMLDivElement>
+  ) => void
+  handleDOMBeforeInput: (event: InputEvent) => void
+  handleKeyDown: (event: React.KeyboardEvent<HTMLDivElement>) => void
 
-  handleDomMutations(mutations: MutationRecord[]): void
-  handleInput(): void
+  handleDomMutations: (mutations: MutationRecord[]) => void
+  handleInput: () => void
 }
 
 export function createAndroidInputManager({

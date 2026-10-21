@@ -3,9 +3,9 @@ import { ReactEditor } from '../../plugin/react-editor'
 import { isDOMElement, isTrackedMutation } from 'slate-dom'
 
 export type RestoreDOMManager = {
-  registerMutations(mutations: MutationRecord[]): void
-  restoreDOM(): void
-  clear(): void
+  registerMutations: (mutations: MutationRecord[]) => void
+  restoreDOM: () => void
+  clear: () => void
 }
 
 const isPlaceholderNode = (node: Node) =>
