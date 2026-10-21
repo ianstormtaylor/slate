@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.147.2
+
+### Patch Changes
+
+- [#6344](https://github.com/ianstormtaylor/slate/pull/6344) [`18f1927`](https://github.com/ianstormtaylor/slate/commit/18f19277a4185cfdeacdff4a43dac09a4c01269a) Thanks [@dylans](https://github.com/dylans)! - Chrome's Writing Direction menu command no longer breaks the editor. The command changes the DOM without a `beforeinput` event, wrapping text in a `direction` span, so React later threw `NotFoundError` on `removeChild` and the editor unmounted. Slate now undoes the DOM changes of any `format*` input it was not asked to handle first and keeps the selection.
+
 ## 0.147.1
 
 ### Patch Changes
