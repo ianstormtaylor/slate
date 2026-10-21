@@ -55,19 +55,59 @@ import {
  * @noInheritDoc
  */
 export interface DOMEditor extends BaseEditor {
-  hasEditableTarget(
+  /**
+   * @group Methods
+   * @category Queries
+   */
+  hasEditableTarget: (
     editor: DOMEditor,
     target: EventTarget | null
-  ): target is DOMNode
-  hasSelectableTarget(editor: DOMEditor, target: EventTarget | null): boolean
-  hasTarget(editor: DOMEditor, target: EventTarget | null): target is DOMNode
-  insertData(data: DataTransfer): void
-  insertFragmentData(data: DataTransfer): boolean
-  insertTextData(data: DataTransfer): boolean
-  isTargetInsideNonReadonlyVoid(
+  ) => target is DOMNode
+
+  /**
+   * @group Methods
+   * @category Queries
+   */
+  hasSelectableTarget: (
     editor: DOMEditor,
     target: EventTarget | null
-  ): boolean
+  ) => boolean
+
+  /**
+   * @group Methods
+   * @category Queries
+   */
+  hasTarget: (
+    editor: DOMEditor,
+    target: EventTarget | null
+  ) => target is DOMNode
+
+  /**
+   * @group Methods
+   * @category Commands
+   */
+  insertData: (data: DataTransfer) => void
+
+  /**
+   * @group Methods
+   * @category Commands
+   */
+  insertFragmentData: (data: DataTransfer) => boolean
+
+  /**
+   * @group Methods
+   * @category Commands
+   */
+  insertTextData: (data: DataTransfer) => boolean
+
+  /**
+   * @group Methods
+   * @category Queries
+   */
+  isTargetInsideNonReadonlyVoid: (
+    editor: DOMEditor,
+    target: EventTarget | null
+  ) => boolean
 
   /**
    * Where DOM mapping errors can be reported without throwing. Slate itself doesn't report anything here at the moment: the `resolve` lookups return `null` quietly, since a miss is often ordinary. By default it hands the error to the browser's `reportError`, so it shows in the console and reaches `window.onerror`. Override it to send errors to your own logging:
@@ -81,13 +121,18 @@ export interface DOMEditor extends BaseEditor {
    * ```
    *
    * The `toDOM*` and `toSlate*` lookups still throw; use the `resolve` versions to get `null` instead.
+   * @group Events
    */
-  onDOMError(error: unknown): void
+  onDOMError: (error: unknown) => void
 
-  setFragmentData(
+  /**
+   * @group Methods
+   * @category Queries
+   */
+  setFragmentData: (
     data: DataTransfer,
     originEvent?: 'drag' | 'copy' | 'cut'
-  ): void
+  ) => void
 }
 
 export interface DOMEditorInterface {

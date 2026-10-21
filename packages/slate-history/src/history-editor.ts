@@ -20,14 +20,24 @@ export interface HistoryEditor extends BaseEditor {
    * Undo to the previous saved state.
    *
    * A saved `selectionBefore` is restored even if the current selection is null, such as after removing the last block. Redo restores that saved selection before replaying the batch. Standalone selection changes are not saved, so redo does not replay cursor moves made after its operations.
+   * @group Methods
+   * @category Commands
    */
-  undo(): void
+  undo: () => void
 
-  /** Redo to the next saved state. */
-  redo(): void
+  /**
+   * Redo to the next saved state. *
+   * @group Methods
+   * @category Commands
+   */
+  redo: () => void
 
-  /** Push a batch of operations as either `undos` or `redos` onto `editor.history.undos` or `editor.history.redos` */
-  writeHistory(stack: 'undos' | 'redos', batch: any): void
+  /**
+   * Push a batch of operations as either `undos` or `redos` onto `editor.history.undos` or `editor.history.redos` *
+   * @group Methods
+   * @category Commands
+   */
+  writeHistory: (stack: 'undos' | 'redos', batch: any) => void
 }
 
 // eslint-disable-next-line no-redeclare

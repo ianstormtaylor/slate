@@ -54,26 +54,42 @@ export interface BaseEditor {
 
   // Overrideable core methods.
 
-  /** Apply an operation in the editor. */
-  apply(operation: Operation): void
+  /**
+   * Apply an operation in the editor. *
+   * @group Methods
+   * @category Core Methods
+   */
+  apply: (operation: Operation) => void
 
-  getDirtyPaths(operation: Operation): Path[]
+  /**
+   * @group Methods
+   * @category Normalization
+   */
+  getDirtyPaths: (operation: Operation) => Path[]
 
-  /** Returns the fragment at the current selection. Used when cutting or copying, as an example, to get the fragment at the current selection. */
-  getFragment(): Descendant[]
+  /**
+   * Returns the fragment at the current selection. Used when cutting or copying, as an example, to get the fragment at the current selection. *
+   * @group Methods
+   * @category Queries
+   */
+  getFragment: () => Descendant[]
 
   /**
    * Return the properties for the new right-hand node when `Transforms.splitNodes` splits `node` at its current `path`. The default is `Node.extractProps(node)`, which copies every property except `children` and `text`. The original left-hand node keeps its properties.
    *
    * Override this method to drop or replace properties such as element IDs. Return the full set of properties to keep, including text marks when splitting a text node; omit `children` and `text`. Commands that use `splitNodes`, including `insertBreak`, `insertFragment` and `setNodes` with `split: true`, use this method too, as does `wrapNodes` when it splits an inline element. See [Node IDs](/concepts/02-nodes.md#node-ids) for a plugin example.
+   * @group Methods
+   * @category Queries
    */
-  getSplitProperties(node: Element | Text, path: Path): Partial<Node>
+  getSplitProperties: (node: Element | Text, path: Path) => Partial<Node>
 
   /**
    * Check if a value is a read-only `Element` object.
    * @see {@link EditorInterface#isElementReadOnly} - A static version of this method.
+   * @group Methods
+   * @category Queries
    */
-  isElementReadOnly(element: Element): boolean
+  isElementReadOnly: (element: Element) => boolean
 
   /**
    * Mark elements whose content must not flow across their edges, such as table cells. Slate's default returns `false`.
@@ -91,58 +107,76 @@ export interface BaseEditor {
    * editor.isIsolated = element =>
    *   element.type === 'table-cell' || isIsolated(element)
    * ```
+   * @group Methods
+   * @category Queries
    */
-  isIsolated(element: Element): boolean
+  isIsolated: (element: Element) => boolean
 
   /**
    * Choose whether insertion at an inline edge belongs inside the inline or in the adjacent text outside it. The rule also applies when the caret names that adjacent text. Defaults to `null`, retaining the current point. An `'inside'` rule never moves a caret into a void, read-only, or non-selectable inline.
 
    * At shared boundaries, the outermost inline edge takes precedence. Between adjacent inlines separated by empty text, rules are considered from left to right; the first non-null rule wins. Empty non-void inlines use their start edge, and an outside rule uses the text before the empty inline. These tie rules keep repeated resolution stable.
+   * @group Methods
+   * @category Queries
    */
-  inlineEdgeAffinity(
+  inlineEdgeAffinity: (
     element: Element,
     edge: 'start' | 'end'
-  ): 'inside' | 'outside' | null
+  ) => 'inside' | 'outside' | null
 
   /**
    * Choose which of two sibling text leaves receives insertion at their shared boundary. `'backward'` uses the end of `before`; `'forward'` uses the start of `after`. Defaults to `null`, retaining the current point. This rule runs after inline affinity and determines the receiving leaf’s marks reported by `Editor.marks`.
+   * @group Methods
+   * @category Queries
    */
-  leafEdgeAffinity(before: Text, after: Text): 'backward' | 'forward' | null
+  leafEdgeAffinity: (before: Text, after: Text) => 'backward' | 'forward' | null
 
   /**
    * Check if a value is a selectable `Element` object.
    * @see {@link EditorInterface#isSelectable} - A static version of this method.
+   * @group Methods
+   * @category Queries
    */
-  isSelectable(element: Element): boolean
+  isSelectable: (element: Element) => boolean
 
   /**
    * Tells which void nodes accept marks. Slate's default implementation
    * returns `false`, but if some void elements support formatting, override
    * this function to include them.
+   * @group Methods
+   * @category Queries
    */
-  markableVoid(element: Element): boolean
+  markableVoid: (element: Element) => boolean
 
   /**
    * Normalize a node according to the schema.
    * @see {@link EditorInterface#normalize} - A static version of this method.
+   * @group Methods
+   * @category Normalization
    */
-  normalizeNode(
+  normalizeNode: (
     entry: NodeEntry,
     options?: {
       operation?: Operation
       fallbackElement?: () => Element
       force?: boolean
     }
-  ): void
+  ) => void
 
-  /** Called when there is a change in the editor. */
-  onChange(options?: { operation?: Operation }): void
+  /**
+   * Called when there is a change in the editor. *
+   * @group Methods
+   * @category Events
+   */
+  onChange: (options?: { operation?: Operation }) => void
 
   /**
    * Override this method to prevent normalizing the editor.
    * @see {@link EditorInterface#isNormalizing} - A static version of this method.
+   * @group Methods
+   * @category Normalization
    */
-  shouldNormalize({
+  shouldNormalize: ({
     iteration,
     dirtyPaths,
     operation,
@@ -151,7 +185,7 @@ export interface BaseEditor {
     initialDirtyPathsLength: number
     dirtyPaths: Path[]
     operation?: Operation
-  }): boolean
+  }) => boolean
 
   // Overrideable core transforms.
 
@@ -161,62 +195,83 @@ export interface BaseEditor {
    * selection is currently collapsed, the marks will be added to the
    * `editor.marks` property instead, and applied when text is inserted next.
    * @see {@link EditorInterface#addMark} - A static version of this method.
+   * @group Methods
+   * @category Commands
    */
-  addMark(key: string, value: any): void
+  addMark: (key: string, value: any) => void
 
   /**
    * Collapse the selection.
    * @param options Type also exported as `SelectionCollapseOptions`
    * @see {@link TransformsInterface#collapse} - A static version of this method.
+   * @group Methods
+   * @category Commands
    */
-  collapse(options?: SelectionCollapseOptions): void
+  collapse: (options?: SelectionCollapseOptions) => void
 
   /**
    * Delete content in the editor.
    * @param options Type also exported as `TextDeleteOptions`
    * @see {@link TransformsInterface#delete} - A static version of this method.
+   * @group Methods
+   * @category Commands
    */
-  delete(options?: TextDeleteOptions): void
+  delete: (options?: TextDeleteOptions) => void
 
   /**
    * Delete content in the editor backward from the current selection.
    * @see {@link EditorInterface#deleteBackward} - A static version of this method.
+   * @group Methods
+   * @category Commands
    */
-  deleteBackward(unit: TextUnit): void
+  deleteBackward: (unit: TextUnit) => void
 
   /**
    * Delete content in the editor forward from the current selection.
    * @see {@link EditorInterface#deleteForward} - A static version of this method.
+   * @group Methods
+   * @category Commands
    */
-  deleteForward(unit: TextUnit): void
+  deleteForward: (unit: TextUnit) => void
 
   /**
    * Delete the content of the current selection.
    * @param options Type also exported as `EditorFragmentDeletionOptions`
    * @see {@link EditorInterface#deleteFragment} - A static version of this method.
+   * @group Methods
+   * @category Commands
    */
-  deleteFragment(options?: EditorFragmentDeletionOptions): void
+  deleteFragment: (options?: EditorFragmentDeletionOptions) => void
 
   /**
    * Unset the selection.
    * @see {@link TransformsInterface#deselect} - A static version of this method.
+   * @group Methods
+   * @category Commands
    */
-  deselect(): void
+  deselect: () => void
 
   /**
    * Insert a block break at the current selection. If the selection is
    * currently expanded, delete it first.
    * @see {@link EditorInterface#insertBreak} - A static version of this method.
+   * @group Methods
+   * @category Commands
    */
-  insertBreak(): void
+  insertBreak: () => void
 
   /**
    * Insert a fragment at the current selection. If the selection is currently
    * expanded, delete it first.
    * @param options Type also exported as `TextInsertFragmentOptions`
    * @see {@link EditorInterface#insertFragment} - A static version of this method.
+   * @group Methods
+   * @category Commands
    */
-  insertFragment(fragment: Node[], options?: TextInsertFragmentOptions): void
+  insertFragment: (
+    fragment: Node[],
+    options?: TextInsertFragmentOptions
+  ) => void
 
   /**
    * Insert a node at the current selection. If the selection is currently
@@ -224,11 +279,13 @@ export interface BaseEditor {
    *
    * @param options Type also exported as `NodeInsertNodesOptions<T>`
    * @see {@link EditorInterface#insertNode} - A static version of this method.
+   * @group Methods
+   * @category Commands
    */
-  insertNode<T extends Node>(
+  insertNode: <T extends Node>(
     node: Node,
     options?: NodeInsertNodesOptions<T>
-  ): void
+  ) => void
 
   /**
    * Insert nodes in the editor at the specified location or (if not defined)
@@ -236,79 +293,95 @@ export interface BaseEditor {
    *
    * @param options Type also exported as `NodeInsertNodesOptions<T>`
    * @see {@link TransformsInterface#insertNodes} - A static version of this method.
+   * @group Methods
+   * @category Commands
    */
-  insertNodes<T extends Node>(
+  insertNodes: <T extends Node>(
     nodes: Node | Node[],
     options?: NodeInsertNodesOptions<T>
-  ): void
+  ) => void
 
   /**
    * Insert a soft break at the current selection. If the selection is
    * currently expanded, delete it first.
    * @see {@link EditorInterface#insertSoftBreak} - A static version of this method.
+   * @group Methods
+   * @category Commands
    */
-  insertSoftBreak(): void
+  insertSoftBreak: () => void
 
   /**
    * Insert text at the current selection. If the selection is currently
    * expanded, delete it first.
    * @param options Type also exported as `TextInsertTextOptions`
    * @see {@link EditorInterface#insertText} - A static version of this method.
+   * @group Methods
+   * @category Commands
    */
-  insertText(text: string, options?: TextInsertTextOptions): void
+  insertText: (text: string, options?: TextInsertTextOptions) => void
 
   /**
    * Lift nodes at a specific location upwards in the document tree, splitting
    * their parent in two if necessary.
    * @see {@link TransformsInterface#liftNodes} - A static version of this method.
+   * @group Methods
+   * @category Commands
    */
-  liftNodes<T extends Node>(options?: {
+  liftNodes: <T extends Node>(options?: {
     at?: Location
     match?: NodeMatch<T>
     mode?: MaximizeMode
     voids?: boolean
-  }): void
+  }) => void
 
   /**
    * Merge a node at a location with the previous node of the same depth,
    * removing any empty containing nodes after the merge if necessary.
    * @see {@link TransformsInterface#mergeNodes} - A static version of this method.
+   * @group Methods
+   * @category Commands
    */
-  mergeNodes<T extends Node>(options?: {
+  mergeNodes: <T extends Node>(options?: {
     at?: Location
     match?: NodeMatch<T>
     mode?: RangeMode
     hanging?: boolean
     voids?: boolean
-  }): void
+  }) => void
 
   /**
    * Move the selection's point forward or backward.
    * @param options Type also exported as `SelectionMoveOptions`
    * @see {@link TransformsInterface#move} - A static version of this method.
+   * @group Methods
+   * @category Commands
    */
-  move(options?: SelectionMoveOptions): void
+  move: (options?: SelectionMoveOptions) => void
 
   /**
    * Move the nodes from an origin to a destination. A destination must be specified in the `options`. If no origin is specified, move the selection.
    *
    * `to` is the path the node ends up at once the move is done, not the path it is inserted before. For example, with four blocks `1 2 3 4`, moving `[0]` to `[2]` gives `2 3 1 4`. When `match` selects several nodes, they are moved one at a time, each to `to`.
    * @see {@link TransformsInterface#moveNodes} - A static version of this method.
+   * @group Methods
+   * @category Commands
    */
-  moveNodes<T extends Node>(options: {
+  moveNodes: <T extends Node>(options: {
     at?: Location
     match?: NodeMatch<T>
     mode?: MaximizeMode
     to: Path
     voids?: boolean
-  }): void
+  }) => void
 
   /**
    * Normalize any dirty objects in the editor.
    * @param options Type also exported as `EditorNormalizeOptions`
    * @see {@link EditorInterface#normalize} - A static version of this method.
+   * @group Methods
+   * @category Normalization
    */
-  normalize(options?: EditorNormalizeOptions): void
+  normalize: (options?: EditorNormalizeOptions) => void
 
   /**
    * Remove a custom property from the leaf text nodes within non-void nodes
@@ -316,26 +389,32 @@ export interface BaseEditor {
    * selection. If the selection is currently collapsed, the removal will be
    * stored on `editor.marks` and applied to the text inserted next.
    * @see {@link EditorInterface#removeMark} - A static version of this method.
+   * @group Methods
+   * @category Commands
    */
-  removeMark(key: string): void
+  removeMark: (key: string) => void
 
   /**
    * Remove the nodes at a specific location in the document.
    * @see {@link TransformsInterface#removeNodes} - A static version of this method.
+   * @group Methods
+   * @category Commands
    */
-  removeNodes<T extends Node>(options?: {
+  removeNodes: <T extends Node>(options?: {
     at?: Location
     match?: NodeMatch<T>
     mode?: RangeMode
     hanging?: boolean
     voids?: boolean
-  }): void
+  }) => void
 
   /**
    * Set the selection to a new value.
    * @see {@link TransformsInterface#select} - A static version of this method.
+   * @group Methods
+   * @category Commands
    */
-  select(target: Location): void
+  select: (target: Location) => void
 
   /**
    * Set properties of nodes at the specified location. If no location is specified, use the selection. Optional node properties can be set to `null` to unset them.
@@ -344,8 +423,10 @@ export interface BaseEditor {
    * If `props` contains `undefined` values, the node's corresponding property will also be set to `undefined` as opposed to ignored.
    *
    * `children` and `text` in `props` are ignored, since they hold a node's content rather than its properties. To change content, use `insertNodes`, `removeNodes` or the text transforms.
+   * @group Methods
+   * @category Commands
    */
-  setNodes<T extends Node>(
+  setNodes: <T extends Node>(
     props:
       | Partial<NullableProps<T>>
       | ((node: T, path: Path) => Partial<NullableProps<T>>),
@@ -360,7 +441,7 @@ export interface BaseEditor {
       merge?: PropsMerge
       replace?: boolean
     }
-  ): void
+  ) => void
 
   /**
    * Apply an external document through Slate operations. Delegates to `editor.setChildren`, so plugins can override the transform. Unchanged child prefixes and suffixes are retained, matched by identity or by deep equality, so a refetched copy of the document with one new block emits a single `insert_node`. Compatible nodes are updated recursively; text edits replace only the changed string middle. Deep-equal cloned values emit no operations.
@@ -371,48 +452,60 @@ export interface BaseEditor {
    *
    * To clear an editable document, pass a schema-valid empty block, for example `[{ type: 'paragraph', children: [{ text: '' }] }]`. `setChildren` itself accepts an empty root; it does not invent a block or reset history.
    * @see {@link TransformsInterface#setChildren} - A static version of this method.
+   * @group Methods
+   * @category Commands
    */
-  setChildren(children: Descendant[]): void
+  setChildren: (children: Descendant[]) => void
 
   /**
    * Manually set if the editor should currently be normalizing.
    *
    * Note: Using this incorrectly can leave the editor in an invalid state.
    * @see {@link EditorInterface#setNormalizing} - A static version of this method.
+   * @group Methods
+   * @category Normalization
    */
-  setNormalizing(isNormalizing: boolean): void
+  setNormalizing: (isNormalizing: boolean) => void
 
   /**
    * Set new properties on one of the selection's points.
    * @param options Type also exported as `SelectionSetPointOptions`
    * @see {@link TransformsInterface#setPoint} - A static version of this method.
+   * @group Methods
+   * @category Commands
    */
-  setPoint(props: Partial<Point>, options?: SelectionSetPointOptions): void
+  setPoint: (props: Partial<Point>, options?: SelectionSetPointOptions) => void
 
   /**
    * Set new properties on the selection.
    * @see {@link TransformsInterface#setSelection} - A static version of this method.
+   * @group Methods
+   * @category Commands
    */
-  setSelection(props: Partial<Selection>): void
+  setSelection: (props: Partial<Selection>) => void
 
   /**
    * Split the nodes at a specific location.
    * @see {@link TransformsInterface#splitNodes} - A static version of this method.
+   * @group Methods
+   * @category Commands
    */
-  splitNodes<T extends Node>(options?: {
+  splitNodes: <T extends Node>(options?: {
     at?: Location
     match?: NodeMatch<T>
     mode?: RangeMode
     always?: boolean
     height?: number
     voids?: boolean
-  }): void
+  }) => void
 
   /**
    * Unset properties on the nodes at a location.
    * @see {@link TransformsInterface#unsetNodes} - A static version of this method.
+   * @group Methods
+   * @category Commands
    */
-  unsetNodes<T extends Node>(
+  unsetNodes: <T extends Node>(
     props: string | string[],
     options?: {
       at?: Location
@@ -422,33 +515,39 @@ export interface BaseEditor {
       split?: boolean
       voids?: boolean
     }
-  ): void
+  ) => void
 
   /**
    * Unwrap the nodes at a location from a parent node, splitting the parent
    * if necessary to ensure that only the content in the range is unwrapped.
    * @see {@link TransformsInterface#unwrapNodes} - A static version of this method.
+   * @group Methods
+   * @category Commands
    */
-  unwrapNodes<T extends Node>(options?: {
+  unwrapNodes: <T extends Node>(options?: {
     at?: Location
     match?: NodeMatch<T>
     mode?: MaximizeMode
     split?: boolean
     voids?: boolean
-  }): void
+  }) => void
 
   /**
    * Call a function, deferring normalization until after it completes.
    * @see {@link EditorInterface#withoutNormalizing} - A static version of this method.
+   * @group Methods
+   * @category Normalization
    */
-  withoutNormalizing(fn: () => void): void
+  withoutNormalizing: (fn: () => void) => void
 
   /**
    * Wrap the nodes at a location in a new container node, splitting the edges
    * of the range first to ensure that only the content in the range is wrapped.
    * @see {@link TransformsInterface#wrapNodes} - A static version of this method.
+   * @group Methods
+   * @category Commands
    */
-  wrapNodes<T extends Node>(
+  wrapNodes: <T extends Node>(
     element: Element,
     options?: {
       at?: Location
@@ -457,7 +556,7 @@ export interface BaseEditor {
       split?: boolean
       voids?: boolean
     }
-  ): void
+  ) => void
 
   // Overrideable core queries.
 
@@ -465,236 +564,312 @@ export interface BaseEditor {
    * Get the ancestor above a location in the document.
    * @param options Type also exported as `EditorAboveOptions<T>`
    * @see {@link EditorInterface#above} - A static version of this method.
+   * @group Methods
+   * @category Queries
    */
-  above<T extends Ancestor>(
+  above: <T extends Ancestor>(
     options?: EditorAboveOptions<T>
-  ): NodeEntry<T> | undefined
+  ) => NodeEntry<T> | undefined
 
   /**
    * Get the point after a location.
    * @param options Type also exported as `EditorAfterOptions`
    * @see {@link EditorInterface#after} - A static version of this method.
+   * @group Methods
+   * @category Queries
    */
-  after(at: Location, options?: EditorAfterOptions): Point | undefined
+  after: (at: Location, options?: EditorAfterOptions) => Point | undefined
 
   /**
    * Get the point before a location.
    * @param options Type also exported as `EditorBeforeOptions`
    * @see {@link EditorInterface#before} - A static version of this method.
+   * @group Methods
+   * @category Queries
    */
-  before(at: Location, options?: EditorBeforeOptions): Point | undefined
+  before: (at: Location, options?: EditorBeforeOptions) => Point | undefined
 
   /**
    * Get the start and end points of a location.
    * @see {@link EditorInterface#edges} - A static version of this method.
+   * @group Methods
+   * @category Queries
    */
-  edges(at: Location): [Point, Point]
+  edges: (at: Location) => [Point, Point]
 
   /**
    * Match a read-only element in the current branch of the editor.
    * @param options Type also exported as `EditorElementReadOnlyOptions`
    * @see {@link EditorInterface#elementReadOnly} - A static version of this method.
+   * @group Methods
+   * @category Queries
    */
-  elementReadOnly(
+  elementReadOnly: (
     options?: EditorElementReadOnlyOptions
-  ): NodeEntry<Element> | undefined
+  ) => NodeEntry<Element> | undefined
 
   /**
    * Get the end point of a location.
    * @see {@link EditorInterface#end} - A static version of this method.
+   * @group Methods
+   * @category Queries
    */
-  end(at: Location): Point
+  end: (at: Location) => Point
 
   /**
    * Get the first node at a location.
    * @see {@link EditorInterface#first} - A static version of this method.
+   * @group Methods
+   * @category Queries
    */
-  first(at: Location): NodeEntry
+  first: (at: Location) => NodeEntry
 
   /**
    * Get the fragment at a location.
    * @see {@link EditorInterface#fragment} - A static version of this method.
+   * @group Methods
+   * @category Queries
    */
-  fragment(at: Location): Descendant[]
+  fragment: (at: Location) => Descendant[]
 
   /**
    * Get the marks that would be added to text at the current selection.
    *
    * If `editor.marks` is set (marks toggled with a collapsed selection), those are returned. With an expanded selection, it returns the marks of the first text node in the selection, skipping a node the selection only touches at its end, so it describes what typing over the selection would produce rather than marks shared by the whole selection. To check whether a mark applies to all of the selected text, iterate `Editor.nodes(editor, { match: Text.isText })` and compare each node.
    * @see {@link EditorInterface#marks} - A static version of this method.
+   * @group Methods
+   * @category Queries
    */
-  getMarks(): Omit<Text, 'text'> | null
+  getMarks: () => Omit<Text, 'text'> | null
 
   /**
    * Check if a node has block children.
    * @see {@link EditorInterface#hasBlocks} - A static version of this method.
+   * @group Methods
+   * @category Queries
    */
-  hasBlocks(element: Element): boolean
+  hasBlocks: (element: Element) => boolean
 
   /**
    * Check if a node has inline and text children.
    * @see {@link EditorInterface#hasInlines} - A static version of this method.
+   * @group Methods
+   * @category Queries
    */
-  hasInlines(element: Element): boolean
+  hasInlines: (element: Element) => boolean
 
   /**
    * @see {@link EditorInterface#hasPath} - A static version of this method.
+   * @group Methods
+   * @category Queries
    */
-  hasPath(path: Path): boolean
+  hasPath: (path: Path) => boolean
 
-  hasRange(range: Range): boolean
+  /**
+   * @group Methods
+   * @category Queries
+   */
+  hasRange: (range: Range) => boolean
 
   /**
    * Check if a node has text children.
    * @see {@link EditorInterface#hasTexts} - A static version of this method.
+   * @group Methods
+   * @category Queries
    */
-  hasTexts(element: Element): boolean
+  hasTexts: (element: Element) => boolean
 
-  insertionPoint(point: Point): Point
+  /**
+   * @group Methods
+   * @category Queries
+   */
+  insertionPoint: (point: Point) => Point
 
   /**
    * Check if an element is a block element. It only accepts an `Element`, so check other values with `Element.isElement` first.
    * @see {@link EditorInterface#isBlock} - A static version of this method.
+   * @group Methods
+   * @category Queries
    */
-  isBlock(value: Element): boolean
+  isBlock: (value: Element) => boolean
 
   /**
    * Check if a point is an edge of a location.
    * @see {@link EditorInterface#isEdge} - A static version of this method.
+   * @group Methods
+   * @category Queries
    */
-  isEdge(point: Point, at: Location): boolean
+  isEdge: (point: Point, at: Location) => boolean
 
   /**
    * Check if an element is empty, accounting for void nodes.
    * @see {@link EditorInterface#isEmpty} - A static version of this method.
+   * @group Methods
+   * @category Queries
    */
-  isEmpty(element: Element): boolean
+  isEmpty: (element: Element) => boolean
 
   /**
    * Check if a point is the end point of a location.
    * @see {@link EditorInterface#isEnd} - A static version of this method.
+   * @group Methods
+   * @category Queries
    */
-  isEnd(point: Point, at: Location): boolean
+  isEnd: (point: Point, at: Location) => boolean
 
   /**
    * Check if an element is an inline element. It only accepts an `Element`, so check other values with `Element.isElement` first.
    * @see {@link EditorInterface#isInline} - A static version of this method.
+   * @group Methods
+   * @category Queries
    */
-  isInline(value: Element): boolean
+  isInline: (value: Element) => boolean
 
   /**
    * Check if the editor is currently normalizing after each operation.
    * @see {@link EditorInterface#isNormalizing} - A static version of this method.
+   * @group Methods
+   * @category Queries
    */
-  isNormalizing(): boolean
+  isNormalizing: () => boolean
 
   /**
    * Check if a point is the start point of a location.
    * @see {@link EditorInterface#isStart} - A static version of this method.
+   * @group Methods
+   * @category Queries
    */
-  isStart(point: Point, at: Location): boolean
+  isStart: (point: Point, at: Location) => boolean
 
   /**
    * Check if an element is a void element. It only accepts an `Element`, so check other values with `Element.isElement` first.
    * @see {@link EditorInterface#isVoid} - A static version of this method.
+   * @group Methods
+   * @category Queries
    */
-  isVoid(value: Element): boolean
+  isVoid: (value: Element) => boolean
 
   /**
    * Get the last node at a location.
    * @see {@link EditorInterface#last} - A static version of this method.
+   * @group Methods
+   * @category Queries
    */
-  last(at: Location): NodeEntry
+  last: (at: Location) => NodeEntry
 
   /**
    * Get the leaf text node at a location.
    * @param options Type also exported as `EditorLeafOptions`
    * @see {@link EditorInterface#leaf} - A static version of this method.
+   * @group Methods
+   * @category Queries
    */
-  leaf(at: Location, options?: EditorLeafOptions): NodeEntry<Text>
+  leaf: (at: Location, options?: EditorLeafOptions) => NodeEntry<Text>
 
   /**
    * Iterate through all of the levels at a location.
    * @param options Type also exported as `EditorLevelsOptions<T>`
    * @see {@link EditorInterface#levels} - A static version of this method.
+   * @group Methods
+   * @category Queries
    */
-  levels<T extends Node>(
+  levels: <T extends Node>(
     options?: EditorLevelsOptions<T>
-  ): Generator<NodeEntry<T>, void, undefined>
+  ) => Generator<NodeEntry<T>, void, undefined>
 
   /**
    * Get the matching node in the branch of the document after a location.
    * @param options Type also exported as `EditorNextOptions<T>`
    * @see {@link EditorInterface#next} - A static version of this method.
+   * @group Methods
+   * @category Queries
    */
-  next<T extends Descendant>(
+  next: <T extends Descendant>(
     options?: EditorNextOptions<T>
-  ): NodeEntry<T> | undefined
+  ) => NodeEntry<T> | undefined
 
   /**
    * Get the node at a location.
    * @param options Type also exported as `EditorNodeOptions`
    * @see {@link EditorInterface#node} - A static version of this method.
+   * @group Methods
+   * @category Queries
    */
-  node(at: Location, options?: EditorNodeOptions): NodeEntry
+  node: (at: Location, options?: EditorNodeOptions) => NodeEntry
 
   /**
    * Iterate through all of the nodes in the Editor.
    * @param options Type also exported as `EditorNodesOptions<T>`
    * @see {@link EditorInterface#nodes} - A static version of this method.
+   * @group Methods
+   * @category Queries
    */
-  nodes<T extends Node>(
+  nodes: <T extends Node>(
     options?: EditorNodesOptions<T>
-  ): Generator<NodeEntry<T>, void, undefined>
+  ) => Generator<NodeEntry<T>, void, undefined>
 
   /**
    * Get the parent node of a location.
    * @param options Type also exported as `EditorParentOptions`
    * @see {@link EditorInterface#parent} - A static version of this method.
+   * @group Methods
+   * @category Queries
    */
-  parent(at: Location, options?: EditorParentOptions): NodeEntry<Ancestor>
+  parent: (at: Location, options?: EditorParentOptions) => NodeEntry<Ancestor>
 
   /**
    * Get the path of a location.
    * @param options Type also exported as `EditorPathOptions`
    * @see {@link EditorInterface#path} - A static version of this method.
+   * @group Methods
+   * @category Queries
    */
-  path(at: Location, options?: EditorPathOptions): Path
+  path: (at: Location, options?: EditorPathOptions) => Path
 
   /**
    * Create a mutable ref for a `Path` object, which will stay in sync as new
    * operations are applied to the editor.
    * @param options Type also exported as `EditorPathRefOptions`
    * @see {@link EditorInterface#pathRef} - A static version of this method.
+   * @group Methods
+   * @category Queries
    */
-  pathRef(path: Path, options?: EditorPathRefOptions): PathRef
+  pathRef: (path: Path, options?: EditorPathRefOptions) => PathRef
 
   /**
    * Get the set of currently tracked path refs of the editor.
    * @see {@link EditorInterface#pathRefs} - A static version of this method.
+   * @group Methods
+   * @category Queries
    */
-  pathRefs(): Set<PathRef>
+  pathRefs: () => Set<PathRef>
 
   /**
    * Get the start or end point of a location.
    * @param options Type also exported as `EditorPointOptions`
    * @see {@link EditorInterface#point} - A static version of this method.
+   * @group Methods
+   * @category Queries
    */
-  point(at: Location, options?: EditorPointOptions): Point
+  point: (at: Location, options?: EditorPointOptions) => Point
 
   /**
    * Create a mutable ref for a `Point` object, which will stay in sync as new
    * operations are applied to the editor.
    * @param options Type also exported as `EditorPointRefOptions`
    * @see {@link EditorInterface#pointRef} - A static version of this method.
+   * @group Methods
+   * @category Queries
    */
-  pointRef(point: Point, options?: EditorPointRefOptions): PointRef
+  pointRef: (point: Point, options?: EditorPointRefOptions) => PointRef
 
   /**
    * Get the set of currently tracked point refs of the editor.
    * @see {@link EditorInterface#pointRefs} - A static version of this method.
+   * @group Methods
+   * @category Queries
    */
-  pointRefs(): Set<PointRef>
+  pointRefs: () => Set<PointRef>
 
   /**
    * Iterate through all of the positions in the document where a `Point` can be placed. The first `Point` returns is always the starting point followed by the next `Point` as determined by the `unit` option.
@@ -707,43 +882,57 @@ export interface BaseEditor {
    *
    * @param options Type also exported as `EditorPositionsOptions`
    * @see {@link EditorInterface#positions} - A static version of this method.
+   * @group Methods
+   * @category Queries
    */
-  positions(options?: EditorPositionsOptions): Generator<Point, void, undefined>
+  positions: (
+    options?: EditorPositionsOptions
+  ) => Generator<Point, void, undefined>
 
   /**
    * Get the matching node in the branch of the document before a location.
    * @param options Type also exported as `EditorPreviousOptions<T>`
    * @see {@link EditorInterface#previous} - A static version of this method.
+   * @group Methods
+   * @category Queries
    */
-  previous<T extends Node>(
+  previous: <T extends Node>(
     options?: EditorPreviousOptions<T>
-  ): NodeEntry<T> | undefined
+  ) => NodeEntry<T> | undefined
 
   /**
    * Get a range of a location.
    * @see {@link EditorInterface#range} - A static version of this method.
+   * @group Methods
+   * @category Queries
    */
-  range(at: Location, to?: Location): Range
+  range: (at: Location, to?: Location) => Range
 
   /**
    * Create a mutable ref for a `Range` object, which will stay in sync as new
    * operations are applied to the editor.
    * @param options Type also exported as `EditorRangeRefOptions`
    * @see {@link EditorInterface#rangeRef} - A static version of this method.
+   * @group Methods
+   * @category Queries
    */
-  rangeRef(range: Range, options?: EditorRangeRefOptions): RangeRef
+  rangeRef: (range: Range, options?: EditorRangeRefOptions) => RangeRef
 
   /**
    * Get the set of currently tracked range refs of the editor.
    * @see {@link EditorInterface#rangeRefs} - A static version of this method.
+   * @group Methods
+   * @category Queries
    */
-  rangeRefs(): Set<RangeRef>
+  rangeRefs: () => Set<RangeRef>
 
   /**
    * Get the start point of a location.
    * @see {@link EditorInterface#start} - A static version of this method.
+   * @group Methods
+   * @category Queries
    */
-  start(at: Location): Point
+  start: (at: Location) => Point
 
   /**
    * Get the text string content of a location.
@@ -752,38 +941,48 @@ export interface BaseEditor {
    * string, regardless of content, unless you pass in true for the voids option.
    * @param options Type also exported as `EditorStringOptions`
    * @see {@link EditorInterface#string} - A static version of this method.
+   * @group Methods
+   * @category Queries
    */
-  string(at: Location, options?: EditorStringOptions): string
+  string: (at: Location, options?: EditorStringOptions) => string
 
   /**
    * Convert a range into a non-hanging one.
    * @param options Type also exported as `EditorUnhangRangeOptions`
    * @see {@link EditorInterface#unhangRange} - A static version of this method.
+   * @group Methods
+   * @category Queries
    */
-  unhangRange(range: Range, options?: EditorUnhangRangeOptions): Range
+  unhangRange: (range: Range, options?: EditorUnhangRangeOptions) => Range
 
   /**
    * Match a void node in the current branch of the editor.
    * @param options Type also exported as `EditorVoidOptions`
    * @see {@link EditorInterface#void} - A static version of this method.
+   * @group Methods
+   * @category Queries
    */
-  void(options?: EditorVoidOptions): NodeEntry<Element> | undefined
+  void: (options?: EditorVoidOptions) => NodeEntry<Element> | undefined
 
   /**
    * Get the range of the word around a point, within its block. Defaults to the selection's focus. Returns `undefined` when the point isn't touching a word, is inside a void, or there is no selection.
    *
    * `Editor.word` reads the editor's value, which doesn't include text an input method is still composing. In React, use `DOMEditor.getWord` to include it.
+   * @group Methods
+   * @category Queries
    */
-  word(options?: EditorWordOptions): Range | undefined
+  word: (options?: EditorWordOptions) => Range | undefined
 
   /**
    * Determine whether or not to remove the previous node when merging.
    * @see {@link EditorInterface#shouldMergeNodesRemovePrevNode} - A static version of this method.
+   * @group Methods
+   * @category Queries
    */
-  shouldMergeNodesRemovePrevNode(
+  shouldMergeNodesRemovePrevNode: (
     prevNodeEntry: NodeEntry,
     curNodeEntry: NodeEntry
-  ): boolean
+  ) => boolean
 }
 
 export type Editor = ExtendedType<'Editor', BaseEditor>
