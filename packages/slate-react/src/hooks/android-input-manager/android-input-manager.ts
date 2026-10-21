@@ -15,7 +15,12 @@ import {
   TextDiff,
   verifyDiffState,
 } from 'slate-dom'
-import { isDOMSelection, isDOMNode, isTrackedMutation } from 'slate-dom'
+import {
+  isDOMSelection,
+  isDOMNode,
+  isTrackedMutation,
+  IS_FIREFOX,
+} from 'slate-dom'
 import {
   EDITOR_TO_FORCE_RENDER,
   EDITOR_TO_PENDING_ACTION,
@@ -96,6 +101,7 @@ export function createAndroidInputManager({
   let flushTimeoutId: ReturnType<typeof setTimeout> | null = null
   let actionTimeoutId: ReturnType<typeof setTimeout> | null = null
   let lastCompositionActivity = 0
+  let lastInsertText = 0
   let compositionCleared = false
   let hasUnrenderedMutations = false
 
@@ -479,6 +485,14 @@ export function createAndroidInputManager({
 
     const isNodeMapDirty = IS_NODE_MAP_DIRTY.get(editor)
     const { inputType: type } = event
+    const continuesFirefoxInsert =
+      IS_FIREFOX &&
+      type === 'insertText' &&
+      Date.now() - lastInsertText < RESOLVE_DELAY
+
+    if (type === 'insertText') {
+      lastInsertText = Date.now()
+    }
 
     if (type === 'insertCompositionText' || type === 'deleteCompositionText') {
       lastCompositionActivity = Date.now()
@@ -772,6 +786,15 @@ export function createAndroidInputManager({
         // the placeholder itself and thus includes the zero-width space inside edit events.
         if (EDITOR_TO_PENDING_INSERTION_MARKS.get(editor)) {
           text = text.replace('\uFEFF', '')
+        }
+
+        if (
+          continuesFirefoxInsert &&
+          editor.selection &&
+          !Range.equals(targetRange, editor.selection)
+        ) {
+          event.preventDefault()
+          return scheduleAction(() => Editor.insertText(editor, text))
         }
 
         // Pastes from the Android clipboard will generate `insertText` events.
