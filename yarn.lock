@@ -10548,7 +10548,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"slate-dom@npm:^0.146.1, slate-dom@workspace:*, slate-dom@workspace:packages/slate-dom":
+"slate-dom@npm:^0.147.0, slate-dom@workspace:*, slate-dom@workspace:packages/slate-dom":
   version: 0.0.0-use.local
   resolution: "slate-dom@workspace:packages/slate-dom"
   dependencies:
@@ -10713,7 +10713,7 @@ __metadata:
     react-dom: "npm:19.2.8"
     scroll-into-view-if-needed: "npm:^3.1.0"
     slate: "npm:^0.146.0"
-    slate-dom: "npm:^0.146.1"
+    slate-dom: "npm:^0.147.0"
     slate-history: "npm:^0.144.0"
     slate-hyperscript: "npm:^0.138.3"
     source-map-loader: "npm:^4.0.1"

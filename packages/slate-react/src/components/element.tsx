@@ -4,6 +4,7 @@ import { JSX } from 'react'
 import { Editor, Element as SlateElement, Node, DecoratedRange } from 'slate'
 import { ReactEditor, useReadOnly, useSlateStatic } from '..'
 import useChildren from '../hooks/use-children'
+import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
 import { isElementDecorationsEqual } from 'slate-dom'
 import {
   EDITOR_TO_KEY_TO_ELEMENT,
@@ -45,6 +46,16 @@ const getEmptyBlockDirection = (element: SlateElement) => {
   const after = parent.children.slice(index + 1)
   return findSiblingDirection(before) ?? findSiblingDirection(after)
 }
+
+const getMountedChildren = (editor: Editor, element: SlateElement): Node[] =>
+  Editor.isVoid(editor, element)
+    ? [Node.texts(element).next().value![0]]
+    : element.children
+
+const findUnmountedChild = (editor: Editor, element: SlateElement) =>
+  getMountedChildren(editor, element).findIndex(
+    child => !NODE_TO_ELEMENT.has(child)
+  )
 
 const defaultRenderElement = (props: RenderElementProps) => (
   <DefaultElement {...props} />
@@ -92,6 +103,24 @@ const Element = (props: {
     },
     [editor, key, element]
   )
+  useIsomorphicLayoutEffect(() => {
+    const index = findUnmountedChild(editor, element)
+
+    if (index !== -1) {
+      const type = (element as { type?: unknown }).type
+      const path = ReactEditor.findPath(editor, element)
+      editor.onDOMError(
+        new Error(
+          `renderElement didn't render the children of the ${
+            typeof type === 'string' ? `"${type}" ` : ''
+          }element at path ${JSON.stringify(
+            path
+          )}: child ${index} has no DOM node. Render the \`children\` prop inside the element.`
+        )
+      )
+    }
+  }, [editor, element])
+
   let children: React.ReactNode = useChildren({
     decorations,
     node: element,

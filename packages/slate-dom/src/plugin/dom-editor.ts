@@ -110,7 +110,7 @@ export interface DOMEditor extends BaseEditor {
   ) => boolean
 
   /**
-   * Where DOM mapping errors can be reported without throwing. Slate itself doesn't report anything here at the moment: the `resolve` lookups return `null` quietly, since a miss is often ordinary. By default it hands the error to the browser's `reportError`, so it shows in the console and reaches `window.onerror`. Override it to send errors to your own logging:
+   * Where DOM mapping errors are reported without throwing. Slate reports here when an element mounts and one of its children has no DOM node, usually because `renderElement` didn't render the `children` prop. The error names the element's `type` and path. The `resolve` lookups return `null` quietly, since a miss is often ordinary. By default it hands the error to the browser's `reportError`, so it shows in the console and reaches `window.onerror`. Override it to send errors to your own logging:
    *
    * ```javascript
    * const { onDOMError } = editor

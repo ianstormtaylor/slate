@@ -1,5 +1,17 @@
 # slate-react
 
+## 0.147.1
+
+### Patch Changes
+
+- [#6340](https://github.com/ianstormtaylor/slate/pull/6340) [`ca37117`](https://github.com/ianstormtaylor/slate/commit/ca37117d2102517aafd0b3642a53bab33a1daeb9) Thanks [@dylans](https://github.com/dylans)! - Report an element whose `renderElement` didn't render its `children` through `editor.onDOMError` when it mounts, naming the element's `type` and path. Before, nothing was reported, and lookups into the element returned `null` with no hint why.
+
+## 0.147.0
+
+### Minor Changes
+
+- [#6338](https://github.com/ianstormtaylor/slate/pull/6338) [`6c4cab5`](https://github.com/ianstormtaylor/slate/commit/6c4cab53efa2645ba797d12fcbce002e33477b0b) Thanks [@dylans](https://github.com/dylans)! - Add `resolveDOMNode`, `resolveSlateNode`, `resolveSlatePoint` and `resolveSlateRange`, which return `null` instead of throwing, like `resolveDOMPoint` and `resolveDOMRange`. Unlike `suppressThrow: true`, `resolveSlatePoint` and `resolveSlateRange` also return `null` before `Editable` mounts and for a selection with no range. The `to` lookups and `suppressThrow` are unchanged.
+
 ## 0.146.1
 
 ### Patch Changes

@@ -160,8 +160,50 @@ describe('DOM lookups that may miss', () => {
     expect(thrown.map(String)).toEqual([])
   })
 
+  test('reports an element that does not render its children when it mounts', () => {
+    const { errors } = setup([p('shown'), childless])
+
+    expect(errors.map(String)).toEqual([
+      'Error: renderElement didn\'t render the children of the "childless" element at path [1]: child 0 has no DOM node. Render the `children` prop inside the element.',
+    ])
+  })
+
+  test('does not report elements and voids that render their children', async () => {
+    const editor = withReact(createEditor())
+    editor.isVoid = element => (element as { type?: string }).type === 'image'
+    const errors: unknown[] = []
+    editor.onDOMError = error => errors.push(error)
+    act(() => {
+      render(
+        <Slate
+          editor={editor}
+          initialValue={[
+            p('a'),
+            { type: 'image', children: [{ text: '' }] } as Descendant,
+            {
+              type: 'image',
+              children: [
+                { type: 'caption', children: [{ text: 'c' }] } as Descendant,
+              ],
+            } as Descendant,
+            p('b'),
+          ]}
+        >
+          <Editable />
+        </Slate>
+      )
+    })
+    await act(async () => {
+      Transforms.insertText(editor, 'c', { at: { path: [3, 0], offset: 1 } })
+      Transforms.splitNodes(editor, { at: { path: [0, 0], offset: 1 } })
+    })
+
+    expect(errors).toEqual([])
+  })
+
   test('returns null for a range inside an element that does not render its children', () => {
     const { editor, errors } = setup([p('shown'), childless])
+    const reportedOnMount = errors.length
 
     expect(
       ReactEditor.resolveDOMRange(editor, {
@@ -169,6 +211,6 @@ describe('DOM lookups that may miss', () => {
         focus: { path: [1, 0], offset: 3 },
       })
     ).toBeNull()
-    expect(errors).toEqual([])
+    expect(errors).toHaveLength(reportedOnMount)
   })
 })
