@@ -25,16 +25,19 @@ const revertMutation = (mutation: MutationRecord) => {
 export const useNativeFormatDOM = (editor: ReactEditor) => {
   const nativeFormatDOM = useMemo(() => {
     let delivered: MutationRecord[] = []
-    const observer = new MutationObserver(mutations => {
+    let observer: MutationObserver | null = null
+
+    const deliver = (mutations: MutationRecord[]) => {
       if (delivered.length === 0) {
         setTimeout(() => {
           delivered = []
         })
       }
       delivered.push(...mutations)
-    })
+    }
 
     const observe = () => {
+      observer ??= new MutationObserver(deliver)
       observer.observe(ReactEditor.toDOMNode(editor, editor), {
         attributes: true,
         attributeOldValue: true,
@@ -46,12 +49,12 @@ export const useNativeFormatDOM = (editor: ReactEditor) => {
     }
 
     const disconnect = () => {
-      observer.disconnect()
+      observer?.disconnect()
       delivered = []
     }
 
     const revert = () => {
-      const mutations = [...delivered, ...observer.takeRecords()]
+      const mutations = [...delivered, ...(observer?.takeRecords() ?? [])]
       delivered = []
       mutations.reverse().forEach(revertMutation)
     }
