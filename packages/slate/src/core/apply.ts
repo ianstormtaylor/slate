@@ -8,23 +8,27 @@ import { WithEditorFirstArg } from '../utils/types'
 import { Editor } from '../interfaces/editor'
 import { isBatchingDirtyPaths } from './batch-dirty-paths'
 import { updateDirtyPaths } from './update-dirty-paths'
+import { Operation } from '../interfaces'
 
 export const apply: WithEditorFirstArg<Editor['apply']> = (editor, op) => {
-  for (const ref of Editor.pathRefs(editor)) {
-    PathRef.transform(ref, op)
+  if (Operation.transformsPaths(op)) {
+    for (const ref of Editor.pathRefs(editor)) {
+      PathRef.transform(ref, op)
+    }
   }
 
-  for (const ref of Editor.pointRefs(editor)) {
-    PointRef.transform(ref, op)
-  }
-
-  for (const ref of Editor.rangeRefs(editor)) {
-    RangeRef.transform(ref, op)
+  if (Operation.transformsPoints(op)) {
+    for (const ref of Editor.pointRefs(editor)) {
+      PointRef.transform(ref, op)
+    }
+    for (const ref of Editor.rangeRefs(editor)) {
+      RangeRef.transform(ref, op)
+    }
   }
 
   // update dirty paths
   if (!isBatchingDirtyPaths(editor)) {
-    const transform = Path.operationCanTransformPath(op)
+    const transform = Operation.transformsPaths(op)
       ? (p: Path) => Path.transform(p, op)
       : undefined
     updateDirtyPaths(
