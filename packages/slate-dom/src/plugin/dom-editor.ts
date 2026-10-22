@@ -1031,7 +1031,7 @@ export const DOMEditor: DOMEditorInterface = {
       }
     }
 
-    if (IS_ANDROID && !textNode && !exactMatch) {
+    if (IS_ANDROID && parentNode && !textNode && !exactMatch) {
       const node = parentNode.hasAttribute('data-slate-node')
         ? parentNode
         : parentNode.closest('[data-slate-node]')
