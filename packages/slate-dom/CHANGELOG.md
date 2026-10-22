@@ -1,5 +1,11 @@
 # slate-dom
 
+## 0.147.3
+
+### Patch Changes
+
+- [#6346](https://github.com/ianstormtaylor/slate/pull/6346) [`b34e312`](https://github.com/ianstormtaylor/slate/commit/b34e312328fc17442b5f01d925b28adf6e725106) Thanks [@dylans](https://github.com/dylans)! - On Android, `toSlatePoint` no longer throws `TypeError` reading `hasAttribute` of null when the DOM point is in a text node the keyboard has detached. It returns null with `suppressThrow`, and otherwise throws the usual "Cannot resolve a Slate point" error. Seen with Firefox for Android while accepting a keyboard suggestion in a new paragraph (#6343).
+
 ## 0.147.0
 
 ### Minor Changes
