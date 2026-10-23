@@ -61,13 +61,12 @@ export interface TextInsertTextOptions {
 
 export interface TextTransforms {
   /**
-   * Delete content in the editor.
+   * {@inheritDoc BaseEditor#delete}
    */
   delete(editor: Editor, options?: TextDeleteOptions): void
 
   /**
-   * Insert a fragment in the editor
-   * at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
+   * {@inheritDoc BaseEditor#insertFragment}
    */
   insertFragment(
     editor: Editor,
@@ -76,8 +75,7 @@ export interface TextTransforms {
   ): void
 
   /**
-   * Insert a string of text in the editor
-   * at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
+   * {@inheritDoc BaseEditor#insertText}
    */
   insertText(
     editor: Editor,

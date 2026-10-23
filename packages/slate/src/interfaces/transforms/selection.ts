@@ -21,36 +21,27 @@ export interface SelectionSetPointOptions {
 
 export interface SelectionTransforms {
   /**
-   * Collapse the selection.
+   * {@inheritDoc BaseEditor#collapse}
    */
   collapse(editor: Editor, options?: SelectionCollapseOptions): void
 
   /**
-   * Unset the selection.
+   * {@inheritDoc BaseEditor#deselect}
    */
   deselect(editor: Editor): void
 
   /**
-   * Move the selection's point forward or backward.
+   * {@inheritDoc BaseEditor#move}
    */
   move(editor: Editor, options?: SelectionMoveOptions): void
 
   /**
-   * Set the selection to a new value.
-   *
-   * @example
-   * For example, to set the selection to the entire contents of the editor:
-   * ```javascript
-   * Transforms.select(editor, {
-   *   anchor: Editor.start(editor, []),
-   *   focus: Editor.end(editor, []),
-   * })
-   * ```
+   * {@inheritDoc BaseEditor#select}
    */
   select(editor: Editor, target: Location): void
 
   /**
-   * Set new properties on one of the selection's points.
+   * {@inheritDoc BaseEditor#setPoint}
    */
   setPoint(
     editor: Editor,
@@ -59,7 +50,7 @@ export interface SelectionTransforms {
   ): void
 
   /**
-   * Set new properties on the selection.
+   * {@inheritDoc BaseEditor#setSelection}
    */
   setSelection(editor: Editor, props: Partial<Selection>): void
 }

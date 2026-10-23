@@ -2,6 +2,7 @@ import {
   Ancestor,
   Descendant,
   Element,
+  ElementInterface,
   ExtendedType,
   Location,
   Node,
@@ -164,7 +165,7 @@ export interface BaseEditor {
   ) => void
 
   /**
-   * Called when there is a change in the editor. *
+   * Called when there is a change in the editor.
    * @group Methods
    * @category Events
    */
@@ -172,7 +173,6 @@ export interface BaseEditor {
 
   /**
    * Override this method to prevent normalizing the editor.
-   * @see {@link EditorInterface#isNormalizing} - A static version of this method.
    * @group Methods
    * @category Normalization
    */
@@ -235,7 +235,14 @@ export interface BaseEditor {
   deleteForward: (unit: TextUnit) => void
 
   /**
-   * Delete the content of the current selection.
+   * Delete the content in the current selection.
+   *
+   * A hanging selection from the start of a block to the start of a following
+   * sibling removes the fully selected blocks, preserving the following block.
+   * Inside an element identified by `editor.isIsolated`, deletion continues to
+   * unhang the selection and retain the block structure. Custom
+   * `deleteFragment` overrides still control deletion.
+   *
    * @param options Type also exported as `EditorFragmentDeletionOptions`
    * @see {@link EditorInterface#deleteFragment} - A static version of this method.
    * @group Methods
@@ -261,8 +268,10 @@ export interface BaseEditor {
   insertBreak: () => void
 
   /**
-   * Insert a fragment at the current selection. If the selection is currently
-   * expanded, delete it first.
+   * Inserts a fragment at the specified location or (if not defined) the
+   * current selection or (if not defined) the end of the document. If the
+   * selection is currently expanded, delete it first.
+   *
    * @param options Type also exported as `TextInsertFragmentOptions`
    * @see {@link EditorInterface#insertFragment} - A static version of this method.
    * @group Methods
@@ -274,8 +283,9 @@ export interface BaseEditor {
   ) => void
 
   /**
-   * Insert a node at the current selection. If the selection is currently
-   * expanded, delete it first.
+   * Insert a node at the specified location or (if not defined) the current
+   * selection or (if not defined) the end of the document. If the selection is
+   * currently expanded, delete it first.
    *
    * @param options Type also exported as `NodeInsertNodesOptions<T>`
    * @see {@link EditorInterface#insertNode} - A static version of this method.
@@ -291,6 +301,17 @@ export interface BaseEditor {
    * Insert nodes in the editor at the specified location or (if not defined)
    * the current selection or (if not defined) the end of the document.
    *
+   * @example
+   * For example, to insert at the very end, without replacing the current
+   * selection and regardless of block nesting, use:
+   * ```javascript
+   * Transforms.insertNodes(
+   *   editor,
+   *   { type: targetType, children: [{ text: '' }] },
+   *   { at: [editor.children.length] }
+   * )
+   * ```
+   *
    * @param options Type also exported as `NodeInsertNodesOptions<T>`
    * @see {@link TransformsInterface#insertNodes} - A static version of this method.
    * @group Methods
@@ -304,6 +325,7 @@ export interface BaseEditor {
   /**
    * Insert a soft break at the current selection. If the selection is
    * currently expanded, delete it first.
+   *
    * @see {@link EditorInterface#insertSoftBreak} - A static version of this method.
    * @group Methods
    * @category Commands
@@ -311,8 +333,10 @@ export interface BaseEditor {
   insertSoftBreak: () => void
 
   /**
-   * Insert text at the current selection. If the selection is currently
-   * expanded, delete it first.
+   * Insert text at the specified location or (if not defined) the current
+   * selection or (if not defined) the end of the document. If the selection is
+   * currently expanded, delete it first.
+   *
    * @param options Type also exported as `TextInsertTextOptions`
    * @see {@link EditorInterface#insertText} - A static version of this method.
    * @group Methods
@@ -337,6 +361,13 @@ export interface BaseEditor {
   /**
    * Merge a node at a location with the previous node of the same depth,
    * removing any empty containing nodes after the merge if necessary.
+   *
+   * Merging elements throws if both have children and one contains blocks while
+   * the other contains text or inline nodes, unless
+   * `shouldMergeNodesRemovePrevNode` removes the previous node instead. The
+   * error names both paths and is raised before moving or removing the merge
+   * targets. An expanded `at` range can be deleted before this check.
+   *
    * @see {@link TransformsInterface#mergeNodes} - A static version of this method.
    * @group Methods
    * @category Commands
@@ -359,9 +390,9 @@ export interface BaseEditor {
   move: (options?: SelectionMoveOptions) => void
 
   /**
-   * Move the nodes from an origin to a destination. A destination must be specified in the `options`. If no origin is specified, move the selection.
+   * Move the nodes from an origin to a destination. A destination must be
+   * specified in the `options`. If no origin is specified, move the selection.
    *
-   * `to` is the path the node ends up at once the move is done, not the path it is inserted before. For example, with four blocks `1 2 3 4`, moving `[0]` to `[2]` gives `2 3 1 4`. When `match` selects several nodes, they are moved one at a time, each to `to`.
    * @see {@link TransformsInterface#moveNodes} - A static version of this method.
    * @group Methods
    * @category Commands
@@ -370,6 +401,12 @@ export interface BaseEditor {
     at?: Location
     match?: NodeMatch<T>
     mode?: MaximizeMode
+    /**
+     * The path the node ends up at once the move is done, not the path it is
+     * inserted before. For example, with four blocks `1 2 3 4`, moving `[0]` to
+     * `[2]` gives `2 3 1 4`. When `match` selects several nodes, they are moved
+     * one at a time, each to `to`.
+     */
     to: Path
     voids?: boolean
   }) => void
@@ -410,6 +447,16 @@ export interface BaseEditor {
 
   /**
    * Set the selection to a new value.
+   *
+   * @example
+   * For example, to set the selection to the entire contents of the editor:
+   * ```js
+   * Transforms.select(editor, {
+   *   anchor: Editor.start(editor, []),
+   *   focus: Editor.end(editor, []),
+   * })
+   * ```
+   *
    * @see {@link TransformsInterface#select} - A static version of this method.
    * @group Methods
    * @category Commands
@@ -417,12 +464,30 @@ export interface BaseEditor {
   select: (target: Location) => void
 
   /**
-   * Set properties of nodes at the specified location. If no location is specified, use the selection. Optional node properties can be set to `null` to unset them.
+   * Set properties of nodes at the specified location. If no location is
+   * specified, use the selection. Optional node properties can be set to `null`
+   * to unset them.
+   *
    * @see {@link TransformsInterface#setNodes} - A static version of this method.
    *
-   * If `props` contains `undefined` values, the node's corresponding property will also be set to `undefined` as opposed to ignored.
+   * @param props If it contains `undefined` values, the node's
+   * corresponding property will also be set to `undefined` as opposed to
+   * ignored.
    *
-   * `children` and `text` in `props` are ignored, since they hold a node's content rather than its properties. To change content, use `insertNodes`, `removeNodes` or the text transforms.
+   * `children` and `text` are ignored, since they hold a node's
+   * content rather than its properties. To change content, use `insertNodes`,
+   * `removeNodes` or the text transforms.
+   *
+   * Can also be a function that receives each matched node and its path and returns the properties for that node, so new values can depend on old ones. Each node still gets one `set_node` operation, so undo works per node:
+   *
+   * @example
+   * With `props` as a function:
+   * ```javascript
+   * Transforms.setNodes(editor, node => ({ indent: (node.indent ?? 0) + 1 }), {
+   *   match: n => Element.isElement(n) && n.type === 'paragraph',
+   * })
+   * ```
+   *
    * @group Methods
    * @category Commands
    */
@@ -439,18 +504,35 @@ export interface BaseEditor {
       voids?: boolean
       compare?: PropsCompare
       merge?: PropsMerge
+
+      /**
+       * With `replace: true`, every other property of each matched node is removed in the same operation, so the node ends up with exactly `props` (plus its `children` or `text`). Use it to change a node into a different type without carrying over properties that only made sense for the old type, such as turning `{ type: 'callout', color: 'blue' }` into `{ type: 'paragraph' }`. Undo restores the removed properties.
+       */
       replace?: boolean
     }
   ) => void
 
   /**
-   * Apply an external document through Slate operations. Delegates to `editor.setChildren`, so plugins can override the transform. Unchanged child prefixes and suffixes are retained, matched by identity or by deep equality, so a refetched copy of the document with one new block emits a single `insert_node`. Compatible nodes are updated recursively; text edits replace only the changed string middle. Deep-equal cloned values emit no operations.
+   * Apply an external document through Slate operations. Unchanged child
+   * prefixes and suffixes are retained, matched by identity or by deep
+   * equality, so a refetched copy of the document with one new block emits a
+   * single `insert_node`. Compatible nodes are updated recursively; text edits
+   * replace only the changed string middle. Deep-equal cloned values emit no
+   * operations.
    *
-   * Nodes shared by object identity can move within or across parents with a `move_node`, preserving selections inside them. Cloned moves are treated as content edits or replacements. Normalization is held until the diff is complete, and selection and refs follow the emitted operations through their normal rules.
+   * Nodes shared by object identity can move within or across parents with a
+   * `move_node`, preserving selections inside them. Cloned moves are treated as
+   * content edits or replacements. Normalization is held until the diff is
+   * complete, and selection and refs follow the emitted operations through
+   * their normal rules.
    *
-   * With `withHistory`, each external change forms one undo step and is separate from typing before and after it.
+   * With `withHistory`, each external change forms one undo step and is
+   * separate from typing before and after it.
    *
-   * To clear an editable document, pass a schema-valid empty block, for example `[{ type: 'paragraph', children: [{ text: '' }] }]`. `setChildren` itself accepts an empty root; it does not invent a block or reset history.
+   * To clear an editable document, pass a schema-valid empty block, for example
+   * `[{ type: 'paragraph', children: [{ text: '' }] }]`. `setChildren` itself
+   * accepts an empty root; it does not invent a block or reset history.
+   *
    * @see {@link TransformsInterface#setChildren} - A static version of this method.
    * @group Methods
    * @category Commands
@@ -562,7 +644,7 @@ export interface BaseEditor {
 
   /**
    * Get the ancestor above a location in the document.
-   * @param options Type also exported as `EditorAboveOptions<T>`
+   * @param options Type also exported as `EditorAboveOptions<T extends Ancestor>`
    * @see {@link EditorInterface#above} - A static version of this method.
    * @group Methods
    * @category Queries
@@ -635,7 +717,19 @@ export interface BaseEditor {
   /**
    * Get the marks that would be added to text at the current selection.
    *
-   * If `editor.marks` is set (marks toggled with a collapsed selection), those are returned. With an expanded selection, it returns the marks of the first text node in the selection, skipping a node the selection only touches at its end, so it describes what typing over the selection would produce rather than marks shared by the whole selection. To check whether a mark applies to all of the selected text, iterate `Editor.nodes(editor, { match: Text.isText })` and compare each node.
+   * At a collapsed caret with a non-null edge rule, returns the receiving
+   * leaf’s marks, unless explicit `editor.marks` are set. When both edge rules
+   * return `null`, the existing previous-leaf behavior at offset zero is
+   * preserved.
+   *
+   * If `editor.marks` is set (marks toggled with a collapsed selection), those
+   * are returned. With an expanded selection, it returns the marks of the first
+   * text node in the selection, skipping a node the selection only touches at
+   * its end, so it describes what typing over the selection would produce
+   * rather than marks shared by the whole selection. To check whether a mark
+   * applies to all of the selected text, iterate
+   * `Editor.nodes(editor, { match:Text.isText })` and compare each node.
+   *
    * @see {@link EditorInterface#marks} - A static version of this method.
    * @group Methods
    * @category Queries
@@ -659,6 +753,7 @@ export interface BaseEditor {
   hasInlines: (element: Element) => boolean
 
   /**
+   * Check if a descendant node exists at a specific path.
    * @see {@link EditorInterface#hasPath} - A static version of this method.
    * @group Methods
    * @category Queries
@@ -666,6 +761,7 @@ export interface BaseEditor {
   hasPath: (path: Path) => boolean
 
   /**
+   * Check whether both endpoint paths of a range exist in the editor. This checks paths, not whether offsets are within the text.
    * @group Methods
    * @category Queries
    */
@@ -680,13 +776,29 @@ export interface BaseEditor {
   hasTexts: (element: Element) => boolean
 
   /**
+   * Resolve a caret to the point that implicit insertion will use. Applies
+   * `inlineEdgeAffinity` first, then `leafEdgeAffinity`, with at most one move
+   * for each rule. Both default to `null`, which preserves the supplied point.
+   * The helper does not change the selection.
+   *
+   * The rules apply to `editor.insertText`, `insertFragment` and insertion of
+   * inline elements with `insertNodes` only when `at` is omitted and the
+   * selection is collapsed. Explicit locations, expanded selections, and
+   * insertion of text or block nodes through `insertNodes` retain their
+   * existing behavior. IME composition remains native; these rules govern
+   * committed insertion.
+   *
    * @group Methods
    * @category Queries
    */
   insertionPoint: (point: Point) => Point
 
   /**
-   * Check if an element is a block element. It only accepts an `Element`, so check other values with `Element.isElement` first.
+   * Check if an element is a block element.
+   *
+   * It only accepts an `Element`, so check other values with
+   * {@link ElementInterface#isElement} first.
+   *
    * @see {@link EditorInterface#isBlock} - A static version of this method.
    * @group Methods
    * @category Queries
@@ -718,7 +830,9 @@ export interface BaseEditor {
   isEnd: (point: Point, at: Location) => boolean
 
   /**
-   * Check if an element is an inline element. It only accepts an `Element`, so check other values with `Element.isElement` first.
+   * Check if an element is an inline element. It only accepts an `Element`, so
+   * check other values with `Element.isElement` first.
+   *
    * @see {@link EditorInterface#isInline} - A static version of this method.
    * @group Methods
    * @category Queries
@@ -742,7 +856,9 @@ export interface BaseEditor {
   isStart: (point: Point, at: Location) => boolean
 
   /**
-   * Check if an element is a void element. It only accepts an `Element`, so check other values with `Element.isElement` first.
+   * Check if an element is a void element. It only accepts an `Element`, so
+   * check other values with `Element.isElement` first.
+   *
    * @see {@link EditorInterface#isVoid} - A static version of this method.
    * @group Methods
    * @category Queries
@@ -872,13 +988,20 @@ export interface BaseEditor {
   pointRefs: () => Set<PointRef>
 
   /**
-   * Iterate through all of the positions in the document where a `Point` can be placed. The first `Point` returns is always the starting point followed by the next `Point` as determined by the `unit` option.
+   * Iterate through all of the positions in the document where a `Point` can be
+   * placed. The first `Point` returns is always the starting point followed by
+   * the next `Point` as determined by the `unit` option.
    *
-   * Points inside non-selectable elements are skipped in both directions, including consecutive non-selectable elements.
+   * Points inside non-selectable elements are skipped in both directions,
+   * including consecutive non-selectable elements.
    *
    * Read `options.unit` to see how this method iterates through positions.
    *
-   * Note: By default void nodes are treated as a single point and iteration will not happen inside their content unless the voids option is set, then iteration will occur. Text immediately after an inline void starts a new traversal boundary, including when the surrounding text is empty. Word traversal restarts segmentation at that boundary.
+   * Note: By default void nodes are treated as a single point and iteration
+   * will not happen inside their content unless the voids option is set, then
+   * iteration will occur. Text immediately after an inline void starts a new
+   * traversal boundary, including when the surrounding text is empty. Word
+   * traversal restarts segmentation at that boundary.
    *
    * @param options Type also exported as `EditorPositionsOptions`
    * @see {@link EditorInterface#positions} - A static version of this method.
@@ -948,6 +1071,23 @@ export interface BaseEditor {
 
   /**
    * Convert a range into a non-hanging one.
+   *
+   * A "hanging" range is one created by the browser's "triple-click" selection
+   * behavior. When triple-clicking a block, the browser selects from the start
+   * of that block to the start of the _next_ block. The range thus "hangs over"
+   * into the next block. If `unhangRange` is given such a range, it moves the
+   * end backwards until it's in a non-empty text node that precedes the hanging
+   * block.
+   *
+   * Note that `unhangRange` is designed for the specific purpose of fixing
+   * triple-clicked blocks, and therefore currently has a number of caveats:
+   *
+   * - It does not modify the start of the range; only the end. For example, it
+   * does not "unhang" a selection that starts at the end of a previous block.
+   * - It only does anything if the start block is fully selected. For example,
+   * it does not handle ranges created by double-clicking the end of a paragraph
+   * (which browsers treat by selecting from the end of that paragraph to the
+   * start of the next).
    * @param options Type also exported as `EditorUnhangRangeOptions`
    * @see {@link EditorInterface#unhangRange} - A static version of this method.
    * @group Methods
@@ -1204,9 +1344,7 @@ export interface EditorVoidOptions {
 
 export interface EditorInterface {
   /**
-   * Get the ancestor above a location in the document.
-   * @param options Type also exported as `EditorAboveOptions<T extends Ancestor>`
-   * @param options Type also exported as `EditorAboveOptions<T>`
+   * {@inheritDoc BaseEditor#above}
    * @category Relational
    */
   above<T extends Ancestor>(
@@ -1215,17 +1353,13 @@ export interface EditorInterface {
   ): NodeEntry<T> | undefined
 
   /**
-   * Add a custom property to the leaf text nodes within non-void nodes or void
-   * nodes that `editor.markableVoid()` allows in the current selection. If the
-   * selection is currently collapsed, the marks will be added to the
-   * `editor.marks` property instead, and applied when text is inserted next.
+   * {@inheritDoc BaseEditor#addMark}
    * @category Commands
    */
   addMark(editor: Editor, key: string, value: any): void
 
   /**
-   * Get the point after a location.
-   * @param options Type also exported as `EditorAfterOptions`
+   * {@inheritDoc BaseEditor#after}
    * @category Relational
    */
   after(
@@ -1235,8 +1369,7 @@ export interface EditorInterface {
   ): Point | undefined
 
   /**
-   * Get the point before a location.
-   * @param options Type also exported as `EditorBeforeOptions`
+   * {@inheritDoc BaseEditor#before}
    * @category Relational
    */
   before(
@@ -1246,37 +1379,31 @@ export interface EditorInterface {
   ): Point | undefined
 
   /**
-   * Delete content in the editor backward from the current selection.
-   * @param options Type also exported as `EditorDirectedDeletionOptions`
+   * {@inheritDoc BaseEditor#deleteBackward}
    * @category Commands
    */
   deleteBackward(editor: Editor, options?: EditorDirectedDeletionOptions): void
 
   /**
-   * Delete content in the editor forward from the current selection.
-   * @param options Type also exported as `EditorDirectedDeletionOptions`
+   * {@inheritDoc BaseEditor#deleteForward}
    * @category Commands
    */
   deleteForward(editor: Editor, options?: EditorDirectedDeletionOptions): void
 
   /**
-   * Delete the content in the current selection.
-   *
-   * A hanging selection from the start of a block to the start of a following sibling removes the fully selected blocks, preserving the following block. Inside an element identified by `editor.isIsolated`, deletion continues to unhang the selection and retain the block structure. Custom `deleteFragment` overrides still control deletion.
-   * @param options Type also exported as `EditorFragmentDeletionOptions`
+   * {@inheritDoc BaseEditor#deleteFragment}
    * @category Commands
    */
   deleteFragment(editor: Editor, options?: EditorFragmentDeletionOptions): void
 
   /**
-   * Get the start and end points of a location.
+   * {@inheritDoc BaseEditor#edges}
    * @category Relational
    */
   edges(editor: Editor, at: Location): [Point, Point]
 
   /**
-   * Match a read-only element in the current branch of the editor.
-   * @param options Type also exported as `EditorElementReadOnlyOptions`
+   * {@inheritDoc BaseEditor#elementReadOnly}
    * @category Relational
    */
   elementReadOnly(
@@ -1285,65 +1412,61 @@ export interface EditorInterface {
   ): NodeEntry<Element> | undefined
 
   /**
-   * Get the end point of a location.
+   * {@inheritDoc BaseEditor#end}
    * @category Relational
    */
   end(editor: Editor, at: Location): Point
 
   /**
-   * Get the first node at a location.
+   * {@inheritDoc BaseEditor#first}
    * @category Relational
    */
   first(editor: Editor, at: Location): NodeEntry
 
   /**
-   * Get the fragment at a location.
+   * {@inheritDoc BaseEditor#fragment}
    * @category Queries
    */
   fragment(editor: Editor, at: Location): Descendant[]
 
   /**
-   * Check if a node has block children.
+   * {@inheritDoc BaseEditor#hasBlocks}
    * @category Queries
    */
   hasBlocks(editor: Editor, element: Element): boolean
 
   /**
-   * Check if a node has inline and text children.
+   * {@inheritDoc BaseEditor#hasInlines}
    * @category Queries
    */
   hasInlines(editor: Editor, element: Element): boolean
 
   /**
-   * Check if a descendant node exists at a specific path.
+   * {@inheritDoc BaseEditor#hasPath}
    * @category Queries
    */
   hasPath(editor: Editor, path: Path): boolean
 
   /**
-   * Check whether both endpoint paths of a range exist in the editor. This checks paths, not whether offsets are within the text.
+   * {@inheritDoc BaseEditor#hasRange}
+   * @category Queries
    */
   hasRange(editor: Editor, range: Range): boolean
 
   /**
-   * Check if a node has text children.
+   * {@inheritDoc BaseEditor#hasTexts}
    * @category Queries
    */
   hasTexts(editor: Editor, element: Element): boolean
 
   /**
-   * Insert a block break at the current selection.
-   *
-   * If the selection is currently expanded, it will be deleted first.
+   * {@inheritDoc BaseEditor#insertBreak}
    * @category Commands
    */
   insertBreak(editor: Editor): void
 
   /**
-   * Inserts a fragment
-   * at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
-   *
-   * @param options Type also exported as `TextInsertFragmentOptions`
+   * {@inheritDoc BaseEditor#insertFragment}
    * @category Commands
    */
   insertFragment(
@@ -1353,10 +1476,7 @@ export interface EditorInterface {
   ): void
 
   /**
-   * Atomically inserts `nodes`
-   * at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
-   *
-   * @param options Type also exported as `NodeInsertNodesOptions<T>`
+   * {@inheritDoc BaseEditor#insertNode}
    * @category Commands
    */
   insertNode<T extends Node>(
@@ -1366,17 +1486,13 @@ export interface EditorInterface {
   ): void
 
   /**
-   * Insert a soft break at the current selection.
-   *
-   * If the selection is currently expanded, it will be deleted first.
+   * {@inheritDoc BaseEditor#insertSoftBreak}
    * @category Commands
    */
   insertSoftBreak(editor: Editor): void
 
   /**
-   * Insert a string of text
-   * at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
-   * @param options Type also exported as `TextInsertTextOptions`
+   * {@inheritDoc BaseEditor#insertText}
    * @category Commands
    */
   insertText(
@@ -1386,13 +1502,13 @@ export interface EditorInterface {
   ): void
 
   /**
-   * Check if an element is a block element. It only accepts an `Element`, so check other values with `Element.isElement` first.
+   * {@inheritDoc BaseEditor#isBlock}
    * @category Queries
    */
   isBlock(editor: Editor, value: Element): boolean
 
   /**
-   * Check if a point is an edge of a location.
+   * {@inheritDoc BaseEditor#isEdge}
    * @category Queries
    */
   isEdge(editor: Editor, point: Point, at: Location): boolean
@@ -1405,7 +1521,7 @@ export interface EditorInterface {
   isEditor(value: any, options?: EditorIsEditorOptions): value is Editor
 
   /**
-   * Check if a value is a read-only `Element` object.
+   * {@inheritDoc BaseEditor#isElementReadOnly}
    * @category Queries
    */
   isElementReadOnly(editor: Editor, element: Element): boolean
@@ -1418,28 +1534,32 @@ export interface EditorInterface {
    */
   insertionPoint(editor: Editor, point: Point): Point
 
+  /**
+   * {@inheritDoc BaseEditor#isIsolated}
+   * @category Queries
+   */
   isIsolated(editor: Editor, element: Element): boolean
 
   /**
-   * Check if an element is empty, accounting for void nodes.
+   * {@inheritDoc BaseEditor#isEmpty}
    * @category Queries
    */
   isEmpty(editor: Editor, element: Element): boolean
 
   /**
-   * Check if a point is the end point of a location.
+   * {@inheritDoc BaseEditor#isEnd}
    * @category Queries
    */
   isEnd(editor: Editor, point: Point, at: Location): boolean
 
   /**
-   * Check if an element is an inline element. It only accepts an `Element`, so check other values with `Element.isElement` first.
+   * {@inheritDoc BaseEditor#isInline}
    * @category Queries
    */
   isInline(editor: Editor, value: Element): boolean
 
   /**
-   * Check if the editor is currently normalizing after each operation.
+   * {@inheritDoc BaseEditor#isNormalizing}
    * @category Queries
    */
   isNormalizing(editor: Editor): boolean
@@ -1450,32 +1570,31 @@ export interface EditorInterface {
   isRemoteChange(editor: Editor): boolean
 
   /**
-   * Check if a value is a selectable `Element` object.
+   * {@inheritDoc BaseEditor#isSelectable}
    * @category Queries
    */
   isSelectable(editor: Editor, element: Element): boolean
 
   /**
-   * Check if a point is the start point of a location.
+   * {@inheritDoc BaseEditor#isStart}
    * @category Queries
    */
   isStart(editor: Editor, point: Point, at: Location): boolean
 
   /**
-   * Check if an element is a void element. It only accepts an `Element`, so check other values with `Element.isElement` first.
+   * {@inheritDoc BaseEditor#isVoid}
    * @category Queries
    */
   isVoid(editor: Editor, value: Element): boolean
 
   /**
-   * Get the last node at a location.
+   * {@inheritDoc BaseEditor#last}
    * @category Relational
    */
   last(editor: Editor, at: Location): NodeEntry
 
   /**
-   * Get the leaf text node at a location.
-   * @param options Type also exported as `EditorLeafOptions`
+   * {@inheritDoc BaseEditor#leaf}
    * @category Retrieval
    */
   leaf(
@@ -1485,8 +1604,7 @@ export interface EditorInterface {
   ): NodeEntry<Text>
 
   /**
-   * Iterate through all of the levels at a location.
-   * @param options Type also exported as `EditorLevelsOptions<T>`
+   * {@inheritDoc BaseEditor#levels}
    * @category Relational
    */
   levels<T extends Node>(
@@ -1495,18 +1613,13 @@ export interface EditorInterface {
   ): Generator<NodeEntry<T>, void, undefined>
 
   /**
-   * Get the marks that would be added to text at the current selection.
-   *
-   * At a collapsed caret with a non-null edge rule, returns the receiving leaf’s marks, unless explicit `editor.marks` are set. When both edge rules return `null`, the existing previous-leaf behavior at offset zero is preserved.
-   *
-   * If `editor.marks` is set (marks toggled with a collapsed selection), those are returned. With an expanded selection, it returns the marks of the first text node in the selection, skipping a node the selection only touches at its end, so it describes what typing over the selection would produce rather than marks shared by the whole selection. To check whether a mark applies to all of the selected text, iterate `Editor.nodes(editor, { match: Text.isText })` and compare each node.
+   * {@inheritDoc BaseEditor#getMarks}
    * @category Queries
    */
   marks(editor: Editor): Omit<Text, 'text'> | null
 
   /**
-   * Get the matching node in the branch of the document after a location.
-   * @param options Type also exported as `EditorNextOptions<T>`
+   * {@inheritDoc BaseEditor#next}
    * @category Relational
    */
   next<T extends Descendant>(
@@ -1515,13 +1628,13 @@ export interface EditorInterface {
   ): NodeEntry<T> | undefined
 
   /**
-   * Get the node at a location.
+   * {@inheritDoc BaseEditor#node}
+   * @category Relational
    */
   node(editor: Editor, at: Location, options?: EditorNodeOptions): NodeEntry
 
   /**
-   * Iterate through all of the nodes in the Editor.
-   * @param options Type also exported as `EditorNodesOptions<T>`
+   * {@inheritDoc BaseEditor#nodes}
    * @category Relational
    */
   nodes<T extends Node>(
@@ -1530,15 +1643,13 @@ export interface EditorInterface {
   ): Generator<NodeEntry<T>, void, undefined>
 
   /**
-   * Normalize any dirty objects in the editor.
-   * @param options Type also exported as `EditorNormalizeOptions`
+   * {@inheritDoc BaseEditor#normalize}
    * @category Commands
    */
   normalize(editor: Editor, options?: EditorNormalizeOptions): void
 
   /**
-   * Get the parent node of a location.
-   * @param options Type also exported as `EditorParentOptions`
+   * {@inheritDoc BaseEditor#parent}
    * @category Relational
    */
   parent(
@@ -1548,37 +1659,31 @@ export interface EditorInterface {
   ): NodeEntry<Ancestor>
 
   /**
-   * Get the path of a location.
-   * @param options Type also exported as `EditorPathOptions`
+   * {@inheritDoc BaseEditor#path}
    * @category Queries
    */
   path(editor: Editor, at: Location, options?: EditorPathOptions): Path
 
   /**
-   * Create a mutable ref for a `Path` object, which will stay in sync as new
-   * operations are applied to the editor.
-   * @param options Type also exported as `EditorPathRefOptions`
+   * {@inheritDoc BaseEditor#pathRef}
    * @category Create Ref
    */
   pathRef(editor: Editor, path: Path, options?: EditorPathRefOptions): PathRef
 
   /**
-   * Get the set of currently tracked path refs of the editor.
+   * {@inheritDoc BaseEditor#pathRefs}
    * @category Queries
    */
   pathRefs(editor: Editor): Set<PathRef>
 
   /**
-   * Get the start or end point of a location.
-   * @param options Type also exported as `EditorPointOptions`
+   * {@inheritDoc BaseEditor#point}
    * @category Queries
    */
   point(editor: Editor, at: Location, options?: EditorPointOptions): Point
 
   /**
-   * Create a mutable ref for a `Point` object, which will stay in sync as new
-   * operations are applied to the editor.
-   * @param options Type also exported as `EditorPointRefOptions`
+   * {@inheritDoc BaseEditor#pointRef}
    * @category Create Ref
    */
   pointRef(
@@ -1588,22 +1693,14 @@ export interface EditorInterface {
   ): PointRef
 
   /**
-   * Get the set of currently tracked point refs of the editor.
+   * {@inheritDoc BaseEditor#pointRefs}
    * @category Queries
    */
   pointRefs(editor: Editor): Set<PointRef>
 
   /**
-   * Return all the positions in `at` range where a `Point` can be placed.
-   *
-   * By default, moves forward by individual offsets at a time, but
-   * the `unit` option can be used to to move by character, word, line, or block.
-   *
-   * The `reverse` option can be used to change iteration direction.
-   *
-   * Note: By default void nodes are treated as a single point and iteration
-   * will not happen inside their content unless you pass in true for the
-   * `voids` option, then iteration will occur. Text immediately after an inline void starts a new traversal boundary, including when the surrounding text is empty. Word traversal restarts segmentation at that boundary.
+   * {@inheritDoc BaseEditor#positions}
+   * @category Relational
    */
   positions(
     editor: Editor,
@@ -1611,8 +1708,7 @@ export interface EditorInterface {
   ): Generator<Point, void, undefined>
 
   /**
-   * Get the matching node in the branch of the document before a location.
-   * @param options Type also exported as `EditorPreviousOptions<T>`
+   * {@inheritDoc BaseEditor#previous}
    * @category Relational
    */
   previous<T extends Node>(
@@ -1621,15 +1717,13 @@ export interface EditorInterface {
   ): NodeEntry<T> | undefined
 
   /**
-   * Get a range of a location.
+   * {@inheritDoc BaseEditor#range}
    * @category Queries
    */
   range(editor: Editor, at: Location, to?: Location): Range
 
   /**
-   * Create a mutable ref for a `Range` object, which will stay in sync as new
-   * operations are applied to the editor.
-   * @param options Type also exported as `EditorRangeRefOptions`
+   * {@inheritDoc BaseEditor#rangeRef}
    * @category Create Ref
    */
   rangeRef(
@@ -1639,55 +1733,37 @@ export interface EditorInterface {
   ): RangeRef
 
   /**
-   * Get the set of currently tracked range refs of the editor.
+   * {@inheritDoc BaseEditor#rangeRefs}
    * @category Queries
    */
   rangeRefs(editor: Editor): Set<RangeRef>
 
   /**
-   * Remove a custom property from all of the leaf text nodes in the current
-   * selection.
-   *
-   * If the selection is currently collapsed, the removal will be stored on
-   * `editor.marks` and applied to the text inserted next.
+   * {@inheritDoc BaseEditor#removeMark}
    * @category Commands
    */
   removeMark(editor: Editor, key: string): void
 
   /**
-   * Manually set if the editor should currently be normalizing.
-   *
-   * Note: Using this incorrectly can leave the editor in an invalid state.
-   *
+   * {@inheritDoc BaseEditor#setNormalizing}
+   * @category Normalization
    */
   setNormalizing(editor: Editor, isNormalizing: boolean): void
 
   /**
-   * Get the start point of a location.
+   * {@inheritDoc BaseEditor#start}
    * @category Relational
    */
   start(editor: Editor, at: Location): Point
 
   /**
-   * Get the text string content of a location.
-   *
-   * Note: by default the text of void nodes is considered to be an empty
-   * string, regardless of content, unless you pass in true for the voids option
-   * @param options Type also exported as `EditorStringOptions`
+   * {@inheritDoc BaseEditor#string}
    * @category Queries
    */
   string(editor: Editor, at: Location, options?: EditorStringOptions): string
 
   /**
-   * Convert a range into a non-hanging one.
-   *
-   * A "hanging" range is one created by the browser's "triple-click" selection behavior. When triple-clicking a block, the browser selects from the start of that block to the start of the _next_ block. The range thus "hangs over" into the next block. If `unhangRange` is given such a range, it moves the end backwards until it's in a non-empty text node that precedes the hanging block.
-   *
-   * Note that `unhangRange` is designed for the specific purpose of fixing triple-clicked blocks, and therefore currently has a number of caveats:
-   *
-   * - It does not modify the start of the range; only the end. For example, it does not "unhang" a selection that starts at the end of a previous block.
-   * - It only does anything if the start block is fully selected. For example, it does not handle ranges created by double-clicking the end of a paragraph (which browsers treat by selecting from the end of that paragraph to the start of the next).
-   * @param options Type also exported as `EditorUnhangRangeOptions`
+   * {@inheritDoc BaseEditor#unhangRange}
    * @category Selection Commands
    */
   unhangRange(
@@ -1697,8 +1773,7 @@ export interface EditorInterface {
   ): Range
 
   /**
-   * Match a void node in the current branch of the editor.
-   * @param options Type also exported as `EditorVoidOptions`
+   * {@inheritDoc BaseEditor#void}
    * @category Relational
    */
   void(
@@ -1706,10 +1781,15 @@ export interface EditorInterface {
     options?: EditorVoidOptions
   ): NodeEntry<Element> | undefined
 
+  /**
+   * {@inheritDoc BaseEditor#word}
+   * @category Relational
+   */
   word(editor: Editor, options?: EditorWordOptions): Range | undefined
 
   /**
-   * Call a function, deferring normalization until after it completes.
+   * {@inheritDoc BaseEditor#withoutNormalizing}
+   * @category Normalization
    */
   withoutNormalizing(editor: Editor, fn: () => void): void
 
@@ -1730,7 +1810,7 @@ export interface EditorInterface {
   withRemoteChanges(editor: Editor, fn: () => void): void
 
   /**
-   *  Call a function, Determine whether or not remove the previous node when merge.
+   * {@inheritDoc BaseEditor#shouldMergeNodesRemovePrevNode}
    * @category Queries
    */
   shouldMergeNodesRemovePrevNode(
