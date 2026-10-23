@@ -3,6 +3,7 @@ import { Point } from '../interfaces/point'
 import { Selection } from '../interfaces'
 import { NON_SETTABLE_SELECTION_PROPERTIES } from '../interfaces/transforms/general'
 
+/** @ignore */
 export const setSelection: SelectionTransforms['setSelection'] = (
   editor,
   props

@@ -3,6 +3,7 @@ import { Range } from '../interfaces/range'
 import { Editor } from '../interfaces/editor'
 import { Transforms } from '../interfaces/transforms'
 
+/** @ignore */
 export const move: SelectionTransforms['move'] = (editor, options = {}) => {
   const { selection } = editor
   const { distance = 1, unit = 'character', reverse = false } = options

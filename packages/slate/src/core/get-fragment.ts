@@ -1,6 +1,7 @@
 import { Editor, Node } from '../interfaces'
 import { WithEditorFirstArg } from '../utils'
 
+/** @ignore */
 export const getFragment: WithEditorFirstArg<
   Editor['getFragment']
 > = editor => {

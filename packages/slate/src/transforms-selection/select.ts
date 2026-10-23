@@ -4,6 +4,7 @@ import { Transforms } from '../interfaces/transforms'
 import { Scrubber } from '../interfaces/scrubber'
 import { Location } from '../interfaces'
 
+/** @ignore */
 export const select: SelectionTransforms['select'] = (editor, target) => {
   const { selection } = editor
   target = Editor.range(editor, target)

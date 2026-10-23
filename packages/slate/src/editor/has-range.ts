@@ -1,5 +1,6 @@
 import { Editor, EditorInterface } from '../interfaces/editor'
 
+/** @ignore */
 export const hasRange: EditorInterface['hasRange'] = (editor, range) => {
   const { anchor, focus } = range
   return (
