@@ -311,11 +311,30 @@ Atomically insert `node` at the specified location or (if not defined) the curre
 
 Options supported: `NodeOptions & {hanging?: boolean, select?: boolean}`.
 
+For example, insert a block before the second block and move the selection into it:
+
+```typescript
+Editor.insertNode(
+  editor,
+  { children: [{ text: 'New block' }] },
+  {
+    at: [1],
+    select: true,
+  }
+)
+```
+
 #### `Editor.insertText(editor: Editor, text: string, options?) => void`
 
 Insert a string of text at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
 
 Options: `{at?: Location, voids?: boolean}`
+
+To insert text at the start of the second block:
+
+```typescript
+Editor.insertText(editor, 'Hello', { at: { path: [1, 0], offset: 0 } })
+```
 
 #### `Editor.removeMark(editor: Editor, key: string) => void`
 
