@@ -16,6 +16,7 @@ export const EXAMPLE_NAMES_AND_PATHS = [
   ['Insert Text Noop', 'insert-text-noop'],
   ['Markdown Preview', 'markdown-preview'],
   ['Markdown Shortcuts', 'markdown-shortcuts'],
+  ['Markdown Sync', 'markdown-sync'],
   ['Mentions', 'mentions'],
   ['Paste HTML', 'paste-html'],
   ['Plain Text', 'plaintext'],
