@@ -330,6 +330,8 @@ Insert a string of text at the specified location or (if not defined) the curren
 
 Options: `{at?: Location, voids?: boolean}`
 
+Pending marks on `editor.marks` apply only when `at` is omitted. Text inserted at an explicit `at` leaves them for the next insertion at the selection, and does not need a selection.
+
 To insert text at the start of the second block:
 
 ```typescript
