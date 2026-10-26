@@ -98,6 +98,9 @@
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "react-error-boundary": "^4.0.11",
+    "remark-parse": "^11.0.0",
+    "remark-slate-transformer": "^0.12.1",
+    "remark-stringify": "^11.0.0",
     "rimraf": "^5.0.5",
     "rollup": "^4.1.4",
     "rollup-plugin-babel": "^4.4.0",
@@ -117,6 +120,7 @@
     "source-map-loader": "^4.0.1",
     "ts-jest": "^29.1.1",
     "typescript": "6.0.3",
+    "unified": "^11.0.5",
     "yjs": "13.6.33"
   },
   "simple-git-hooks": {
