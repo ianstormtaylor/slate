@@ -848,16 +848,16 @@ export const Editor: EditorInterface = {
     editor.insertFragment(fragment, options)
   },
 
-  insertNode(editor, node) {
-    editor.insertNode(node)
+  insertNode(editor, node, options) {
+    editor.insertNode(node, options)
   },
 
   insertSoftBreak(editor) {
     editor.insertSoftBreak()
   },
 
-  insertText(editor, text) {
-    editor.insertText(text)
+  insertText(editor, text, options) {
+    editor.insertText(text, options)
   },
 
   isBlock(editor, value) {
