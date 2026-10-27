@@ -21,6 +21,27 @@ test.describe('On markdown-sync example', () => {
     )
   })
 
+  test('toggles marks with keyboard shortcuts', async ({ page }) => {
+    const editor = page.getByRole('textbox', { name: 'Rich text editor' })
+    await editor.click()
+    const handle = await getEditorHandle(editor)
+    await handle.evaluate(editor => editor.select(editor.end([2, 1])))
+    await handle.dispose()
+    await page.keyboard.type(' ')
+    await page.keyboard.press('ControlOrMeta+b')
+    await page.keyboard.type('bold')
+    await page.keyboard.press('ControlOrMeta+b')
+    await page.keyboard.type(' ')
+    await page.keyboard.press('ControlOrMeta+i')
+    await page.keyboard.type('italic')
+
+    await expect(editor.locator('li strong')).toHaveText('bold')
+    await expect(editor.locator('li em')).toHaveText('italic')
+    await expect(page.getByRole('textbox', { name: 'Markdown' })).toHaveValue(
+      /\* Enter in a list item starts a new one \*\*bold\*\* \*italic\*\n/
+    )
+  })
+
   test('renders Markdown edits in the editor', async ({ page }) => {
     await page
       .getByRole('textbox', { name: 'Markdown' })

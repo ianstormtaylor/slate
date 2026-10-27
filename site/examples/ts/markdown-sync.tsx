@@ -1,4 +1,5 @@
 import { css } from '@emotion/css'
+import isHotkey from 'is-hotkey'
 import React, { useCallback, useMemo, useState } from 'react'
 import remarkParse from 'remark-parse'
 import remarkStringify from 'remark-stringify'
@@ -9,7 +10,7 @@ import {
   slateToRemark,
   withMdast,
 } from 'remark-slate-transformer'
-import { createEditor, Descendant } from 'slate'
+import { createEditor, Descendant, Editor } from 'slate'
 import { withHistory } from 'slate-history'
 import {
   Editable,
@@ -34,6 +35,23 @@ const toSlate = (markdown: string): Descendant[] => {
 
 const toMarkdown = (value: Descendant[]) =>
   serializer.stringify(slateToRemark(value))
+
+type Mark = 'strong' | 'emphasis' | 'inlineCode'
+
+const HOTKEYS: Record<string, Mark> = {
+  'mod+b': 'strong',
+  'mod+i': 'emphasis',
+  'mod+`': 'inlineCode',
+}
+
+const toggleMark = (editor: Editor, mark: Mark) => {
+  const marks = Editor.marks(editor) as Partial<MdastText> | null
+  if (marks?.[mark]) {
+    Editor.removeMark(editor, mark)
+  } else {
+    Editor.addMark(editor, mark, true)
+  }
+}
 
 const initialMarkdown = `# Markdown sync
 
@@ -91,6 +109,14 @@ const MarkdownSyncExample = () => {
           aria-label="Rich text editor"
           renderElement={renderElement}
           renderLeaf={renderLeaf}
+          onKeyDown={event => {
+            for (const hotkey in HOTKEYS) {
+              if (isHotkey(hotkey, event)) {
+                event.preventDefault()
+                toggleMark(editor, HOTKEYS[hotkey])
+              }
+            }
+          }}
         />
       </Slate>
       <textarea
