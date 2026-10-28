@@ -13,6 +13,7 @@ export const EXAMPLE_NAMES_AND_PATHS = [
   ['Huge Document', 'huge-document'],
   ['Images', 'images'],
   ['Inlines', 'inlines'],
+  ['Input Events', 'input-events'],
   ['Insert Text Noop', 'insert-text-noop'],
   ['Markdown Preview', 'markdown-preview'],
   ['Markdown Shortcuts', 'markdown-shortcuts'],
@@ -29,7 +30,11 @@ export const EXAMPLE_NAMES_AND_PATHS = [
   ['Tables', 'tables'],
 ] as const
 
-export const HIDDEN_EXAMPLES = ['android-tests', 'insert-text-noop'] as const
+export const HIDDEN_EXAMPLES = [
+  'android-tests',
+  'input-events',
+  'insert-text-noop',
+] as const
 
 export const NON_HIDDEN_EXAMPLES = EXAMPLE_NAMES_AND_PATHS.filter(
   ([, path]) => !HIDDEN_EXAMPLES.includes(path as any)
