@@ -22,6 +22,7 @@ const setup = () => {
   editor.onChange = jest.fn()
   IS_NODE_MAP_DIRTY.set(editor, false)
   jest.spyOn(ReactEditor, 'getWindow').mockReturnValue(window)
+  jest.spyOn(ReactEditor, 'hasDOMNode').mockReturnValue(true)
 
   const manager = createAndroidInputManager({
     editor,
