@@ -68,8 +68,8 @@ describe('a keyboard replacement whose target range is outside the editor', () =
     const event = insertOutside('rather ')
     await jest.advanceTimersByTimeAsync(500)
 
-    expect(event.defaultPrevented).toBe(true)
     expect(Node.string(editor)).toBe('This is rather ')
+    expect(event.defaultPrevented).toBe(true)
   })
 
   test('inserts at the caret when the replacement starts with another letter', async () => {
