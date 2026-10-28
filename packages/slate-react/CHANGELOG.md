@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.147.5
+
+### Patch Changes
+
+- [#6358](https://github.com/ianstormtaylor/slate/pull/6358) [`a25994b`](https://github.com/ianstormtaylor/slate/commit/a25994b14f52acdd2f473d1d33ee3f6b0510bc85) Thanks [@dylans](https://github.com/dylans)! - On Android, a keyboard correction whose target range points outside the editor now replaces the word before the caret instead of inserting the corrected word after it
+
 ## 0.147.3
 
 ### Patch Changes
