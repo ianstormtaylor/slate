@@ -150,7 +150,7 @@ export const GeneralTransforms: GeneralTransforms = {
         // of date. So instead of using the `op.newPath` directly, we
         // transform `op.path` to ascertain what the `newPath` would be after
         // the operation was applied.
-        const truePath = Path.transform(path, op)!
+        const truePath = Path.transform(path, op)
         const newIndex = truePath[truePath.length - 1]
 
         modifyChildren(editor, Path.parent(truePath), children =>
