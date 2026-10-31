@@ -1,5 +1,13 @@
 # slate
 
+## 0.147.4
+
+### Patch Changes
+
+- [#6351](https://github.com/ianstormtaylor/slate/pull/6351) [`18de0a4`](https://github.com/ianstormtaylor/slate/commit/18de0a4bca9f6cc2b59554f4aa84ef10a2eecc70) Thanks [@dylans](https://github.com/dylans)! - `editor.insertText` with an explicit `at` now inserts there when the editor has no selection, and no longer applies or clears pending `editor.marks`, which belong to the selection.
+
+- [#6349](https://github.com/ianstormtaylor/slate/pull/6349) [`5939eb4`](https://github.com/ianstormtaylor/slate/commit/5939eb443a99e65229a70b317f03d5ba88fb8ae3) Thanks [@Marve10s](https://github.com/Marve10s)! - Forward options from `Editor.insertText` and `Editor.insertNode` to the corresponding editor methods. Explicit insertion locations and other supported options now take effect instead of being silently ignored.
+
 ## 0.146.0
 
 ### Minor Changes

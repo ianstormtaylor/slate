@@ -287,6 +287,19 @@ export interface BaseEditor {
    * selection or (if not defined) the end of the document. If the selection is
    * currently expanded, delete it first.
    *
+   * @example
+   * For example, insert a block before the second block and move the selection into it:
+   * ```typescript
+   * Editor.insertNode(
+   *   editor,
+   *   { children: [{ text: 'New block' }] },
+   *   {
+   *     at: [1],
+   *     select: true,
+   *   }
+   * )
+   * ```
+   *
    * @param options Type also exported as `NodeInsertNodesOptions<T>`
    * @see {@link EditorInterface#insertNode} - A static version of this method.
    * @group Methods
@@ -336,6 +349,16 @@ export interface BaseEditor {
    * Insert text at the specified location or (if not defined) the current
    * selection or (if not defined) the end of the document. If the selection is
    * currently expanded, delete it first.
+   *
+   * Pending marks on `editor.marks` apply only when `at` is omitted. Text
+   * inserted at an explicit `at` leaves them for the next insertion at the
+   * selection, and does not need a selection.
+   *
+   * @example
+   * To insert text at the start of the second block:
+   * ```typescript
+   * Editor.insertText(editor, 'Hello', { at: { path: [1, 0], offset: 0 } })
+   * ```
    *
    * @param options Type also exported as `TextInsertTextOptions`
    * @see {@link EditorInterface#insertText} - A static version of this method.
@@ -1900,16 +1923,16 @@ export const Editor: EditorInterface = {
     editor.insertFragment(fragment, options)
   },
 
-  insertNode(editor, node) {
-    editor.insertNode(node)
+  insertNode(editor, node, options) {
+    editor.insertNode(node, options)
   },
 
   insertSoftBreak(editor) {
     editor.insertSoftBreak()
   },
 
-  insertText(editor, text) {
-    editor.insertText(text)
+  insertText(editor, text, options) {
+    editor.insertText(text, options)
   },
 
   isBlock(editor, value) {

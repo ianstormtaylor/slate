@@ -15,7 +15,12 @@ import {
   TextDiff,
   verifyDiffState,
 } from 'slate-dom'
-import { isDOMSelection, isDOMNode, isTrackedMutation } from 'slate-dom'
+import {
+  isDOMSelection,
+  isDOMNode,
+  isTrackedMutation,
+  IS_FIREFOX,
+} from 'slate-dom'
 import {
   EDITOR_TO_FORCE_RENDER,
   EDITOR_TO_PENDING_ACTION,
@@ -53,6 +58,22 @@ const debug = (..._: unknown[]) => {}
 // Type guard to check if a value is a DataTransfer
 const isDataTransfer = (value: any): value is DataTransfer =>
   value?.constructor.name === 'DataTransfer'
+
+const wordEndingAt = (
+  editor: Editor,
+  point: Point,
+  replacement: string
+): Range | null => {
+  const start = Editor.before(editor, point, { unit: 'word' })
+  if (!start || !Path.equals(start.path, point.path)) {
+    return null
+  }
+  const typed = Editor.string(editor, { anchor: start, focus: point })
+  return !/\s/.test(typed) &&
+    replacement[0]?.toLowerCase() === typed[0].toLowerCase()
+    ? { anchor: start, focus: point }
+    : null
+}
 
 export type CreateAndroidInputManagerOptions = {
   editor: ReactEditor
@@ -96,6 +117,7 @@ export function createAndroidInputManager({
   let flushTimeoutId: ReturnType<typeof setTimeout> | null = null
   let actionTimeoutId: ReturnType<typeof setTimeout> | null = null
   let lastCompositionActivity = 0
+  let lastInsertText = 0
   let compositionCleared = false
   let hasUnrenderedMutations = false
 
@@ -479,6 +501,14 @@ export function createAndroidInputManager({
 
     const isNodeMapDirty = IS_NODE_MAP_DIRTY.get(editor)
     const { inputType: type } = event
+    const continuesFirefoxInsert =
+      IS_FIREFOX &&
+      type === 'insertText' &&
+      Date.now() - lastInsertText < RESOLVE_DELAY
+
+    if (type === 'insertText') {
+      lastInsertText = Date.now()
+    }
 
     if (type === 'insertCompositionText' || type === 'deleteCompositionText') {
       lastCompositionActivity = Date.now()
@@ -524,6 +554,9 @@ export function createAndroidInputManager({
     }
 
     let [nativeTargetRange] = (event as any).getTargetRanges()
+    const targetOutsideEditor =
+      !!nativeTargetRange &&
+      !ReactEditor.hasDOMNode(editor, nativeTargetRange.startContainer)
     if (nativeTargetRange && !isNodeMapDirty) {
       targetRange = ReactEditor.toSlateRange(editor, nativeTargetRange, {
         exactMatch: false,
@@ -772,6 +805,22 @@ export function createAndroidInputManager({
         // the placeholder itself and thus includes the zero-width space inside edit events.
         if (EDITOR_TO_PENDING_INSERTION_MARKS.get(editor)) {
           text = text.replace('\uFEFF', '')
+        }
+
+        if (
+          continuesFirefoxInsert &&
+          editor.selection &&
+          !Range.equals(targetRange, editor.selection)
+        ) {
+          event.preventDefault()
+          return scheduleAction(() => Editor.insertText(editor, text))
+        }
+
+        if (targetOutsideEditor && Range.isCollapsed(targetRange)) {
+          event.preventDefault()
+          return scheduleAction(() => Editor.insertText(editor, text), {
+            at: wordEndingAt(editor, targetRange.anchor, text) ?? targetRange,
+          })
         }
 
         // Pastes from the Android clipboard will generate `insertText` events.

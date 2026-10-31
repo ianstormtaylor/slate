@@ -1,5 +1,23 @@
 # slate-react
 
+## 0.147.5
+
+### Patch Changes
+
+- [#6358](https://github.com/ianstormtaylor/slate/pull/6358) [`a25994b`](https://github.com/ianstormtaylor/slate/commit/a25994b14f52acdd2f473d1d33ee3f6b0510bc85) Thanks [@dylans](https://github.com/dylans)! - On Android, a keyboard correction whose target range points outside the editor now replaces the word before the caret instead of inserting the corrected word after it
+
+## 0.147.3
+
+### Patch Changes
+
+- [#6346](https://github.com/ianstormtaylor/slate/pull/6346) [`b34e312`](https://github.com/ianstormtaylor/slate/commit/b34e312328fc17442b5f01d925b28adf6e725106) Thanks [@dylans](https://github.com/dylans)! - Firefox for Android no longer splits a word across blocks when a keyboard suggestion is accepted in an empty paragraph. Firefox commits the word as one `insertText` per character at offsets it computed first; once the first character re-rendered the empty leaf, the rest of the word went into the next block. A character that arrives within 25 ms of the previous one and targets somewhere other than the editor's selection is now inserted at the selection instead (#6343).
+
+## 0.147.2
+
+### Patch Changes
+
+- [#6344](https://github.com/ianstormtaylor/slate/pull/6344) [`18f1927`](https://github.com/ianstormtaylor/slate/commit/18f19277a4185cfdeacdff4a43dac09a4c01269a) Thanks [@dylans](https://github.com/dylans)! - Chrome's Writing Direction menu command no longer breaks the editor. The command changes the DOM without a `beforeinput` event, wrapping text in a `direction` span, so React later threw `NotFoundError` on `removeChild` and the editor unmounted. Slate now undoes the DOM changes of any `format*` input it was not asked to handle first and keeps the selection.
+
 ## 0.147.1
 
 ### Patch Changes

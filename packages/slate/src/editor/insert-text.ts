@@ -11,18 +11,20 @@ export const insertText: EditorInterface['insertText'] = (
 ) => {
   const { selection, marks } = editor
 
+  if (options.at != null) {
+    Transforms.insertText(editor, text, options)
+    return
+  }
+
   if (selection) {
-    if (options.at == null && Range.isCollapsed(selection)) {
+    if (Range.isCollapsed(selection)) {
       const point = Editor.insertionPoint(editor, selection.anchor)
       if (!Point.equals(point, selection.anchor))
         Transforms.select(editor, point)
     }
     if (marks) {
       const node = { text, ...marks }
-      Transforms.insertNodes(editor, node, {
-        at: options.at,
-        voids: options.voids,
-      })
+      Transforms.insertNodes(editor, node, { voids: options.voids })
     } else {
       Transforms.insertText(editor, text, options)
     }
