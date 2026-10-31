@@ -1,9 +1,8 @@
 import { BaseEditor, Editor } from 'slate'
 import { History } from './history'
+import { withHistory } from './with-history'
 
-/**
- * Weakmaps for attaching state to the editor.
- */
+// Weakmaps for attaching state to the editor.
 
 export const HISTORY = new WeakMap<Editor, History>()
 export const SAVING = new WeakMap<Editor, boolean | undefined>()
@@ -11,13 +10,33 @@ export const MERGING = new WeakMap<Editor, boolean | undefined>()
 export const SPLITTING_ONCE = new WeakMap<Editor, boolean | undefined>()
 
 /**
- * `HistoryEditor` contains helpers for history-enabled editors.
+ * The `HistoryEditor` interface is added to the `Editor` when it is instantiated using the {@link withHistory} method.
+ * @noInheritDoc
  */
-
 export interface HistoryEditor extends BaseEditor {
   history: History
+
+  /**
+   * Undo to the previous saved state.
+   *
+   * A saved `selectionBefore` is restored even if the current selection is null, such as after removing the last block. Redo restores that saved selection before replaying the batch. Standalone selection changes are not saved, so redo does not replay cursor moves made after its operations.
+   * @group Methods
+   * @category Commands
+   */
   undo: () => void
+
+  /**
+   * Redo to the next saved state. *
+   * @group Methods
+   * @category Commands
+   */
   redo: () => void
+
+  /**
+   * Push a batch of operations as either `undos` or `redos` onto `editor.history.undos` or `editor.history.redos` *
+   * @group Methods
+   * @category Commands
+   */
   writeHistory: (stack: 'undos' | 'redos', batch: any) => void
 }
 
@@ -26,7 +45,6 @@ export const HistoryEditor = {
   /**
    * Check if a value is a `HistoryEditor` object.
    */
-
   isHistoryEditor(value: any): value is HistoryEditor {
     return History.isHistory(value.history) && Editor.isEditor(value)
   },
@@ -34,7 +52,6 @@ export const HistoryEditor = {
   /**
    * Get the merge flag's current value.
    */
-
   isMerging(editor: HistoryEditor): boolean | undefined {
     return MERGING.get(editor)
   },
@@ -42,7 +59,6 @@ export const HistoryEditor = {
   /**
    * Get the splitting once flag's current value.
    */
-
   isSplittingOnce(editor: HistoryEditor): boolean | undefined {
     return SPLITTING_ONCE.get(editor)
   },
@@ -54,7 +70,6 @@ export const HistoryEditor = {
   /**
    * Get the saving flag's current value.
    */
-
   isSaving(editor: HistoryEditor): boolean | undefined {
     return SAVING.get(editor)
   },
@@ -62,15 +77,15 @@ export const HistoryEditor = {
   /**
    * Redo to the previous saved state.
    */
-
   redo(editor: HistoryEditor): void {
     editor.redo()
   },
 
   /**
    * Undo to the previous saved state.
+   *
+   * A saved `selectionBefore` is restored even if the current selection is null, such as after removing the last block. Redo restores that saved selection before replaying the batch. Standalone selection changes are not saved, so redo does not replay cursor moves made after its operations.
    */
-
   undo(editor: HistoryEditor): void {
     editor.undo()
   },
@@ -112,8 +127,9 @@ export const HistoryEditor = {
   /**
    * Apply a series of changes inside a synchronous `fn`, without merging any of
    * the new operations into previous save point in the history.
+   *
+   * Each transform called inside `fn` becomes its own undo step, and the normalization it triggers stays in that step. Use `withNewBatch` to make several transforms one step.
    */
-
   withoutMerging(editor: HistoryEditor, fn: () => void): void {
     const prev = HistoryEditor.isMerging(editor)
     MERGING.set(editor, false)
@@ -127,8 +143,13 @@ export const HistoryEditor = {
   /**
    * Apply a series of changes inside a synchronous `fn`, without saving any of
    * their operations into the history.
+   *
+   * Undo and redo steps already in the history are moved past these changes, so a
+   * later undo still reverts the user's own edit even when the unsaved change
+   * inserted, removed or edited content around it. A step whose content was
+   * removed, or that can no longer be applied, such as a split whose halves are no
+   * longer next to each other, is dropped.
    */
-
   withoutSaving(editor: HistoryEditor, fn: () => void): void {
     const prev = HistoryEditor.isSaving(editor)
     SAVING.set(editor, false)

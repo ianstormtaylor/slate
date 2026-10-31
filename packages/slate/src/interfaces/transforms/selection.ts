@@ -1,10 +1,12 @@
 import { Editor, Location, Point, Selection } from '../../index'
 import { MoveUnit, SelectionEdge } from '../../types/types'
 
+/** @hidden @inline */
 export interface SelectionCollapseOptions {
   edge?: SelectionEdge
 }
 
+/** @hidden @inline */
 export interface SelectionMoveOptions {
   distance?: number
   unit?: MoveUnit
@@ -12,44 +14,45 @@ export interface SelectionMoveOptions {
   edge?: SelectionEdge
 }
 
+/** @hidden @inline */
 export interface SelectionSetPointOptions {
   edge?: SelectionEdge
 }
 
 export interface SelectionTransforms {
   /**
-   * Collapse the selection.
+   * {@inheritDoc BaseEditor#collapse}
    */
-  collapse: (editor: Editor, options?: SelectionCollapseOptions) => void
+  collapse(editor: Editor, options?: SelectionCollapseOptions): void
 
   /**
-   * Unset the selection.
+   * {@inheritDoc BaseEditor#deselect}
    */
-  deselect: (editor: Editor) => void
+  deselect(editor: Editor): void
 
   /**
-   * Move the selection's point forward or backward.
+   * {@inheritDoc BaseEditor#move}
    */
-  move: (editor: Editor, options?: SelectionMoveOptions) => void
+  move(editor: Editor, options?: SelectionMoveOptions): void
 
   /**
-   * Set the selection to a new value.
+   * {@inheritDoc BaseEditor#select}
    */
-  select: (editor: Editor, target: Location) => void
+  select(editor: Editor, target: Location): void
 
   /**
-   * Set new properties on one of the selection's points.
+   * {@inheritDoc BaseEditor#setPoint}
    */
-  setPoint: (
+  setPoint(
     editor: Editor,
     props: Partial<Point>,
     options?: SelectionSetPointOptions
-  ) => void
+  ): void
 
   /**
-   * Set new properties on the selection.
+   * {@inheritDoc BaseEditor#setSelection}
    */
-  setSelection: (editor: Editor, props: Partial<Selection>) => void
+  setSelection(editor: Editor, props: Partial<Selection>): void
 }
 
 // eslint-disable-next-line no-redeclare

@@ -1,6 +1,7 @@
 import { Node, NodeEntry } from '../interfaces/node'
 import { Editor, EditorLevelsOptions } from '../interfaces/editor'
 
+/** @ignore */
 export function* levels<T extends Node>(
   editor: Editor,
   options: EditorLevelsOptions<T> = {}

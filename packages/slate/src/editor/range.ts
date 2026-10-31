@@ -1,6 +1,7 @@
 import { Location } from '../interfaces'
 import { Editor, EditorInterface } from '../interfaces/editor'
 
+/** @ignore */
 export const range: EditorInterface['range'] = (editor, at, to) => {
   if (Location.isRange(at) && !to) {
     return at
