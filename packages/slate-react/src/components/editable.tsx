@@ -329,7 +329,12 @@ export const Editable = forwardRef(
           const el = ReactEditor.toDOMNode(editor, editor)
           const root = el.getRootNode()
 
-          if (!processing.current && IS_WEBKIT && root instanceof ShadowRoot) {
+          if (
+            !processing.current &&
+            IS_WEBKIT &&
+            root instanceof ShadowRoot &&
+            !ReactEditor.isComposing(editor)
+          ) {
             processing.current = true
 
             const active = getActiveElement()
@@ -1509,6 +1514,15 @@ export const Editable = forwardRef(
                     if (IS_WEBKIT) {
                       const domSelection = getSelection(root)
                       domSelection?.removeAllRanges()
+
+                      // COMPAT: Removing the selection while an input method is
+                      // composing makes Safari drop the composition without a
+                      // `compositionend` event. Clear the composing state, or the
+                      // editor ignores selection changes until the next key press.
+                      if (ReactEditor.isComposing(editor)) {
+                        IS_COMPOSING.set(editor, false)
+                        setIsComposing(false)
+                      }
                     }
 
                     IS_FOCUSED.delete(editor)
