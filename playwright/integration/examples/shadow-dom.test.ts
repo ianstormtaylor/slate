@@ -218,6 +218,37 @@ test.describe('shadow-dom example', () => {
     })
   }
 
+  test('types where you click mid-composition in WebKit', async ({
+    page,
+    browserName,
+  }) => {
+    test.skip(browserName !== 'webkit', 'Replays WebKit composition events')
+    const outerShadow = page.locator('[data-cy="outer-shadow-root"]')
+    const innerShadow = outerShadow.locator('> div')
+    const textbox = innerShadow.getByRole('textbox')
+    const editor = await getEditorHandle(textbox)
+
+    await clearEditor(textbox)
+    await page.keyboard.type('Hello')
+    await expect(textbox).toHaveText('Hello')
+
+    // Option+E, with no letter after it
+    expect(await composeLikeWebKit(textbox, { composing: ['´'] })).toEqual({
+      cancelled: false,
+    })
+
+    // WebKit ends a real composition right after `mousedown`, but it doesn't
+    // know about this replayed one, so this relies on Slate clearing the
+    // composing state on `mousedown` itself.
+    const text = textbox.locator('[data-slate-string]')
+    const box = (await text.boundingBox())!
+    await page.mouse.click(box.x + 1, box.y + box.height / 2)
+    await page.keyboard.type('Oh ')
+
+    await expect(textbox).toHaveText('Oh Hello')
+    expect(await editor.evaluate(editor => editor.string([]))).toBe('Oh Hello')
+  })
+
   test('types where you click after blurring mid-composition in WebKit', async ({
     page,
     browserName,

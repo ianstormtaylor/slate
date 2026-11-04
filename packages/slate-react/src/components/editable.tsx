@@ -1535,6 +1535,27 @@ export const Editable = forwardRef(
                     flushDOMSelectionChange,
                   ]
                 )}
+                onMouseDown={useCallback(
+                  (event: React.MouseEvent<HTMLDivElement>) => {
+                    // COMPAT: WebKit ends an open composition right after
+                    // `mousedown`. In a shadow root, the re-render that
+                    // `compositionend` triggers can come after the click has
+                    // moved the caret, and moves it back to where the composition
+                    // started. Clear the composing state now, so the re-render
+                    // happens before the caret moves.
+                    if (
+                      IS_WEBKIT &&
+                      ReactEditor.isComposing(editor) &&
+                      ReactEditor.hasTarget(editor, event.target)
+                    ) {
+                      IS_COMPOSING.set(editor, false)
+                      setIsComposing(false)
+                    }
+
+                    isEventHandled(event, attributes.onMouseDown)
+                  },
+                  [editor, attributes.onMouseDown]
+                )}
                 onClick={useCallback(
                   (event: React.MouseEvent<HTMLDivElement>) => {
                     if (ReactEditor.hasTarget(editor, event.target)) {
