@@ -3,6 +3,7 @@ import { Editor } from '../interfaces/editor'
 import { matchPath } from '../utils/match-path'
 import { Location, Node } from '../interfaces'
 
+/** @ignore */
 export const removeNodes: NodeTransforms['removeNodes'] = (
   editor,
   options = {}

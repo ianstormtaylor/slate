@@ -2,6 +2,7 @@
  * Extendable Custom Types Interface
  */
 
+/** @inline */
 type ExtendableTypes =
   | 'Editor'
   | 'Element'

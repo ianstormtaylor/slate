@@ -9,6 +9,7 @@ import { ReactEditor } from '../plugin/react-editor'
  *
  * Set `suppressThrow` to return `false` instead of throwing when the element
  * can no longer be found in the editor.
+ * @group Hooks
  */
 
 export const useSelected = ({

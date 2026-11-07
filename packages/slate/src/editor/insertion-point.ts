@@ -1,6 +1,7 @@
 import { EditorInterface } from '../interfaces/editor'
 import { getInsertionPoint } from '../utils/get-insertion-point'
 
+/** @ignore */
 export const insertionPoint: EditorInterface['insertionPoint'] = (
   editor,
   point

@@ -3,6 +3,7 @@ import { Point } from '../interfaces/point'
 import { Range } from '../interfaces/range'
 import { Editor, EditorInterface } from '../interfaces/editor'
 
+/** @ignore */
 export const insertText: EditorInterface['insertText'] = (
   editor,
   text,

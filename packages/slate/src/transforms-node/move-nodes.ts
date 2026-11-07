@@ -4,6 +4,7 @@ import { Path } from '../interfaces/path'
 import { matchPath } from '../utils/match-path'
 import { Location, Node, Transforms } from '../interfaces'
 
+/** @ignore */
 export const moveNodes: NodeTransforms['moveNodes'] = (editor, options) => {
   Editor.withoutNormalizing(editor, () => {
     const {

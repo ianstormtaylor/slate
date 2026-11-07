@@ -9,6 +9,7 @@ import { Editor } from '../interfaces/editor'
 import { isBatchingDirtyPaths } from './batch-dirty-paths'
 import { updateDirtyPaths } from './update-dirty-paths'
 
+/** @ignore */
 export const apply: WithEditorFirstArg<Editor['apply']> = (editor, op) => {
   for (const ref of Editor.pathRefs(editor)) {
     PathRef.transform(ref, op)

@@ -2,6 +2,7 @@ import { Editor, EditorInterface } from '../interfaces/editor'
 import { getSymbolDispose } from '../utils/symbol-dispose'
 import { PointRef } from '../interfaces/point-ref'
 
+/** @ignore */
 export const pointRef: EditorInterface['pointRef'] = (
   editor,
   point,

@@ -10,6 +10,7 @@ import {
   Ancestor,
 } from '../interfaces'
 
+/** @ignore */
 export const normalizeNode: WithEditorFirstArg<Editor['normalizeNode']> = (
   editor,
   entry,

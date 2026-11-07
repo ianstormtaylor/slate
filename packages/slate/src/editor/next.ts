@@ -1,6 +1,7 @@
 import { Editor, EditorInterface } from '../interfaces/editor'
 import { Location, Span } from '../interfaces/location'
 
+/** @ignore */
 export const next: EditorInterface['next'] = (editor, options = {}) => {
   const { mode = 'lowest', voids = false } = options
   let { match, at = editor.selection } = options

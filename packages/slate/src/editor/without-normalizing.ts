@@ -1,5 +1,6 @@
 import { Editor, EditorInterface } from '../interfaces/editor'
 
+/** @ignore */
 export const withoutNormalizing: EditorInterface['withoutNormalizing'] = (
   editor,
   fn

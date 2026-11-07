@@ -1,6 +1,7 @@
 import { EditorInterface } from '../interfaces/editor'
 import { Node } from '../interfaces/node'
 
+/** @ignore */
 export const isEmpty: EditorInterface['isEmpty'] = (editor, element) => {
   const { children } = element
   const [first] = children

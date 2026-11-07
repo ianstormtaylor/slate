@@ -1,6 +1,7 @@
 import { EditorInterface } from '../interfaces/editor'
 import { PATH_REFS } from '../utils/weak-maps'
 
+/** @ignore */
 export const pathRefs: EditorInterface['pathRefs'] = editor => {
   let refs = PATH_REFS.get(editor)
 

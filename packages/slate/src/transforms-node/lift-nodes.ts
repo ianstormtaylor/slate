@@ -6,6 +6,7 @@ import { Ancestor, Node, NodeEntry } from '../interfaces/node'
 import { Transforms } from '../interfaces/transforms'
 import { Location } from '../interfaces'
 
+/** @ignore */
 export const liftNodes: NodeTransforms['liftNodes'] = (
   editor,
   options = {}

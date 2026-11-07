@@ -9,3 +9,4 @@ package.json
 site/out/
 tmp/
 .yarn/
+docs/api/

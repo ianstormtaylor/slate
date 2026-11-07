@@ -2,6 +2,7 @@ import { Editor, EditorInterface } from '../interfaces/editor'
 import { getSymbolDispose } from '../utils/symbol-dispose'
 import { RangeRef } from '../interfaces/range-ref'
 
+/** @ignore */
 export const rangeRef: EditorInterface['rangeRef'] = (
   editor,
   range,

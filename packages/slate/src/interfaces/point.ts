@@ -3,18 +3,22 @@ import { TextDirection } from '../types/types'
 
 /**
  * `Point` objects refer to a specific location in a text node in a Slate
- * document. Its path refers to the location of the node in the tree, and its
- * offset refers to the distance into the node's string of text. Points can
- * only refer to `Text` nodes.
+ * document. Points can only refer to `Text` nodes.
  */
-
 export interface BasePoint {
+  /**
+   * The location of the node in the tree.
+   */
   path: Path
+  /**
+   * The distance into the node's string of text.
+   */
   offset: number
 }
 
 export type Point = ExtendedType<'Point', BasePoint>
 
+/** @hidden @inline */
 export interface PointTransformOptions {
   affinity?: TextDirection | null
 }
@@ -23,37 +27,44 @@ export interface PointInterface {
   /**
    * Compare a point to another, returning an integer indicating whether the
    * point was before, at, or after the other.
+   * @category Comparison
    */
-  compare: (point: Point, another: Point) => -1 | 0 | 1
+  compare(point: Point, another: Point): -1 | 0 | 1
 
   /**
    * Check if a point is after another.
+   * @category Comparison
    */
-  isAfter: (point: Point, another: Point) => boolean
+  isAfter(point: Point, another: Point): boolean
 
   /**
    * Check if a point is before another.
+   * @category Comparison
    */
-  isBefore: (point: Point, another: Point) => boolean
+  isBefore(point: Point, another: Point): boolean
 
   /**
    * Check if a point is exactly equal to another.
+   * @category Comparison
    */
-  equals: (point: Point, another: Point) => boolean
+  equals(point: Point, another: Point): boolean
 
   /**
    * Check if a value implements the `Point` interface.
+   * @category Type Guards
    */
-  isPoint: (value: any) => value is Point
+  isPoint(value: any): value is Point
 
   /**
    * Transform a point by an operation.
+   * @param options Type also exported as `PointTransformOptions`
+   * @category Relational
    */
-  transform: (
+  transform(
     point: Point,
     op: Operation,
     options?: PointTransformOptions
-  ) => Point | null
+  ): Point | null
 }
 
 // eslint-disable-next-line no-redeclare
@@ -184,5 +195,4 @@ export const Point: PointInterface = {
  * `PointEntry` objects are returned when iterating over `Point` objects that
  * belong to a range.
  */
-
 export type PointEntry = [Point, 'anchor' | 'focus']

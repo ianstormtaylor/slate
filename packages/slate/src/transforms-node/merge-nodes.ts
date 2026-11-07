@@ -19,6 +19,7 @@ const hasSingleChildNest = (editor: Editor, node: Node): boolean => {
   )
 }
 
+/** @ignore */
 export const mergeNodes: NodeTransforms['mergeNodes'] = (
   editor,
   options = {}

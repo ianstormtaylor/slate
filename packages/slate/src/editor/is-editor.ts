@@ -4,6 +4,7 @@ import { Node } from '../interfaces/node'
 import { Operation } from '../interfaces/operation'
 import { isObject } from '../utils'
 
+/** @ignore */
 export const isEditor: EditorInterface['isEditor'] = (
   value: any,
   { deep = false } = {}

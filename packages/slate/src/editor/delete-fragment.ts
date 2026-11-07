@@ -5,6 +5,7 @@ import { Element } from '../interfaces/element'
 import { Transforms } from '../interfaces/transforms'
 import { Editor, EditorInterface } from '../interfaces/editor'
 
+/** @ignore */
 export const deleteFragment: EditorInterface['deleteFragment'] = (
   editor,
   { direction = 'forward' } = {}

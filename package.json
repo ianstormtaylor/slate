@@ -10,6 +10,7 @@
   },
   "scripts": {
     "build": "yarn build:rollup && yarn build:next",
+    "build:docs": "typedoc",
     "build:next": "cd ./site && next build",
     "build:rollup": "rollup --config ./config/rollup/rollup.config.js --bundleConfigAsCjs",
     "changesetversion": "yarn changeset version && yarn install && git add .",
@@ -119,6 +120,9 @@
     "slate-react": "workspace:*",
     "source-map-loader": "^4.0.1",
     "ts-jest": "^29.1.1",
+    "typedoc": "^0.28.18",
+    "typedoc-plugin-markdown": "^4.11.0",
+    "typedoc-plugin-no-inherit": "^1.6.1",
     "typescript": "6.0.3",
     "unified": "^11.0.5",
     "yjs": "13.6.33"
