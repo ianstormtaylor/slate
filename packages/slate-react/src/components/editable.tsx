@@ -1440,6 +1440,7 @@ export const Editable = forwardRef(
                     editor,
                     compositionDOM,
                     nativeFormatDOM,
+                    state,
                   ]
                 )}
                 onBlur={useCallback(
