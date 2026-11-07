@@ -229,6 +229,13 @@ export const Editable = forwardRef(
     const editor = useSlate()
     // Rerender editor when composition status changed
     const [isComposing, setIsComposing] = useState(false)
+    const setComposing = useCallback(
+      (composing: boolean) => {
+        setIsComposing(composing)
+        IS_COMPOSING.set(editor, composing)
+      },
+      [editor]
+    )
     useIsomorphicLayoutEffect(() => {
       EDITOR_TO_COMPOSING.set(editor, isComposing)
       return () => {
@@ -975,8 +982,7 @@ export const Editable = forwardRef(
                 // won't be updated properly.
                 // https://www.w3.org/TR/input-events-2/
                 if (ReactEditor.isComposing(editor)) {
-                  setIsComposing(false)
-                  IS_COMPOSING.set(editor, false)
+                  setComposing(false)
                 }
               }
 
@@ -1033,6 +1039,7 @@ export const Editable = forwardRef(
         compositionDOM,
         flushDOMSelectionChange,
         readOnly,
+        setComposing,
       ]
     )
 
@@ -1662,8 +1669,7 @@ export const Editable = forwardRef(
                     }
                     if (ReactEditor.hasSelectableTarget(editor, event.target)) {
                       Promise.resolve().then(() => {
-                        setIsComposing(false)
-                        IS_COMPOSING.set(editor, false)
+                        setComposing(false)
                       })
 
                       androidInputManagerRef.current?.handleCompositionEnd(
@@ -1727,6 +1733,7 @@ export const Editable = forwardRef(
                     attributes.onCompositionEnd,
                     editor,
                     compositionDOM,
+                    setComposing,
                   ]
                 )}
                 onCompositionUpdate={useCallback(
@@ -1742,12 +1749,16 @@ export const Editable = forwardRef(
                       !isDOMEventTargetInput(event)
                     ) {
                       if (!ReactEditor.isComposing(editor)) {
-                        setIsComposing(true)
-                        IS_COMPOSING.set(editor, true)
+                        setComposing(true)
                       }
                     }
                   },
-                  [readOnly, attributes.onCompositionUpdate, editor]
+                  [
+                    readOnly,
+                    attributes.onCompositionUpdate,
+                    editor,
+                    setComposing,
+                  ]
                 )}
                 onCompositionStart={useCallback(
                   (event: React.CompositionEvent<HTMLDivElement>) => {
@@ -2057,8 +2068,7 @@ export const Editable = forwardRef(
                         (nativeEvent.isComposing === false ||
                           isDeletingInVoid(editor, nativeEvent))
                       ) {
-                        IS_COMPOSING.set(editor, false)
-                        setIsComposing(false)
+                        setComposing(false)
                       }
 
                       if (
@@ -2426,7 +2436,7 @@ export const Editable = forwardRef(
                       }
                     }
                   },
-                  [readOnly, editor, attributes.onKeyDown]
+                  [readOnly, editor, attributes.onKeyDown, setComposing]
                 )}
                 onPaste={useCallback(
                   (event: React.ClipboardEvent<HTMLDivElement>) => {
