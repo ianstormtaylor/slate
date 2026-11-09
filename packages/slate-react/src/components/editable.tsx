@@ -1813,6 +1813,13 @@ export const Editable = forwardRef(
                   (event: React.ClipboardEvent<HTMLDivElement>) => {
                     if (
                       ReactEditor.hasSelectableTarget(editor, event.target) &&
+                      !isDOMEventTargetInput(event)
+                    ) {
+                      flushDOMSelectionChange()
+                    }
+
+                    if (
+                      ReactEditor.hasSelectableTarget(editor, event.target) &&
                       !isEventHandled(event, attributes.onCopy) &&
                       !isDOMEventTargetInput(event)
                     ) {
@@ -1824,13 +1831,20 @@ export const Editable = forwardRef(
                       )
                     }
                   },
-                  [attributes.onCopy, editor]
+                  [attributes.onCopy, editor, flushDOMSelectionChange]
                 )}
                 onCut={useCallback(
                   (event: React.ClipboardEvent<HTMLDivElement>) => {
                     if (readOnly) {
                       isEventHandled(event, attributes.onCut)
                       return
+                    }
+
+                    if (
+                      ReactEditor.hasSelectableTarget(editor, event.target) &&
+                      !isDOMEventTargetInput(event)
+                    ) {
+                      flushDOMSelectionChange()
                     }
 
                     if (
@@ -1862,7 +1876,7 @@ export const Editable = forwardRef(
                       }
                     }
                   },
-                  [readOnly, editor, attributes.onCut]
+                  [readOnly, editor, attributes.onCut, flushDOMSelectionChange]
                 )}
                 onDragOver={useCallback(
                   (event: React.DragEvent<HTMLDivElement>) => {

@@ -159,4 +159,39 @@ test.describe('plaintext example', () => {
 
     expect(offset).toBe(5)
   })
+
+  for (const type of ['copy', 'cut'] as const) {
+    test(`${type} takes a selection made just before it`, async ({ page }) => {
+      const textbox = page.getByRole('textbox')
+      await textbox.click()
+      await page.waitForTimeout(200)
+
+      const result = await page.evaluate(async type => {
+        const string = document.querySelector('[data-slate-string]')!
+        const text = string.firstChild!
+        const expected = text.textContent!.slice(0, 5)
+        const wait = (ms: number) =>
+          new Promise(resolve => setTimeout(resolve, ms))
+
+        // Let one selection reach editor.selection, then select something
+        // else and copy right away, before selectionchange is processed
+        window.getSelection()!.setBaseAndExtent(text, 0, text, 1)
+        await wait(300)
+        window.getSelection()!.setBaseAndExtent(text, 0, text, 5)
+
+        const clipboardData = new DataTransfer()
+        string.dispatchEvent(
+          new ClipboardEvent(type, {
+            clipboardData,
+            bubbles: true,
+            cancelable: true,
+          })
+        )
+
+        return { expected, copied: clipboardData.getData('text/plain') }
+      }, type)
+
+      expect(result.copied).toBe(result.expected)
+    })
+  }
 })
