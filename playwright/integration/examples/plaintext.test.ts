@@ -179,16 +179,19 @@ test.describe('plaintext example', () => {
         await wait(300)
         window.getSelection()!.setBaseAndExtent(text, 0, text, 5)
 
-        const clipboardData = new DataTransfer()
-        string.dispatchEvent(
-          new ClipboardEvent(type, {
-            clipboardData,
-            bubbles: true,
-            cancelable: true,
-          })
-        )
+        // Firefox gives the event its own clipboardData rather than the one
+        // passed in, so read it back from the event
+        const event = new ClipboardEvent(type, {
+          clipboardData: new DataTransfer(),
+          bubbles: true,
+          cancelable: true,
+        })
+        string.dispatchEvent(event)
 
-        return { expected, copied: clipboardData.getData('text/plain') }
+        return {
+          expected,
+          copied: event.clipboardData!.getData('text/plain'),
+        }
       }, type)
 
       expect(result.copied).toBe(result.expected)
