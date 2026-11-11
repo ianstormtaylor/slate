@@ -46,13 +46,11 @@ export const getDirtyPaths: WithEditorFirstArg<Editor['getDirtyPaths']> = (
       const newAncestors: Path[] = []
 
       for (const ancestor of Path.ancestors(path)) {
-        const p = Path.transform(ancestor, op)
-        oldAncestors.push(p!)
+        oldAncestors.push(Path.transform(ancestor, op))
       }
 
       for (const ancestor of Path.ancestors(newPath)) {
-        const p = Path.transform(ancestor, op)
-        newAncestors.push(p!)
+        newAncestors.push(Path.transform(ancestor, op))
       }
 
       const newParent = newAncestors[newAncestors.length - 1]

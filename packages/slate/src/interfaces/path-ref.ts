@@ -1,4 +1,4 @@
-import { Operation, Path } from '..'
+import { Operation, Path, TextDirection } from '..'
 
 /**
  * `PathRef` objects keep a specific path in a document synced over time as new
@@ -8,7 +8,7 @@ import { Operation, Path } from '..'
 
 export interface PathRef {
   current: Path | null
-  affinity: 'forward' | 'backward' | null
+  affinity: TextDirection | null
   unref(): Path | null
   [Symbol.dispose](): void
 }
