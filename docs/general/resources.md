@@ -38,6 +38,7 @@ These products use Slate, and can give you an idea of what's possible:
 - [Dropdeck](https://www.dropdeck.com/): Magically create beautiful slides — faster than ever
 - [Easy Email Pro](https://www.easyemail.pro/): A powerful, highly customizable email editor
 - [Eraser](https://www.tryeraser.com/): The Whiteboard for Engineering Teams
+- [Formstep](https://formstep.io/): Collect information from anyone, without the back-and-forth
 - [GitBook](https://www.gitbook.com/): Plan, centralize and share knowledge
 - [Discord](https://discord.com/): Text & voice channels to collaborate & share
 - [Grafana](https://grafana.com/): Operational dashboards for your data
