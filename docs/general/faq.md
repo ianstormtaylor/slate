@@ -2,7 +2,7 @@
 
 A series of common questions people have about Slate:
 
-- [Why is content pasted as plain text?](faq.md#why-is-content-is-pasted-as-plaintext)
+- [Why is content pasted as plain text?](faq.md#why-is-content-pasted-as-plain-text)
 - [What browsers and devices does Slate support?](faq.md#what-browsers-and-devices-does-slate-support)
 
 ## Why is content pasted as plain text?
