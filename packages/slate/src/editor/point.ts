@@ -3,6 +3,7 @@ import { Node } from '../interfaces/node'
 import { Range } from '../interfaces/range'
 import { Location } from '../interfaces'
 
+/** @ignore */
 export const point: EditorInterface['point'] = (editor, at, options = {}) => {
   const { edge = 'start' } = options
 

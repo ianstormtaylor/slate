@@ -21,8 +21,8 @@ const POINTS: WeakMap<Node, Set<[number, PointToken]>> = new WeakMap()
 
 /**
  * All tokens inherit from a single constructor for `instanceof` checking.
+ * @inline
  */
-
 export class Token<Ref = unknown> {
   offset?: number
   path?: Path
@@ -52,26 +52,25 @@ export class Token<Ref = unknown> {
 
 /**
  * Anchor tokens represent the selection's anchor point.
+ * @inline
  */
-
 export class AnchorToken extends Token<HyperscriptRangeRef> {}
 
 /**
  * Focus tokens represent the selection's focus point.
+ * @inline
  */
-
 export class FocusToken extends Token<HyperscriptRangeRef> {}
 
 /**
  * Point tokens represent arbitrary points.
+ * @inline
  */
-
 export class PointToken extends Token<HyperscriptPointRef> {}
 
 /**
  * Add an anchor token to the end of a text node.
  */
-
 export function addAnchorToken(text: Text, token: AnchorToken) {
   const offset = text.text.length
 

@@ -2,6 +2,7 @@ import { Descendant, Editor, Element, Location, Node, Path } from '../../index'
 import { NodeMatch, NullableProps, PropsCompare, PropsMerge } from '../editor'
 import { MaximizeMode, RangeMode } from '../../types/types'
 
+/** @hidden @inline */
 export interface NodeInsertNodesOptions<T extends Node> {
   at?: Location
   match?: NodeMatch<T>
@@ -13,39 +14,42 @@ export interface NodeInsertNodesOptions<T extends Node> {
 }
 
 export interface NodeTransforms {
-  setChildren: (editor: Editor, children: Descendant[]) => void
+  /**
+   * {@inheritDoc BaseEditor#setChildren}
+   */
+  setChildren(editor: Editor, children: Descendant[]): void
 
   /**
-   * Insert nodes in the editor
-   * at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
+   * {@inheritDoc BaseEditor#insertNodes}
    */
-  insertNodes: <T extends Node>(
+  insertNodes<T extends Node>(
     editor: Editor,
     nodes: Node | Node[],
     options?: NodeInsertNodesOptions<T>
-  ) => void
+  ): void
 
   /**
-   * Lift nodes at a specific location upwards in the document tree, splitting
-   * their parent in two if necessary.
+   * {@inheritDoc BaseEditor#liftNodes}
    */
-  liftNodes: <T extends Node>(
+  liftNodes<T extends Node>(
     editor: Editor,
     options?: {
       at?: Location
       select?: boolean
+      /**
+       * Defaults to `1` and must be a non-negative integer. A height of `0` does nothing; larger heights lift each matched node through that many ancestors, stopping at the top level. A node that is already at the top level cannot be lifted. For `options.mode`, `'all'` is also supported.
+       */
       height?: number
       match?: NodeMatch<T>
       mode?: MaximizeMode
       voids?: boolean
     }
-  ) => void
+  ): void
 
   /**
-   * Merge a node at a location with the previous node of the same depth,
-   * removing any empty containing nodes after the merge if necessary.
+   * {@inheritDoc BaseEditor#mergeNodes}
    */
-  mergeNodes: <T extends Node>(
+  mergeNodes<T extends Node>(
     editor: Editor,
     options?: {
       at?: Location
@@ -54,12 +58,12 @@ export interface NodeTransforms {
       hanging?: boolean
       voids?: boolean
     }
-  ) => void
+  ): void
 
   /**
-   * Move the nodes at a location to a new location.
+   * {@inheritDoc BaseEditor#moveNodes}
    */
-  moveNodes: <T extends Node>(
+  moveNodes<T extends Node>(
     editor: Editor,
     options: {
       at?: Location
@@ -69,12 +73,12 @@ export interface NodeTransforms {
       to: Path
       voids?: boolean
     }
-  ) => void
+  ): void
 
   /**
-   * Remove the nodes at a specific location in the document.
+   * {@inheritDoc BaseEditor#removeNodes}
    */
-  removeNodes: <T extends Node>(
+  removeNodes<T extends Node>(
     editor: Editor,
     options?: {
       at?: Location
@@ -83,12 +87,12 @@ export interface NodeTransforms {
       hanging?: boolean
       voids?: boolean
     }
-  ) => void
+  ): void
 
   /**
-   * Set new properties on the nodes at a location.
+   * {@inheritDoc BaseEditor#setNodes}
    */
-  setNodes: <T extends Node>(
+  setNodes<T extends Node>(
     editor: Editor,
     props:
       | Partial<NullableProps<T>>
@@ -104,12 +108,12 @@ export interface NodeTransforms {
       merge?: PropsMerge
       replace?: boolean
     }
-  ) => void
+  ): void
 
   /**
-   * Split the nodes at a specific location.
+   * {@inheritDoc BaseEditor#splitNodes}
    */
-  splitNodes: <T extends Node>(
+  splitNodes<T extends Node>(
     editor: Editor,
     options?: {
       at?: Location
@@ -120,12 +124,12 @@ export interface NodeTransforms {
       height?: number
       voids?: boolean
     }
-  ) => void
+  ): void
 
   /**
-   * Unset properties on the nodes at a location.
+   * {@inheritDoc BaseEditor#unsetNodes}
    */
-  unsetNodes: <T extends Node>(
+  unsetNodes<T extends Node>(
     editor: Editor,
     props: string | string[],
     options?: {
@@ -136,13 +140,12 @@ export interface NodeTransforms {
       split?: boolean
       voids?: boolean
     }
-  ) => void
+  ): void
 
   /**
-   * Unwrap the nodes at a location from a parent node, splitting the parent if
-   * necessary to ensure that only the content in the range is unwrapped.
+   * {@inheritDoc BaseEditor#unwrapNodes}
    */
-  unwrapNodes: <T extends Node>(
+  unwrapNodes<T extends Node>(
     editor: Editor,
     options?: {
       at?: Location
@@ -152,13 +155,12 @@ export interface NodeTransforms {
       split?: boolean
       voids?: boolean
     }
-  ) => void
+  ): void
 
   /**
-   * Wrap the nodes at a location in a new container node, splitting the edges
-   * of the range first to ensure that only the content in the range is wrapped.
+   * {@inheritDoc BaseEditor#wrapNodes}
    */
-  wrapNodes: <T extends Node>(
+  wrapNodes<T extends Node>(
     editor: Editor,
     element: Element,
     options?: {
@@ -169,7 +171,7 @@ export interface NodeTransforms {
       split?: boolean
       voids?: boolean
     }
-  ) => void
+  ): void
 }
 
 // eslint-disable-next-line no-redeclare

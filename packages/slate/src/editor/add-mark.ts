@@ -5,6 +5,7 @@ import { Transforms } from '../interfaces/transforms'
 import { FLUSHING } from '../utils/weak-maps'
 import { Editor, EditorInterface } from '../interfaces/editor'
 
+/** @ignore */
 export const addMark: EditorInterface['addMark'] = (editor, key, value) => {
   const { selection } = editor
 

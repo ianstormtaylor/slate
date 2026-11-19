@@ -8,6 +8,7 @@ import { getWordBounds } from '../utils/string'
 
 type TextRun = { path: Path; start: number; end: number }
 
+/** @ignore */
 export const word: EditorInterface['word'] = (editor, options = {}) => {
   const { at = editor.selection, isWordCharacter } = options
 

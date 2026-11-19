@@ -10,6 +10,7 @@ import { NON_SETTABLE_NODE_PROPERTIES } from '../interfaces/transforms/general'
 
 type GetProps = (node: Node, path: Path) => Partial<NullableProps<Node>>
 
+/** @ignore */
 export const setNodes: NodeTransforms['setNodes'] = (
   editor,
   props,

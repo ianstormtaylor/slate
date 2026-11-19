@@ -15,6 +15,7 @@ type SavedPointer =
       node: ChunkDescendant
     }
 
+/** @inline */
 export interface ChunkTreeHelperOptions {
   chunkSize: number
   debug?: boolean

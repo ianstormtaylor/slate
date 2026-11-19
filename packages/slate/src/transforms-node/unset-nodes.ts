@@ -1,6 +1,7 @@
 import { NodeTransforms } from '../interfaces/transforms/node'
 import { Transforms } from '../interfaces/transforms'
 
+/** @ignore */
 export const unsetNodes: NodeTransforms['unsetNodes'] = (
   editor,
   props,
