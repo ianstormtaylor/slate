@@ -68,6 +68,11 @@ inserted, removed or edited content around it. A step whose content was
 removed, or that can no longer be applied, such as a split whose halves are no
 longer next to each other, is dropped.
 
+A batch that would remove a whole node is also dropped if an unsaved change
+edits that node or its descendants, or moves or merges content into it. The
+node is kept with the unsaved changes and its original saved content; other
+operations in that same batch are kept too.
+
 ### Check methods
 
 #### `HistoryEditor.isHistoryEditor(value: any): value is HistoryEditor`

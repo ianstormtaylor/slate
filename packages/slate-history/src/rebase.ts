@@ -147,6 +147,23 @@ const transform = (
   by: Operation,
   side: Side
 ): Operation[] | null => {
+  if (
+    op.type === 'remove_node' &&
+    by.type !== 'set_selection' &&
+    (Path.isAncestor(op.path, by.path) ||
+      ((by.type === 'insert_text' ||
+        by.type === 'remove_text' ||
+        by.type === 'set_node' ||
+        by.type === 'split_node') &&
+        Path.equals(op.path, by.path)) ||
+      (by.type === 'merge_node' &&
+        Path.equals(op.path, Path.previous(by.path))) ||
+      (by.type === 'move_node' && Path.isAncestor(op.path, by.newPath)))
+  ) {
+    // Removing the whole node would also discard the unsaved change.
+    return null
+  }
+
   switch (op.type) {
     case 'set_selection':
       return [op]
