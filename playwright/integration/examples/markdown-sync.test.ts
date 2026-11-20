@@ -42,6 +42,24 @@ test.describe('On markdown-sync example', () => {
     )
   })
 
+  test('keeps spaces inside inline code', async ({ page }) => {
+    const editor = page.getByRole('textbox', { name: 'Rich text editor' })
+    await editor.click()
+    const handle = await getEditorHandle(editor)
+    await handle.evaluate(editor => editor.select(editor.end([2, 1])))
+    await handle.dispose()
+    await page.keyboard.type(' ')
+    await page.keyboard.press('ControlOrMeta+Backquote')
+    await page.keyboard.type('a ')
+    await page.keyboard.press('ControlOrMeta+Backquote')
+    await page.keyboard.type('b')
+
+    await expect(editor.locator('li code')).toHaveText('a ')
+    await expect(page.getByRole('textbox', { name: 'Markdown' })).toHaveValue(
+      /\* Enter in a list item starts a new one `a `b\n/
+    )
+  })
+
   test('renders Markdown edits in the editor', async ({ page }) => {
     await page
       .getByRole('textbox', { name: 'Markdown' })
