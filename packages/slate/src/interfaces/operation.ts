@@ -123,6 +123,17 @@ export type NodeOperation =
   | SetNodeOperation
   | SplitNodeOperation
 
+export type PathTransformingOperation =
+  | InsertNodeOperation
+  | MergeNodeOperation
+  | MoveNodeOperation
+  | RemoveNodeOperation
+  | SplitNodeOperation
+
+export type PointTransformingOperation =
+  | PathTransformingOperation
+  | TextOperation
+
 export type SelectionOperation = SetSelectionOperation
 
 export type TextOperation = InsertTextOperation | RemoveTextOperation
@@ -168,6 +179,16 @@ export interface OperationInterface {
    * original when applied.
    */
   inverse: (op: Operation) => Operation
+
+  /**
+   * Check if an operation is of a type that could affect a Path.
+   */
+  transformsPaths: (op: Operation) => op is PathTransformingOperation
+
+  /**
+   * Check if an operation is of a type that could affect a Point (and by extension, a Range).
+   */
+  transformsPoints: (op: Operation) => op is PointTransformingOperation
 }
 
 // eslint-disable-next-line no-redeclare
@@ -277,8 +298,8 @@ export const Operation: OperationInterface = {
         // and find the original path. We can accomplish this (only in non-sibling)
         // moves by looking at the impact of the move operation on the node
         // after the original move path.
-        const inversePath = Path.transform(path, op)!
-        const inverseNewPath = Path.transform(Path.next(path), op)!
+        const inversePath = Path.transform(path, op)
+        const inverseNewPath = Path.transform(Path.next(path), op)
         return { ...op, path: inversePath, newPath: inverseNewPath }
       }
 
@@ -298,26 +319,40 @@ export const Operation: OperationInterface = {
       case 'set_selection': {
         const { properties, newProperties } = op
 
-        if (properties == null) {
-          return {
-            ...op,
-            properties: newProperties as Range,
-            newProperties: null,
-          }
-        } else if (newProperties == null) {
-          return {
-            ...op,
-            properties: null,
-            newProperties: properties as Range,
-          }
-        } else {
-          return { ...op, properties: newProperties, newProperties: properties }
-        }
+        // assertions are fine here because the inverse is always as valid as the original
+        return { ...op, properties: newProperties!, newProperties: properties! }
       }
 
       case 'split_node': {
         return { ...op, type: 'merge_node', path: Path.next(op.path) }
       }
+    }
+  },
+
+  transformsPaths(
+    operation: Operation
+  ): operation is PathTransformingOperation {
+    switch (operation.type) {
+      case 'insert_node':
+      case 'remove_node':
+      case 'merge_node':
+      case 'split_node':
+      case 'move_node':
+        return true
+      default:
+        return false
+    }
+  },
+
+  transformsPoints(
+    operation: Operation
+  ): operation is PointTransformingOperation {
+    switch (operation.type) {
+      case 'insert_text':
+      case 'remove_text':
+        return true
+      default:
+        return Operation.transformsPaths(operation)
     }
   },
 }

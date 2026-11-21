@@ -9,6 +9,7 @@ import { isObject } from './is-object'
  * normalised to undefined.
  */
 export const isDeepEqual = (a: unknown, b: unknown): boolean => {
+  if (a === b) return true
   if (Array.isArray(a) && Array.isArray(b)) {
     if (a.length !== b.length) return false
     for (let i = 0; i < a.length; i++) {
@@ -35,5 +36,5 @@ export const isDeepEqual = (a: unknown, b: unknown): boolean => {
     return true
   }
 
-  return a === b
+  return false
 }
