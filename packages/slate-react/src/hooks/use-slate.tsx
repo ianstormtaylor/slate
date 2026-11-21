@@ -6,8 +6,8 @@ import { useIsomorphicLayoutEffect } from './use-isomorphic-layout-effect'
 
 /**
  * Get the current editor object and re-render whenever it changes.
+ * @group Hooks
  */
-
 export const useSlate = (): Editor => {
   const { addEventListener } = useContext(SlateSelectorContext)
   const [, forceRender] = useReducer(s => s + 1, 0)
@@ -52,11 +52,11 @@ const getEditorVersionRef = (editor: Editor): MutableRefObject<number> => {
 /**
  * Get the current editor object and its version, which increments on every
  * change.
+ * @group Hooks
  *
  * @deprecated The `v` counter is no longer used except for this hook, and may
  * be removed in a future version.
  */
-
 export const useSlateWithV = (): { editor: Editor; v: number } => {
   const editor = useSlate()
   const vRef = useMemo(() => getEditorVersionRef(editor), [editor])

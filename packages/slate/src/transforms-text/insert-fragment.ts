@@ -11,6 +11,7 @@ import { getDefaultInsertLocation } from '../utils'
 import { Location } from '../interfaces'
 import { getInsertionPoint } from '../utils/get-insertion-point'
 
+/** @ignore */
 export const insertFragment: TextTransforms['insertFragment'] = (
   editor,
   fragment,

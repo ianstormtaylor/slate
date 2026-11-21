@@ -44,6 +44,7 @@ const edges = (before: Descendant[], after: Descendant[]) => {
   return { start, suffix }
 }
 
+/** @ignore */
 export const setChildren: NodeTransforms['setChildren'] = (
   editor,
   children

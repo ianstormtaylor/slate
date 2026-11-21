@@ -9,6 +9,7 @@ import {
   splitByCharacterDistance,
 } from '../utils/string'
 
+/** @ignore */
 export function* positions(
   editor: Editor,
   options: EditorPositionsOptions = {}

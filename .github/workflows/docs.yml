@@ -1,0 +1,139 @@
+name: Publish generated docs
+
+# After a release, build the typedoc Markdown and force-push it to the
+# `docs-generated` branch, which the GitBook space tracks via Git Sync.
+#
+# This is triggered from the Release workflow instead of `release: published`
+# or a tag push, because Release creates its tags and GitHub releases with
+# GITHUB_TOKEN, and events created that way don't start new workflow runs.
+
+on:
+  workflow_run:
+    workflows: [Release]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch: # manual run; start it from `main`
+
+permissions:
+  contents: read
+
+# Never let two pushes to the docs branch race each other.
+concurrency:
+  group: docs-generated
+  cancel-in-progress: false
+
+env:
+  # Everything `yarn build:docs` generates that should be committed, one path
+  # per line, relative to the repo root. Files or folders both work, and
+  # gitignored paths are fine. These must sit inside the folder GitBook syncs from.
+  DOCS_PATHS: |
+    docs/api
+    docs/SUMMARY.md
+  DOCS_BRANCH: docs-generated
+
+jobs:
+  check:
+    name: Check for a release
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    outputs:
+      released: ${{ steps.release.outputs.released }}
+      sha: ${{ steps.release.outputs.sha }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # need tags
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          persist-credentials: false
+
+      - name: Did this commit publish a release?
+        id: release
+        env:
+          EVENT: ${{ github.event_name }}
+        run: |
+          set -euo pipefail
+          sha="$(git rev-parse HEAD)"
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+
+          # Manual runs always build.
+          if [ "$EVENT" = "workflow_dispatch" ]; then
+            echo "released=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Release runs on every push to main, but only tags the commit
+          # when `changeset publish` actually published something.
+          tags="$(git tag --points-at "$sha" --list 'slate*@*')"
+          if [ -n "$tags" ]; then
+            echo "Release tags on $sha:"
+            echo "$tags"
+            echo "released=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "No release tags on $sha, skipping docs."
+            echo "released=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  docs:
+    name: Build and push docs
+    needs: check
+    if: needs.check.outputs.released == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # push the docs branch
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          ref: ${{ needs.check.outputs.sha }}
+
+      - name: Enable Corepack (Yarn)
+        run: corepack enable
+
+      - name: Setup node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Build packages
+        run: yarn build
+
+      - name: Build docs
+        run: yarn build:docs
+
+      - name: Check docs output exists
+        run: |
+          missing=0
+          while IFS= read -r path; do
+            [ -n "$path" ] || continue
+            if [ ! -e "$path" ]; then
+              echo "::error::Expected docs output at $path but it wasn't created. Update DOCS_PATHS in this workflow."
+              missing=1
+            fi
+          done <<< "$DOCS_PATHS"
+          exit "$missing"
+
+      - name: Commit docs and force-push to ${{ env.DOCS_BRANCH }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # Reset the docs branch to the released commit, then add the
+          # generated docs on top. `-f` in case the paths are gitignored.
+          short_sha="$(git rev-parse --short HEAD)"
+          git checkout -B "$DOCS_BRANCH"
+          while IFS= read -r path; do
+            [ -n "$path" ] || continue
+            git add -f -- "$path"
+          done <<< "$DOCS_PATHS"
+          git diff --cached --quiet || git commit -m "docs: generate API docs for $short_sha"
+
+          git push --force origin "$DOCS_BRANCH"

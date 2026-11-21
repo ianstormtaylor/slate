@@ -1,5 +1,6 @@
 import { Editor, EditorInterface } from '../interfaces/editor'
 
+/** @ignore */
 export const before: EditorInterface['before'] = (editor, at, options = {}) => {
   const anchor = Editor.start(editor, [])
   const focus = Editor.point(editor, at, { edge: 'start' })

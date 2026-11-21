@@ -3,6 +3,7 @@ import { Transforms } from '../interfaces/transforms'
 import { Range } from '../interfaces/range'
 import { WithEditorFirstArg } from '../utils/types'
 
+/** @ignore */
 export const deleteBackward: WithEditorFirstArg<Editor['deleteBackward']> = (
   editor,
   unit

@@ -3,6 +3,7 @@ import {
   createEditor,
   Descendant,
   Editor,
+  EditorInterface,
   EditorWordOptions,
   Node,
   Path,
@@ -51,29 +52,83 @@ import {
 
 /**
  * A DOM-specific version of the `Editor` interface.
+ * @noInheritDoc
  */
-
 export interface DOMEditor extends BaseEditor {
+  /**
+   * @group Methods
+   * @category Queries
+   */
   hasEditableTarget: (
     editor: DOMEditor,
     target: EventTarget | null
   ) => target is DOMNode
+
+  /**
+   * @group Methods
+   * @category Queries
+   */
   hasSelectableTarget: (
     editor: DOMEditor,
     target: EventTarget | null
   ) => boolean
+
+  /**
+   * @group Methods
+   * @category Queries
+   */
   hasTarget: (
     editor: DOMEditor,
     target: EventTarget | null
   ) => target is DOMNode
+
+  /**
+   * @group Methods
+   * @category Commands
+   */
   insertData: (data: DataTransfer) => void
+
+  /**
+   * @group Methods
+   * @category Commands
+   */
   insertFragmentData: (data: DataTransfer) => boolean
+
+  /**
+   * @group Methods
+   * @category Commands
+   */
   insertTextData: (data: DataTransfer) => boolean
+
+  /**
+   * @group Methods
+   * @category Queries
+   */
   isTargetInsideNonReadonlyVoid: (
     editor: DOMEditor,
     target: EventTarget | null
   ) => boolean
+
+  /**
+   * Where DOM mapping errors are reported without throwing. Slate reports here when an element mounts and one of its children has no DOM node, usually because `renderElement` didn't render the `children` prop. The error names the element's `type` and path. The `resolve` lookups return `null` quietly, since a miss is often ordinary. By default it hands the error to the browser's `reportError`, so it shows in the console and reaches `window.onerror`. Override it to send errors to your own logging:
+   *
+   * ```javascript
+   * const { onDOMError } = editor
+   * editor.onDOMError = error => {
+   *   logger.warn(error)
+   *   onDOMError(error)
+   * }
+   * ```
+   *
+   * The `toDOM*` and `toSlate*` lookups still throw; use the `resolve` versions to get `null` instead.
+   * @group Events
+   */
   onDOMError: (error: unknown) => void
+
+  /**
+   * @group Methods
+   * @category Queries
+   */
   setFragmentData: (
     data: DataTransfer,
     originEvent?: 'drag' | 'copy' | 'cut'
@@ -84,27 +139,27 @@ export interface DOMEditorInterface {
   /**
    * Experimental and android specific: Get pending diffs
    */
-  androidPendingDiffs: (editor: Editor) => TextDiff[] | undefined
+  androidPendingDiffs(editor: Editor): TextDiff[] | undefined
 
   /**
    * Experimental and android specific: Flush all pending diffs and cancel composition at the next possible time.
    */
-  androidScheduleFlush: (editor: Editor) => void
+  androidScheduleFlush(editor: Editor): void
 
   /**
    * Blur the editor.
    */
-  blur: (editor: DOMEditor) => void
+  blur(editor: DOMEditor): void
 
   /**
    * Deselect the editor.
    */
-  deselect: (editor: DOMEditor) => void
+  deselect(editor: DOMEditor): void
 
   /**
    * Find the DOM node that implements DocumentOrShadowRoot for the editor.
    */
-  findDocumentOrShadowRoot: (editor: DOMEditor) => Document | ShadowRoot
+  findDocumentOrShadowRoot(editor: DOMEditor): Document | ShadowRoot
 
   /**
    * Get the target range from a DOM `event`.
@@ -113,158 +168,181 @@ export interface DOMEditorInterface {
    * outside of the editor even when the event's target lies inside it. With
    * `suppressThrow`, `null` is returned instead of throwing in that case.
    */
-  findEventRange: <T extends boolean = false>(
+  findEventRange<T extends boolean = false>(
     editor: DOMEditor,
     event: any,
     options?: { suppressThrow?: T }
-  ) => T extends true ? Range | null : Range
+  ): T extends true ? Range | null : Range
 
   /**
    * Find a key for a Slate node.
    */
-  findKey: (editor: DOMEditor, node: Node) => Key
+  findKey(editor: DOMEditor, node: Node): Key
 
   /**
    * Find the path of Slate node.
    */
-  findPath: (editor: DOMEditor, node: Node) => Path
+  findPath(editor: DOMEditor, node: Node): Path
 
   /**
    * Focus the editor.
+   *
+   * In tests that run in jsdom, use `DOMEditor.focus(editor)` instead of calling `focus()` on the editable element. `Editable` doesn't treat a native focus event in jsdom as a focus of the editor, partly because jsdom doesn't implement `isContentEditable`, so `DOMEditor.isFocused` and `useFocused` stay `false`. `DOMEditor.focus` sets the focused state itself.
    */
-  focus: (editor: DOMEditor, options?: { retries: number }) => void
+  focus(editor: DOMEditor, options?: { retries: number }): void
 
   /**
    * Return the host window of the current editor.
    */
-  getWindow: (editor: DOMEditor) => Window
+  getWindow(editor: DOMEditor): Window
 
   /**
    * Check if a DOM node is within the editor.
    */
-  hasDOMNode: (
+  hasDOMNode(
     editor: DOMEditor,
     target: DOMNode,
     options?: { editable?: boolean }
-  ) => boolean
+  ): boolean
 
   /**
    * Check if the target is editable and in the editor.
    */
-  hasEditableTarget: (
+  hasEditableTarget(
     editor: DOMEditor,
     target: EventTarget | null
-  ) => target is DOMNode
+  ): target is DOMNode
 
   /**
    *
    */
-  hasRange: (editor: DOMEditor, range: Range) => boolean
+  hasRange(editor: DOMEditor, range: Range): boolean
 
   /**
    * Check if the target can be selectable
    */
-  hasSelectableTarget: (
-    editor: DOMEditor,
-    target: EventTarget | null
-  ) => boolean
+  hasSelectableTarget(editor: DOMEditor, target: EventTarget | null): boolean
 
   /**
    * Check if the target is in the editor.
    */
-  hasTarget: (
-    editor: DOMEditor,
-    target: EventTarget | null
-  ) => target is DOMNode
+  hasTarget(editor: DOMEditor, target: EventTarget | null): target is DOMNode
 
   /**
    * Insert data from a `DataTransfer` into the editor.
    */
-  insertData: (editor: DOMEditor, data: DataTransfer) => void
+  insertData(editor: DOMEditor, data: DataTransfer): void
 
   /**
    * Insert fragment data from a `DataTransfer` into the editor.
    */
-  insertFragmentData: (editor: DOMEditor, data: DataTransfer) => boolean
+  insertFragmentData(editor: DOMEditor, data: DataTransfer): boolean
 
   /**
    * Insert text data from a `DataTransfer` into the editor.
    */
-  insertTextData: (editor: DOMEditor, data: DataTransfer) => boolean
+  insertTextData(editor: DOMEditor, data: DataTransfer): boolean
 
   /**
    * Check if the user is currently composing inside the editor.
    */
-  isComposing: (editor: DOMEditor) => boolean
+  isComposing(editor: DOMEditor): boolean
 
-  getWord: (
+  /**
+   * Like {@link EditorInterface#word}, but while an input method is composing it reads the composing text from the DOM and uses the DOM caret when `at` isn't given. `text` is the word as currently shown. During a composition, `range` counts the composing characters, so it only matches the editor's value once the composition ends.
+   */
+  getWord(
     editor: DOMEditor,
     options?: EditorWordOptions
-  ) => { range: Range; text: string } | undefined
+  ): { range: Range; text: string } | undefined
 
   /**
    * Check if the editor is focused.
    */
-  isFocused: (editor: DOMEditor) => boolean
+  isFocused(editor: DOMEditor): boolean
 
-  isMounted: (editor: DOMEditor) => boolean
+  /**
+   * Check if the editor is mounted, meaning it is rendered and has a DOM element. Methods that resolve DOM nodes, such as `toDOMNode`, throw for an editor that is not mounted.
+   */
+  isMounted(editor: DOMEditor): boolean
 
   /**
    * Check if the editor is in read-only mode.
    */
-  isReadOnly: (editor: DOMEditor) => boolean
+  isReadOnly(editor: DOMEditor): boolean
 
   /**
    * Check if the target is inside void and in an non-readonly editor.
    */
-  isTargetInsideNonReadonlyVoid: (
+  isTargetInsideNonReadonlyVoid(
     editor: DOMEditor,
     target: EventTarget | null
-  ) => boolean
+  ): boolean
 
   /**
    * Sets data from the currently selected fragment on a `DataTransfer`.
    */
-  setFragmentData: (
+  setFragmentData(
     editor: DOMEditor,
     data: DataTransfer,
     originEvent?: 'drag' | 'copy' | 'cut'
-  ) => void
+  ): void
 
-  resolveDOMPoint: (editor: DOMEditor, point: Point) => DOMPoint | null
+  /**
+   * Like `toDOMPoint`, but returns `null` instead of throwing. A point can be missing for ordinary reasons, for example during a React commit, before `Editable` mounts, or after `editor.children` was replaced, so a miss isn't reported.
+   */
+  resolveDOMPoint(editor: DOMEditor, point: Point): DOMPoint | null
 
-  resolveDOMRange: (editor: DOMEditor, range: Range) => DOMRange | null
+  /**
+   * Like `toDOMRange`, but returns `null` instead of throwing, including when either point is missing or the editor's window isn't known yet.
+   */
+  resolveDOMRange(editor: DOMEditor, range: Range): DOMRange | null
 
-  resolveEventRange: (editor: DOMEditor, event: any) => Range | null
+  /**
+   * Like `findEventRange`, but returns `null` when the event doesn't map to a range in the editor.
+   */
+  resolveEventRange(editor: DOMEditor, event: any): Range | null
 
-  resolveDOMNode: (editor: DOMEditor, node: Node) => HTMLElement | null
+  /**
+   * Like `toDOMNode`, but returns `null` when the node isn't rendered.
+   */
+  resolveDOMNode(editor: DOMEditor, node: Node): HTMLElement | null
 
-  resolveSlateNode: (editor: DOMEditor, domNode: DOMNode) => Node | null
+  /**
+   * Like `toSlateNode`, but returns `null` when the DOM node isn't inside a Slate node.
+   */
+  resolveSlateNode(editor: DOMEditor, domNode: DOMNode): Node | null
 
-  resolveSlatePoint: (
+  /**
+   * Like `toSlatePoint`, but returns `null` instead of throwing, including in the cases where `suppressThrow: true` still throws, such as before `Editable` mounts. `exactMatch` defaults to `false`.
+   */
+  resolveSlatePoint(
     editor: DOMEditor,
     domPoint: DOMPoint,
     options?: {
       exactMatch?: boolean
       searchDirection?: 'forward' | 'backward'
     }
-  ) => Point | null
+  ): Point | null
 
-  resolveSlateRange: (
+  /**
+   * Like `toSlateRange`, but returns `null` instead of throwing, including for a selection with no range. `exactMatch` defaults to `false`.
+   */
+  resolveSlateRange(
     editor: DOMEditor,
     domRange: DOMRange | DOMStaticRange | DOMSelection,
     options?: { exactMatch?: boolean }
-  ) => Range | null
+  ): Range | null
 
   /**
    * Find the native DOM element from a Slate node.
    */
-  toDOMNode: (editor: DOMEditor, node: Node) => HTMLElement
+  toDOMNode(editor: DOMEditor, node: Node): HTMLElement
 
   /**
    * Find a native DOM selection point from a Slate point.
    */
-  toDOMPoint: (editor: DOMEditor, point: Point) => DOMPoint
+  toDOMPoint(editor: DOMEditor, point: Point): DOMPoint
 
   /**
    * Find a native DOM range from a Slate `range`.
@@ -274,17 +352,17 @@ export interface DOMEditorInterface {
    * there is no way to create a reverse DOM Range using Range.setStart/setEnd
    * according to https://dom.spec.whatwg.org/#concept-range-bp-set.
    */
-  toDOMRange: (editor: DOMEditor, range: Range) => DOMRange
+  toDOMRange(editor: DOMEditor, range: Range): DOMRange
 
   /**
    * Find a Slate node from a native DOM `element`.
    */
-  toSlateNode: (editor: DOMEditor, domNode: DOMNode) => Node
+  toSlateNode(editor: DOMEditor, domNode: DOMNode): Node
 
   /**
    * Find a Slate point from a DOM selection's `domNode` and `domOffset`.
    */
-  toSlatePoint: <T extends boolean>(
+  toSlatePoint<T extends boolean>(
     editor: DOMEditor,
     domPoint: DOMPoint,
     options: {
@@ -296,19 +374,19 @@ export interface DOMEditorInterface {
        */
       searchDirection?: 'forward' | 'backward'
     }
-  ) => T extends true ? Point | null : Point
+  ): T extends true ? Point | null : Point
 
   /**
    * Find a Slate range from a DOM range or selection.
    */
-  toSlateRange: <T extends boolean>(
+  toSlateRange<T extends boolean>(
     editor: DOMEditor,
     domRange: DOMRange | DOMStaticRange | DOMSelection,
     options: {
       exactMatch: boolean
       suppressThrow: T
     }
-  ) => T extends true ? Range | null : Range
+  ): T extends true ? Range | null : Range
 }
 
 // eslint-disable-next-line no-redeclare

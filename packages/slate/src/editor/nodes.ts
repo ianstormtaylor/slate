@@ -3,6 +3,7 @@ import { Editor, EditorNodesOptions } from '../interfaces/editor'
 import { Location } from '../interfaces/location'
 import { Path } from '../interfaces/path'
 
+/** @ignore */
 export function* nodes<T extends Node>(
   editor: Editor,
   options: EditorNodesOptions<T> = {}

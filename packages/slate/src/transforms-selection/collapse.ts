@@ -2,6 +2,7 @@ import { SelectionTransforms } from '../interfaces/transforms/selection'
 import { Transforms } from '../interfaces/transforms'
 import { Range } from '../interfaces/range'
 
+/** @ignore */
 export const collapse: SelectionTransforms['collapse'] = (
   editor,
   options = {}

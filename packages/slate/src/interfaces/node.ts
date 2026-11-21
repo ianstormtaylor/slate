@@ -10,14 +10,17 @@ import { modifyChildren, modifyLeaf, removeChildren } from '../utils/modify'
 export type BaseNode = Editor | Element | Text
 export type Node = Editor | Element | Text
 
+/** @hidden @inline */
 export interface NodeAncestorsOptions {
   reverse?: boolean
 }
 
+/** @hidden @inline */
 export interface NodeChildrenOptions {
   reverse?: boolean
 }
 
+/** @hidden @inline */
 export interface NodeDescendantsOptions {
   from?: Path
   to?: Path
@@ -25,6 +28,7 @@ export interface NodeDescendantsOptions {
   pass?: (node: NodeEntry) => boolean
 }
 
+/** @hidden @inline */
 export interface NodeElementsOptions {
   from?: Path
   to?: Path
@@ -32,14 +36,17 @@ export interface NodeElementsOptions {
   pass?: (node: NodeEntry) => boolean
 }
 
+/** @hidden @inline */
 export interface NodeIsNodeOptions {
   deep?: boolean
 }
 
+/** @hidden @inline */
 export interface NodeLevelsOptions {
   reverse?: boolean
 }
 
+/** @hidden @inline */
 export interface NodeNodesOptions {
   from?: Path
   to?: Path
@@ -47,6 +54,7 @@ export interface NodeNodesOptions {
   pass?: (entry: NodeEntry) => boolean
 }
 
+/** @hidden @inline */
 export interface NodeTextsOptions {
   from?: Path
   to?: Path
@@ -56,171 +64,236 @@ export interface NodeTextsOptions {
 
 export interface NodeInterface {
   /**
-   * Get the node at a specific path, asserting that it's an ancestor node.
+   * Get the node at a specific path, asserting that it's an ancestor node. If the specified node is not an ancestor node, throw an error.
+   * @category Queries
    */
-  ancestor: (root: Node, path: Path) => Ancestor
+  ancestor(root: Node, path: Path): Ancestor
 
   /**
    * Return a generator of all the ancestor nodes above a specific path.
    *
    * By default the order is top-down, from highest to lowest ancestor in
    * the tree, but you can pass the `reverse: true` option to go bottom-up.
+   * @param options Type also exported as `NodeAncestorsOptions`
+   * @category Relational
    */
-  ancestors: (
+  ancestors(
     root: Node,
     path: Path,
     options?: NodeAncestorsOptions
-  ) => Generator<NodeEntry<Ancestor>, void, undefined>
+  ): Generator<NodeEntry<Ancestor>, void, undefined>
 
   /**
    * Get the child of a node at a specific index.
+   * @category Relational
    */
-  child: (root: Node, index: number) => Descendant
+  child(root: Node, index: number): Descendant
 
   /**
    * Iterate over the children of a node at a specific path.
+   * @param options Type also exported as `NodeChildrenOptions`
+   * @category Relational
    */
-  children: (
+  children(
     root: Node,
     path: Path,
     options?: NodeChildrenOptions
-  ) => Generator<NodeEntry<Descendant>, void, undefined>
+  ): Generator<NodeEntry<Descendant>, void, undefined>
 
   /**
-   * Get an entry for the common ancestor node of two paths.
+   * Get an entry for the common ancesetor of two paths.
+   * In most cases this will be an Element node, but could the root Editor node if the paths have no other common ancestors, or a Text node if the paths are the same (or if they point to nodes that don't exist).
+   *
+   * If the paths are equal, or one is an ancestor of the other, the entry is for the node at the shorter path. For example, `Node.common(editor, [0, 0], [0, 0])` returns the text node at `[0, 0]`, and `Node.common(editor, [0], [0, 0])` returns the element at `[0]`.
+   * @category Retrieval
    */
-  common: (root: Node, path: Path, another: Path) => NodeEntry
+  common(root: Node, path: Path, another: Path): NodeEntry
 
   /**
    * Get the node at a specific path, asserting that it's a descendant node.
+   * @category Retrieval
    */
-  descendant: (root: Node, path: Path) => Descendant
+  descendant(root: Node, path: Path): Descendant
 
   /**
    * Return a generator of all the descendant node entries inside a root node.
+   * @param options Type also exported as `NodeDescendantsOptions`
+   * @category Retrieval
    */
-  descendants: (
+  descendants(
     root: Node,
     options?: NodeDescendantsOptions
-  ) => Generator<NodeEntry<Descendant>, void, undefined>
+  ): Generator<NodeEntry<Descendant>, void, undefined>
 
   /**
    * Return a generator of all the element nodes inside a root node. Each iteration
    * will return an `ElementEntry` tuple consisting of `[Element, Path]`. If the
    * root node is an element it will be included in the iteration as well.
+   * @param options Type also exported as `NodeElementsOptions`
+   * @category Retrieval
    */
-  elements: (
+  elements(
     root: Node,
     options?: NodeElementsOptions
-  ) => Generator<ElementEntry, void, undefined>
+  ): Generator<ElementEntry, void, undefined>
 
   /**
-   * Extract props from a Node.
+   * Extract all properties from a Node except for its content-related fields (`children` for Element nodes and `text` for Text nodes).
+   * @returns An object containing the extracted properties of the node.
+   * @category Queries
+   *
+   * @example
+   * ```typescript
+   * // For an Element node
+   * const element = {
+   *   type: 'paragraph',
+   *   align: 'center',
+   *   children: [{ text: 'Try it out for yourself!' }],
+   * }
+   * const props = Node.extractProps(element)
+   * // Returns: { type: 'paragraph', align: "center" }
+   *
+   * // For a Text node
+   * const text = { text: 'Hello', bold: true }
+   * const props = Node.extractProps(text)
+   * // Returns: { bold: true }
+   * ```
    */
-  extractProps: (node: Node) => NodeProps
+  extractProps(node: Node): NodeProps
 
   /**
    * Get the first leaf node entry in a root node from a path.
+   * @category Retrieval
    */
-  first: (root: Node, path: Path) => NodeEntry
+  first(root: Node, path: Path): NodeEntry
 
   /**
    * Get the sliced fragment represented by a range inside a root node.
+   * @category Queries
    */
-  fragment: <T extends Ancestor = Editor>(
-    root: T,
-    range: Range
-  ) => T['children']
+  fragment<T extends Ancestor = Editor>(root: T, range: Range): T['children']
+
+  /**
+   * Find the path of `node` inside `root` by walking the tree, comparing nodes by identity. Returns `[]` for the root itself and `undefined` if `node` isn't in the tree. It doesn't need a rendered editor, so it works on the server too; `ReactEditor.findPath` is faster for rendered nodes and falls back to this.
+   */
+  findPath(root: Node, node: Node): Path | undefined
 
   /**
    * Get the descendant node referred to by a specific path. If the path is an
    * empty array, it refers to the root node itself.
+   * @category Retrieval
    */
-  findPath: (root: Node, node: Node) => Path | undefined
-
-  get: (root: Node, path: Path) => Node
+  get(root: Node, path: Path): Node
 
   /**
-   * Similar to get, but returns undefined if the node does not exist.
+   * Get a descendant node at a specific path, returning `undefined` if the node does not exist. This is a safer alternative to `Node.get()` as it won't throw an error if the path is invalid.
+   * @category Retrieval
+   *
+   * @example
+   * ```typescript
+   * const node = Node.getIf(root, [0, 1])
+   * if (node) {
+   *   // node exists at path [0, 1]
+   * } else {
+   *   // no node exists at path [0, 1]
+   * }
+   * ```
    */
-  getIf: (root: Node, path: Path) => Node | undefined
+  getIf(root: Node, path: Path): Node | undefined
 
   /**
    * Check if a descendant node exists at a specific path.
+   * @category Queries
    */
-  has: (root: Node, path: Path) => boolean
+  has(root: Node, path: Path): boolean
 
   /**
    * Check if a node is an `Editor` or `Element` object.
+   * @category Type Guards
    */
-  isAncestor: (node: Node) => node is Ancestor
+  isAncestor(node: Node): node is Ancestor
 
   /**
    * Check if a node is an `Editor` object.
+   * @category Type Guards
    */
-  isEditor: (node: Node) => node is Editor
+  isEditor(node: Node): node is Editor
 
   /**
    * Check if a node is an `Element` object.
+   * @category Type Guards
    */
-  isElement: (node: Node) => node is Element
+  isElement(node: Node): node is Element
 
   /**
    * Check if a value implements the `Node` interface.
+   * @param options Type also exported as `NodeIsNodeOptions`
+   * @category Type Guards
    */
-  isNode: (value: any, options?: NodeIsNodeOptions) => value is Node
+  isNode(value: any, options?: NodeIsNodeOptions): value is Node
 
   /**
    * Check if a value is a list of `Node` objects.
+   * @param options Type also exported as `NodeIsNodeOptions`
+   * @category Type Guards
    */
-  isNodeList: (value: any, options?: NodeIsNodeOptions) => value is Node[]
+  isNodeList(value: any, options?: NodeIsNodeOptions): value is Node[]
 
   /**
    * Check if a node is an `Text` object.
+   * @category Type Guards
    */
-  isText: (node: Node) => node is Text
+  isText(node: Node): node is Text
 
   /**
    * Get the last leaf node entry in a root node from a path.
+   * @category Retrieval
    */
-  last: (root: Node, path: Path) => NodeEntry
+  last(root: Node, path: Path): NodeEntry
 
   /**
-   * Get the node at a specific path, ensuring it's a leaf text node.
+   * Get the node at a specific path, ensuring it's a leaf text node. If the node is not a leaf text node, throw an error.
+   * @category Retrieval
    */
-  leaf: (root: Node, path: Path) => Text
+  leaf(root: Node, path: Path): Text
 
   /**
    * Return a generator of the in a branch of the tree, from a specific path.
    *
    * By default the order is top-down, from highest to lowest node in the tree,
    * but you can pass the `reverse: true` option to go bottom-up.
+   * @param options Type also exported as `NodeLevelsOptions`
+   * @category Retrieval
    */
-  levels: (
+  levels(
     root: Node,
     path: Path,
     options?: NodeLevelsOptions
-  ) => Generator<NodeEntry, void, undefined>
+  ): Generator<NodeEntry, void, undefined>
 
   /**
    * Check if a node matches a set of props.
+   * @category Queries
    */
-  matches: (node: Node, props: Partial<Node>) => boolean
+  matches(node: Node, props: Partial<Node>): boolean
 
   /**
    * Return a generator of all the node entries of a root node. Each entry is
    * returned as a `[Node, Path]` tuple, with the path referring to the node's
    * position inside the root node.
+   * @param options Type also exported as `NodeNodesOptions`
+   * @category Retrieval
    */
-  nodes: (
+  nodes(
     root: Node,
     options?: NodeNodesOptions
-  ) => Generator<NodeEntry, void, undefined>
+  ): Generator<NodeEntry, void, undefined>
 
   /**
    * Get the parent of a node at a specific path.
+   * @category Retrieval
    */
-  parent: (root: Node, path: Path) => Ancestor
+  parent(root: Node, path: Path): Ancestor
 
   /**
    * Get the concatenated text string of a node's content.
@@ -228,16 +301,19 @@ export interface NodeInterface {
    * Note that this will not include spaces or line breaks between block nodes.
    * It is not a user-facing string, but a string for performing offset-related
    * computations for a node.
+   * @category Queries
    */
-  string: (node: Node) => string
+  string(node: Node): string
 
   /**
    * Return a generator of all leaf text nodes in a root node.
+   * @param options Type also exported as `NodeTextsOptions`
+   * @category Retrieval
    */
-  texts: (
+  texts(
     root: Node,
     options?: NodeTextsOptions
-  ) => Generator<NodeEntry<Text>, void, undefined>
+  ): Generator<NodeEntry<Text>, void, undefined>
 }
 
 // eslint-disable-next-line no-redeclare
@@ -685,7 +761,6 @@ export const Node: NodeInterface = {
  * tree. It is returned as a convenience in certain cases to narrow a value
  * further than the more generic `Node` union.
  */
-
 export type Descendant = Element | Text
 
 /**
@@ -693,15 +768,13 @@ export type Descendant = Element | Text
  * It is returned as a convenience in certain cases to narrow a value further
  * than the more generic `Node` union.
  */
-
 export type Ancestor = Editor | Element
 
 /**
  * `NodeEntry` objects are returned when iterating over the nodes in a Slate
- * document tree. They consist of the node and its `Path` relative to the root
+ * document tree. They consist of the node and its path relative to the root
  * node in the document.
  */
-
 export type NodeEntry<T extends Node = Node> = [T, Path]
 
 /**

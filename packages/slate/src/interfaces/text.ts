@@ -7,7 +7,6 @@ import { isDeepEqual } from '../utils/deep-equal'
  * Slate document along with any formatting properties. They are always leaf
  * nodes in the document tree as they cannot contain any children.
  */
-
 export interface BaseText {
   text: string
 }
@@ -21,8 +20,17 @@ export interface LeafPosition {
   isLast?: true
 }
 
+/** @hidden @inline */
 export interface TextEqualsOptions {
+  /**
+   * Top-level property names to exclude from both nodes before comparing, such as `ignore: ['id']` for application-generated IDs. Nested properties are still compared deeply, and neither input node is changed. Combine with `loose: true` to ignore both text content and the named properties. The default is an empty list.
+   */
   ignore?: readonly string[]
+  /**
+   * When `true`, it checks if the properties of the `Text` object are equal except for the `text` property (i.e. the `String` value of the `Text`). When `false` (default), checks all properties including `text`.
+   *
+   * This is used to check whether sibling text nodes can be merged.
+   */
   loose?: boolean
 }
 
@@ -38,41 +46,47 @@ export interface TextInterface {
   /**
    * Check if two text nodes are equal.
    *
-   * When loose is set, the text is not compared. This is
-   * used to check whether sibling text nodes can be merged.
+   * @param options Type also exported as `TextEqualsOptions`
+   * @category Queries
    */
-  equals: (text: Text, another: Text, options?: TextEqualsOptions) => boolean
+  equals(text: Text, another: Text, options?: TextEqualsOptions): boolean
 
   /**
    * Check if a value implements the `Text` interface.
+   * @category Type Guards
    */
-  isText: (value: any) => value is Text
+  isText(value: any): value is Text
 
   /**
    * Check if a value is a list of `Text` objects.
+   * @category Type Guards
    */
-  isTextList: (value: any) => value is Text[]
+  isTextList(value: any): value is Text[]
 
   /**
    * Check if some props are a partial of Text.
+   * @category Type Guards
    */
-  isTextProps: (props: any) => props is Partial<Text>
+  isTextProps(props: any): props is Partial<Text>
 
   /**
-   * Check if an text matches set of properties.
+   * Check if `text` matches a set of `props`.
    *
-   * Note: this is for matching custom properties, and it does not ensure that
-   * the `text` property are two nodes equal.
+   * The way the check works is that it makes sure that (a) all the `props` exist in the `text`, and (b) if it exists, that it exactly matches the properties in the `text`.
+   * If a `props.text` property is passed in, it will be ignored.
+   * If there are properties in `text` that are not in `props`, those will be ignored when it comes to testing for a match.
+   * @category Queries
    */
-  matches: (text: Text, props: Partial<Text>) => boolean
+  matches(text: Text, props: Partial<Text>): boolean
 
   /**
    * Get the leaves for a text node given decorations.
+   * @category Queries
    */
-  decorations: (
+  decorations(
     node: Text,
     decorations: DecoratedRange[]
-  ) => { leaf: Text; position?: LeafPosition }[]
+  ): { leaf: Text; position?: LeafPosition }[]
 }
 
 const omitText = ({ text, ...rest }: Text) => rest

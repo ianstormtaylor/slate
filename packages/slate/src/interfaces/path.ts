@@ -13,17 +13,19 @@ import { TextDirection } from '../types/types'
  * a Slate node tree. Although they are usually relative to the root `Editor`
  * object, they can be relative to any `Node` object.
  */
-
 export type Path = number[]
 
+/** @hidden @inline */
 export interface PathAncestorsOptions {
   reverse?: boolean
 }
 
+/** @hidden @inline */
 export interface PathLevelsOptions {
   reverse?: boolean
 }
 
+/** @hidden @inline */
 export interface PathTransformOptions {
   affinity?: TextDirection | null
 }
@@ -34,13 +36,16 @@ export interface PathInterface {
    *
    * The paths are sorted from shallowest to deepest ancestor. However, if the
    * `reverse: true` option is passed, they are reversed.
+   * @param options Type also exported as `PathAncestorsOptions`
+   * @category Relational
    */
-  ancestors: (path: Path, options?: PathAncestorsOptions) => Path[]
+  ancestors(path: Path, options?: PathAncestorsOptions): Path[]
 
   /**
    * Get the common ancestor path of two paths.
+   * @category Relational
    */
-  common: (path: Path, another: Path) => Path
+  common(path: Path, another: Path): Path
 
   /**
    * Compare a path to another, returning an integer indicating whether the path
@@ -48,79 +53,94 @@ export interface PathInterface {
    *
    * Note: Two paths of unequal length can still receive a `0` result if one is
    * directly above or below the other. If you want exact matching, use
-   * [[Path.equals]] instead.
+   * {@link Path.equals} instead.
+   * @category Comparison
    */
-  compare: (path: Path, another: Path) => -1 | 0 | 1
+  compare(path: Path, another: Path): -1 | 0 | 1
 
   /**
    * Check if a path ends after one of the indexes in another.
+   * @category Comparison
    */
-  endsAfter: (path: Path, another: Path) => boolean
+  endsAfter(path: Path, another: Path): boolean
 
   /**
    * Check if a path ends at one of the indexes in another.
+   * @category Comparison
    */
-  endsAt: (path: Path, another: Path) => boolean
+  endsAt(path: Path, another: Path): boolean
 
   /**
    * Check if a path ends before one of the indexes in another.
+   * @category Comparison
    */
-  endsBefore: (path: Path, another: Path) => boolean
+  endsBefore(path: Path, another: Path): boolean
 
   /**
    * Check if a path is exactly equal to another.
+   * @category Comparison
    */
-  equals: (path: Path, another: Path) => boolean
+  equals(path: Path, another: Path): boolean
 
   /**
    * Check if the path of previous sibling node exists
+   * @category Queries
    */
-  hasPrevious: (path: Path) => boolean
+  hasPrevious(path: Path): boolean
 
   /**
    * Check if a path is after another.
+   * @category Comparison
    */
-  isAfter: (path: Path, another: Path) => boolean
+  isAfter(path: Path, another: Path): boolean
 
   /**
    * Check if a path is an ancestor of another.
+   * @category Comparison
    */
-  isAncestor: (path: Path, another: Path) => boolean
+  isAncestor(path: Path, another: Path): boolean
 
   /**
    * Check if a path is before another.
+   * @category Comparison
    */
-  isBefore: (path: Path, another: Path) => boolean
+  isBefore(path: Path, another: Path): boolean
 
   /**
    * Check if a path is a child of another.
+   * @category Comparison
    */
-  isChild: (path: Path, another: Path) => boolean
+  isChild(path: Path, another: Path): boolean
 
   /**
    * Check if a path is equal to or an ancestor of another.
+   * @category Comparison
    */
-  isCommon: (path: Path, another: Path) => boolean
+  isCommon(path: Path, another: Path): boolean
 
   /**
    * Check if a path is a descendant of another.
+   * @category Comparison
    */
-  isDescendant: (path: Path, another: Path) => boolean
+  isDescendant(path: Path, another: Path): boolean
 
   /**
    * Check if a path is the parent of another.
+   * @category Comparison
    */
-  isParent: (path: Path, another: Path) => boolean
+  isParent(path: Path, another: Path): boolean
 
   /**
    * Check is a value implements the `Path` interface.
+   * @category Type Guards
    */
-  isPath: (value: any) => value is Path
+  isPath(value: any): value is Path
 
   /**
    * Check if a path is a sibling of another.
+   * @category Comparison
    */
-  isSibling: (path: Path, another: Path) => boolean
+  isSibling(path: Path, another: Path): boolean
 
   /**
    * Get a list of paths at every level down to a path. Note: this is the same
@@ -128,24 +148,28 @@ export interface PathInterface {
    *
    * The paths are sorted from shallowest to deepest. However, if the `reverse:
    * true` option is passed, they are reversed.
+   * @param options Type also exported as `PathLevelsOptions`
+   * @category Relational
    */
-  levels: (path: Path, options?: PathLevelsOptions) => Path[]
+  levels(path: Path, options?: PathLevelsOptions): Path[]
 
   /**
-   * Given a path, get the path to the next sibling node.
+   * Given a path, get the path to the next sibling node. The method does not
+   * ensure that the returned `Path` is valid in the document.
+   * @category Relational
    */
-  next: (path: Path) => Path
+  next(path: Path): Path
 
   /**
    * Returns whether this operation can affect paths or not. Used as an
    * optimization when updating dirty paths during normalization
    *
-   * NOTE: This *must* be kept in sync with the implementation of 'transform'
+   * @privateRemarks This *must* be kept in sync with the implementation of 'transform'
    * below
    */
-  operationCanTransformPath: (
+  operationCanTransformPath(
     operation: Operation
-  ) => operation is
+  ): operation is
     | InsertNodeOperation
     | RemoveNodeOperation
     | MergeNodeOperation
@@ -154,27 +178,39 @@ export interface PathInterface {
 
   /**
    * Given a path, return a new path referring to the parent node above it.
+   * If the `path` argument is equal to `[]`, throws an error.
+   * @category Relational
    */
-  parent: (path: Path) => Path
+  parent(path: Path): Path
 
   /**
-   * Given a path, get the path to the previous sibling node.
+   * Given a path, get the path to the previous sibling node. The method will
+   * throw an error if there are no previous siblings (e.g. if the Path is
+   * currently `[1, 0]`, the previous path would be `[1, -1]` which is illegal
+   * and will throw an error).
+   * @category Relational
    */
-  previous: (path: Path) => Path
+  previous(path: Path): Path
 
   /**
-   * Get a path relative to an ancestor.
+   * Given two paths, one that is an ancestor to the other, returns the
+   * relative path from the `ancestor` argument to the `path` argument. If the
+   * `ancestor` path is not actually an ancestor or equal to the `path`
+   * argument, throws an error.
+   * @category Relational
    */
-  relative: (path: Path, ancestor: Path) => Path
+  relative(path: Path, ancestor: Path): Path
 
   /**
    * Transform a path by an operation.
+   * @param options Type also exported as `PathTransformOptions`
+   * @category Relational
    */
-  transform: (
+  transform(
     path: Path,
     operation: Operation,
     options?: PathTransformOptions
-  ) => Path | null
+  ): Path | null
 }
 
 // eslint-disable-next-line no-redeclare

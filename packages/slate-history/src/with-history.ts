@@ -4,15 +4,19 @@ import { HistoryEditor } from './history-editor'
 import { rebaseHistory } from './rebase'
 
 /**
- * The `withHistory` plugin keeps track of the operation history of a Slate
- * editor as operations are applied to it, using undo and redo stacks.
+ * Adds the `HistoryEditor` interface to an `Editor` instance and keeps track of each operation applied to it, so they can be undone and redone.
  *
- * If you are using TypeScript, you must extend Slate's CustomTypes to use
- * this plugin.
+ * If you are using TypeScript, you must extend Slate's CustomTypes to use this plugin. See https://docs.slatejs.org/concepts/11-typescript to learn how.
  *
- * See https://docs.slatejs.org/concepts/11-typescript to learn how.
+ * The plugin also overrides `editor.setChildren`. Each `Transforms.setChildren` call starts its own undo batch, including normalization, and does not merge with typing before or after the external update. A deep-equal update creates no history entry.
+ *
+ * When used with `withReact`, `withHistory` should be applied inside, see example below.
+ *
+ * @example
+ * ```javascript
+ * const [editor] = useState(() => withReact(withHistory(createEditor())))
+ * ```
  */
-
 export const withHistory = <T extends Editor>(editor: T) => {
   const e = editor as T & HistoryEditor
   const { apply, normalize, setChildren } = e

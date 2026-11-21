@@ -2,6 +2,7 @@ import { Editor, EditorInterface } from '../interfaces/editor'
 import { getSymbolDispose } from '../utils/symbol-dispose'
 import { PathRef } from '../interfaces/path-ref'
 
+/** @ignore */
 export const pathRef: EditorInterface['pathRef'] = (
   editor,
   path,

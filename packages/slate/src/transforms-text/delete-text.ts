@@ -135,6 +135,7 @@ const clampToIsolation = (
     : Editor.end(editor, isolatedPath)
 }
 
+/** @ignore */
 export const deleteText: TextTransforms['delete'] = (editor, options = {}) => {
   Editor.withoutNormalizing(editor, () => {
     const {
