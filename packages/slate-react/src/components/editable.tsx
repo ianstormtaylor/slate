@@ -400,7 +400,9 @@ export const Editable = forwardRef(
                   !androidInputManager?.isFlushing()
                 ) {
                   const isCaretOutsideText =
-                    domSelection.isCollapsed && !isInSlateText(anchorNode)
+                    domSelection.isCollapsed &&
+                    !isInSlateText(anchorNode) &&
+                    !isFormControl(activeElement)
 
                   if (
                     isCaretOutsideText &&
@@ -2536,6 +2538,13 @@ const isInSlateText = (node: unknown) =>
   isDOMNode(node) &&
   node.nodeType === node.TEXT_NODE &&
   !!node.parentElement?.closest('[data-slate-string], [data-slate-zero-width]')
+
+// A focused <input> or <textarea>, such as one inside an editable void, reports
+// its parent as the DOM selection. That is not a stray caret, so restoring the
+// editor's selection would take the selection away from the control.
+const isFormControl = (node: unknown) =>
+  isDOMElement(node) &&
+  (node.tagName === 'INPUT' || node.tagName === 'TEXTAREA')
 
 const restoreDomSelection = (
   editor: ReactEditor,
