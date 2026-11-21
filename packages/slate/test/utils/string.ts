@@ -190,6 +190,10 @@ describe(`getWordDistance - ltr`, () => {
       assert.strictEqual(getWordDistance(str), dist)
     })
   })
+
+  it('handles long sequences of chameleon characters without stack overflow', () => {
+    assert.strictEqual(getWordDistance("'".repeat(15000)), 15000)
+  })
 })
 
 describe(`getWordDistance - rtl`, () => {
@@ -197,6 +201,10 @@ describe(`getWordDistance - rtl`, () => {
     it(str, () => {
       assert.strictEqual(getWordDistance(str, true), dist)
     })
+  })
+
+  it('handles long sequences of chameleon characters without stack overflow', () => {
+    assert.strictEqual(getWordDistance("'".repeat(15000), true), 15000)
   })
 })
 

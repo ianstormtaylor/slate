@@ -225,15 +225,20 @@ export const splitByCharacterDistance = (
 const isWordCharacter = (
   char: string,
   remaining: string,
-  isRTL = false
+  isRTL = false,
+  depth = 0
 ): boolean => {
-  if (SPACE.test(char)) {
+  if (!char || SPACE.test(char)) {
     return false
   }
 
   // Chameleons count as word characters as long as they're in a word, so
   // recurse to see if the next one is a word character or not.
   if (CHAMELEON.test(char)) {
+    if (depth > 0 || !remaining) {
+      return false
+    }
+
     const charDist = getCharacterDistance(remaining, isRTL)
     const [nextChar, nextRemaining] = splitByCharacterDistance(
       remaining,
@@ -241,7 +246,7 @@ const isWordCharacter = (
       isRTL
     )
 
-    if (isWordCharacter(nextChar, nextRemaining, isRTL)) {
+    if (isWordCharacter(nextChar, nextRemaining, isRTL, depth + 1)) {
       return true
     }
   }
