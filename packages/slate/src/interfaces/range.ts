@@ -147,7 +147,8 @@ export const Range: RangeInterface = {
     if (!intersectionRange) {
       return false
     }
-    return Range.equals(intersectionRange, target)
+    const [start, end] = Range.edges(target)
+    return Range.equals(intersectionRange, { anchor: start, focus: end })
   },
 
   includes(range: Range, target: Location): boolean {
