@@ -1,6 +1,6 @@
 import React from 'react'
 import { createEditor, Transforms } from 'slate'
-import { act, renderHook } from '@testing-library/react'
+import { act, render, renderHook } from '@testing-library/react'
 import { Slate, withReact, Editable, useSlateSelector } from '../src'
 import _ from 'lodash'
 
@@ -56,5 +56,44 @@ describe('useSlateSelector', () => {
 
     // Return values should have referential equality because of the custom equality function
     expect(firstResult).toBe(result.current)
+  })
+
+  test('discards queued updates when a deferred selector unmounts', async () => {
+    const editor = withReact(createEditor())
+    const initialValue = [{ children: [{ text: 'test' }] }]
+    const activeSelector = jest.fn(() => false)
+    const removedSelector = jest.fn(() => false)
+
+    const DeferredSelector = ({ selector }: { selector: () => boolean }) => {
+      useSlateSelector(selector, undefined, { deferred: true })
+      return null
+    }
+
+    const renderSlate = (
+      showRemovedSelector: boolean,
+      showEditable: boolean
+    ) => (
+      <Slate editor={editor} initialValue={initialValue}>
+        <DeferredSelector selector={activeSelector} />
+        {showRemovedSelector && <DeferredSelector selector={removedSelector} />}
+        {showEditable && <Editable />}
+      </Slate>
+    )
+
+    const { rerender } = render(renderSlate(true, false))
+    activeSelector.mockClear()
+    removedSelector.mockClear()
+
+    await act(async () => {
+      Transforms.insertText(editor, '!', { at: { path: [0, 0], offset: 4 } })
+    })
+    expect(activeSelector).not.toHaveBeenCalled()
+    expect(removedSelector).not.toHaveBeenCalled()
+
+    rerender(renderSlate(false, false))
+    rerender(renderSlate(false, true))
+
+    expect(activeSelector).toHaveBeenCalledTimes(1)
+    expect(removedSelector).not.toHaveBeenCalled()
   })
 })
