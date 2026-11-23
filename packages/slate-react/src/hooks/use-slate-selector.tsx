@@ -106,6 +106,9 @@ export function useSelectorContext() {
 
       return () => {
         eventListeners.current.delete(callback)
+        if (deferred) {
+          deferredEventListeners.current.delete(callbackProp)
+        }
       }
     },
     []
